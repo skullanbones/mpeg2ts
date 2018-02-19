@@ -13,6 +13,9 @@ COMPONENT_NAME ?= ts-lib
 all:
 	g++ main.cc TsParser.cc GetBits.cc -std=c++11 -o tsparser
 
+lint:
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\)' -exec clang-format-5.0 -style=file -i {} \;
+
 clean:
 	rm *.o
 	rm tsparser
