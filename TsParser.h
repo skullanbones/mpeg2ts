@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include "TsPacketInfo.h"
+#include "GetBits.h"
 
 const int TS_PACKET_SYNC_BYTE = 0x47;
 const int TS_PACKET_SIZE = 188;
@@ -104,16 +105,8 @@ struct TsAdaptationFieldExtensionHeader {
 };
 
 
-class TsParser {
+class TsParser : GetBits {
 public:
-
-    /*!
-     * Parses maximum 64 bits by bit from data and returns results
-     * @param requestedBits Number of bits to parse
-     * @param data Data to parse
-     * @return Parsed bits
-     */
-    uint64_t getBits(uint8_t requestedBits, const uint8_t* data);
 
     /*!
     * Parse information about one ts-packet to find useful information
@@ -175,10 +168,4 @@ public:
 private:
     uint64_t mPacketErrorCounter; // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
-
-
-    /// Bitreader data
-    uint8_t mNumStoredBits = 0;
-    uint8_t mBitStore = 0;
-    uint8_t mSrcInx = 0;
 };
