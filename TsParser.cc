@@ -6,33 +6,9 @@
 #include <stdio.h>
 #include <iostream>
 
-
-uint64_t TsParser::getBits(uint8_t requestedBits, const uint8_t* data)
-{
-    uint64_t ret = 0;
-
-    while(requestedBits)
-    {
-        uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
-        ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
-
-        requestedBits -= bitsToFromStore;
-        mNumStoredBits -= bitsToFromStore;
-        mBitStore <<= bitsToFromStore;
-
-        if (mNumStoredBits == 0)
-        {
-            mNumStoredBits = 8;
-            mBitStore = data[mSrcInx++];
-        }
-    }
-
-    return ret;
-};
-
-
 void TsParser::parseTsPacketInfo(const uint8_t *packet, TsPacketInfo &outInfo)
 {
+    resetBits(packet,  TS_PACKET_SIZE - 1);
     TsHeader hdr = parseTsHeader(packet);
     outInfo.pid = hdr.PID;
     outInfo.errorIndicator = hdr.transport_error_indicator;
@@ -60,18 +36,15 @@ bool TsParser::checkSyncByte(const uint8_t* byte)
 TsHeader TsParser::parseTsHeader(const uint8_t *packet)
 {
     TsHeader hdr;
-    mSrcInx = 0;
-    mNumStoredBits = 0;
-    mBitStore = 0;
 
-    hdr.sync_byte = getBits(8, packet);
-    hdr.transport_error_indicator = getBits(1, packet);
-    hdr.payload_unit_start_indicator = getBits(1, packet);
-    hdr.transport_priority = getBits(1, packet);
-    hdr.PID = getBits(13, packet);
-    hdr.transport_scrambling_control = getBits(2, packet);
-    hdr.adaptation_field_control = getBits(2, packet);
-    hdr.continuity_counter = getBits(4, packet);
+    hdr.sync_byte = getBits(8);
+    hdr.transport_error_indicator = getBits(1);
+    hdr.payload_unit_start_indicator = getBits(1);
+    hdr.transport_priority = getBits(1);
+    hdr.PID = getBits(13);
+    hdr.transport_scrambling_control = getBits(2);
+    hdr.adaptation_field_control = getBits(2);
+    hdr.continuity_counter = getBits(4);
 //    std::cout << hdr << std::endl;
     return hdr;
 }
@@ -138,14 +111,12 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     uint64_t pcr_base = 0;
     uint16_t pcr_extension = 0;
 
-    mSrcInx = 0;
-    mNumStoredBits = 0;
-    mBitStore = 0;
+    resetBits(buffer, TS_PACKET_SIZE); //TODO: set right size
 
-    pcr_base = getBits(33, buffer);
-    int reserved = getBits(6, buffer);
+    pcr_base = getBits(33);
+    int reserved = getBits(6);
 
-    pcr_extension = getBits(9, buffer);
+    pcr_extension = getBits(9);
     pcr_base = pcr_base * 300;
 
     // 9 bits

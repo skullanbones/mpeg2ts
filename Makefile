@@ -11,7 +11,7 @@ COMPONENT_NAME ?= ts-lib
 .PHONY: all clean
 
 all:
-	g++ main.cc TsParser.cc -std=c++11 -o tsparser
+	g++ main.cc TsParser.cc GetBits.cc -std=c++11 -o tsparser
 
 clean:
 	rm *.o
