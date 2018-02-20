@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install --yes \
         build-essential \
         clang-format-5.0 \
         tstools \
-        git
+        git \
+        gdb
 
 WORKDIR /tmp/workspace
