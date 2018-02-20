@@ -11,7 +11,7 @@ BinPackParameters: false
 BreakBeforeBinaryOperators: false
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: false
-BreakConstructorInitializersBeforeComma: false
+BreakConstructorInitializersBeforeComma: true
 ColumnLimit: 100
 CommentPragmas: ''
 ConstructorInitializerAllOnOneLineOrOnePerLine: false

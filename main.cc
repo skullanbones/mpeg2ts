@@ -2,10 +2,10 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
-#include <iostream>
-#include <stdio.h>
 #include <cstdlib>
+#include <iostream>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <unistd.h>
@@ -19,7 +19,8 @@
 unsigned long count = 0;
 unsigned long countAdaptPacket = 0;
 
-int main(int, char **) {
+int main(int, char**)
+{
     std::cout << "Staring parser of stdout" << std::endl;
 
     unsigned long count;
@@ -40,7 +41,8 @@ int main(int, char **) {
     std::cout << std::is_pod<TsHeader>::value << '\n';
     std::cout << std::is_pod<TsAdaptationFieldHeader>::value << '\n';
 
-    for (count = 0;; ++count) {
+    for (count = 0;; ++count)
+    {
 
         unsigned char packet[TS_PACKET_SIZE];
         // SYNC
@@ -49,17 +51,18 @@ int main(int, char **) {
 
 
         b = getchar();
-        while (b != TS_PACKET_SYNC_BYTE) {
+        while (b != TS_PACKET_SYNC_BYTE)
+        {
             b = getchar();
-            if (b == EOF) {
+            if (b == EOF)
+            {
                 std::cout << "End Of File..." << std::endl;
                 std::cout << "Found " << count << " ts-packets." << std::endl;
-                std::cout << "Found Adaptation Field packets:" << countAdaptPacket
-                          << " ts-packets." << std::endl;
+                std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets."
+                          << std::endl;
                 return EXIT_SUCCESS;
             }
         }
-
 
 
         /*
@@ -79,19 +82,22 @@ int main(int, char **) {
         packet[0] = b;
 
         // Read TS Packet from stdin
-        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
-        //memcpy(packet, &buffer[position], TS_PACKET_SIZE);
-
+        size_t res =
+        fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        // memcpy(packet, &buffer[position], TS_PACKET_SIZE);
 
 
         tsParser.parseTsPacketInfo(packet, tsPacketInfo);
         std::cout << tsPacketInfo.toString() << std::endl;
-        if (tsPacketInfo.hasAdaptationField) {
+        if (tsPacketInfo.hasAdaptationField)
+        {
             //      printf("found packet with adaptation field");
             countAdaptPacket++;
 
-            if (countAdaptPacket == 1) {
-                for (int i = 0; i < TS_PACKET_SIZE; i++) {
+            if (countAdaptPacket == 1)
+            {
+                for (int i = 0; i < TS_PACKET_SIZE; i++)
+                {
                     //	  printf("0x%1x, ", packet[i]);
                 }
             }
