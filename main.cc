@@ -12,6 +12,7 @@
 
 #include "TsPacketInfo.h"
 #include "TsParser.h"
+#include "TsDemuxer.h"
 
 #include <type_traits>
 
@@ -90,6 +91,22 @@ unsigned char packet_3[] = { 0x47, 0x41, 0x21, 0x1c, 0x00, 0x00, 0x01, 0xe0, 0x0
 unsigned long count = 0;
 unsigned long countAdaptPacket = 0;
 
+void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
+{
+    (void)packet;
+    std::cout << "demuxed TS packet \n" << tsPacketInfo.toString();
+}
+
+void PSICallback(const PsiTable& table)
+{
+    std::cout << "demuxed PSI table \n" << table.id;
+}
+
+void PESCallback(const PesPacket& pes)
+{
+    std::cout << "demuxed PES packet \n";
+}
+
 int main(int, char**)
 {
     std::cout << "Staring parser of stdout" << std::endl;
@@ -106,6 +123,10 @@ int main(int, char**)
 
     TsPacketInfo tsPacketInfo = { 0 };
     TsParser tsParser;
+    
+    TsDemuxer tsDemux;
+    tsDemux.addPid(0, std::bind(&PSICallback, std::placeholders::_1));
+
     TsAdaptationFieldHeader fieldHeader;
 
     std::cout << std::boolalpha;

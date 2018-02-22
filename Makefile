@@ -13,7 +13,7 @@ DOCKER_IMAGE_NAME ?= tslib-docker-image
 .PHONY: all clean lint docker-image docker-bash
 
 all:
-	g++ main.cc TsParser.cc GetBits.cc -std=c++11 -o tsparser
+	g++ main.cc TsParser.cc GetBits.cc TsDemuxer.cc -std=c++11 -o tsparser
 
 lint:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\)' -exec clang-format-5.0 -style=file -i {} \;
