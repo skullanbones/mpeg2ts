@@ -17,6 +17,7 @@ public:
     bool errorIndicator;    // If indication of at least 1 uncorrectable bit in ts-packet
     bool isPayloadStart;    // If this packet is the first in a PES-packet.
     bool hasAdaptationField;// If this packet contains adaptation field data.
+    bool hasPayload;        // If this packet contains payload.
     bool hasPrivateData;    // If this packet contains private data.
     bool hasRandomAccess;   // If this packet contain aid random access.
     bool isScrambled;       // If this packet is scrambled
@@ -36,8 +37,8 @@ public:
     uint32_t privateDataOffset;
 
     // Payload data:
-    size_t PayloadSize;  // The size of the payload
-    uint8_t PayloadStartOffset; // Offset from and sync byte to start of payload.
+    size_t payloadSize;  // The size of the payload
+    uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
 
 
@@ -46,14 +47,19 @@ public:
         std::ostringstream ss;
         ss << "-------------TsPacketInfo------------- " << std::endl;
         ss << "PID: " << pid << std::endl;
-//        ss << "isPayloadOnly: " << isPayloadOnly << std::endl;
-        ss << "hasPrivateData: " << hasPrivateData << std::endl;
         ss << "hasAdaptationField: " << hasAdaptationField << std::endl;
         ss << "pcr: " << pcr << std::endl;
         ss << "opcr: " << opcr << std::endl;
-        ss << "privateDataSize: " << privateDataSize << std::endl;
-        ss << "privateDataOffset: " << privateDataOffset << std::endl;
-//        ss << "payloadStartOffset: " << payloadStartOffset << std::endl;
+        if (hasPrivateData)
+        {
+            ss << "privateDataSize: " << privateDataSize << std::endl;
+            ss << "privateDataOffset: " << privateDataOffset << std::endl;
+        }
+        if (hasPayload)
+        {
+            ss << "payloadSize: " << payloadSize << std::endl;
+            ss << "payloadStartOffset: " << (int)payloadStartOffset << std::endl;
+        }
         return ss.str();
     }
 };
