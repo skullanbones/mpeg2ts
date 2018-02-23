@@ -1,18 +1,16 @@
 #include "GetBits.h"
 
 GetBits::GetBits()
-    : mNumStoredBits{0}
-    , mBitStore{0}
-    , mSrcInx{0}
-    , mSize{0}
-    ,mSrcBytes{0}
+: mNumStoredBits{ 0 }
+, mBitStore{ 0 }
+, mSrcInx{ 0 }
+, mSize{ 0 }
+, mSrcBytes{ 0 }
 {
-
 }
 
 GetBits::~GetBits()
 {
-
 }
 
 uint64_t GetBits::getBits(uint8_t requestedBits)
@@ -23,8 +21,8 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
     {
         throw GetBitsException("null input data");
     }
-    
-    while(requestedBits)
+
+    while (requestedBits)
     {
         uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
         ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
@@ -48,7 +46,7 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
     return ret;
 };
 
-void GetBits::resetBits(const uint8_t *srcBytes, size_t srcSize)
+void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize)
 {
     mNumStoredBits = 0;
     mBitStore = 0;
@@ -58,13 +56,10 @@ void GetBits::resetBits(const uint8_t *srcBytes, size_t srcSize)
 }
 
 GetBitsException::GetBitsException(const std::string msg)
-    : mMsg{msg}
+: mMsg{ msg }
 {
-
 }
 
 GetBitsException::~GetBitsException()
 {
-
 }
-
