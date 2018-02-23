@@ -10,9 +10,9 @@
 
 #include <unistd.h>
 
+#include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsParser.h"
-#include "TsDemuxer.h"
 
 #include <type_traits>
 
@@ -123,7 +123,7 @@ int main(int, char**)
 
     TsPacketInfo tsPacketInfo = { 0 };
     TsParser tsParser;
-    
+
     TsDemuxer tsDemux;
     tsDemux.addPid(0, std::bind(&PSICallback, std::placeholders::_1));
 

@@ -12,13 +12,12 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
-#include <stdint.h>
 #include "TsDemuxer.h"
 #include "GetBits.h"
+#include <stdint.h>
 
 TsDemuxer::TsDemuxer()
 {
-
 }
 
 void TsDemuxer::demux(const unsigned char* packet, const TsPacketInfo& tsPacketInfo)
@@ -26,7 +25,7 @@ void TsDemuxer::demux(const unsigned char* packet, const TsPacketInfo& tsPacketI
     if (mCallbackMap.find(tsPacketInfo.pid) != mCallbackMap.end())
     {
         PsiTable table;
-        //TODO: gatehr whole teble and send it then
+        // TODO: gatehr whole teble and send it then
         mCallbackMap[tsPacketInfo.pid](table);
     }
 }
