@@ -6,7 +6,6 @@ GetBits::GetBits()
 , mSrcInx{ 0 }
 , mSize{ 0 }
 , mSrcBytes{ 0 }
-GetBits::GetBits() : mNumStoredBits{ 0 }, mBitStore{ 0 }, mSrcInx{ 0 }, mSize{ 0 }, mSrcBytes{ 0 }
 {
 }
 
