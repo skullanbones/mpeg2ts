@@ -11,6 +11,20 @@
 TEST(TsParserConstants, CheckConstants)
 {
     EXPECT_EQ(TS_PACKET_HEADER_SIZE, 4);
+    EXPECT_EQ(TS_PACKET_SIZE, 188);
+    EXPECT_EQ(TS_PACKET_SYNC_BYTE, 0x47);
+    EXPECT_EQ(TS_PACKET_MAX_PAYLOAD_SIZE, 184);
+    EXPECT_EQ(TS_PACKET_PID_PAT, 0);
+    EXPECT_EQ(TS_PACKET_PID_NULL, 0x1fff);
+    EXPECT_EQ(PCR_SIZE, 6);
+    EXPECT_EQ(OPCR_SIZE, 6);
+}
+
+TEST(TsParserConstants, CheckSyncByte)
+{
+    TsParser parser;
+    const uint8_t packet_data[TS_PACKET_SIZE] = {0x47};
+    EXPECT_TRUE(parser.checkSyncByte(packet_data));
 }
 
 TEST(MathTest, TwoPlusTwoEqualsFour) {

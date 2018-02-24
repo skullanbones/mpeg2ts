@@ -119,7 +119,7 @@ int main(int, char**)
     //  char buffer[200*10224*1024];
     //  setbuf(stdin, buffer);
 
-    unsigned long position = 0;
+    // unsigned long position = 0;
 
     TsPacketInfo tsPacketInfo = { 0 };
     TsParser tsParser;
@@ -127,7 +127,7 @@ int main(int, char**)
     TsDemuxer tsDemux;
     tsDemux.addPid(0, std::bind(&PATCallback, std::placeholders::_1));
 
-    TsAdaptationFieldHeader fieldHeader;
+//    TsAdaptationFieldHeader fieldHeader;
 
     std::cout << std::boolalpha;
     std::cout << std::is_pod<TsHeader>::value << '\n';
@@ -180,8 +180,8 @@ int main(int, char**)
         packet[0] = b;
 
         // Read TS Packet from stdin
-        size_t res =
-        fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        (void) res;
         // memcpy(packet, &buffer[position], TS_PACKET_SIZE);
 
 
