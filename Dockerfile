@@ -14,6 +14,18 @@ RUN apt-get update && apt-get install --yes \
         clang-format-5.0 \
         tstools \
         git \
-        gdb
+        gdb \
+        gdbserver \
+        cmake
 
+# Install gtest/gmock
+COPY ./3rd-party/gtest/release-1.8.0.tar.gz /tmp
+WORKDIR /tmp
+RUN tar xvzf release-1.8.0.tar.gz
+WORKDIR googletest-release-1.8.0/
+RUN cmake -DBUILD_SHARED_LIBS=ON .
+RUN make
+RUN cp -a googletest/include/gtest /usr/include
+RUN cp -a googlemock/include/gmock /usr/include
+RUN cp -a googlemock/gtest/libgtest_main.so googlemock/gtest/libgtest.so /usr/lib/
 WORKDIR /tmp/workspace

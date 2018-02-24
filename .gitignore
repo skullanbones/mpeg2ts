@@ -31,5 +31,8 @@
 *.out
 *.app
 
-# Added by skullanbones
+
+# Project specific files
 tsparser
+tests/gtests
+
