@@ -1,5 +1,5 @@
 CC = g++
-INC := -I$(PROJ_ROOT) -I$(CURDIR)
+INC := -I$(PROJ_ROOT) -I$(CURDIR) -I$(INCDIR)
 TESTS_NAME := gtests
 
 .PHONY: all clean

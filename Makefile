@@ -11,12 +11,15 @@ DOCKER_IMAGE_VER ?= v1
 DOCKER_IMAGE_NAME ?= tslib-docker-image
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
-CC = g++
+CXX = g++
 STATIC = libts.a
-CFLAGS = -Wall -Winline -pipe -std=c++11
+CXXFLAGS = -Wall -Winline -pipe -std=c++11
+SRCDIR = $(PROJ_ROOT)/src
+INCDIR = $(PROJ_ROOT)/include
+export INCDIR
 
 
-SRC = TsParser.cc GetBits.cc TsDemuxer.cc
+SRC = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
 OBJ = $(SRC:.cc=.o)
 
 docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
@@ -26,14 +29,14 @@ docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(D
 all: tsparser
 
 tsparser: main.o $(OBJ) $(STATIC)
-	$(CC) -o $@ main.o -L. -lts
+	$(CXX) -o $@ main.o -L. -lts
 
-main.o: main.cc
-	$(CC) -c $(CFLAGS) main.cc
+main.o: $(SRCDIR)/main.cc
+	$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
 .cc.o:
 	@echo [Compile] $<
-	@$(CC) -c $(CFLAGS) $< -o $@
+	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
 $(STATIC): $(OBJ)
 	@echo "[Link (Static)]"
