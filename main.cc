@@ -97,9 +97,9 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
     std::cout << "demuxed TS packet \n" << tsPacketInfo.toString();
 }
 
-void PSICallback(const PsiTable& table)
+void PATCallback(const PsiTable& table)
 {
-    std::cout << "demuxed PSI table \n" << table.id;
+    std::cout << "demuxed PAT table \n" << table.id;
 }
 
 void PESCallback(const PesPacket& pes)
@@ -125,7 +125,7 @@ int main(int, char**)
     TsParser tsParser;
 
     TsDemuxer tsDemux;
-    tsDemux.addPid(0, std::bind(&PSICallback, std::placeholders::_1));
+    tsDemux.addPid(0, std::bind(&PATCallback, std::placeholders::_1));
 
     TsAdaptationFieldHeader fieldHeader;
 
@@ -186,7 +186,7 @@ int main(int, char**)
 
 
         tsParser.parseTsPacketInfo(packet, tsPacketInfo);
-        std::cout << tsPacketInfo.toString() << std::endl;
+//        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet, tsPacketInfo);
 
