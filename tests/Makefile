@@ -1,13 +1,12 @@
-
 CC = g++
-
+INC := $(PROJ_ROOT)
+TESTS_NAME := gtests
 
 .PHONY: all clean
 
 all:
-	$(CC) TestTsParser.cc -I$(PROJ_ROOT) -lgtest
-	./a.out
-
+	$(CC) TestTsParser.cc -I$(INC) -lgtest -o $(TESTS_NAME)
+	./$(TESTS_NAME)
 
 clean:
-	a.out
+	rm $(TESTS_NAME)

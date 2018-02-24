@@ -10,6 +10,7 @@ COMPONENT_NAME ?= ts-lib
 DOCKER_IMAGE_VER ?= v1
 DOCKER_IMAGE_NAME ?= tslib-docker-image
 export PROJ_ROOT := $(CURDIR)
+SUBDIRS = tests
 CC = g++
 
 docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
@@ -35,6 +36,7 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
+# TODO check that docker-image exists...
 test:
 	$(call docker_command, gtests)
 
@@ -42,4 +44,5 @@ gtests:
 	$(MAKE) -C tests
 
 clean:
+	$(MAKE) -C $(SUBDIRS) clean
 	rm tsparser
