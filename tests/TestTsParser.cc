@@ -7,6 +7,7 @@
 
 /// Project files
 #include "TsParser.h"
+#include "TsPacketTestData.h"
 
 TEST(TsParserConstants, CheckConstants)
 {
@@ -25,6 +26,9 @@ TEST(TsParserConstants, CheckSyncByte)
     TsParser parser;
     const uint8_t packet_data[TS_PACKET_SIZE] = {0x47};
     EXPECT_TRUE(parser.checkSyncByte(packet_data));
+    EXPECT_TRUE(parser.checkSyncByte(packet_1));
+    EXPECT_TRUE(parser.checkSyncByte(packet_2));
+    EXPECT_TRUE(parser.checkSyncByte(packet_3));
 }
 
 TEST(MathTest, TwoPlusTwoEqualsFour) {
