@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install --yes \
         gdbserver \
         cmake
 
+# Install gtest/gmock
 COPY ./3rd-party/gtest/release-1.8.0.tar.gz /tmp
 WORKDIR /tmp
 RUN tar xvzf release-1.8.0.tar.gz
