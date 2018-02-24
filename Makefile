@@ -19,8 +19,8 @@ INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
 
-SRC = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
-OBJ = $(SRC:.cc=.o)
+SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
+OBJS = $(SRCS:.cc=.o)
 
 docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
@@ -28,7 +28,7 @@ docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(D
 
 all: tsparser
 
-tsparser: main.o $(OBJ) $(STATIC)
+tsparser: main.o $(OBJS) $(STATIC)
 	$(CXX) -o $@ main.o -L. -lts
 
 main.o: $(SRCDIR)/main.cc
@@ -38,7 +38,7 @@ main.o: $(SRCDIR)/main.cc
 	@echo [Compile] $<
 	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
-$(STATIC): $(OBJ)
+$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
@@ -66,6 +66,6 @@ gtests:
 	$(MAKE) -C tests
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJS)
 	rm tsparser
 	$(MAKE) -C $(SUBDIRS) clean

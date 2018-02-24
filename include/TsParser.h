@@ -17,7 +17,9 @@
 #include <stdint.h>
 #include "TsPacketInfo.h"
 #include "GetBits.h"
+#include "TsStandards.h"
 
+// TODO move out to TsStandards.h
 const int TS_PACKET_SYNC_BYTE = 0x47;
 const int TS_PACKET_SIZE = 188;
 const int TS_PACKET_HEADER_SIZE = 4;
@@ -164,6 +166,14 @@ public:
      * @return The PCR value.
      */
     uint64_t parsePcr(const uint8_t* buffer);
+
+    /*!
+     * Parses PAT table
+     * @param packet
+     * @param info
+     * @return
+     */
+    PsiTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
 
 private:
     uint64_t mPacketErrorCounter; // Wrong sync byte

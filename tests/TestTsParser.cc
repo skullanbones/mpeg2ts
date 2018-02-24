@@ -66,6 +66,21 @@ TEST(TsParserTests, CheckPid)
     // TODO add more tests...
 }
 
+TEST(TsParserTests, CheckParsePatPacket)
+{
+    TsParser parser;
+    // TsHeader hdr = parser.parseTsHeader(packet_1);
+
+    PsiTable pat;
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(pat_packet_1, info);
+    pat = parser.parsePatPacket(pat_packet_1, info);
+    EXPECT_EQ(0, info.pid); // TODO Should use constants..
+    EXPECT_EQ(0, pat.table_id); // TODO -"-
+//    EXPECT_EQ(598, pat.network_PID);
+    // TODO add more tests...
+}
+
 TEST(TsParserTests, CheckParseTsHeader)
 {
     TsParser parser;

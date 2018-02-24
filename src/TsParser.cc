@@ -51,7 +51,6 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
     hdr.transport_scrambling_control = getBits(2);
     hdr.adaptation_field_control = getBits(2);
     hdr.continuity_counter = getBits(4);
-    //    std::cout << hdr << std::endl;
     return hdr;
 }
 
@@ -84,22 +83,22 @@ bool TsParser::checkHasPayload(TsHeader hdr)
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
 {
-    TsAdaptationFieldHeader ret;
-    ret.adaptation_field_length = getBits(8);
-    if (ret.adaptation_field_length == 0)
+    TsAdaptationFieldHeader hdr;
+    hdr.adaptation_field_length = getBits(8);
+    if (hdr.adaptation_field_length == 0)
     {
-        return ret;
+        return hdr;
     }
-    ret.discontinuity_indicator = getBits(1);
-    ret.random_access_indicator = getBits(1);
-    ret.elementary_stream_priority_indicator = getBits(1);
-    ret.PCR_flag = getBits(1);
-    ret.OPCR_flag = getBits(1);
-    ret.splicing_point_flag = getBits(1);
-    ret.transport_private_data_flag = getBits(1);
-    ret.adaptation_field_extension_flag = getBits(1);
+    hdr.discontinuity_indicator = getBits(1);
+    hdr.random_access_indicator = getBits(1);
+    hdr.elementary_stream_priority_indicator = getBits(1);
+    hdr.PCR_flag = getBits(1);
+    hdr.OPCR_flag = getBits(1);
+    hdr.splicing_point_flag = getBits(1);
+    hdr.transport_private_data_flag = getBits(1);
+    hdr.adaptation_field_extension_flag = getBits(1);
 
-    return ret;
+    return hdr;
 }
 
 
@@ -183,4 +182,36 @@ std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
     ss << "adaptation_field_control: " << (int)rhs.adaptation_field_control << std::endl;
     ss << "continuity_counter: " << (int)rhs.continuity_counter << std::endl;
     return ss;
+}
+
+PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+{
+    PsiTable psi;
+    uint8_t pointerOffset = info.payloadStartOffset;
+
+    const uint8_t pointer_field = packet[pointerOffset];
+    pointerOffset += sizeof(pointer_field);
+    pointerOffset += pointer_field;
+
+    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
+    psi.table_id = getBits(8);
+    psi.section_syntax_indicator = getBits(1);
+    getBits(1); // '0'
+    getBits(2); // reserved
+    psi.section_length = getBits(12);
+    psi.transport_stream_id = getBits(16);
+    getBits(2);
+    psi.version_number = getBits(5);
+    psi.current_next_indicator = getBits(1);
+    psi.section_number = getBits(8);
+    psi.last_section_number = getBits(8);
+    psi.program_number = getBits(16);
+    psi.network_PID = getBits(13);
+    //const ProgramAssociationTable pat = *reinterpret_cast<const ProgramAssociationTable*>(&packet[pointerOffset]);
+
+
+    //TODO parse vector structure
+
+
+    return psi;
 }

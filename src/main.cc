@@ -27,7 +27,7 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(const PsiTable& table)
 {
-    std::cout << "demuxed PAT table \n" << table.id;
+    std::cout << "demuxed PAT table \n" << table.table_id;
 }
 
 void PESCallback(const PesPacket& pes)
