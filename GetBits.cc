@@ -24,13 +24,6 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
 
     while (requestedBits)
     {
-        uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
-        ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
-
-        requestedBits -= bitsToFromStore;
-        mNumStoredBits -= bitsToFromStore;
-        mBitStore <<= bitsToFromStore;
-
         if (mNumStoredBits == 0)
         {
             if (mSrcInx >= mSize)
@@ -41,16 +34,23 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
             mNumStoredBits = 8;
             mBitStore = mSrcBytes[mSrcInx++];
         }
+
+        uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
+        ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
+
+        requestedBits -= bitsToFromStore;
+        mNumStoredBits -= bitsToFromStore;
+        mBitStore <<= bitsToFromStore;
     }
 
     return ret;
 };
 
-void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize)
+void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
 {
     mNumStoredBits = 0;
     mBitStore = 0;
-    mSrcInx = 0;
+    mSrcInx = inx;
     mSize = srcSize;
     mSrcBytes = srcBytes;
 }
@@ -58,6 +58,11 @@ void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize)
 GetBitsException::GetBitsException(const std::string msg)
 : mMsg{ msg }
 {
+}
+
+size_t GetBits::getByteInx()
+{
+    return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
 }
 
 GetBitsException::~GetBitsException()

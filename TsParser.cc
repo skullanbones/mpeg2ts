@@ -8,12 +8,13 @@
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    resetBits(packet, TS_PACKET_SIZE - 1);
+    resetBits(packet, TS_PACKET_SIZE);
     TsHeader hdr = parseTsHeader(packet);
     outInfo.pid = hdr.PID;
     outInfo.errorIndicator = hdr.transport_error_indicator;
     outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
+    outInfo.hasPayload = checkHasPayload(hdr);
 
     if (outInfo.hasAdaptationField)
     {
@@ -23,6 +24,11 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
             outInfo.hasPrivateData = true;
         else
             outInfo.hasPrivateData = false;
+    }
+    if (outInfo.hasPayload)
+    {
+        outInfo.payloadSize = TS_PACKET_SIZE - getByteInx();
+        outInfo.payloadStartOffset = getByteInx();
     }
 }
 
@@ -63,58 +69,94 @@ bool TsParser::checkHasAdaptationField(TsHeader hdr)
     }
 }
 
-
-uint8_t TsParser::parseAdaptationFieldLength(TsHeader hdr, const uint8_t* packet)
+bool TsParser::checkHasPayload(TsHeader hdr)
 {
-    if (checkHasAdaptationField(hdr))
+    if (hdr.adaptation_field_control == ts_adaptation_field_control_payload_only ||
+        hdr.adaptation_field_control == ts_adaptation_field_control_adaptation_payload)
     {
-        return packet[TS_PACKET_HEADER_SIZE];
+        return true;
     }
-    return 0; // Length must be 0 if ts-packet doesn't have adaptation field
+    else
+    {
+        return false;
+    }
 }
-
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
 {
-    return *reinterpret_cast<const TsAdaptationFieldHeader*>(&packet[TS_PACKET_HEADER_SIZE]);
+    TsAdaptationFieldHeader ret;
+    ret.adaptation_field_length = getBits(8);
+    if (ret.adaptation_field_length == 0)
+    {
+        return ret;
+    }
+    ret.discontinuity_indicator = getBits(1);
+    ret.random_access_indicator = getBits(1);
+    ret.elementary_stream_priority_indicator = getBits(1);
+    ret.PCR_flag = getBits(1);
+    ret.OPCR_flag = getBits(1);
+    ret.splicing_point_flag = getBits(1);
+    ret.transport_private_data_flag = getBits(1);
+    ret.adaptation_field_extension_flag = getBits(1);
+
+    return ret;
 }
 
 
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(packet);
-    uint16_t offset = TS_PACKET_HEADER_SIZE + TS_PACKET_ADAPTATION_FIELD_SIZE;
+    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
+    printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    if (adaptHdr.adaptation_field_length == 0)
+    {
+        return;
+    }
+
+    auto ofsAfterAF =
+    getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
 
     if (adaptHdr.PCR_flag)
     {
-        outInfo.pcr = parsePcr(&packet[offset]);
-        offset += PCR_SIZE;
+        outInfo.pcr = parsePcr(nullptr);
     }
     if (adaptHdr.OPCR_flag)
     {
-        outInfo.opcr = parsePcr(&packet[offset]);
-        offset += OPCR_SIZE;
+        outInfo.opcr = parsePcr(nullptr);
     }
-    //    if (adaptHdr.splicing_point_flag) {
-    //        outData.splice_countdown = packet[offset];
-    //        offset += 1; // size of splice_countdown is 1 byte
-    //    }
+    if (adaptHdr.splicing_point_flag)
+    {
+        /*outData.splice_countdown = */ getBits(8);
+    }
+
     if (adaptHdr.transport_private_data_flag)
     {
-        outInfo.privateDataSize = packet[offset];
-        offset += 1; // size of transport-private_data_length is 1 bytes
-        outInfo.privateDataOffset = offset;
+        outInfo.privateDataSize = getBits(8);
+        outInfo.privateDataOffset = getByteInx();
+        for (auto i = 0; i < outInfo.privateDataSize; i++) // skip it for now
+        {
+            getBits(8);
+        }
     }
+
+    if (adaptHdr.adaptation_field_extension_flag)
+    {
+        auto adaptation_field_extension_length = getBits(8);
+        for (auto i = 0; i < adaptation_field_extension_length; i++) // skip it for now
+        {
+            getBits(8);
+        }
+    }
+
+    // 0..N stuffing bytes goes here and we have to adjust read offset
+    resetBits(packet, TS_PACKET_SIZE, ofsAfterAF);
 }
 
 
 uint64_t TsParser::parsePcr(const uint8_t* buffer)
 {
     uint64_t pcr_base = 0;
-    uint16_t pcr_extension = 0;
-
-    resetBits(buffer, TS_PACKET_SIZE); // TODO: set right size
+    uint64_t pcr_extension = 0;
 
     pcr_base = getBits(33);
     int reserved = getBits(6);
@@ -123,7 +165,7 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     pcr_base = pcr_base * 300;
 
     // 9 bits
-    pcr_base |= pcr_extension;
+    pcr_base += pcr_extension;
 
     return pcr_base;
 }

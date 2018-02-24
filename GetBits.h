@@ -1,3 +1,5 @@
+
+#pragma once
 #include <stdint.h>
 #include <string>
 
@@ -15,7 +17,12 @@ public:
      */
     uint64_t getBits(uint8_t requestedBits);
     
-    void resetBits(const uint8_t *srcBytes, size_t srcSize);
+    void resetBits(const uint8_t *srcBytes, size_t srcSize, size_t inx = 0);
+    
+    /*!
+     * Return offset to current byte
+     */
+    size_t getByteInx();
 
 protected:
     uint8_t mNumStoredBits;

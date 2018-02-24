@@ -136,13 +136,13 @@ public:
     * @return True if it has adaptation field, else false.
     */
     bool checkHasAdaptationField(TsHeader header);
-
+    
     /*!
-     * Return the adaptation field length.
-     * @param packet Pointer to ts-packet.
-     * @return The adaptation field length.
-     */
-     uint8_t parseAdaptationFieldLength(TsHeader hdr, const uint8_t* packet);
+    * Checks if a ts-packet has the adaptation field.
+    * @param packet Pointer to ts-packet.
+    * @return True if it has payload, else false.
+    */
+    bool checkHasPayload(TsHeader header);
 
     /*!
      * Return a copy of the TsAdaptationFieldHeader
