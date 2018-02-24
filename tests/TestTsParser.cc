@@ -2,14 +2,14 @@
 // Created by microlab on 2/24/18.
 //
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <iostream>
 
 /// Project files
-#include "TsParser.h"
-#include "TsPacketTestData.h"
 #include "TsPacketInfo.h"
+#include "TsPacketTestData.h"
+#include "TsParser.h"
 
 TEST(TsParserConstants, CheckConstants)
 {
@@ -26,7 +26,7 @@ TEST(TsParserConstants, CheckConstants)
 TEST(TsParserConstants, CheckSyncByte)
 {
     TsParser parser;
-    const uint8_t packet_data[TS_PACKET_SIZE] = {0x47};
+    const uint8_t packet_data[TS_PACKET_SIZE] = { 0x47 };
     EXPECT_TRUE(parser.checkSyncByte(packet_data));
     EXPECT_TRUE(parser.checkSyncByte(packet_1));
     EXPECT_TRUE(parser.checkSyncByte(packet_2));
@@ -36,16 +36,16 @@ TEST(TsParserConstants, CheckSyncByte)
 TEST(TsParserTests, CheckParserInfo)
 {
     TsParser parser;
-    //TsHeader hdr = parser.parseTsHeader(packet_1);
+    // TsHeader hdr = parser.parseTsHeader(packet_1);
 
     TsPacketInfo info;
     parser.parseTsPacketInfo(packet_1, info);
-    //std::cout << info.toString();
+    // std::cout << info.toString();
 
-    //std::cout << hdr.toString();
+    // std::cout << hdr.toString();
     EXPECT_EQ(0, info.pcr);
     // TODO Why is this OCPR not 0???
-    //EXPECT_EQ(0, info.opcr);
+    // EXPECT_EQ(0, info.opcr);
     EXPECT_EQ(47, info.payloadSize);
     EXPECT_EQ(141, info.payloadStartOffset);
     EXPECT_TRUE(info.hasAdaptationField);
@@ -56,7 +56,7 @@ TEST(TsParserTests, CheckParserInfo)
 TEST(TsParserTests, CheckPid)
 {
     TsParser parser;
-    //TsHeader hdr = parser.parseTsHeader(packet_1);
+    // TsHeader hdr = parser.parseTsHeader(packet_1);
 
     TsPacketInfo info;
     parser.parseTsPacketInfo(packet_3, info);
@@ -69,25 +69,29 @@ TEST(TsParserTests, CheckPid)
 TEST(TsParserTests, CheckParseTsHeader)
 {
     TsParser parser;
-    try {
+    try
+    {
         TsHeader hdr = parser.parseTsHeader(packet_3);
     }
-    catch(GetBitsException e) {
+    catch (GetBitsException e)
+    {
         std::cout << "Got exception: " << e.mMsg;
     }
     // TODO why do we get exception here????
 
     //      EXPECT_EQ(289, hdr.PID);
-    //parser.parseTsPacketInfo(packet_4, info);
-    //EXPECT_EQ(481, info.pid);
+    // parser.parseTsPacketInfo(packet_4, info);
+    // EXPECT_EQ(481, info.pid);
     // TODO add more tests...
 }
 
-TEST(MathTest, TwoPlusTwoEqualsFour) {
+TEST(MathTest, TwoPlusTwoEqualsFour)
+{
     EXPECT_EQ(2 + 2, 4);
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest( &argc, argv );
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

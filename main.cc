@@ -55,7 +55,7 @@ int main(int, char**)
     TsDemuxer tsDemux;
     tsDemux.addPid(0, std::bind(&PATCallback, std::placeholders::_1));
 
-//    TsAdaptationFieldHeader fieldHeader;
+    //    TsAdaptationFieldHeader fieldHeader;
 
     std::cout << std::boolalpha;
     std::cout << std::is_pod<TsHeader>::value << '\n';
@@ -108,13 +108,14 @@ int main(int, char**)
         packet[0] = b;
 
         // Read TS Packet from stdin
-        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
-        (void) res;
+        size_t res =
+        fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        (void)res;
         // memcpy(packet, &buffer[position], TS_PACKET_SIZE);
 
 
         tsParser.parseTsPacketInfo(packet, tsPacketInfo);
-//        std::cout << tsPacketInfo.toString() << std::endl;
+        //        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet, tsPacketInfo);
 
