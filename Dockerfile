@@ -27,5 +27,4 @@ RUN make
 RUN cp -a googletest/include/gtest /usr/include
 RUN cp -a googlemock/include/gmock /usr/include
 RUN cp -a googlemock/gtest/libgtest_main.so googlemock/gtest/libgtest.so /usr/lib/
-RUN ldconfig -v | grep gtest
 WORKDIR /tmp/workspace
