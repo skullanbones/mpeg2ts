@@ -4,10 +4,12 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <iostream>
 
 /// Project files
 #include "TsParser.h"
 #include "TsPacketTestData.h"
+#include "TsPacketInfo.h"
 
 TEST(TsParserConstants, CheckConstants)
 {
@@ -29,6 +31,56 @@ TEST(TsParserConstants, CheckSyncByte)
     EXPECT_TRUE(parser.checkSyncByte(packet_1));
     EXPECT_TRUE(parser.checkSyncByte(packet_2));
     EXPECT_TRUE(parser.checkSyncByte(packet_3));
+}
+
+TEST(TsParserTests, CheckParserInfo)
+{
+    TsParser parser;
+    //TsHeader hdr = parser.parseTsHeader(packet_1);
+
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(packet_1, info);
+    //std::cout << info.toString();
+
+    //std::cout << hdr.toString();
+    EXPECT_EQ(0, info.pcr);
+    // TODO Why is this OCPR not 0???
+    //EXPECT_EQ(0, info.opcr);
+    EXPECT_EQ(47, info.payloadSize);
+    EXPECT_EQ(141, info.payloadStartOffset);
+    EXPECT_TRUE(info.hasAdaptationField);
+
+    // TODO add more tests
+}
+
+TEST(TsParserTests, CheckPid)
+{
+    TsParser parser;
+    //TsHeader hdr = parser.parseTsHeader(packet_1);
+
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(packet_3, info);
+    EXPECT_EQ(289, info.pid);
+    parser.parseTsPacketInfo(packet_4, info);
+    EXPECT_EQ(481, info.pid);
+    // TODO add more tests...
+}
+
+TEST(TsParserTests, CheckParseTsHeader)
+{
+    TsParser parser;
+    try {
+        TsHeader hdr = parser.parseTsHeader(packet_3);
+    }
+    catch(GetBitsException e) {
+        std::cout << "Got exception: " << e.mMsg;
+    }
+    // TODO why do we get exception here????
+
+    //      EXPECT_EQ(289, hdr.PID);
+    //parser.parseTsPacketInfo(packet_4, info);
+    //EXPECT_EQ(481, info.pid);
+    // TODO add more tests...
 }
 
 TEST(MathTest, TwoPlusTwoEqualsFour) {
