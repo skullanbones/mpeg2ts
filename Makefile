@@ -9,11 +9,15 @@
 COMPONENT_NAME ?= ts-lib
 DOCKER_IMAGE_VER ?= v1
 DOCKER_IMAGE_NAME ?= tslib-docker-image
+export PROJ_ROOT := $(CURDIR)
+CC = g++
+
+docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
 .PHONY: all clean lint docker-image docker-bash
 
 all:
-	g++ main.cc TsParser.cc GetBits.cc TsDemuxer.cc -std=c++11 -o tsparser
+	$(CC) main.cc TsParser.cc GetBits.cc TsDemuxer.cc -std=c++11 -o tsparser
 
 lint:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\)' -exec clang-format-5.0 -style=file -i {} \;
@@ -31,6 +35,11 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
+test:
+	$(call docker_command, gtests)
+
+gtests:
+	$(MAKE) -C tests
+
 clean:
-	rm *.o
 	rm tsparser
