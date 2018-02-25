@@ -8,7 +8,7 @@
 
 COMPONENT_NAME ?= ts-lib
 DOCKER_IMAGE_VER ?= v1
-DOCKER_IMAGE_NAME ?= tslib-docker-image
+DOCKER_IMAGE_NAME ?= skullanbones/ts-lib
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 CXX = g++
@@ -58,8 +58,8 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
-# TODO check that docker-image exists...
 test: $(STATIC)
+	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
 gtests:

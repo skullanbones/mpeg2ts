@@ -9,7 +9,20 @@ cat test1.ts | ./tsparser
 ```
 
 ## Docker image
-To build the image:
+To just use the latest image just pull from our private registry/repository @ DockerHub:
+```
+docker pull skullanbones/ts-lib:v1
+```
+If you get a security message like this:
+```
+Error response from daemon: pull access denied for heliconave/ts-lib, repository does not exist or may require 'docker login'
+```
+it means you must first login:
+```
+docker login
+```
+Ask for username/password from kohnech.
+To build the image your self:
 ```
 make docker-image
 ```
