@@ -43,7 +43,7 @@ $(STATIC): $(OBJS)
 	@ar rcs $@ $^
 
 lint:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\)' -exec clang-format-5.0 -style=file -i {} \;
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 docker-image:
 	docker build \

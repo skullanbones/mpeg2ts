@@ -9,7 +9,7 @@
 // TODO: move to own file
 class PsiTable
 {
-public:
+    public:
     uint8_t table_id;
     bool section_syntax_indicator;
     uint16_t section_length;
@@ -24,7 +24,7 @@ public:
     uint16_t network_PID;
     uint16_t program_map_PID;
 
-    //std::vector
+    // std::vector
     uint32_t CRC_32;
 };
 
@@ -32,5 +32,17 @@ public:
 // TODO: move to own file
 class PesPacket
 {
-protected:
+    protected:
+};
+
+/*! @brief Table_id assignment values
+ * [ISO 13818-1] Table 2-31 - table_id assignment values
+ *
+ */
+enum PsiTableId_e
+{
+    PSI_TABLE_ID_PAT = 0x00, /*! Program Association Table Id */
+    PSI_TABLE_ID_CAT = 0x01, /*! Conditional Access Section Table Id */
+    PSI_TABLE_ID_PMT = 0x02, /*! Program Map Table Id */
+    PSI_TABLE_ID_TDT = 0x03  /*! Optional Transport stream Desciption Table id */
 };

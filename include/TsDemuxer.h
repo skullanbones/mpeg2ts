@@ -4,10 +4,10 @@
  */
 
 #pragma once
-#include <iostream>
-#include <stdio.h>
 #include <functional>
+#include <iostream>
 #include <map>
+#include <stdio.h>
 
 /// project files
 #include "TsParser.h"
@@ -17,14 +17,15 @@
 /// @brief Demux ts packets into PSI and PES (plus passthrough)
 class TsDemuxer
 {
-public:
+    public:
     typedef std::function<void(const PsiTable& table)> PsiCallBackFnc;
-    //TODO: add 2 more
+    // TODO: add 2 more
 
     TsDemuxer();
 
     void demux(const uint8_t* packet, const TsPacketInfo& tsPacketInfo);
     void addPid(int pid, PsiCallBackFnc cb);
-protected:
-    std::map<int, PsiCallBackFnc> mCallbackMap;//TODO: make cb generic
+
+    protected:
+    std::map<int, PsiCallBackFnc> mCallbackMap; // TODO: make cb generic
 };

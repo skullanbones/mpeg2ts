@@ -75,10 +75,18 @@ TEST(TsParserTests, CheckParsePatPacket)
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
     pat = parser.parsePatPacket(pat_packet_1, info);
-    EXPECT_EQ(0, info.pid); // TODO Should use constants..
-    EXPECT_EQ(0, pat.table_id); // TODO -"-
-//    EXPECT_EQ(598, pat.network_PID);
-    // TODO add more tests...
+    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
+    //    EXPECT_EQ(598, pat.network_PID);
+
+    parser.parseTsPacketInfo(pat_packet_2, info);
+    pat = parser.parsePatPacket(pat_packet_2, info);
+    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
+
+    EXPECT_EQ(0x03fd, pat.transport_stream_id);
+    EXPECT_EQ(0, pat.section_number);
+    EXPECT_EQ(0, pat.last_section_number);
 }
 
 TEST(TsParserTests, CheckParseTsHeader)

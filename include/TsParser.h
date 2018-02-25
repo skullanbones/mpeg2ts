@@ -14,10 +14,10 @@
  */
 #pragma once
 
-#include <stdint.h>
-#include "TsPacketInfo.h"
 #include "GetBits.h"
+#include "TsPacketInfo.h"
 #include "TsStandards.h"
+#include <stdint.h>
 
 // TODO move out to TsStandards.h
 const int TS_PACKET_SYNC_BYTE = 0x47;
@@ -25,7 +25,7 @@ const int TS_PACKET_SIZE = 188;
 const int TS_PACKET_HEADER_SIZE = 4;
 const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
 const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
-const int TS_PACKET_PID_PAT = 0x0;  // PAT packet
+const int TS_PACKET_PID_PAT = 0x0;     // PAT packet
 const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
 
 
@@ -48,7 +48,7 @@ struct TsHeader
     uint8_t adaptation_field_control;
     uint8_t continuity_counter;
 
-    friend std::ostream& operator << (std::ostream& os, const TsHeader& rhs);
+    friend std::ostream& operator<<(std::ostream& os, const TsHeader& rhs);
 
     std::string toString() const
     {
@@ -76,46 +76,48 @@ struct TsAdaptationFieldHeader
     uint8_t adaptation_field_length;
 
     uint8_t adaptation_field_extension_flag : 1;
-    uint8_t transport_private_data_flag     : 1;
-    uint8_t splicing_point_flag             : 1;
-    uint8_t OPCR_flag                       : 1;
-    uint8_t PCR_flag                        : 1;
+    uint8_t transport_private_data_flag : 1;
+    uint8_t splicing_point_flag : 1;
+    uint8_t OPCR_flag : 1;
+    uint8_t PCR_flag : 1;
     uint8_t elementary_stream_priority_indicator : 1;
-    uint8_t random_access_indicator         : 1;
-    uint8_t discontinuity_indicator         : 1;
+    uint8_t random_access_indicator : 1;
+    uint8_t discontinuity_indicator : 1;
 };
 
 /*!
  * Adaptation field control values, see table 2-5,
  * in ISO/IEC 13818-1:2015
  */
-enum TsAdaptationFieldControl {
-    ts_adaptation_field_control_reserved        = 0x00,
-    ts_adaptation_field_control_payload_only    = 0x01,
+enum TsAdaptationFieldControl
+{
+    ts_adaptation_field_control_reserved = 0x00,
+    ts_adaptation_field_control_payload_only = 0x01,
     ts_adaptation_field_control_adaptation_only = 0x02,
     ts_adaptation_field_control_adaptation_payload = 0x03
 };
 
 
-struct TsAdaptationFieldExtensionHeader {
+struct TsAdaptationFieldExtensionHeader
+{
     uint8_t adaptation_field_extension_length;
 
-    uint8_t reserved                       : 5;
-    uint8_t seamless_splice_flag           : 1;
-    uint8_t piecewise_rate_flag            : 1;
-    uint8_t ltw_flag                       : 1;
+    uint8_t reserved : 5;
+    uint8_t seamless_splice_flag : 1;
+    uint8_t piecewise_rate_flag : 1;
+    uint8_t ltw_flag : 1;
 };
 
 
-class TsParser : GetBits {
-public:
-
+class TsParser : GetBits
+{
+    public:
     /*!
-    * Parse information about one ts-packet to find useful information
-    * like for example PES-start, PCR, DTS,
-    * @param pkt Pointer to ts-packet.
-    * @param info Ts-packet information describing this packet.
-    */
+     * Parse information about one ts-packet to find useful information
+     * like for example PES-start, PCR, DTS,
+     * @param pkt Pointer to ts-packet.
+     * @param info Ts-packet information describing this packet.
+     */
     void parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo);
 
     /*!
@@ -133,17 +135,17 @@ public:
     TsHeader parseTsHeader(const uint8_t* packet);
 
     /*!
-    * Checks if a pts-packet has the adaptation field.
-    * @param packet Pointer to ts-packet.
-    * @return True if it has adaptation field, else false.
-    */
+     * Checks if a pts-packet has the adaptation field.
+     * @param packet Pointer to ts-packet.
+     * @return True if it has adaptation field, else false.
+     */
     bool checkHasAdaptationField(TsHeader header);
-    
+
     /*!
-    * Checks if a ts-packet has the adaptation field.
-    * @param packet Pointer to ts-packet.
-    * @return True if it has payload, else false.
-    */
+     * Checks if a ts-packet has the adaptation field.
+     * @param packet Pointer to ts-packet.
+     * @return True if it has payload, else false.
+     */
     bool checkHasPayload(TsHeader header);
 
     /*!
@@ -175,7 +177,7 @@ public:
      */
     PsiTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
 
-private:
-    uint64_t mPacketErrorCounter; // Wrong sync byte
+    private:
+    uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };

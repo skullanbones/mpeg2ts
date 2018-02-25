@@ -4,28 +4,28 @@
  */
 #pragma once
 
+#include <sstream>
 #include <stdint.h>
 #include <stdio.h>
-#include <sstream>
 
 
 class TsPacketInfo
 {
-public:
-    uint16_t pid;   // This Packet Identifier.
+    public:
+    uint16_t pid; // This Packet Identifier.
 
-    bool errorIndicator;    // If indication of at least 1 uncorrectable bit in ts-packet
-    bool isPayloadStart;    // If this packet is the first in a PES-packet.
-    bool hasAdaptationField;// If this packet contains adaptation field data.
-    bool hasPayload;        // If this packet contains payload.
-    bool hasPrivateData;    // If this packet contains private data.
-    bool hasRandomAccess;   // If this packet contain aid random access.
-    bool isScrambled;       // If this packet is scrambled
+    bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
+    bool isPayloadStart;     // If this packet is the first in a PES-packet.
+    bool hasAdaptationField; // If this packet contains adaptation field data.
+    bool hasPayload;         // If this packet contains payload.
+    bool hasPrivateData;     // If this packet contains private data.
+    bool hasRandomAccess;    // If this packet contain aid random access.
+    bool isScrambled;        // If this packet is scrambled
 
     uint8_t continuityCounter : 4; // 4-bit continuity counter
 
     // Adaptation field data:
-    uint64_t pcr;            // PCR clock...
+    uint64_t pcr; // PCR clock...
     uint64_t opcr;
 
     // For elementary-streams
@@ -37,9 +37,8 @@ public:
     uint32_t privateDataOffset;
 
     // Payload data:
-    size_t payloadSize;  // The size of the payload
+    size_t payloadSize;         // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
-
 
 
     std::string toString() const

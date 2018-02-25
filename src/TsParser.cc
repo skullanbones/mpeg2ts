@@ -207,10 +207,11 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     psi.last_section_number = getBits(8);
     psi.program_number = getBits(16);
     psi.network_PID = getBits(13);
-    //const ProgramAssociationTable pat = *reinterpret_cast<const ProgramAssociationTable*>(&packet[pointerOffset]);
+    // const ProgramAssociationTable pat = *reinterpret_cast<const
+    // ProgramAssociationTable*>(&packet[pointerOffset]);
 
 
-    //TODO parse vector structure
+    // TODO parse vector structure
 
 
     return psi;
