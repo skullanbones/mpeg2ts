@@ -132,7 +132,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     {
         outInfo.privateDataSize = getBits(8);
         outInfo.privateDataOffset = getByteInx();
-        for (auto i = 0; i < outInfo.privateDataSize; i++) // skip it for now
+        for (uint32_t i = 0; i < outInfo.privateDataSize; i++) // skip it for now
         {
             getBits(8);
         }
@@ -140,8 +140,8 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.adaptation_field_extension_flag)
     {
-        auto adaptation_field_extension_length = getBits(8);
-        for (auto i = 0; i < adaptation_field_extension_length; i++) // skip it for now
+        uint8_t adaptation_field_extension_length = getBits(8);
+        for (uint8_t i = 0; i < adaptation_field_extension_length; i++) // skip it for now
         {
             getBits(8);
         }
@@ -158,7 +158,7 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     uint64_t pcr_extension = 0;
 
     pcr_base = getBits(33);
-    int reserved = getBits(6);
+    getBits(6); // reserved
 
     pcr_extension = getBits(9);
     pcr_base = pcr_base * 300;
