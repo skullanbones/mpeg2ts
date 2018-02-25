@@ -13,7 +13,7 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 CXX = g++
 STATIC = libts.a
-CXXFLAGS = -Wall -Winline -pipe -std=c++11
+CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 SRCDIR = $(PROJ_ROOT)/src
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
