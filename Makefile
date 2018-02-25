@@ -8,19 +8,19 @@
 
 COMPONENT_NAME ?= ts-lib
 DOCKER_IMAGE_VER ?= v1
-DOCKER_IMAGE_NAME ?= tslib-docker-image
+DOCKER_IMAGE_NAME ?= skullanbones/ts-lib
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 CXX = g++
 STATIC = libts.a
-CXXFLAGS = -Wall -Winline -pipe -std=c++11
+CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 SRCDIR = $(PROJ_ROOT)/src
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
 
-SRC = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
-OBJ = $(SRC:.cc=.o)
+SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
+OBJS = $(SRCS:.cc=.o)
 
 docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
@@ -28,7 +28,7 @@ docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(D
 
 all: tsparser
 
-tsparser: main.o $(OBJ) $(STATIC)
+tsparser: main.o $(OBJS) $(STATIC)
 	$(CXX) -o $@ main.o -L. -lts
 
 main.o: $(SRCDIR)/main.cc
@@ -38,12 +38,12 @@ main.o: $(SRCDIR)/main.cc
 	@echo [Compile] $<
 	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
-$(STATIC): $(OBJ)
+$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
 lint:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\)' -exec clang-format-5.0 -style=file -i {} \;
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 docker-image:
 	docker build \
@@ -58,14 +58,14 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
-# TODO check that docker-image exists...
 test: $(STATIC)
+	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
 gtests:
 	$(MAKE) -C tests
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJS)
 	rm tsparser
 	$(MAKE) -C $(SUBDIRS) clean
