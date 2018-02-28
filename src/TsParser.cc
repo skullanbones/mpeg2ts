@@ -8,7 +8,9 @@
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    resetBits(packet, TS_PACKET_SIZE);
+    TsPacketInfo zero = {0};
+    outInfo = zero;
+
     TsHeader hdr = parseTsHeader(packet);
     outInfo.pid = hdr.PID;
     outInfo.errorIndicator = hdr.transport_error_indicator;
@@ -42,6 +44,7 @@ bool TsParser::checkSyncByte(const uint8_t* byte)
 TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 {
     TsHeader hdr;
+    resetBits(packet, TS_PACKET_SIZE);
 
     hdr.sync_byte = getBits(8);
     hdr.transport_error_indicator = getBits(1);
