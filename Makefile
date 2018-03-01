@@ -67,5 +67,7 @@ gtests:
 
 clean:
 	rm -f $(OBJS)
-	rm tsparser
-	$(MAKE) -C $(SUBDIRS) clean
+	rm -f tsparser
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir clean; \
+	done

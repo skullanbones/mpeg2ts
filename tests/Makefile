@@ -9,4 +9,4 @@ all:
 	./$(TESTS_NAME)
 
 clean:
-	rm $(TESTS_NAME)
+	rm -f $(TESTS_NAME)
