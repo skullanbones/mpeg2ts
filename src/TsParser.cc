@@ -208,14 +208,17 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     psi.current_next_indicator = getBits(1);
     psi.section_number = getBits(8);
     psi.last_section_number = getBits(8);
-    psi.program_number = getBits(16);
-    psi.network_PID = getBits(13);
-    // const ProgramAssociationTable pat = *reinterpret_cast<const
-    // ProgramAssociationTable*>(&packet[pointerOffset]);
 
+    int numberOfPrograms = (psi.section_length - PAT_OFFSET_LENGTH - CRC32_SIZE) / PAT_PROGRAM_SIZE;
 
-    // TODO parse vector structure
-
+    for (int i = 0; i < numberOfPrograms; i++)
+    {
+        Program prg;
+        prg.program_number = getBits(16);
+        getBits(3);  // reserved
+        prg.program_map_PID = getBits(13);
+        psi.programs.push_back(prg);
+    }
 
     return psi;
 }
