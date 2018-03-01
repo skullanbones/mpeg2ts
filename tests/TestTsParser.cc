@@ -44,8 +44,7 @@ TEST(TsParserTests, CheckParserInfo)
 
     // std::cout << hdr.toString();
     EXPECT_EQ(0, info.pcr);
-    // TODO Why is this OCPR not 0???
-    // EXPECT_EQ(0, info.opcr);
+    EXPECT_EQ(0, info.opcr);
     EXPECT_EQ(47, info.payloadSize);
     EXPECT_EQ(141, info.payloadStartOffset);
     EXPECT_TRUE(info.hasAdaptationField);
@@ -92,19 +91,11 @@ TEST(TsParserTests, CheckParsePatPacket)
 TEST(TsParserTests, CheckParseTsHeader)
 {
     TsParser parser;
-    try
-    {
-        TsHeader hdr = parser.parseTsHeader(packet_3);
-    }
-    catch (GetBitsException e)
-    {
-        std::cout << "Got exception: " << e.mMsg;
-    }
-    // TODO why do we get exception here????
+    TsHeader hdr = parser.parseTsHeader(packet_3);
 
-    //      EXPECT_EQ(289, hdr.PID);
-    // parser.parseTsPacketInfo(packet_4, info);
-    // EXPECT_EQ(481, info.pid);
+    EXPECT_EQ(289, hdr.PID);
+    //parser.parseTsPacketInfo(packet_4, info);
+    //EXPECT_EQ(481, info.pid);
     // TODO add more tests...
 }
 
