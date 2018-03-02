@@ -65,7 +65,7 @@ TEST(TsParserTests, CheckPid)
     // TODO add more tests...
 }
 
-TEST(TsParserTests, CheckParsePatPacket)
+TEST(TsParserTests, CheckParsePatPacket1)
 {
     TsParser parser;
     // TsHeader hdr = parser.parseTsHeader(packet_1);
@@ -77,6 +77,13 @@ TEST(TsParserTests, CheckParsePatPacket)
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
     //    EXPECT_EQ(598, pat.network_PID);
+}
+
+TEST(TsParserTests, CheckParsePatPacket2)
+{
+    TsParser parser;
+    PsiTable pat;
+    TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
     pat = parser.parsePatPacket(pat_packet_2, info);
