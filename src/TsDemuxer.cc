@@ -29,7 +29,7 @@ void TsDemuxer::demux(const uint8_t* packet)
         // TODO Filter PID from PSI, TS, PES etc...
         // Check what table
         PsiTable psi;
-        psi = mParser.parsePsiTableTmp(packet, tsPacketInfo);
+        mParser.parsePsiTable(packet, tsPacketInfo, psi);
 
         if (tsPacketInfo.pid == TS_PACKET_PID_PAT) // TODO also use table_id?
         {

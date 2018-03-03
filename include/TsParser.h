@@ -81,14 +81,12 @@ public:
     uint64_t parsePcr(const uint8_t* buffer);
 
     /*!
-     * Parses only the common part of the Psi-Table.
-     * @param packet Transport stream packet data
-     * @param table Psi Table Result from parsing
+     * Parses PSI table
+     * @param packet
+     * @param info
+     * @param psiTable
      */
-    void parsePsiTable(const uint8_t* packet, PsiTable& table);
-
-    // TODO remove or exchange these
-    PsiTable parsePsiTableTmp(const uint8_t* packet, const TsPacketInfo& info);
+    void parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& psiTable);
 
     /*!
      * Parses PAT table

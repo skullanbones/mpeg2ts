@@ -172,24 +172,9 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
-void TsParser::parsePsiTable(const uint8_t* packet, PsiTable& table)
-{
-    table.table_id = getBits(8);
-    table.section_syntax_indicator = getBits(1);
-    getBits(1); // '0'
-    getBits(2); // reserved
-    table.section_length = getBits(12);
-    table.transport_stream_id = getBits(16);
-    getBits(2);
-    table.version_number = getBits(5);
-    table.current_next_indicator = getBits(1);
-    table.section_number = getBits(8);
-    table.last_section_number = getBits(8);
-}
 
-PsiTable TsParser::parsePsiTableTmp(const uint8_t* packet, const TsPacketInfo& info)
+void TsParser::parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& table)
 {
-    PsiTable table;
     uint8_t pointerOffset = info.payloadStartOffset;
 
     const uint8_t pointer_field = packet[pointerOffset];
@@ -209,22 +194,13 @@ PsiTable TsParser::parsePsiTableTmp(const uint8_t* packet, const TsPacketInfo& i
     table.current_next_indicator = getBits(1);
     table.section_number = getBits(8);
     table.last_section_number = getBits(8);
-
-    return table;
 }
 
 
 PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
 {
     PatTable pat;
-    uint8_t pointerOffset = info.payloadStartOffset;
-
-    const uint8_t pointer_field = packet[pointerOffset];
-    pointerOffset += sizeof(pointer_field);
-    pointerOffset += pointer_field;
-
-    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
-    parsePsiTable(packet, pat);
+    parsePsiTable(packet, info, pat);
 
     int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
@@ -244,30 +220,29 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
 PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info)
 {
     PmtTable pmt;
-    uint8_t pointerOffset = info.payloadStartOffset;
+    parsePsiTable(packet, info, pmt);
 
-    const uint8_t pointer_field = packet[pointerOffset];
-    pointerOffset += sizeof(pointer_field);
-    pointerOffset += pointer_field;
-
-    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
-    parsePsiTable(packet, pmt);
     getBits(3); // reserved
     pmt.PCR_PID = getBits(13);
     getBits(4); // reserved
     pmt.program_info_length = getBits(12);
+    getBits(8 * pmt.program_info_length); // skip descriptors for now
 
-    //    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) /
-    //    PAT_PACKET_PROGRAM_SIZE;
+    int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
 
-    //    for (int i = 0; i < numberOfPrograms; i++)
-    //    {
-    //        Program prg;
-    //        prg.program_number = getBits(16);
-    //        getBits(3); // reserved
-    //        prg.program_map_PID = getBits(13);
-    //        pat.programs.push_back(prg);
-    //    }
+    int readSize = 0;
+    while(readSize < streamsSize)
+    {
+        StreamTypeHeader hdr;
+        hdr.stream_type = getBits(8);
+        getBits(3); // reserved
+        hdr.elementary_PID = getBits(13);
+        getBits(4); // reserved
+        hdr.ES_info_length = getBits(12);
+        getBits(hdr.ES_info_length * 8); // Skip for now
+        readSize += hdr.ES_info_length + PMT_STREAM_TYPE_LENGTH;
+        pmt.streams.push_back(hdr);
+    }
 
     return pmt;
 }

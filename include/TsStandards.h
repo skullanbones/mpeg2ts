@@ -22,6 +22,9 @@ const int PAT_PACKET_OFFSET_LENGTH = 5;
 const int CRC32_SIZE = 4;
 const int PAT_PACKET_PROGRAM_SIZE = 4;
 
+const int PMT_PACKET_OFFSET_LENGTH = 9;
+const int PMT_STREAM_TYPE_LENGTH = 5;
+
 
 /*!
  * References in this file are taken from ISO/IEC 13818-1:2015
@@ -193,8 +196,9 @@ public:
         for (unsigned int i = 0; i < rhs.streams.size(); i++)
         {
             ss << "-------------stream " << i << "--------------" << std::endl;
-            //            ss << "program_number: " << rhs.programs[i].program_number << std::endl;
-            //            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
+            ss << "stream_type: " << (int)rhs.streams[i].stream_type << std::endl;
+            ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
+            ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
         }
 
         return ss;
