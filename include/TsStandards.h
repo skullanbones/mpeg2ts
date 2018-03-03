@@ -109,6 +109,8 @@ struct Program
 class PsiTable
 {
 public:
+    virtual ~PsiTable() = default;
+
     uint8_t table_id;
     bool section_syntax_indicator;
     uint16_t section_length;
@@ -117,8 +119,6 @@ public:
     bool current_next_indicator;
     uint8_t section_number;
     uint8_t last_section_number;
-    std::vector<Program> programs;
-    uint32_t CRC_32;
 
     friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
@@ -131,6 +131,21 @@ public:
         ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
         ss << "section_number: " << (int)rhs.section_number << std::endl;
         ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
+        return ss;
+    }
+};
+
+class PatTable : public PsiTable
+{
+public:
+    std::vector<Program> programs;
+    uint32_t CRC_32;
+
+    friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
+    {
+        ss << "-------------PatTable------------- " << std::endl;
+        // ss << static_cast<const PsiTable&>(rhs) << std::endl;
+        // ss << PsiTable::operator<<(rhs) << std::endl;
         ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
         for (unsigned int i = 0; i < rhs.programs.size(); i++)
         {
@@ -141,7 +156,6 @@ public:
 
         return ss;
     }
-
 };
 
 

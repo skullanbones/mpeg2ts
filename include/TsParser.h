@@ -86,7 +86,7 @@ public:
      * @param info
      * @return
      */
-    PsiTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
+    PatTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
 
 private:
     uint64_t mPacketErrorCounter;              // Wrong sync byte

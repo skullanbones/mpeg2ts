@@ -1,12 +1,13 @@
-CC = g++
+CXX = g++
 INC := -I$(PROJ_ROOT) -I$(CURDIR) -I$(INCDIR)
-TESTS_NAME := gtests
+COMPONENT_NAME := gtests
+CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 
 .PHONY: all clean
 
 all:
-	$(CC) TestTsParser.cc $(INC) -lgtest -L$(PROJ_ROOT) -lts -o $(TESTS_NAME)
-	./$(TESTS_NAME)
+	$(CXX) $(CXXFLAGS) TestTsParser.cc $(INC) -lgtest -L$(PROJ_ROOT) -lts -o $(COMPONENT_NAME)
+	./$(COMPONENT_NAME)
 
 clean:
-	rm -f $(TESTS_NAME)
+	rm -f $(COMPONENT_NAME)
