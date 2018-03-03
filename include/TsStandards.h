@@ -123,14 +123,14 @@ public:
     friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
         ss << "-------------PsiTable------------- " << std::endl;
-        ss << "table_id:" << std::hex << (int) rhs.table_id << std::dec << std::endl;
-        ss << "section_syntax_indicator: " << (int) rhs.section_syntax_indicator << std::endl;
-        ss << "section_length: " << (int) rhs.section_length << std::endl;
-        ss << "transport_stream_id: " << (int) rhs.transport_stream_id << std::endl;
+        ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
+        ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
+        ss << "section_length: " << (int)rhs.section_length << std::endl;
+        ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
         ss << "version_number: " << rhs.version_number << std::endl;
-        ss << "current_next_indicator: " << (int) rhs.current_next_indicator << std::endl;
-        ss << "section_number: " << (int) rhs.section_number << std::endl;
-        ss << "last_section_number: " << (int) rhs.last_section_number << std::endl;
+        ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
+        ss << "section_number: " << (int)rhs.section_number << std::endl;
+        ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
         return ss;
     }
 };
@@ -144,8 +144,8 @@ public:
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
         ss << "-------------PatTable------------- " << std::endl;
-        //ss << static_cast<const PsiTable&>(rhs) << std::endl;
-        //ss << PsiTable::operator<<(rhs) << std::endl;
+        // ss << static_cast<const PsiTable&>(rhs) << std::endl;
+        // ss << PsiTable::operator<<(rhs) << std::endl;
         ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
         for (unsigned int i = 0; i < rhs.programs.size(); i++)
         {
@@ -156,7 +156,6 @@ public:
 
         return ss;
     }
-
 };
 
 

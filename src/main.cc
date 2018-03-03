@@ -32,8 +32,7 @@ void PATCallback(PsiTable& table)
 
     std::cout << "Got PSI table:" << std::endl << table << std::endl;
     PatTable* pat = static_cast<PatTable*>(&table);
-    std::cout << "Got PAT packet:" << std::endl
-             << *pat << std::endl;
+    std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
 }
 
 void PESCallback(const PesPacket& pes)
