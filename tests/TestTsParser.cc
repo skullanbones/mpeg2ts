@@ -164,7 +164,7 @@ TEST(TsParserTests, CheckParsePmtTable)
     EXPECT_EQ(1, pmt.section_syntax_indicator);
     EXPECT_EQ(0x034, pmt.section_length);
     EXPECT_EQ(0x03f2, pmt.transport_stream_id);
-  //  EXPECT_EQ(0xed & , pmt.version_number);
+    EXPECT_EQ((0xed >> 1) & 0x1F, pmt.version_number);
     EXPECT_EQ(1, pmt.current_next_indicator);
     EXPECT_EQ(0x00, pmt.section_number);
     EXPECT_EQ(0, pmt.last_section_number);
