@@ -87,6 +87,9 @@ public:
      */
     void parsePsiTable(const uint8_t* packet, PsiTable& table);
 
+    // TODO remove or exchange these
+    PsiTable parsePsiTableTmp(const uint8_t* packet, const TsPacketInfo& info);
+
     /*!
      * Parses PAT table
      * @param packet

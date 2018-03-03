@@ -187,6 +187,32 @@ void TsParser::parsePsiTable(const uint8_t* packet, PsiTable& table)
     table.last_section_number = getBits(8);
 }
 
+PsiTable TsParser::parsePsiTableTmp(const uint8_t* packet, const TsPacketInfo& info)
+{
+    PsiTable table;
+    uint8_t pointerOffset = info.payloadStartOffset;
+
+    const uint8_t pointer_field = packet[pointerOffset];
+    pointerOffset += sizeof(pointer_field);
+    pointerOffset += pointer_field;
+
+    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
+
+    table.table_id = getBits(8);
+    table.section_syntax_indicator = getBits(1);
+    getBits(1); // '0'
+    getBits(2); // reserved
+    table.section_length = getBits(12);
+    table.transport_stream_id = getBits(16);
+    getBits(2);
+    table.version_number = getBits(5);
+    table.current_next_indicator = getBits(1);
+    table.section_number = getBits(8);
+    table.last_section_number = getBits(8);
+
+    return table;
+}
+
 
 PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
 {

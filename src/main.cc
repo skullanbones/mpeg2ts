@@ -19,7 +19,7 @@
 
 unsigned long count = 0;
 unsigned long countAdaptPacket = 0;
-unsigned int g_SPPID = 0;
+unsigned int g_SPPID = 0; // Single Program PID
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -42,7 +42,7 @@ void PMTCallback(PsiTable& table)
     std::cout << "demuxed PMT table \n" << table.table_id;
 
     std::cout << "Got PSI table:" << std::endl << table << std::endl;
-    PatTable* pmt = static_cast<PatTable*>(&table);
+    PmtTable* pmt = static_cast<PmtTable*>(&table);
     std::cout << "Got PMT packet:" << std::endl << *pmt << std::endl;
 }
 
