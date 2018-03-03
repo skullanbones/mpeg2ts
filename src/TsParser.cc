@@ -8,7 +8,7 @@
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsPacketInfo zero = {0};
+    TsPacketInfo zero = { 0 };
     outInfo = zero;
 
     TsHeader hdr = parseTsHeader(packet);
@@ -175,7 +175,7 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
 
 std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
 {
-    ss << "-------------_TsHeader------------- " << std::endl;
+    ss << "-------------TsHeader------------- " << std::endl;
     ss << "sync_byte:  0x" << std::hex << (int)rhs.sync_byte << std::dec << std::endl;
     ss << "transport_error_indicator: " << (int)rhs.transport_error_indicator << std::endl;
     ss << "payload_unit_start_indicator: " << (int)rhs.payload_unit_start_indicator << std::endl;
@@ -215,7 +215,7 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     {
         Program prg;
         prg.program_number = getBits(16);
-        getBits(3);  // reserved
+        getBits(3); // reserved
         prg.program_map_PID = getBits(13);
         psi.programs.push_back(prg);
     }

@@ -20,15 +20,17 @@ export INCDIR
 
 
 SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
+HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
+		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h
 OBJS = $(SRCS:.cc=.o)
 
 docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
-.PHONY: all clean lint docker-image docker-bash
+.PHONY: all clean lint docker-image docker-bash test gtests
 
 all: tsparser
 
-tsparser: main.o $(OBJS) $(STATIC)
+tsparser: main.o $(STATIC) $(HDRS)
 	$(CXX) -o $@ main.o -L. -lts
 
 main.o: $(SRCDIR)/main.cc
@@ -38,7 +40,7 @@ main.o: $(SRCDIR)/main.cc
 	@echo [Compile] $<
 	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
-$(STATIC): $(OBJS)
+$(STATIC): $(OBJS) $(HDRS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 

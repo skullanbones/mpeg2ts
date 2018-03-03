@@ -112,7 +112,7 @@ struct Program
 
 class PsiTable
 {
-    public:
+public:
     uint8_t table_id;
     bool section_syntax_indicator;
     uint16_t section_length;
@@ -122,15 +122,38 @@ class PsiTable
     uint8_t section_number;
     uint8_t last_section_number;
     std::vector<Program> programs;
-    // std::vector
     uint32_t CRC_32;
+
+    std::string toString() const
+    {
+        std::ostringstream ss;
+        ss << "-------------PsiTable------------- " << std::endl;
+        ss << "table_id:" << std::hex << (int)table_id << std::dec << std::endl;
+        ss << "section_syntax_indicator: " << (int)section_syntax_indicator << std::endl;
+        ss << "section_length: " << (int)section_length << std::endl;
+        ss << "transport_stream_id: " << (int)transport_stream_id << std::endl;
+        ss << "version_number: " << version_number << std::endl;
+        ss << "current_next_indicator: " << (int)current_next_indicator << std::endl;
+        ss << "section_number: " << (int)section_number << std::endl;
+        ss << "last_section_number: " << (int)last_section_number << std::endl;
+        ss << "programs.size(): " << (int)programs.size() << std::endl;
+        for (unsigned int i = 0; i < programs.size(); i++)
+        {
+            ss << "-------------program " << i << "--------------" << std::endl;
+            ss << "program_number: " << programs[i].program_number << std::endl;
+            ss << "program_map_PID: " << programs[i].program_map_PID << std::endl;
+        }
+
+        return ss.str();
+    }
 };
+
 
 /// @brief Parsed PES
 // TODO: move to own file
 class PesPacket
 {
-    protected:
+protected:
 };
 
 /*! @brief Table_id assignment values

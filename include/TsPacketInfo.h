@@ -11,7 +11,7 @@
 
 class TsPacketInfo
 {
-    public:
+public:
     uint16_t pid; // This Packet Identifier.
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet

@@ -20,10 +20,9 @@
 #include <stdint.h>
 
 
-
 class TsParser : GetBits
 {
-    public:
+public:
     /*!
      * Parse information about one ts-packet to find useful information
      * like for example PES-start, PCR, DTS,
@@ -89,7 +88,7 @@ class TsParser : GetBits
      */
     PsiTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
 
-    private:
+private:
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };
