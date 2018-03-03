@@ -20,16 +20,18 @@ TsDemuxer::TsDemuxer()
 {
 }
 
-void TsDemuxer::demux(const uint8_t* packet, const TsPacketInfo& tsPacketInfo)
+void TsDemuxer::demux(const uint8_t* packet)
 {
+    TsPacketInfo tsPacketInfo;
+    mParser.parseTsPacketInfo(packet, tsPacketInfo);
     if (mCallbackMap.find(tsPacketInfo.pid) != mCallbackMap.end())
     {
         // TODO Filter PID from PSI, TS, PES etc...
         PsiTable table;
 
-        // if (tsPacketInfo.pid == TS_PACKET_PID_PAT) {
-        //    parsePatPacket(packet);
-        //}
+        if (tsPacketInfo.pid == TS_PACKET_PID_PAT) {
+            table = mParser.parsePatPacket(packet, tsPacketInfo);
+        }
 
         // TODO: gather whole table and send it then
         mCallbackMap[tsPacketInfo.pid](table);
