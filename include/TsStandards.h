@@ -18,10 +18,9 @@ const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
 const int PCR_SIZE = 48 / 8;
 const int OPCR_SIZE = 48 / 8;
 
-// TODO fix better naming
-const int PAT_OFFSET_LENGTH = 5;
+const int PAT_PACKET_OFFSET_LENGTH = 5;
 const int CRC32_SIZE = 4;
-const int PAT_PROGRAM_SIZE = 4;
+const int PAT_PACKET_PROGRAM_SIZE = 4;
 
 
 /*!
@@ -39,21 +38,18 @@ struct TsHeader
     uint8_t adaptation_field_control;
     uint8_t continuity_counter;
 
-    friend std::ostream& operator<<(std::ostream& os, const TsHeader& rhs);
-
-    std::string toString() const
+    friend std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
     {
-        std::ostringstream ss;
         ss << "-------------TsHeader------------- " << std::endl;
-        ss << "sync_byte:  0x" << std::hex << (int)sync_byte << std::dec << std::endl;
-        ss << "transport_error_indicator: " << (int)transport_error_indicator << std::endl;
-        ss << "payload_unit_start_indicator: " << (int)payload_unit_start_indicator << std::endl;
-        ss << "transport_priority: " << (int)transport_priority << std::endl;
-        ss << "PID: " << PID << std::endl;
-        ss << "transport_scrambling_control: " << (int)transport_scrambling_control << std::endl;
-        ss << "adaptation_field_control: " << (int)adaptation_field_control << std::endl;
-        ss << "continuity_counter: " << (int)continuity_counter << std::endl;
-        return ss.str();
+        ss << "sync_byte:  0x" << std::hex << (int)rhs.sync_byte << std::dec << std::endl;
+        ss << "transport_error_indicator: " << (int)rhs.transport_error_indicator << std::endl;
+        ss << "payload_unit_start_indicator: " << (int)rhs.payload_unit_start_indicator << std::endl;
+        ss << "transport_priority: " << (int)rhs.transport_priority << std::endl;
+        ss << "PID: " << rhs.PID << std::endl;
+        ss << "transport_scrambling_control: " << (int)rhs.transport_scrambling_control << std::endl;
+        ss << "adaptation_field_control: " << (int)rhs.adaptation_field_control << std::endl;
+        ss << "continuity_counter: " << (int)rhs.continuity_counter << std::endl;
+        return ss;
     }
 };
 
@@ -124,28 +120,28 @@ public:
     std::vector<Program> programs;
     uint32_t CRC_32;
 
-    std::string toString() const
+    friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
-        std::ostringstream ss;
         ss << "-------------PsiTable------------- " << std::endl;
-        ss << "table_id:" << std::hex << (int)table_id << std::dec << std::endl;
-        ss << "section_syntax_indicator: " << (int)section_syntax_indicator << std::endl;
-        ss << "section_length: " << (int)section_length << std::endl;
-        ss << "transport_stream_id: " << (int)transport_stream_id << std::endl;
-        ss << "version_number: " << version_number << std::endl;
-        ss << "current_next_indicator: " << (int)current_next_indicator << std::endl;
-        ss << "section_number: " << (int)section_number << std::endl;
-        ss << "last_section_number: " << (int)last_section_number << std::endl;
-        ss << "programs.size(): " << (int)programs.size() << std::endl;
-        for (unsigned int i = 0; i < programs.size(); i++)
+        ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
+        ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
+        ss << "section_length: " << (int)rhs.section_length << std::endl;
+        ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
+        ss << "version_number: " << rhs.version_number << std::endl;
+        ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
+        ss << "section_number: " << (int)rhs.section_number << std::endl;
+        ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
+        ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
+        for (unsigned int i = 0; i < rhs.programs.size(); i++)
         {
             ss << "-------------program " << i << "--------------" << std::endl;
-            ss << "program_number: " << programs[i].program_number << std::endl;
-            ss << "program_map_PID: " << programs[i].program_map_PID << std::endl;
+            ss << "program_number: " << rhs.programs[i].program_number << std::endl;
+            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
         }
 
-        return ss.str();
+        return ss;
     }
+
 };
 
 

@@ -173,20 +173,6 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
 }
 
 
-std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
-{
-    ss << "-------------TsHeader------------- " << std::endl;
-    ss << "sync_byte:  0x" << std::hex << (int)rhs.sync_byte << std::dec << std::endl;
-    ss << "transport_error_indicator: " << (int)rhs.transport_error_indicator << std::endl;
-    ss << "payload_unit_start_indicator: " << (int)rhs.payload_unit_start_indicator << std::endl;
-    ss << "transport_priority: " << (int)rhs.transport_priority << std::endl;
-    ss << "PID: " << rhs.PID << std::endl;
-    ss << "transport_scrambling_control: " << (int)rhs.transport_scrambling_control << std::endl;
-    ss << "adaptation_field_control: " << (int)rhs.adaptation_field_control << std::endl;
-    ss << "continuity_counter: " << (int)rhs.continuity_counter << std::endl;
-    return ss;
-}
-
 PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
 {
     PsiTable psi;
@@ -209,7 +195,7 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     psi.section_number = getBits(8);
     psi.last_section_number = getBits(8);
 
-    int numberOfPrograms = (psi.section_length - PAT_OFFSET_LENGTH - CRC32_SIZE) / PAT_PROGRAM_SIZE;
+    int numberOfPrograms = (psi.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {

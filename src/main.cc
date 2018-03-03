@@ -13,6 +13,7 @@
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsParser.h"
+#include "TsStandards.h"
 
 #include <type_traits>
 
@@ -22,13 +23,14 @@ unsigned long countAdaptPacket = 0;
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
     (void)packet;
-    std::cout << "demuxed TS packet \n" << tsPacketInfo.toString();
+    std::cout << "demuxed TS packet \n" << tsPacketInfo;
 }
 
 void PATCallback(const PsiTable& table)
 {
     std::cout << "demuxed PAT table \n" << table.table_id;
-    std::cout << "Got PAT packet:" << table.toString() << std::endl;
+    std::cout << "Got PAT packet:" << std::endl
+              << table << std::endl;
 }
 
 void PESCallback(const PesPacket& pes)

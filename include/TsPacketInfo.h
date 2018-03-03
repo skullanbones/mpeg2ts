@@ -41,24 +41,23 @@ public:
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
 
-    std::string toString() const
+    friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
     {
-        std::ostringstream ss;
         ss << "-------------TsPacketInfo------------- " << std::endl;
-        ss << "PID: " << pid << std::endl;
-        ss << "hasAdaptationField: " << hasAdaptationField << std::endl;
-        ss << "pcr: " << pcr << std::endl;
-        ss << "opcr: " << opcr << std::endl;
-        if (hasPrivateData)
+        ss << "PID: " << rhs.pid << std::endl;
+        ss << "hasAdaptationField: " << rhs.hasAdaptationField << std::endl;
+        ss << "pcr: " << rhs.pcr << std::endl;
+        ss << "opcr: " << rhs.opcr << std::endl;
+        if (rhs.hasPrivateData)
         {
-            ss << "privateDataSize: " << privateDataSize << std::endl;
-            ss << "privateDataOffset: " << privateDataOffset << std::endl;
+            ss << "privateDataSize: " << rhs.privateDataSize << std::endl;
+            ss << "privateDataOffset: " << rhs.privateDataOffset << std::endl;
         }
-        if (hasPayload)
+        if (rhs.hasPayload)
         {
-            ss << "payloadSize: " << payloadSize << std::endl;
-            ss << "payloadStartOffset: " << (int)payloadStartOffset << std::endl;
+            ss << "payloadSize: " << rhs.payloadSize << std::endl;
+            ss << "payloadStartOffset: " << (int)rhs.payloadStartOffset << std::endl;
         }
-        return ss.str();
+        return ss;
     }
 };
