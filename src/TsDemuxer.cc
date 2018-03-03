@@ -1,5 +1,5 @@
 /**
- * @class TsParser
+ * @class TsDemuxer
  *
  * @brief Demux transport stream packet
  *
@@ -24,10 +24,10 @@ void TsDemuxer::demux(const uint8_t* packet)
 {
     TsPacketInfo tsPacketInfo;
     mParser.parseTsPacketInfo(packet, tsPacketInfo);
-    if (mCallbackMap.find(tsPacketInfo.pid) != mCallbackMap.end())
+    if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // TODO Filter PID from PSI, TS, PES etc...
-        PsiTable table;
+        PatTable table;
 
         if (tsPacketInfo.pid == TS_PACKET_PID_PAT)
         {
@@ -35,11 +35,11 @@ void TsDemuxer::demux(const uint8_t* packet)
         }
 
         // TODO: gather whole table and send it then
-        mCallbackMap[tsPacketInfo.pid](table);
+        mPsiCallbackMap[tsPacketInfo.pid](table);
     }
 }
 
-void TsDemuxer::addPid(int pid, PsiCallBackFnc cb)
+void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)
 {
-    mCallbackMap[pid] = cb;
+    mPsiCallbackMap[pid] = cb;
 }

@@ -33,7 +33,7 @@ all: tsparser
 tsparser: main.o $(STATIC) $(HDRS)
 	$(CXX) -o $@ main.o -L. -lts
 
-main.o: $(SRCDIR)/main.cc
+main.o: $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
 .cc.o:

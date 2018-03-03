@@ -14,20 +14,24 @@
 #include "TsStandards.h"
 
 
-/// @brief Demux ts packets into PSI and PES (plus passthrough)
+/// @brief Demux ts packets into PSI and PES (plus TS pass through)
 class TsDemuxer
 {
 public:
-    typedef std::function<void(const PsiTable& table)> PsiCallBackFnc;
-    // TODO: add 2 more
+    typedef std::function<void(PsiTable& table)> PsiCallBackFnc;
+    typedef std::function<void(const PesPacket& table)> PesCallBackFnc;
+    typedef std::function<void(const TsHeader& hdr)> TsCallBackFnc;
 
     TsDemuxer();
 
     void demux(const uint8_t* packet);
-    void addPid(int pid, PsiCallBackFnc cb);
+
+    void addPsiPid(int pid, PsiCallBackFnc cb);
+    void addPesPid(int pid, PesCallBackFnc cb);
+    void addTsPid(int pid, TsCallBackFnc cb);
 
 protected:
-    std::map<int, PsiCallBackFnc> mCallbackMap; // TODO: make cb generic
+    std::map<int, PsiCallBackFnc> mPsiCallbackMap; // TODO: make cb generic
 
 
 private:

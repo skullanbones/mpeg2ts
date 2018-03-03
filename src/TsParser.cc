@@ -173,9 +173,9 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
 }
 
 
-PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
 {
-    PsiTable psi;
+    PatTable pat;
     uint8_t pointerOffset = info.payloadStartOffset;
 
     const uint8_t pointer_field = packet[pointerOffset];
@@ -183,19 +183,19 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     pointerOffset += pointer_field;
 
     resetBits(packet, TS_PACKET_SIZE, pointerOffset);
-    psi.table_id = getBits(8);
-    psi.section_syntax_indicator = getBits(1);
+    pat.table_id = getBits(8);
+    pat.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    psi.section_length = getBits(12);
-    psi.transport_stream_id = getBits(16);
+    pat.section_length = getBits(12);
+    pat.transport_stream_id = getBits(16);
     getBits(2);
-    psi.version_number = getBits(5);
-    psi.current_next_indicator = getBits(1);
-    psi.section_number = getBits(8);
-    psi.last_section_number = getBits(8);
+    pat.version_number = getBits(5);
+    pat.current_next_indicator = getBits(1);
+    pat.section_number = getBits(8);
+    pat.last_section_number = getBits(8);
 
-    int numberOfPrograms = (psi.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {
@@ -203,8 +203,8 @@ PsiTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
         prg.program_number = getBits(16);
         getBits(3); // reserved
         prg.program_map_PID = getBits(13);
-        psi.programs.push_back(prg);
+        pat.programs.push_back(prg);
     }
 
-    return psi;
+    return pat;
 }
