@@ -24,7 +24,7 @@ HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
 		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h
 OBJS = $(SRCS:.cc=.o)
 
-docker_command = docker run --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
+docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
 .PHONY: all clean lint docker-image docker-bash test gtests
 

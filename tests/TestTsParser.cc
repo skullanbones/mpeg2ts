@@ -82,7 +82,7 @@ TEST(TsParserTests, CheckParsePatPacket1)
 TEST(TsParserTests, CheckParsePatPacket2)
 {
     TsParser parser;
-    PsiTable pat;
+    PatTable pat;
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
