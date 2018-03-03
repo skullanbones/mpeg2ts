@@ -172,6 +172,21 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
+void TsParser::parsePsiTable(const uint8_t* packet, PsiTable& table)
+{
+    table.table_id = getBits(8);
+    table.section_syntax_indicator = getBits(1);
+    getBits(1); // '0'
+    getBits(2); // reserved
+    table.section_length = getBits(12);
+    table.transport_stream_id = getBits(16);
+    getBits(2);
+    table.version_number = getBits(5);
+    table.current_next_indicator = getBits(1);
+    table.section_number = getBits(8);
+    table.last_section_number = getBits(8);
+}
+
 
 PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
 {
@@ -183,17 +198,7 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     pointerOffset += pointer_field;
 
     resetBits(packet, TS_PACKET_SIZE, pointerOffset);
-    pat.table_id = getBits(8);
-    pat.section_syntax_indicator = getBits(1);
-    getBits(1); // '0'
-    getBits(2); // reserved
-    pat.section_length = getBits(12);
-    pat.transport_stream_id = getBits(16);
-    getBits(2);
-    pat.version_number = getBits(5);
-    pat.current_next_indicator = getBits(1);
-    pat.section_number = getBits(8);
-    pat.last_section_number = getBits(8);
+    parsePsiTable(packet, pat);
 
     int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
@@ -207,4 +212,35 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     }
 
     return pat;
+}
+
+// TODO support PMTs greater than 1 Ts packet.
+PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info)
+{
+    PmtTable pmt;
+    uint8_t pointerOffset = info.payloadStartOffset;
+
+    const uint8_t pointer_field = packet[pointerOffset];
+    pointerOffset += sizeof(pointer_field);
+    pointerOffset += pointer_field;
+
+    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
+    parsePsiTable(packet, pmt);
+    getBits(3); // reserved
+    pmt.PCR_PID = getBits(13);
+    getBits(4); // reserved
+    pmt.program_info_length = getBits(12);
+
+//    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+
+//    for (int i = 0; i < numberOfPrograms; i++)
+//    {
+//        Program prg;
+//        prg.program_number = getBits(16);
+//        getBits(3); // reserved
+//        prg.program_map_PID = getBits(13);
+//        pat.programs.push_back(prg);
+//    }
+
+    return pmt;
 }

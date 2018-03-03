@@ -19,6 +19,7 @@
 
 unsigned long count = 0;
 unsigned long countAdaptPacket = 0;
+unsigned int g_SPPID = 0;
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -30,9 +31,19 @@ void PATCallback(PsiTable& table)
 {
     std::cout << "demuxed PAT table \n" << table.table_id;
 
-    std::cout << "Got PSI table:" << std::endl << table << std::endl;
+    //std::cout << "Got PSI table:" << std::endl << table << std::endl;
     PatTable* pat = static_cast<PatTable*>(&table);
-    std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
+    //std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
+    g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
+}
+
+void PMTCallback(PsiTable& table)
+{
+    std::cout << "demuxed PMT table \n" << table.table_id;
+
+    std::cout << "Got PSI table:" << std::endl << table << std::endl;
+    PatTable* pmt = static_cast<PatTable*>(&table);
+    std::cout << "Got PMT packet:" << std::endl << *pmt << std::endl;
 }
 
 void PESCallback(const PesPacket& pes)
@@ -123,6 +134,11 @@ int main(int, char**)
         //        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet);
+        if (g_SPPID)
+        {
+            //std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
+            tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+        }
 
         if (tsPacketInfo.hasAdaptationField)
         {
