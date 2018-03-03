@@ -81,12 +81,28 @@ public:
     uint64_t parsePcr(const uint8_t* buffer);
 
     /*!
+     * Parses PSI table
+     * @param packet
+     * @param info
+     * @param psiTable
+     */
+    void parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& psiTable);
+
+    /*!
      * Parses PAT table
      * @param packet
      * @param info
      * @return
      */
     PatTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
+
+    /*!
+     * Parse PMT table
+     * @param packet
+     * @param info
+     * @return
+     */
+    PmtTable parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info);
 
 private:
     uint64_t mPacketErrorCounter;              // Wrong sync byte

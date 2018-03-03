@@ -65,7 +65,7 @@ TEST(TsParserTests, CheckPid)
     // TODO add more tests...
 }
 
-TEST(TsParserTests, CheckParsePatPacket1)
+TEST(TsParserTests, CheckParsePatTable)
 {
     TsParser parser;
     // TsHeader hdr = parser.parseTsHeader(packet_1);
@@ -79,7 +79,7 @@ TEST(TsParserTests, CheckParsePatPacket1)
     //    EXPECT_EQ(598, pat.network_PID);
 }
 
-TEST(TsParserTests, CheckParsePatPacket2)
+TEST(TsParserTests, CheckParsePatTable2)
 {
     TsParser parser;
     PatTable pat;
@@ -148,6 +148,51 @@ TEST(TsParserTests, CheckParsePatPacket2)
 
     EXPECT_EQ(0xbd6, pat.programs[16].program_number);
     EXPECT_EQ(0xbd6, pat.programs[16].program_map_PID);
+}
+
+TEST(TsParserTests, CheckParsePmtTable)
+{
+    TsParser parser;
+    PmtTable pmt;
+    TsPacketInfo info;
+
+    parser.parseTsPacketInfo(pmt_packet_1, info);
+    pmt = parser.parsePmtPacket(pmt_packet_1, info);
+    EXPECT_EQ(1010, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
+
+    EXPECT_EQ(1, pmt.section_syntax_indicator);
+    EXPECT_EQ(0x034, pmt.section_length);
+    EXPECT_EQ(0x03f2, pmt.transport_stream_id);
+    EXPECT_EQ((0xed >> 1) & 0x1F, pmt.version_number);
+    EXPECT_EQ(1, pmt.current_next_indicator);
+    EXPECT_EQ(0x00, pmt.section_number);
+    EXPECT_EQ(0, pmt.last_section_number);
+
+    // Extensions from PsiTable
+    EXPECT_EQ(0x03fb, pmt.PCR_PID);
+    EXPECT_EQ(0, pmt.program_info_length);
+
+    EXPECT_EQ(4, pmt.streams.size());
+    // ESPID=1004(0x3ec)
+    EXPECT_EQ(0x6, pmt.streams[0].stream_type);
+    EXPECT_EQ(0x3ec, pmt.streams[0].elementary_PID);
+    EXPECT_EQ(7, pmt.streams[0].ES_info_length);
+
+    // ESPID=1018(0x3fa)
+    EXPECT_EQ(0x3, pmt.streams[1].stream_type);
+    EXPECT_EQ(0x3fa, pmt.streams[1].elementary_PID);
+    EXPECT_EQ(0, pmt.streams[1].ES_info_length);
+
+    // ESPID=1017(0x3f9)
+    EXPECT_EQ(0x6, pmt.streams[2].stream_type);
+    EXPECT_EQ(0x3f9, pmt.streams[2].elementary_PID);
+    EXPECT_EQ(12, pmt.streams[2].ES_info_length);
+
+    // ESPID=1019(0x3fb)
+    EXPECT_EQ(0x2, pmt.streams[3].stream_type);
+    EXPECT_EQ(0x3fb, pmt.streams[3].elementary_PID);
+    EXPECT_EQ(0, pmt.streams[3].ES_info_length);
 }
 
 TEST(TsParserTests, CheckParseTsHeader)

@@ -173,9 +173,8 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
 }
 
 
-PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+void TsParser::parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& table)
 {
-    PatTable pat;
     uint8_t pointerOffset = info.payloadStartOffset;
 
     const uint8_t pointer_field = packet[pointerOffset];
@@ -183,17 +182,25 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     pointerOffset += pointer_field;
 
     resetBits(packet, TS_PACKET_SIZE, pointerOffset);
-    pat.table_id = getBits(8);
-    pat.section_syntax_indicator = getBits(1);
+
+    table.table_id = getBits(8);
+    table.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    pat.section_length = getBits(12);
-    pat.transport_stream_id = getBits(16);
+    table.section_length = getBits(12);
+    table.transport_stream_id = getBits(16);
     getBits(2);
-    pat.version_number = getBits(5);
-    pat.current_next_indicator = getBits(1);
-    pat.section_number = getBits(8);
-    pat.last_section_number = getBits(8);
+    table.version_number = getBits(5);
+    table.current_next_indicator = getBits(1);
+    table.section_number = getBits(8);
+    table.last_section_number = getBits(8);
+}
+
+
+PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+{
+    PatTable pat;
+    parsePsiTable(packet, info, pat);
 
     int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
@@ -207,4 +214,35 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     }
 
     return pat;
+}
+
+// TODO support PMTs greater than 1 Ts packet.
+PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info)
+{
+    PmtTable pmt;
+    parsePsiTable(packet, info, pmt);
+
+    getBits(3); // reserved
+    pmt.PCR_PID = getBits(13);
+    getBits(4); // reserved
+    pmt.program_info_length = getBits(12);
+    getBits(8 * pmt.program_info_length); // skip descriptors for now
+
+    int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
+
+    int readSize = 0;
+    while (readSize < streamsSize)
+    {
+        StreamTypeHeader hdr;
+        hdr.stream_type = getBits(8);
+        getBits(3); // reserved
+        hdr.elementary_PID = getBits(13);
+        getBits(4); // reserved
+        hdr.ES_info_length = getBits(12);
+        getBits(hdr.ES_info_length * 8); // Skip for now
+        readSize += hdr.ES_info_length + PMT_STREAM_TYPE_LENGTH;
+        pmt.streams.push_back(hdr);
+    }
+
+    return pmt;
 }

@@ -22,9 +22,23 @@ const int PAT_PACKET_OFFSET_LENGTH = 5;
 const int CRC32_SIZE = 4;
 const int PAT_PACKET_PROGRAM_SIZE = 4;
 
+const int PMT_PACKET_OFFSET_LENGTH = 9;
+const int PMT_STREAM_TYPE_LENGTH = 5;
+
 
 /*!
- * transport stream header, see ISO/IEC 13818-1:2015
+ * References in this file are taken from ISO/IEC 13818-1:2015
+ * Fifth edition 2015-07-01
+ * Information technology — Generic
+ * coding of moving pictures and
+ * associated audio information —
+ * Part 1: Systems
+ *
+ * All references here after reference to this document.
+ */
+
+/*!
+ * transport stream header
  * 4 bytes
  */
 struct TsHeader
@@ -55,7 +69,7 @@ struct TsHeader
 
 
 /*!
- * adaptation field header, see ISO/IEC 13818-1:2015
+ * adaptation field header
  * 2 bytes
  */
 struct TsAdaptationFieldHeader
@@ -73,8 +87,7 @@ struct TsAdaptationFieldHeader
 };
 
 /*!
- * Adaptation field control values, see table 2-5,
- * in ISO/IEC 13818-1:2015
+ * Adaptation field control values, see table 2-5
  */
 enum TsAdaptationFieldControl
 {
@@ -114,7 +127,7 @@ public:
     uint8_t table_id;
     bool section_syntax_indicator;
     uint16_t section_length;
-    uint16_t transport_stream_id;
+    uint16_t transport_stream_id; // TODO program_number for PMT? Use Union?
     uint8_t version_number;
     bool current_next_indicator;
     uint8_t section_number;
@@ -127,7 +140,7 @@ public:
         ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
         ss << "section_length: " << (int)rhs.section_length << std::endl;
         ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
-        ss << "version_number: " << rhs.version_number << std::endl;
+        ss << "version_number: " << (int)rhs.version_number << std::endl;
         ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
         ss << "section_number: " << (int)rhs.section_number << std::endl;
         ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
@@ -158,6 +171,40 @@ public:
     }
 };
 
+struct StreamTypeHeader
+{
+    uint8_t stream_type;
+    uint16_t elementary_PID;
+    uint16_t ES_info_length;
+};
+
+class PmtTable : public PsiTable
+{
+public:
+    uint16_t PCR_PID;
+    uint16_t program_info_length;
+    //    std::vector<Descriptor> descriptors; // TODO
+    std::vector<StreamTypeHeader> streams;
+
+
+    friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
+    {
+        ss << "-------------PmtTable------------- " << std::endl;
+        ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
+        ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
+        ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;
+        for (unsigned int i = 0; i < rhs.streams.size(); i++)
+        {
+            ss << "-------------stream " << i << "--------------" << std::endl;
+            ss << "stream_type: " << (int)rhs.streams[i].stream_type << std::endl;
+            ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
+            ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
+        }
+
+        return ss;
+    }
+};
+
 
 /// @brief Parsed PES
 // TODO: move to own file
@@ -167,7 +214,7 @@ protected:
 };
 
 /*! @brief Table_id assignment values
- * [ISO 13818-1] Table 2-31 - table_id assignment values
+ * Table 2-31 - table_id assignment values
  *
  */
 enum PsiTableId_e
