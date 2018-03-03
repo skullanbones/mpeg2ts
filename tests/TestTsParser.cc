@@ -168,6 +168,31 @@ TEST(TsParserTests, CheckParsePmtTable)
     EXPECT_EQ(1, pmt.current_next_indicator);
     EXPECT_EQ(0x00, pmt.section_number);
     EXPECT_EQ(0, pmt.last_section_number);
+
+    // Extensions from PsiTable
+    EXPECT_EQ(0x03fb, pmt.PCR_PID);
+    EXPECT_EQ(0, pmt.program_info_length);
+
+    EXPECT_EQ(4, pmt.streams.size());
+    // ESPID=1004(0x3ec)
+    EXPECT_EQ(0x6, pmt.streams[0].stream_type);
+    EXPECT_EQ(0x3ec, pmt.streams[0].elementary_PID);
+    EXPECT_EQ(7, pmt.streams[0].ES_info_length);
+
+    // ESPID=1018(0x3fa)
+    EXPECT_EQ(0x3, pmt.streams[1].stream_type);
+    EXPECT_EQ(0x3fa, pmt.streams[1].elementary_PID);
+    EXPECT_EQ(0, pmt.streams[1].ES_info_length);
+
+    // ESPID=1017(0x3f9)
+    EXPECT_EQ(0x6, pmt.streams[2].stream_type);
+    EXPECT_EQ(0x3f9, pmt.streams[2].elementary_PID);
+    EXPECT_EQ(12, pmt.streams[2].ES_info_length);
+
+    // ESPID=1019(0x3fb)
+    EXPECT_EQ(0x2, pmt.streams[3].stream_type);
+    EXPECT_EQ(0x3fb, pmt.streams[3].elementary_PID);
+    EXPECT_EQ(0, pmt.streams[3].ES_info_length);
 }
 
 TEST(TsParserTests, CheckParseTsHeader)
