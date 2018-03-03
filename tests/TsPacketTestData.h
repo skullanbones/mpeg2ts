@@ -123,55 +123,50 @@ const uint8_t pat_packet_1[] =
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 
-/*
- * PAT Packet
- * PID: 0
- *
- */
-/*
+/*!
  *
  * Taken from:
  * https://www.lysator.liu.se/upplysning/fa/DVB-uppLYSning.pdf
  *
  * Example: PAT — Swedish Terrestrial MUX1
-Here is an example from a live broadcast of the Swedish terrestrial
-MUX1, where the raw data of the Program Association Table was:
-00 b0 4d 03 fd c3 00 00 00 00 e0 10 14 3c f4 3c
-13 ba f3 ba 13 ce f3 ce 15 a4 f5 a4 04 d8 e4 d8
-16 08 f6 08 03 f2 e3 f2 16 d0 f6 d0 16 a8 f6 a8
-05 0a e5 0a 05 00 e5 00 03 66 e3 66 ff fe e7 12
-0b c2 eb c2 0b cc eb cc 0b d6 eb d6 e8 ca 31 cb
-The first eight bytes are the Table header, which decodes as follows:
-00 Table Type for PAT
-b0 4d Size: 0x04d bytes after the length field
-03 fd Table Extension: 0x03fd (TSID)
-c3 Table version information
-00 00 This section is number 0, last section is number 0
-The last four bytes are a 32-bit CRC checksum. The rest is a list of
-32-bit entries containing the following information:
-Program 0(0x0) PID=16(0x10)
-Program 5180(0x143c) PID=5180(0x143c)
-Program 5050(0x13ba) PID=5050(0x13ba)
-Program 5070(0x13ce) PID=5070(0x13ce)
-Program 5540(0x15a4) PID=5540(0x15a4)
-Program 1240(0x4d8) PID=1240(0x4d8)
-Program 5640(0x1608) PID=5640(0x1608)
-Program 1010(0x3f2) PID=1010(0x3f2)
-Program 5840(0x16d0) PID=5840(0x16d0)
-Program 5800(0x16a8) PID=5800(0x16a8)
-Program 1290(0x50a) PID=1290(0x50a)
-Program 1280(0x500) PID=1280(0x500)
-Program 870(0x366) PID=870(0x366)
-Program 65534(0xfffe) PID=1810(0x712)
-Program 3010(0xbc2) PID=3010(0xbc2)
-Program 3020(0xbcc) PID=3020(0xbcc)
-Program 3030(0xbd6) PID=3030(0xbd6)
-Note 1: Program 0 is not a real program; it’s used to indicate the PID where
-network information is broadcast.
-Note 2: the Swedish operator, Teracom, has chosen to use the same number for PID
-and Program Number for most of the programs, so Program 870 has it’s PMTs on
-PID 870. But not all operators do this, and it isn’t possible to do it generally, since
-the Program Number is a 16-bit value, but the PID is only a 13-bit value.
+ * Here is an example from a live broadcast of the Swedish terrestrial
+ * MUX1, where the raw data of the Program Association Table was:
+ * 00 b0 4d 03 fd c3 00 00 00 00 e0 10 14 3c f4 3c
+ * 13 ba f3 ba 13 ce f3 ce 15 a4 f5 a4 04 d8 e4 d8
+ * 16 08 f6 08 03 f2 e3 f2 16 d0 f6 d0 16 a8 f6 a8
+ * 05 0a e5 0a 05 00 e5 00 03 66 e3 66 ff fe e7 12
+ * 0b c2 eb c2 0b cc eb cc 0b d6 eb d6 e8 ca 31 cb
+ * The first eight bytes are the Table header, which decodes as follows:
+ * 00 Table Type for PAT
+ * b0 4d Size: 0x04d bytes after the length field
+ * 03 fd Table Extension: 0x03fd (TSID)
+ * c3 Table version information
+ * 00 00 This section is number 0, last section is number 0
+ * The last four bytes are a 32-bit CRC checksum. The rest is a list of
+ * 32-bit entries containing the following information:
+ * Program 0(0x0) PID=16(0x10)
+ * Program 5180(0x143c) PID=5180(0x143c)
+ * Program 5050(0x13ba) PID=5050(0x13ba)
+ * Program 5070(0x13ce) PID=5070(0x13ce)
+ * Program 5540(0x15a4) PID=5540(0x15a4)
+ * Program 1240(0x4d8) PID=1240(0x4d8)
+ * Program 5640(0x1608) PID=5640(0x1608)
+ * Program 1010(0x3f2) PID=1010(0x3f2)
+ * Program 5840(0x16d0) PID=5840(0x16d0)
+ * Program 5800(0x16a8) PID=5800(0x16a8)
+ * Program 1290(0x50a) PID=1290(0x50a)
+ * Program 1280(0x500) PID=1280(0x500)
+ * Program 870(0x366) PID=870(0x366)
+ * Program 65534(0xfffe) PID=1810(0x712)
+ * Program 3010(0xbc2) PID=3010(0xbc2)
+ * Program 3020(0xbcc) PID=3020(0xbcc)
+ * Program 3030(0xbd6) PID=3030(0xbd6)
+ * Note 1: Program 0 is not a real program; it’s used to indicate the PID where
+ * network information is broadcast.
+ * Note 2: the Swedish operator, Teracom, has chosen to use the same number for PID
+ * and Program Number for most of the programs, so Program 870 has it’s PMTs on
+ * PID 870. But not all operators do this, and it isn’t possible to do it generally, since
+ * the Program Number is a 16-bit value, but the PID is only a 13-bit value.
  */
 const uint8_t pat_packet_2[] =
 { 0x47, 0x40, 0x00, 0x18, 0x00, 0x00, 0xb0, 0x4d, 0x03, 0xfd, 0xc3, 0x00, 0x00, 0x00, 0x00, 0xe0,
@@ -186,3 +181,51 @@ const uint8_t pat_packet_2[] =
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+
+/*!
+ * Continuing with the same recorded data as for the PAT in the previous
+ * example, this was the raw data of the PMT on PID 1010, for Program
+ * 1010:
+
+ * The first eight bytes are the Table header:
+ * 02          Table Type for PMT
+ * b0 34       Size: 0x034 bytes after the length field
+ * 03 f2       Table Extension: 0x03f2 (Program Number)
+ * ed          Table version information
+ * 00 00       This section is number 0, last section is number 0
+
+ * After the header, the first two bytes (e3 fb) are the PCR PID, but
+ * only the lowest 13 bits are used, giving the value: 0x03fb.
+ * After the PCR PID, there is a Program Descriptor Loop, with first 4
+ * unused bits, then a 12-bit length field, and then the Descriptor data.
+ * But in this case, the data is f0 00, giving a value of 0 for the length
+ * field, meaning no Descriptor data is present.
+ * The remaining data is a list of Elementary Streams, which decodes to
+ * the following information:
+ * ESPID=1004(0x3ec), type=6(0x6)
+ * teletext_descriptor
+ * (RAW DATA: 56 05 73 77 65 09 00)
+ * ESPID=1018(0x3fa), type=3(0x3)
+ * ESPID=1017(0x3f9), type=6(0x6)
+ * AC-3_descriptor
+ * (RAW DATA: 6a 01 00)
+ * stream_identifier_descriptor, tag: 189(0xbd)
+ * (RAW DATA: 52 01 bd)
+ * registration_descriptor
+ * (RAW DATA: 05 04 41 43 2d 33)
+ * ESPID=1019(0x3fb), type=2(0x2)
+ */
+const uint8_t pmt_packet_1[] =
+{ 0x47, 0x43, 0xF2, 0x18, 0x00, 0x02, 0xb0, 0x34, 0x03, 0xf2, 0xed, 0x00, 0x00, 0xe3, 0xfb, 0xf0,
+  0x00, 0x06, 0xe3, 0xec, 0xf0, 0x07, 0x56, 0x05, 0x73, 0x77, 0x65, 0x09, 0x00, 0x03, 0xe3, 0xfa,
+  0xf0, 0x00, 0x06, 0xe3, 0xf9, 0xf0, 0x0c, 0x6a, 0x01, 0x00, 0x52, 0x01, 0xbd, 0x05, 0x04, 0x41,
+  0x43, 0x2d, 0x33, 0x02, 0xe3, 0xfb, 0xf0, 0x00, 0xa1, 0xd9, 0x4a, 0x10, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+

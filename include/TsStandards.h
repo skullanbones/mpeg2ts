@@ -127,7 +127,7 @@ public:
     uint8_t table_id;
     bool section_syntax_indicator;
     uint16_t section_length;
-    uint16_t transport_stream_id;
+    uint16_t transport_stream_id; // TODO program_number for PMT? Use Union?
     uint8_t version_number;
     bool current_next_indicator;
     uint8_t section_number;
@@ -140,7 +140,7 @@ public:
         ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
         ss << "section_length: " << (int)rhs.section_length << std::endl;
         ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
-        ss << "version_number: " << rhs.version_number << std::endl;
+        ss << "version_number: " << (int)rhs.version_number << std::endl;
         ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
         ss << "section_number: " << (int)rhs.section_number << std::endl;
         ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;

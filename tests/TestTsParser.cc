@@ -65,7 +65,7 @@ TEST(TsParserTests, CheckPid)
     // TODO add more tests...
 }
 
-TEST(TsParserTests, CheckParsePatPacket1)
+TEST(TsParserTests, CheckParsePatTable)
 {
     TsParser parser;
     // TsHeader hdr = parser.parseTsHeader(packet_1);
@@ -79,7 +79,7 @@ TEST(TsParserTests, CheckParsePatPacket1)
     //    EXPECT_EQ(598, pat.network_PID);
 }
 
-TEST(TsParserTests, CheckParsePatPacket2)
+TEST(TsParserTests, CheckParsePatTable2)
 {
     TsParser parser;
     PatTable pat;
@@ -148,6 +148,26 @@ TEST(TsParserTests, CheckParsePatPacket2)
 
     EXPECT_EQ(0xbd6, pat.programs[16].program_number);
     EXPECT_EQ(0xbd6, pat.programs[16].program_map_PID);
+}
+
+TEST(TsParserTests, CheckParsePmtTable)
+{
+    TsParser parser;
+    PmtTable pmt;
+    TsPacketInfo info;
+
+    parser.parseTsPacketInfo(pmt_packet_1, info);
+    pmt = parser.parsePmtPacket(pmt_packet_1, info);
+    EXPECT_EQ(1010, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
+
+    EXPECT_EQ(1, pmt.section_syntax_indicator);
+    EXPECT_EQ(0x034, pmt.section_length);
+    EXPECT_EQ(0x03f2, pmt.transport_stream_id);
+  //  EXPECT_EQ(0xed & , pmt.version_number);
+    EXPECT_EQ(1, pmt.current_next_indicator);
+    EXPECT_EQ(0x00, pmt.section_number);
+    EXPECT_EQ(0, pmt.last_section_number);
 }
 
 TEST(TsParserTests, CheckParseTsHeader)
