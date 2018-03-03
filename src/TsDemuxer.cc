@@ -37,7 +37,7 @@ void TsDemuxer::demux(const uint8_t* packet)
             table = mParser.parsePatPacket(packet, tsPacketInfo);
             mPsiCallbackMap[tsPacketInfo.pid](table);
         }
-        else if(psi.table_id == PSI_TABLE_ID_PMT)
+        else if (psi.table_id == PSI_TABLE_ID_PMT)
         {
             PmtTable table;
             table = mParser.parsePmtPacket(packet, tsPacketInfo);
@@ -45,7 +45,6 @@ void TsDemuxer::demux(const uint8_t* packet)
         }
 
         // TODO: gather whole table and send it then
-
     }
 }
 

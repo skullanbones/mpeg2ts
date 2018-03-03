@@ -25,6 +25,12 @@ const int PAT_PACKET_PROGRAM_SIZE = 4;
 
 /*!
  * References in this file are taken from ISO/IEC 13818-1:2015
+ * Fifth edition 2015-07-01
+ * Information technology — Generic
+ * coding of moving pictures and
+ * associated audio information —
+ * Part 1: Systems
+ *
  * All references here after reference to this document.
  */
 
@@ -174,7 +180,7 @@ class PmtTable : public PsiTable
 public:
     uint16_t PCR_PID;
     uint16_t program_info_length;
-//    std::vector<Descriptor> descriptors; // TODO
+    //    std::vector<Descriptor> descriptors; // TODO
     std::vector<StreamTypeHeader> streams;
 
 
@@ -187,8 +193,8 @@ public:
         for (unsigned int i = 0; i < rhs.streams.size(); i++)
         {
             ss << "-------------stream " << i << "--------------" << std::endl;
-//            ss << "program_number: " << rhs.programs[i].program_number << std::endl;
-//            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
+            //            ss << "program_number: " << rhs.programs[i].program_number << std::endl;
+            //            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
         }
 
         return ss;

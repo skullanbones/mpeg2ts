@@ -31,9 +31,9 @@ void PATCallback(PsiTable& table)
 {
     std::cout << "demuxed PAT table \n" << table.table_id;
 
-    //std::cout << "Got PSI table:" << std::endl << table << std::endl;
+    // std::cout << "Got PSI table:" << std::endl << table << std::endl;
     PatTable* pat = static_cast<PatTable*>(&table);
-    //std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
+    // std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
     g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
 }
 
@@ -136,7 +136,7 @@ int main(int, char**)
         tsDemux.demux(packet);
         if (g_SPPID)
         {
-            //std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
+            // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
             tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 

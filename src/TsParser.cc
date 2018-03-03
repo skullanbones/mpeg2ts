@@ -257,16 +257,17 @@ PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& inf
     getBits(4); // reserved
     pmt.program_info_length = getBits(12);
 
-//    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    //    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) /
+    //    PAT_PACKET_PROGRAM_SIZE;
 
-//    for (int i = 0; i < numberOfPrograms; i++)
-//    {
-//        Program prg;
-//        prg.program_number = getBits(16);
-//        getBits(3); // reserved
-//        prg.program_map_PID = getBits(13);
-//        pat.programs.push_back(prg);
-//    }
+    //    for (int i = 0; i < numberOfPrograms; i++)
+    //    {
+    //        Program prg;
+    //        prg.program_number = getBits(16);
+    //        getBits(3); // reserved
+    //        prg.program_map_PID = getBits(13);
+    //        pat.programs.push_back(prg);
+    //    }
 
     return pmt;
 }
