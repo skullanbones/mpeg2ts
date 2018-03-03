@@ -231,7 +231,7 @@ PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& inf
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
 
     int readSize = 0;
-    while(readSize < streamsSize)
+    while (readSize < streamsSize)
     {
         StreamTypeHeader hdr;
         hdr.stream_type = getBits(8);
