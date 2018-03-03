@@ -137,7 +137,8 @@ public:
         ss << "section_number: " << (int)section_number << std::endl;
         ss << "last_section_number: " << (int)last_section_number << std::endl;
         ss << "programs.size(): " << (int)programs.size() << std::endl;
-        for (unsigned int i = 0; i < programs.size(); i++) {
+        for (unsigned int i = 0; i < programs.size(); i++)
+        {
             ss << "-------------program " << i << "--------------" << std::endl;
             ss << "program_number: " << programs[i].program_number << std::endl;
             ss << "program_map_PID: " << programs[i].program_map_PID << std::endl;
@@ -146,7 +147,6 @@ public:
         return ss.str();
     }
 };
-
 
 
 /// @brief Parsed PES

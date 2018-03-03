@@ -5,7 +5,7 @@
 
 class GetBits
 {
-    public:
+public:
     GetBits();
 
     virtual ~GetBits();
@@ -24,7 +24,7 @@ class GetBits
      */
     size_t getByteInx();
 
-    protected:
+protected:
     uint8_t mNumStoredBits;
     uint8_t mBitStore;
     size_t mSrcInx;

@@ -156,8 +156,8 @@ TEST(TsParserTests, CheckParseTsHeader)
     TsHeader hdr = parser.parseTsHeader(packet_3);
 
     EXPECT_EQ(289, hdr.PID);
-    //parser.parseTsPacketInfo(packet_4, info);
-    //EXPECT_EQ(481, info.pid);
+    // parser.parseTsPacketInfo(packet_4, info);
+    // EXPECT_EQ(481, info.pid);
     // TODO add more tests...
 }
 
