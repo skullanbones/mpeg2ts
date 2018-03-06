@@ -209,6 +209,33 @@ TEST(TsParserTests, CheckParseTsHeader)
     // TODO add more tests...
 }
 
+TEST(TsParserTests, CheckParselargePmtTable)
+{
+    TsParser parser;
+
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(pmt_packet_2_1, info);
+    auto table = parser.collectTable(pmt_packet_2_1, info);
+    EXPECT_TRUE(table.empty());
+    parser.parseTsPacketInfo(pmt_packet_2_2, info);
+    table = parser.collectTable(pmt_packet_2_2, info);
+    EXPECT_FALSE(table.empty());
+
+    auto pmt = parser.parsePmtPacket(table);
+    EXPECT_EQ(32, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
+    
+    // Extensions from PsiTable
+    EXPECT_EQ(599, pmt.PCR_PID);
+    EXPECT_EQ(22, pmt.program_info_length);
+    
+    EXPECT_EQ(9, pmt.streams.size());
+    
+    EXPECT_EQ(21, pmt.streams[8].stream_type);
+    EXPECT_EQ(144, pmt.streams[8].elementary_PID);
+    EXPECT_EQ(26, pmt.streams[8].ES_info_length);
+}
+
 TEST(MathTest, TwoPlusTwoEqualsFour)
 {
     EXPECT_EQ(2 + 2, 4);
