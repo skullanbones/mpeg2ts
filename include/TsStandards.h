@@ -132,6 +132,7 @@ public:
     bool current_next_indicator;
     uint8_t section_number;
     uint8_t last_section_number;
+    uint32_t CRC_32;
 
     friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
@@ -203,6 +204,15 @@ public:
 
         return ss;
     }
+};
+
+struct CatDescriptor
+{};
+
+class CatTable : public PsiTable
+{
+public:
+    std::vector<CatDescriptor> descriptors;
 };
 
 
