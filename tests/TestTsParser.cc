@@ -73,7 +73,8 @@ TEST(TsParserTests, CheckParsePatTable)
     PsiTable pat;
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
-    pat = parser.parsePatPacket(pat_packet_1, info);
+    auto table = parser.collectTable(pat_packet_1, info);
+    pat = parser.parsePatPacket(table);
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
     //    EXPECT_EQ(598, pat.network_PID);
@@ -86,7 +87,8 @@ TEST(TsParserTests, CheckParsePatTable2)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
-    pat = parser.parsePatPacket(pat_packet_2, info);
+    auto table = parser.collectTable(pat_packet_2, info);
+    pat = parser.parsePatPacket(table);
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
 
@@ -157,7 +159,8 @@ TEST(TsParserTests, CheckParsePmtTable)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pmt_packet_1, info);
-    pmt = parser.parsePmtPacket(pmt_packet_1, info);
+    auto table = parser.collectTable(pmt_packet_1, info);
+    pmt = parser.parsePmtPacket(table);
     EXPECT_EQ(1010, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
 

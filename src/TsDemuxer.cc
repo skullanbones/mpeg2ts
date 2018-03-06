@@ -20,31 +20,32 @@ TsDemuxer::TsDemuxer()
 {
 }
 
-void TsDemuxer::demux(const uint8_t* packet)
+void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo;
-    mParser.parseTsPacketInfo(packet, tsPacketInfo);
+    mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // TODO Filter PID from PSI, TS, PES etc...
         // Check what table
-        PsiTable psi;
-        mParser.parsePsiTable(packet, tsPacketInfo, psi);
+        auto table = mParser.collectTable(tsPacket, tsPacketInfo);
 
-        if (tsPacketInfo.pid == TS_PACKET_PID_PAT) // TODO also use table_id?
+        if (table.empty())
         {
-            PatTable table;
-            table = mParser.parsePatPacket(packet, tsPacketInfo);
-            mPsiCallbackMap[tsPacketInfo.pid](table);
+            return;
         }
-        else if (psi.table_id == PSI_TABLE_ID_PMT)
+        
+        PsiTable tableInfo = mParser.parsePsiTable(table);
+        if (tableInfo.table_id == PSI_TABLE_ID_PAT)
         {
-            PmtTable table;
-            table = mParser.parsePmtPacket(packet, tsPacketInfo);
-            mPsiCallbackMap[tsPacketInfo.pid](table);
+            PatTable pat = mParser.parsePatPacket(table);
+            mPsiCallbackMap[tsPacketInfo.pid](pat);
         }
-
-        // TODO: gather whole table and send it then
+        else if (tableInfo.table_id == PSI_TABLE_ID_PMT)
+        {
+            PmtTable pmt = mParser.parsePmtPacket(table);
+            mPsiCallbackMap[tsPacketInfo.pid](pmt);
+        }
     }
 }
 

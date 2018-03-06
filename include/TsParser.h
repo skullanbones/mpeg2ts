@@ -80,13 +80,14 @@ public:
      */
     uint64_t parsePcr(const uint8_t* buffer);
 
+    std::vector<uint8_t> collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
     /*!
      * Parses PSI table
      * @param packet
      * @param info
      * @param psiTable
      */
-    void parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& psiTable);
+    PsiTable parsePsiTable(const std::vector<uint8_t>& table);
 
     /*!
      * Parses PAT table
@@ -94,7 +95,7 @@ public:
      * @param info
      * @return
      */
-    PatTable parsePatPacket(const uint8_t* packet, const TsPacketInfo& info);
+    PatTable parsePatPacket(const std::vector<uint8_t>& table);
 
     /*!
      * Parse PMT table
@@ -102,9 +103,18 @@ public:
      * @param info
      * @return
      */
-    PmtTable parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info);
+    PmtTable parsePmtPacket(const std::vector<uint8_t>& table);
 
 private:
+    std::vector<uint8_t> mSectionBuffer;
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
+};
+
+struct TsParserException
+{
+    TsParserException(const std::string msg);
+    virtual ~TsParserException();
+
+    const std::string mMsg;
 };

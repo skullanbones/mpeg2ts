@@ -172,37 +172,64 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
-
-void TsParser::parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& table)
+std::vector<uint8_t> TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
 {
-    uint8_t pointerOffset = info.payloadStartOffset;
+    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    if (tsPacketInfo.isPayloadStart)
+    {
+        mSectionBuffer.clear();
+        
+        const uint8_t pointer_field = tsPacket[pointerOffset];
+        pointerOffset += sizeof(pointer_field);
+        pointerOffset += pointer_field;
+    }
+    
+    mSectionBuffer.insert(mSectionBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+    PsiTable tableInfo = parsePsiTable(mSectionBuffer);
+    if (mSectionBuffer.size() < tableInfo.section_length)
+    {
+        return std::vector<uint8_t>();
+    }
+/*for (auto x : mSectionBuffer)
+{
+    std::cerr << std::hex << (int)x << " ";
+}
+std::cerr << "size " << mSectionBuffer.size() << "\n";*/
+    return mSectionBuffer;
+}
 
-    const uint8_t pointer_field = packet[pointerOffset];
-    pointerOffset += sizeof(pointer_field);
-    pointerOffset += pointer_field;
+PsiTable TsParser::parsePsiTable(const std::vector<uint8_t>& table)
+{
+    PsiTable tableInfo;
 
-    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
+    resetBits(table.data(), TS_PACKET_SIZE, 0);
 
-    table.table_id = getBits(8);
-    table.section_syntax_indicator = getBits(1);
+    tableInfo.table_id = getBits(8);
+    tableInfo.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    table.section_length = getBits(12);
-    table.transport_stream_id = getBits(16);
+    tableInfo.section_length = getBits(12);
+    tableInfo.transport_stream_id = getBits(16);
     getBits(2);
-    table.version_number = getBits(5);
-    table.current_next_indicator = getBits(1);
-    table.section_number = getBits(8);
-    table.last_section_number = getBits(8);
+    tableInfo.version_number = getBits(5);
+    tableInfo.current_next_indicator = getBits(1);
+    tableInfo.section_number = getBits(8);
+    tableInfo.last_section_number = getBits(8);
+
+    return tableInfo;
 }
 
 
-PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+PatTable TsParser::parsePatPacket(const std::vector<uint8_t>& table)
 {
     PatTable pat;
-    parsePsiTable(packet, info, pat);
+    PsiTable tableInfo = parsePsiTable(table);
+    pat.section_length = tableInfo.section_length;
+    pat.table_id = tableInfo.table_id;
+    pat.transport_stream_id= tableInfo.transport_stream_id;
+    pat.version_number = tableInfo.version_number;
 
-    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    int numberOfPrograms = (tableInfo.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {
@@ -216,11 +243,18 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     return pat;
 }
 
-// TODO support PMTs greater than 1 Ts packet.
-PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info)
+PmtTable TsParser::parsePmtPacket(const std::vector<uint8_t>& table)
 {
     PmtTable pmt;
-    parsePsiTable(packet, info, pmt);
+    PsiTable tableInfo = parsePsiTable(table);
+    pmt.section_length = tableInfo.section_length;
+    pmt.table_id = tableInfo.table_id;
+    pmt.section_syntax_indicator = tableInfo.section_syntax_indicator;
+    pmt.transport_stream_id= tableInfo.transport_stream_id;
+    pmt.version_number= tableInfo.version_number;
+    pmt.current_next_indicator= tableInfo.current_next_indicator;
+    pmt.section_number= tableInfo.section_number;
+    pmt.last_section_number= tableInfo.last_section_number;
 
     getBits(3); // reserved
     pmt.PCR_PID = getBits(13);
@@ -228,7 +262,7 @@ PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& inf
     pmt.program_info_length = getBits(12);
     getBits(8 * pmt.program_info_length); // skip descriptors for now
 
-    int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
+    int streamsSize = (tableInfo.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
 
     int readSize = 0;
     while (readSize < streamsSize)
