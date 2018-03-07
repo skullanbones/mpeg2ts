@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 .PHONY: all clean
 
 all:
-	$(CXX) $(CXXFLAGS) TestTsParser.cc $(INC) -lgtest -L$(PROJ_ROOT) -lts -o $(COMPONENT_NAME)
+	$(CXX) $(CXXFLAGS) TestTsParser.cc $(INC) -lgtest -lpthread -L$(PROJ_ROOT) -lts -o $(COMPONENT_NAME)
 	./$(COMPONENT_NAME)
 
 clean:

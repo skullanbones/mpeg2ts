@@ -8,7 +8,7 @@
 
 COMPONENT_NAME ?= ts-lib
 DOCKER_IMAGE_VER ?= v1
-DOCKER_IMAGE_NAME ?= skullanbones/ts-lib
+DOCKER_IMAGE_NAME ?= heliconwave/circleci
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 CXX = g++
