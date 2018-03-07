@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: m1kev4ndyke/docker-gtest
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: echo "Hello, world." && make
+      - run:
+          name: Print the Current Time
+          command: date
