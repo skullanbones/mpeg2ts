@@ -5,10 +5,10 @@
 #
 
 FROM ubuntu:16.04
-MAINTAINER heliconwave <heliconwave@gmail.com>
 
 
-RUN apt-get update && apt-get install --yes \
+RUN apt-get update && \
+        apt-get install --yes \
         software-properties-common \
         build-essential \
         clang-format-5.0 \
@@ -19,13 +19,23 @@ RUN apt-get update && apt-get install --yes \
         cmake
 
 # Install gtest/gmock
-COPY ./3rd-party/gtest/release-1.8.0.tar.gz /tmp
-WORKDIR /tmp
-RUN tar xvzf release-1.8.0.tar.gz
-WORKDIR googletest-release-1.8.0/
-RUN cmake -DBUILD_SHARED_LIBS=ON .
-RUN make
-RUN cp -a googletest/include/gtest /usr/include
-RUN cp -a googlemock/include/gmock /usr/include
-RUN cp -a googlemock/gtest/libgtest_main.so googlemock/gtest/libgtest.so /usr/lib/
+RUN git clone -q https://github.com/google/googletest.git /googletest \
+  && cd googletest \
+  && git checkout tags/release-1.8.0 \
+  && mkdir -p /googletest/build \
+  && cd /googletest/build \
+  && cmake .. && make && make install \
+  && cd / && rm -rf /googletest
+
+# Install benchmark
+RUN git clone -q https://github.com/google/benchmark.git /benchmark \
+  && cd benchmark \
+  && git checkout tags/v1.3.0 \
+  && mkdir -p /benchmark/build \
+  && cd /benchmark/build \
+  && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
+  && cd / && rm -rf /benchmark
+
+
+
 WORKDIR /tmp/workspace
