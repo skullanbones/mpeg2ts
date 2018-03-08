@@ -80,14 +80,20 @@ public:
      */
     uint64_t parsePcr(const uint8_t* buffer);
 
-    std::vector<uint8_t> collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
+    /*!
+     * Parses Collects all parts of table and parses basic table information (eg table id)
+     * @param tsPacket mpeg2 transport stream packet with table in payload
+     * @param tsPacketInfo Input packet inforamtion
+     * @param table_id Collected table id
+     */
+    void collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id);
     /*!
      * Parses PSI table
      * @param packet
      * @param info
      * @param psiTable
      */
-    PsiTable parsePsiTable(const std::vector<uint8_t>& table);
+    void parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo);
 
     /*!
      * Parses PAT table
@@ -95,7 +101,7 @@ public:
      * @param info
      * @return
      */
-    PatTable parsePatPacket(const std::vector<uint8_t>& table);
+    PatTable parsePatPacket();
 
     /*!
      * Parse PMT table
@@ -103,18 +109,10 @@ public:
      * @param info
      * @return
      */
-    PmtTable parsePmtPacket(const std::vector<uint8_t>& table);
+    PmtTable parsePmtPacket();
 
 private:
     std::vector<uint8_t> mSectionBuffer;
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
-};
-
-struct TsParserException
-{
-    TsParserException(const std::string msg);
-    virtual ~TsParserException();
-
-    const std::string mMsg;
 };

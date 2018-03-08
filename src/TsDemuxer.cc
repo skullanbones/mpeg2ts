@@ -28,22 +28,17 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     {
         // TODO Filter PID from PSI, TS, PES etc...
         // Check what table
-        auto table = mParser.collectTable(tsPacket, tsPacketInfo);
+        uint8_t table_id;
+        mParser.collectTable(tsPacket, tsPacketInfo, table_id);
 
-        if (table.empty())
+        if (table_id == PSI_TABLE_ID_PAT)
         {
-            return;
-        }
-        
-        PsiTable tableInfo = mParser.parsePsiTable(table);
-        if (tableInfo.table_id == PSI_TABLE_ID_PAT)
-        {
-            PatTable pat = mParser.parsePatPacket(table);
+            PatTable pat = mParser.parsePatPacket();
             mPsiCallbackMap[tsPacketInfo.pid](pat);
         }
-        else if (tableInfo.table_id == PSI_TABLE_ID_PMT)
+        else if (table_id == PSI_TABLE_ID_PMT)
         {
-            PmtTable pmt = mParser.parsePmtPacket(table);
+            PmtTable pmt = mParser.parsePmtPacket();
             mPsiCallbackMap[tsPacketInfo.pid](pmt);
         }
     }

@@ -207,7 +207,8 @@ public:
 };
 
 struct CatDescriptor
-{};
+{
+};
 
 class CatTable : public PsiTable
 {
@@ -229,8 +230,9 @@ protected:
  */
 enum PsiTableId_e
 {
-    PSI_TABLE_ID_PAT = 0x00, /*! Program Association Table Id */
-    PSI_TABLE_ID_CAT = 0x01, /*! Conditional Access Section Table Id */
-    PSI_TABLE_ID_PMT = 0x02, /*! Program Map Table Id */
-    PSI_TABLE_ID_TDT = 0x03  /*! Optional Transport stream Desciption Table id */
+    PSI_TABLE_ID_PAT = 0x00,       /*! Program Association Table Id */
+    PSI_TABLE_ID_CAT = 0x01,       /*! Conditional Access Section Table Id */
+    PSI_TABLE_ID_PMT = 0x02,       /*! Program Map Table Id */
+    PSI_TABLE_ID_TDT = 0x03,       /*! Optional Transport stream Desciption Table id */
+    PSI_TABLE_ID_INCOMPLETE = 0xff /*! section under construction */
 };
