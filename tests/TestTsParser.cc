@@ -73,7 +73,10 @@ TEST(TsParserTests, CheckParsePatTable)
     PsiTable pat;
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
-    pat = parser.parsePatPacket(pat_packet_1, info);
+    uint8_t table_id;
+    parser.collectTable(pat_packet_1, info, table_id);
+    EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
+    pat = parser.parsePatPacket();
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
     //    EXPECT_EQ(598, pat.network_PID);
@@ -86,7 +89,10 @@ TEST(TsParserTests, CheckParsePatTable2)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
-    pat = parser.parsePatPacket(pat_packet_2, info);
+    uint8_t table_id;
+    parser.collectTable(pat_packet_2, info, table_id);
+    EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
+    pat = parser.parsePatPacket();
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
 
@@ -157,7 +163,10 @@ TEST(TsParserTests, CheckParsePmtTable)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pmt_packet_1, info);
-    pmt = parser.parsePmtPacket(pmt_packet_1, info);
+    uint8_t table_id;
+    parser.collectTable(pmt_packet_1, info, table_id);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+    pmt = parser.parsePmtPacket();
     EXPECT_EQ(1010, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
 
@@ -204,6 +213,34 @@ TEST(TsParserTests, CheckParseTsHeader)
     // parser.parseTsPacketInfo(packet_4, info);
     // EXPECT_EQ(481, info.pid);
     // TODO add more tests...
+}
+
+TEST(TsParserTests, CheckParselargePmtTable)
+{
+    TsParser parser;
+
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(pmt_packet_2_1, info);
+    uint8_t table_id;
+    parser.collectTable(pmt_packet_2_1, info, table_id);
+    EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+    parser.parseTsPacketInfo(pmt_packet_2_2, info);
+    parser.collectTable(pmt_packet_2_2, info, table_id);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+    auto pmt = parser.parsePmtPacket();
+    EXPECT_EQ(32, info.pid);
+    EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
+
+    // Extensions from PsiTable
+    EXPECT_EQ(599, pmt.PCR_PID);
+    EXPECT_EQ(22, pmt.program_info_length);
+
+    EXPECT_EQ(9, pmt.streams.size());
+
+    EXPECT_EQ(21, pmt.streams[8].stream_type);
+    EXPECT_EQ(144, pmt.streams[8].elementary_PID);
+    EXPECT_EQ(26, pmt.streams[8].ES_info_length);
 }
 
 TEST(MathTest, TwoPlusTwoEqualsFour)

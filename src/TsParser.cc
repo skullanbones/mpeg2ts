@@ -172,35 +172,47 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
-
-void TsParser::parsePsiTable(const uint8_t* packet, const TsPacketInfo& info, PsiTable& table)
+void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
-    uint8_t pointerOffset = info.payloadStartOffset;
+    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    if (tsPacketInfo.isPayloadStart)
+    {
+        mSectionBuffer.clear();
 
-    const uint8_t pointer_field = packet[pointerOffset];
-    pointerOffset += sizeof(pointer_field);
-    pointerOffset += pointer_field;
+        const uint8_t pointer_field = tsPacket[pointerOffset];
+        pointerOffset += sizeof(pointer_field);
+        pointerOffset += pointer_field;
+    }
 
-    resetBits(packet, TS_PACKET_SIZE, pointerOffset);
+    mSectionBuffer.insert(mSectionBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+    PsiTable tableInfo;
+    parsePsiTable(mSectionBuffer, tableInfo);
+    table_id = (mSectionBuffer.size() < tableInfo.section_length) ? PSI_TABLE_ID_INCOMPLETE :
+                                                                    tableInfo.table_id;
+}
 
-    table.table_id = getBits(8);
-    table.section_syntax_indicator = getBits(1);
+void TsParser::parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo)
+{
+    resetBits(table.data(), TS_PACKET_SIZE, 0);
+
+    tableInfo.table_id = getBits(8);
+    tableInfo.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    table.section_length = getBits(12);
-    table.transport_stream_id = getBits(16);
+    tableInfo.section_length = getBits(12);
+    tableInfo.transport_stream_id = getBits(16);
     getBits(2);
-    table.version_number = getBits(5);
-    table.current_next_indicator = getBits(1);
-    table.section_number = getBits(8);
-    table.last_section_number = getBits(8);
+    tableInfo.version_number = getBits(5);
+    tableInfo.current_next_indicator = getBits(1);
+    tableInfo.section_number = getBits(8);
+    tableInfo.last_section_number = getBits(8);
 }
 
 
-PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& info)
+PatTable TsParser::parsePatPacket()
 {
     PatTable pat;
-    parsePsiTable(packet, info, pat);
+    parsePsiTable(mSectionBuffer, pat);
 
     int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
@@ -216,11 +228,10 @@ PatTable TsParser::parsePatPacket(const uint8_t* packet, const TsPacketInfo& inf
     return pat;
 }
 
-// TODO support PMTs greater than 1 Ts packet.
-PmtTable TsParser::parsePmtPacket(const uint8_t* packet, const TsPacketInfo& info)
+PmtTable TsParser::parsePmtPacket()
 {
     PmtTable pmt;
-    parsePsiTable(packet, info, pmt);
+    parsePsiTable(mSectionBuffer, pmt);
 
     getBits(3); // reserved
     pmt.PCR_PID = getBits(13);
