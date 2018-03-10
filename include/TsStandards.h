@@ -225,14 +225,38 @@ protected:
 };
 
 /*! @brief Table_id assignment values
+ *
  * Table 2-31 - table_id assignment values
  *
  */
-enum PsiTableId_e
+enum PsiTableId
 {
     PSI_TABLE_ID_PAT = 0x00,       /*! Program Association Table Id */
     PSI_TABLE_ID_CAT = 0x01,       /*! Conditional Access Section Table Id */
     PSI_TABLE_ID_PMT = 0x02,       /*! Program Map Table Id */
     PSI_TABLE_ID_TDT = 0x03,       /*! Optional Transport stream Desciption Table id */
     PSI_TABLE_ID_INCOMPLETE = 0xff /*! section under construction */
+};
+
+/*! @brief Stream type
+ *
+ * Table 2-34 - Stream type assignments.
+ *
+ */
+enum StreamType
+{
+    STREAMTYPE_RESERVED    = 0x00,
+    STREAMTYPE_VIDEO_MPEG1 = 0X01,
+    STREAMTYPE_VIDEO_MPEG2 = 0x02,
+    STREAMTYPE_AUDIO_MPEG1 = 0X03,
+    STREAMTYPE_AUDIO_MPEG2 = 0x04,
+    STREAMTYPE_PRIVATE_TABLE = 0x05,
+    STREAMTYPE_PRIVATE_PES = 0X06,
+    STREAMTYPE_MHEG        = 0X07,
+    STREAMTYPE_VIDEO_MPEG4 = 0X10,
+    STREAMTYPE_AUDIO_ADTS  = 0x0F,
+    STREAMTYPE_VIDEO_H264  = 0x1B,
+    STREAMTYPE_VIDEO_H265  = 0X24,
+    STREAMTYPE_AUDIO_AC3   = 0X81,
+    STREAMTYPE_Any         = 0xFF // User private
 };

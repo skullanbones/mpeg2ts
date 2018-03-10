@@ -18,6 +18,7 @@
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 uint32_t g_SPPID = 0; // Single Program PID
+uint32_t g_ESPID1 = 0; // Test 1 ES
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -39,9 +40,12 @@ void PMTCallback(PsiTable* table)
 {
     std::cout << "demuxed PMT table \n" << table->table_id;
 
-    std::cout << "Got PSI table:" << std::endl << table << std::endl;
+    std::cout << "Got PSI table:" << std::endl << *table << std::endl;
     PmtTable* pmt = static_cast<PmtTable*>(table);
     std::cout << "Got PMT packet:" << std::endl << *pmt << std::endl;
+
+    std::cout << "pmt streams size:" << pmt->streams.size() << std::endl;
+    g_ESPID1 = pmt->streams[0].elementary_PID; // Use 1st ES
 }
 
 void PESCallback(const PesPacket& pes)
@@ -88,8 +92,7 @@ int main(int argc, char** argv)
         // SYNC
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
-
-
+        
         b = getchar();
         while (b != TS_PACKET_SYNC_BYTE)
         {
@@ -136,6 +139,11 @@ int main(int argc, char** argv)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
             tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+        }
+
+        if (g_ESPID1)
+        {
+            tsDemux.addPesPid(g_ESPID1, std::bind(&PESCallback, std::placeholders::_1));
         }
 
         if (tsPacketInfo.hasAdaptationField)
