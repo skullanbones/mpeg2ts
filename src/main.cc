@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
 #include <unistd.h>
 
@@ -17,9 +15,9 @@
 
 #include <type_traits>
 
-unsigned long count = 0;
-unsigned long countAdaptPacket = 0;
-unsigned int g_SPPID = 0; // Single Program PID
+uint64_t count = 0;
+uint64_t countAdaptPacket = 0;
+uint32_t g_SPPID = 0; // Single Program PID
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -27,22 +25,22 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
     std::cout << "demuxed TS packet \n" << tsPacketInfo;
 }
 
-void PATCallback(PsiTable& table)
+void PATCallback(PsiTable* table)
 {
-    std::cout << "demuxed PAT table \n" << table.table_id;
+    std::cout << "demuxed PAT table \n" << table->table_id;
 
     // std::cout << "Got PSI table:" << std::endl << table << std::endl;
-    PatTable* pat = static_cast<PatTable*>(&table);
+    PatTable* pat = static_cast<PatTable*>(table);
     // std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
     g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
 }
 
-void PMTCallback(PsiTable& table)
+void PMTCallback(PsiTable* table)
 {
-    std::cout << "demuxed PMT table \n" << table.table_id;
+    std::cout << "demuxed PMT table \n" << table->table_id;
 
     std::cout << "Got PSI table:" << std::endl << table << std::endl;
-    PmtTable* pmt = static_cast<PmtTable*>(&table);
+    PmtTable* pmt = static_cast<PmtTable*>(table);
     std::cout << "Got PMT packet:" << std::endl << *pmt << std::endl;
 }
 
@@ -51,11 +49,11 @@ void PESCallback(const PesPacket& pes)
     std::cout << "demuxed PES packet \n";
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
     std::cout << "Staring parser of stdout" << std::endl;
 
-    unsigned long count;
+    uint64_t count;
 
     // Specify input stream
     setvbuf(stdout, NULL, _IOLBF, 0);
@@ -142,7 +140,7 @@ int main(int, char**)
 
         if (tsPacketInfo.hasAdaptationField)
         {
-            //      printf("found packet with adaptation field");
+            //      std::cout << "found packet with adaptation field";
             countAdaptPacket++;
 
             if (countAdaptPacket == 1)
