@@ -34,12 +34,12 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         if (table_id == PSI_TABLE_ID_PAT)
         {
             PatTable pat = mParser.parsePatPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](pat);
+            mPsiCallbackMap[tsPacketInfo.pid](&pat);
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
             PmtTable pmt = mParser.parsePmtPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](pmt);
+            mPsiCallbackMap[tsPacketInfo.pid](&pmt);
         }
     }
 }
