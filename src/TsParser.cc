@@ -343,26 +343,47 @@ void TsParser::parsePesPacket()
         else if (mPesPacket.PTS_DTS_flags == 0x02) // Only PTS value
         {
             getBits(4);
-            uint64_t pts;
-            pts = getBits(3) << 30;
+            uint64_t pts = 0;
+            uint64_t pts_32_30 = getBits(3);
             getBits(1); // marker_bit
-            pts = getBits(15) << 15;
+            uint64_t pts_29_15 = getBits(15);
             getBits(1); // marker_bit
-            pts = getBits(15);
+            uint64_t pts_14_0 = getBits(15);
             getBits(1); // marker_bit
+
+            pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
+
             mPesPacket.pts = pts;
             mPesPacket.dts = -1;
         }
         else if (mPesPacket.PTS_DTS_flags == 0x03) // Both PTS and DTS
         {
-            ;
+            getBits(4);
+            uint64_t pts = 0;
+            uint64_t pts_32_30 = getBits(3);
+            getBits(1); // marker_bit
+            uint64_t pts_29_15 = getBits(15);
+            getBits(1); // marker_bit
+            uint64_t pts_14_0 = getBits(15);
+            getBits(1); // marker_bit
+
+            pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
+
+            mPesPacket.pts = pts;
+
+            getBits(4);
+            uint64_t dts = 0;
+            uint64_t dts_32_30 = getBits(3);
+            getBits(1); // marker_bit
+            uint64_t dts_29_15 = getBits(15);
+            getBits(1); // marker_bit
+            uint64_t dts_14_0 = getBits(15);
+            getBits(1); // marker_bit
+
+            pts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
+
+            mPesPacket.dts = dts;
         }
 
     }
-
-
-
-    //std::cout << "Got PesPacket start: " << std::endl << mPesPacket << std::endl;
-
-
 }

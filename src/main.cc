@@ -51,6 +51,7 @@ void PMTCallback(PsiTable* table)
 void PESCallback(const PesPacket& pes)
 {
     std::cout << "demuxed PES packet \n";
+    std::cout << "Got PesPacket start: " << std::endl << pes << std::endl;
 }
 
 int main(int argc, char** argv)
