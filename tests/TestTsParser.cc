@@ -277,8 +277,8 @@ TEST(TsParserTests, TestParsePesPacket)
     EXPECT_FALSE(pes.PES_CRC_flag);
     EXPECT_FALSE(pes.PES_extension_flag);
     EXPECT_EQ(10, pes.PES_header_data_length);
-    //EXPECT_EQ(0, pes.pts);
-    //EXPECT_EQ(0, pes.dts);
+    EXPECT_EQ(689094304, pes.pts);
+    EXPECT_EQ(689090704, pes.dts);
 }
 
 int main(int argc, char** argv)
