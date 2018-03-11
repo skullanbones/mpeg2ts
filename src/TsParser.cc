@@ -304,6 +304,37 @@ void TsParser::parsePesPacket()
 
     mPesPacket.packet_start_code_prefix = getBits(24);
     mPesPacket.stream_id = getBits(8);
+    mPesPacket.PES_packet_length = getBits(16);
+
+    // ISO/IEC 13818-1:2015: Table 2-21 PES packet
+    if (mPesPacket.stream_id != program_stream_map
+        && mPesPacket.stream_id != padding_stream
+        && mPesPacket.stream_id != private_stream_2
+        && mPesPacket.stream_id != ECM_stream
+        && mPesPacket.stream_id != EMM_stream
+        && mPesPacket.stream_id != program_stream_directory
+        && mPesPacket.stream_id != DSMCC_stream
+        && mPesPacket.stream_id != ITU_T_Rec_H222_1_type_E_stream)
+    {
+        getBits(2); // '10'
+        mPesPacket.PES_scrambling_control = getBits(2);
+
+        mPesPacket.PES_priority = getBits(1);
+        mPesPacket.data_alignment_indicator = getBits(1);
+        mPesPacket.copyright = getBits(1);
+        mPesPacket.original_or_copy = getBits(1);
+        mPesPacket.PTS_DTS_flags = getBits(2);
+        mPesPacket.ESCR_flag = getBits(1);
+        mPesPacket.ES_rate_flag = getBits(1);
+        mPesPacket.DSM_trick_mode_flag = getBits(1);
+        mPesPacket.additional_copy_info_flag = getBits(1);
+        mPesPacket.PES_CRC_flag = getBits(1);
+        mPesPacket.PES_extension_flag = getBits(1);
+
+        mPesPacket.PES_header_data_length = getBits(8);
+    }
+
+
 
     std::cout << "Got PesPacket start: " << std::endl << mPesPacket << std::endl;
 
