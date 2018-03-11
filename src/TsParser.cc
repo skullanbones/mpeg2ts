@@ -192,27 +192,39 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 }
 
 
-void TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
+bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
 {
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
-    std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
-    std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
+    //std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
+    //std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
 
     if (tsPacketInfo.isPayloadStart)
     {
+        // Return previous assembled packet
+        PesPacket pkt = mPesPacket;
+
+        // Create new PES
+        mPesPacket = PesPacket();
         mPesPacket.mPesBuffer.clear();
 
-        std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
+        //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
 
         mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket();
+        return true;
     }
     else {
         // Assemble packet
-        //mPesPacket.mPesBuffer.insert(mSectionBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
     }
+    return false;
+}
+
+PesPacket TsParser::getPesPacket()
+{
+    return mPesPacket;
 }
 
 void TsParser::parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo)

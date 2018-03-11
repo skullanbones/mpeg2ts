@@ -111,8 +111,9 @@ public:
      */
     PmtTable parsePmtPacket();
 
-    void collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
+    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
     void parsePesPacket();
+    PesPacket getPesPacket();
 
 private:
     std::vector<uint8_t> mSectionBuffer;
