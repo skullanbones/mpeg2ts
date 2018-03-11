@@ -380,7 +380,7 @@ void TsParser::parsePesPacket()
             uint64_t dts_14_0 = getBits(15);
             getBits(1); // marker_bit
 
-            pts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
+            dts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
 
             mPesPacket.dts = dts;
         }
