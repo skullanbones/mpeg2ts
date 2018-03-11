@@ -258,11 +258,27 @@ TEST(TsParserTests, TestParsePesPacket)
     parser.parseTsPacketInfo(pes_packet_1, info);
     EXPECT_EQ(481, info.pid);
 
-    if (parser.collectPes(pes_packet_1, info))
-    {
-        pes = parser.getPesPacket();
-        EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
-    }
+    EXPECT_TRUE(parser.collectPes(pes_packet_1, info));
+    pes = parser.getPesPacket();
+    EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
+    EXPECT_EQ(pes_video_stream, pes.stream_id);
+    EXPECT_EQ(0, pes.PES_packet_length); // Unbounded video packet.
+    EXPECT_FALSE(pes.PES_scrambling_control); // Unscrambled.
+    EXPECT_FALSE(pes.PES_priority);
+    EXPECT_TRUE(pes.data_alignment_indicator);
+    EXPECT_FALSE(pes.copyright);
+    EXPECT_FALSE(pes.original_or_copy);
+    EXPECT_EQ(3, pes.PTS_DTS_flags);
+    EXPECT_FALSE(pes.ESCR_flag);
+
+    EXPECT_FALSE(pes.ES_rate_flag);
+    EXPECT_FALSE(pes.DSM_trick_mode_flag);
+    EXPECT_FALSE(pes.additional_copy_info_flag);
+    EXPECT_FALSE(pes.PES_CRC_flag);
+    EXPECT_FALSE(pes.PES_extension_flag);
+    EXPECT_EQ(10, pes.PES_header_data_length);
+    //EXPECT_EQ(0, pes.pts);
+    //EXPECT_EQ(0, pes.dts);
 }
 
 int main(int argc, char** argv)
