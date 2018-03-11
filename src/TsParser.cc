@@ -191,6 +191,30 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
                                                                     tableInfo.table_id;
 }
 
+
+void TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
+{
+    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+
+    std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
+    std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
+
+    if (tsPacketInfo.isPayloadStart)
+    {
+        mPesPacket.mPesBuffer.clear();
+
+        std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
+
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+
+        parsePesPacket();
+    }
+    else {
+        // Assemble packet
+        //mPesPacket.mPesBuffer.insert(mSectionBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+    }
+}
+
 void TsParser::parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo)
 {
     resetBits(table.data(), TS_PACKET_SIZE, 0);
@@ -228,6 +252,7 @@ PatTable TsParser::parsePatPacket()
     return pat;
 }
 
+
 PmtTable TsParser::parsePmtPacket()
 {
     PmtTable pmt;
@@ -256,4 +281,19 @@ PmtTable TsParser::parsePmtPacket()
     }
 
     return pmt;
+}
+
+
+void TsParser::parsePesPacket()
+{
+    resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
+
+    std::cout << "Came here..." << std::endl;
+
+    mPesPacket.packet_start_code_prefix = getBits(24);
+    mPesPacket.stream_id = getBits(8);
+
+    std::cout << "Got PesPacket start: " << std::endl << mPesPacket << std::endl;
+
+
 }

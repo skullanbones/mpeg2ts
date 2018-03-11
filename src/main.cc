@@ -92,7 +92,7 @@ int main(int argc, char** argv)
         // SYNC
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
-        
+
         b = getchar();
         while (b != TS_PACKET_SYNC_BYTE)
         {

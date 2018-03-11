@@ -111,8 +111,12 @@ public:
      */
     PmtTable parsePmtPacket();
 
+    void collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
+    void parsePesPacket();
+
 private:
     std::vector<uint8_t> mSectionBuffer;
+    PesPacket mPesPacket;            // TODO where to store it?
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };
