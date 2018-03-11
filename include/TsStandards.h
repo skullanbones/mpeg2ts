@@ -1,37 +1,3 @@
-//
-// Created by microlab on 2/24/18.
-//
-#pragma once
-
-#include <vector>
-#include <map>
-
-#define ENUM_TO_STR(ENUM) std::string(#ENUM)
-
-// TS Packet
-const int TS_PACKET_SYNC_BYTE = 0x47;
-const int TS_PACKET_SIZE = 188;
-const int TS_PACKET_HEADER_SIZE = 4;
-const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
-const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
-const int TS_PACKET_PID_PAT = 0x00;     // PAT packet, Table 2-28
-const int TS_PACKET_PID_CAT = 0x01;
-const int TS_PACKET_PID_TDT = 0x02;
-const int TS_PACKET_PID_IPMP = 0x03;
-const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
-
-
-const int PCR_SIZE = 48 / 8;
-const int OPCR_SIZE = 48 / 8;
-
-const int PAT_PACKET_OFFSET_LENGTH = 5;
-const int CRC32_SIZE = 4;
-const int PAT_PACKET_PROGRAM_SIZE = 4;
-
-const int PMT_PACKET_OFFSET_LENGTH = 9;
-const int PMT_STREAM_TYPE_LENGTH = 5;
-
-
 /*!
  * References in this file are taken from ISO/IEC 13818-1:2015
  * Fifth edition 2015-07-01
@@ -47,6 +13,37 @@ const int PMT_STREAM_TYPE_LENGTH = 5;
  * transport stream header
  * 4 bytes
  */
+#pragma once
+
+#include <vector>
+#include <map>
+
+#define ENUM_TO_STR(ENUM) std::string(#ENUM)
+
+// TS Packet
+const int TS_PACKET_SYNC_BYTE = 0x47;
+const int TS_PACKET_SIZE = 188;
+const int TS_PACKET_HEADER_SIZE = 4;
+const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
+const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
+const int TS_PACKET_PID_PAT = 0x00;     // PAT packet, Table 2-28
+const int TS_PACKET_PID_CAT = 0x01;     // CAT packet, Table 2-28
+const int TS_PACKET_PID_TDT = 0x02;     // TDT packet, Table 2-28
+const int TS_PACKET_PID_IPMP = 0x03;    // IPMP packet, Table 2-28
+const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
+const int PES_PACKET_START_CODE_PREFIX = 0x000001; // Section 2.4.3.7
+
+
+const int PCR_SIZE = 48 / 8;
+const int OPCR_SIZE = 48 / 8;
+
+const int PAT_PACKET_OFFSET_LENGTH = 5;
+const int CRC32_SIZE = 4;
+const int PAT_PACKET_PROGRAM_SIZE = 4;
+
+const int PMT_PACKET_OFFSET_LENGTH = 9;
+const int PMT_STREAM_TYPE_LENGTH = 5;
+
 struct TsHeader
 {
     uint8_t sync_byte;
@@ -240,7 +237,7 @@ public:
     bool data_alignment_indicator;
     bool copyright;
     bool original_or_copy;
-    bool PTS_DTS_flags;
+    uint8_t PTS_DTS_flags;
     bool ESCR_flag;
     bool ES_rate_flag;
     bool DSM_trick_mode_flag;
@@ -274,6 +271,9 @@ public:
         ss << "additional_copy_info_flag: " << (int)rhs.additional_copy_info_flag << std::endl;
         ss << "PES_CRC_flag: " << (int)rhs.PES_CRC_flag << std::endl;
         ss << "PES_extension_flag: " << (int)rhs.PES_extension_flag << std::endl;
+
+        ss << "pts: " << (int)rhs.pts << std::endl;
+        ss << "dts: " << (int)rhs.dts << std::endl;
 
         ss << "PES_header_data_length: " << (int)rhs.PES_header_data_length << std::endl;
         return ss;

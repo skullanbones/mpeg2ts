@@ -332,6 +332,32 @@ void TsParser::parsePesPacket()
         mPesPacket.PES_extension_flag = getBits(1);
 
         mPesPacket.PES_header_data_length = getBits(8);
+
+        // Forbidden value
+        if (mPesPacket.PTS_DTS_flags == 0x01)
+        {
+            std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket.PTS_DTS_flags << std::endl;
+            mPesPacket.pts = -1;
+            mPesPacket.dts = -1;
+        }
+        else if (mPesPacket.PTS_DTS_flags == 0x02) // Only PTS value
+        {
+            getBits(4);
+            uint64_t pts;
+            pts = getBits(3) << 30;
+            getBits(1); // marker_bit
+            pts = getBits(15) << 15;
+            getBits(1); // marker_bit
+            pts = getBits(15);
+            getBits(1); // marker_bit
+            mPesPacket.pts = pts;
+            mPesPacket.dts = -1;
+        }
+        else if (mPesPacket.PTS_DTS_flags == 0x03) // Both PTS and DTS
+        {
+            ;
+        }
+
     }
 
 

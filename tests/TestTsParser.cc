@@ -248,6 +248,23 @@ TEST(MathTest, TwoPlusTwoEqualsFour)
     EXPECT_EQ(2 + 2, 4);
 }
 
+
+TEST(TsParserTests, TestParsePesPacket)
+{
+    TsParser parser;
+    PesPacket pes;
+    TsPacketInfo info;
+
+    parser.parseTsPacketInfo(pes_packet_1, info);
+    EXPECT_EQ(481, info.pid);
+
+    if (parser.collectPes(pes_packet_1, info))
+    {
+        pes = parser.getPesPacket();
+        EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
+    }
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
