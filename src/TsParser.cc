@@ -2,9 +2,12 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
-#include "TsParser.h"
 #include <iostream>
 #include <stdio.h>
+
+// Project files
+#include "TsParser.h"
+#include "CommonTypes.h"
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
@@ -206,18 +209,18 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Create new PES
         mPesPacket = PesPacket();
-        mPesPacket.mPesBuffer.clear();
+        mPesPacket.getPesBuffer().clear();
 
         //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
 
-        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket.getPesBuffer().insert(mPesPacket.getPesBuffer().end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket();
         return true;
     }
     else {
         // Assemble packet
-        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket.getPesBuffer().insert(mPesPacket.getPesBuffer().end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
     }
     return false;
 }
@@ -227,7 +230,7 @@ PesPacket TsParser::getPesPacket()
     return mPesPacket;
 }
 
-void TsParser::parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo)
+void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {
     resetBits(table.data(), TS_PACKET_SIZE, 0);
 
@@ -298,7 +301,7 @@ PmtTable TsParser::parsePmtPacket()
 
 void TsParser::parsePesPacket()
 {
-    resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
+    resetBits(mPesPacket.getPesBuffer().data(), TS_PACKET_SIZE, 0);
 
     std::cout << "Came here..." << std::endl;
 

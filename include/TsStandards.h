@@ -18,6 +18,9 @@
 #include <vector>
 #include <map>
 
+// Project files
+#include "CommonTypes.h"
+
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
@@ -281,7 +284,13 @@ public:
 
     // TODO much more information that we don't need for now...
 
-    std::vector<uint8_t> mPesBuffer;
+    inline ByteVector getPesBuffer()
+    {
+        return mPesBuffer;
+    }
+
+private:
+    ByteVector mPesBuffer;
 };
 
 /*! @brief Table_id assignment values
