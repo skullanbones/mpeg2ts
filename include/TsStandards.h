@@ -369,15 +369,15 @@ static std::map<StreamType, std::string> StreamTypeToString =
  */
 enum StreamId
 {
-    program_stream_map = 0xBC,
-    private_stream_1 = 0xBD,
-    padding_stream = 0xBE,
-    private_stream_2 = 0xBF,
-    pes_audio_stream = 0xC0,
-    pes_video_stream = 0xE0,
-    ECM_stream = 0xF0,
-    EMM_stream = 0xF1,
-    DSMCC_stream = 0xF2,
-    ITU_T_Rec_H222_1_type_E_stream = 0xF8,
-    program_stream_directory = 0xFF
+    STREAM_ID_program_stream_map = 0xBC,
+    STREAM_ID_private_stream_1 = 0xBD,
+    STREAM_ID_padding_stream = 0xBE,
+    STREAM_ID_private_stream_2 = 0xBF,
+    STREAM_ID_pes_audio_stream = 0xC0,
+    STREAM_ID_pes_video_stream = 0xE0,
+    STREAM_ID_ECM_stream = 0xF0,
+    STREAM_ID_EMM_stream = 0xF1,
+    STREAM_ID_DSMCC_stream = 0xF2,
+    STREAM_ID_ITU_T_Rec_H222_1_type_E_stream = 0xF8,
+    STREAM_ID_program_stream_directory = 0xFF
 };

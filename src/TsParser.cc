@@ -310,14 +310,14 @@ void TsParser::parsePesPacket()
     mPesPacket.PES_packet_length = getBits(16);
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
-    if (mPesPacket.stream_id != program_stream_map
-        && mPesPacket.stream_id != padding_stream
-        && mPesPacket.stream_id != private_stream_2
-        && mPesPacket.stream_id != ECM_stream
-        && mPesPacket.stream_id != EMM_stream
-        && mPesPacket.stream_id != program_stream_directory
-        && mPesPacket.stream_id != DSMCC_stream
-        && mPesPacket.stream_id != ITU_T_Rec_H222_1_type_E_stream)
+    if (mPesPacket.stream_id != STREAM_ID_program_stream_map
+        && mPesPacket.stream_id != STREAM_ID_padding_stream
+        && mPesPacket.stream_id != STREAM_ID_private_stream_2
+        && mPesPacket.stream_id != STREAM_ID_ECM_stream
+        && mPesPacket.stream_id != STREAM_ID_EMM_stream
+        && mPesPacket.stream_id != STREAM_ID_program_stream_directory
+        && mPesPacket.stream_id != STREAM_ID_DSMCC_stream
+        && mPesPacket.stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
         getBits(2); // '10'
         mPesPacket.PES_scrambling_control = getBits(2);
