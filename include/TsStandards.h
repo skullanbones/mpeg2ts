@@ -284,12 +284,6 @@ public:
 
     // TODO much more information that we don't need for now...
 
-    inline ByteVector getPesBuffer()
-    {
-        return mPesBuffer;
-    }
-
-private:
     ByteVector mPesBuffer;
 };
 

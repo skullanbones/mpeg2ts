@@ -209,18 +209,18 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Create new PES
         mPesPacket = PesPacket();
-        mPesPacket.getPesBuffer().clear();
+        mPesPacket.mPesBuffer.clear();
 
         //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
 
-        mPesPacket.getPesBuffer().insert(mPesPacket.getPesBuffer().end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket();
         return true;
     }
     else {
         // Assemble packet
-        mPesPacket.getPesBuffer().insert(mPesPacket.getPesBuffer().end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
     }
     return false;
 }
@@ -301,7 +301,7 @@ PmtTable TsParser::parsePmtPacket()
 
 void TsParser::parsePesPacket()
 {
-    resetBits(mPesPacket.getPesBuffer().data(), TS_PACKET_SIZE, 0);
+    resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
 
     std::cout << "Came here..." << std::endl;
 
