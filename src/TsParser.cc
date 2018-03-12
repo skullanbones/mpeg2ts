@@ -9,6 +9,7 @@
 #include "TsParser.h"
 #include "CommonTypes.h"
 
+
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
     TsPacketInfo zero = { 0 };
@@ -74,6 +75,7 @@ bool TsParser::checkHasAdaptationField(TsHeader hdr)
     }
 }
 
+
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
     if (hdr.adaptation_field_control == ts_adaptation_field_control_payload_only ||
@@ -86,6 +88,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
         return false;
     }
 }
+
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
 {
@@ -175,6 +178,7 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
+
 void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
@@ -225,10 +229,12 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     return false;
 }
 
+
 PesPacket TsParser::getPesPacket()
 {
     return mPesPacket;
 }
+
 
 void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {
@@ -302,8 +308,6 @@ PmtTable TsParser::parsePmtPacket()
 void TsParser::parsePesPacket()
 {
     resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
-
-    std::cout << "Came here..." << std::endl;
 
     mPesPacket.packet_start_code_prefix = getBits(24);
     mPesPacket.stream_id = getBits(8);
@@ -387,6 +391,5 @@ void TsParser::parsePesPacket()
 
             mPesPacket.dts = dts;
         }
-
     }
 }

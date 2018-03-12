@@ -14,10 +14,13 @@
  */
 #pragma once
 
+#include <stdint.h>
+
+// Project files
 #include "GetBits.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
-#include <stdint.h>
+#include "PesPacket.h"
 
 
 class TsParser : GetBits
