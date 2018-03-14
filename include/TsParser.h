@@ -137,11 +137,11 @@ public:
      * a complete PES-Packet.
      * @return The collected PES-Packet
      */
-    PesPacket getPesPacket();
+    PesPacket& getPesPacket();
 
 private:
     ByteVector mSectionBuffer;
-    PesPacket mPesPacket;            // TODO where to store it?
+    PesPacket mPesPacket;
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };

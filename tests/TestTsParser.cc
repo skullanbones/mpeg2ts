@@ -40,9 +40,7 @@ TEST(TsParserTests, CheckParserInfo)
 
     TsPacketInfo info;
     parser.parseTsPacketInfo(packet_1, info);
-    // std::cout << info.toString();
 
-    // std::cout << hdr.toString();
     EXPECT_EQ(0, info.pcr);
     EXPECT_EQ(0, info.opcr);
     EXPECT_EQ(47, info.payloadSize);

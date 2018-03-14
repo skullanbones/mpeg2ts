@@ -61,7 +61,5 @@ public:
         return ss;
     }
 
-    // TODO much more information that we don't need for now...
-
     ByteVector mPesBuffer;
 };

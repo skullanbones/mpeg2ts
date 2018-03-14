@@ -230,7 +230,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 }
 
 
-PesPacket TsParser::getPesPacket()
+PesPacket& TsParser::getPesPacket()
 {
     return mPesPacket;
 }
