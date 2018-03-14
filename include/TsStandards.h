@@ -1,31 +1,3 @@
-//
-// Created by microlab on 2/24/18.
-//
-#include <vector>
-
-#pragma once
-
-
-const int TS_PACKET_SYNC_BYTE = 0x47;
-const int TS_PACKET_SIZE = 188;
-const int TS_PACKET_HEADER_SIZE = 4;
-const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
-const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
-const int TS_PACKET_PID_PAT = 0x0;     // PAT packet
-const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
-
-
-const int PCR_SIZE = 48 / 8;
-const int OPCR_SIZE = 48 / 8;
-
-const int PAT_PACKET_OFFSET_LENGTH = 5;
-const int CRC32_SIZE = 4;
-const int PAT_PACKET_PROGRAM_SIZE = 4;
-
-const int PMT_PACKET_OFFSET_LENGTH = 9;
-const int PMT_STREAM_TYPE_LENGTH = 5;
-
-
 /*!
  * References in this file are taken from ISO/IEC 13818-1:2015
  * Fifth edition 2015-07-01
@@ -41,6 +13,40 @@ const int PMT_STREAM_TYPE_LENGTH = 5;
  * transport stream header
  * 4 bytes
  */
+#pragma once
+
+#include <vector>
+#include <map>
+
+// Project files
+#include "CommonTypes.h"
+
+#define ENUM_TO_STR(ENUM) std::string(#ENUM)
+
+// TS Packet
+const int TS_PACKET_SYNC_BYTE = 0x47;
+const int TS_PACKET_SIZE = 188;
+const int TS_PACKET_HEADER_SIZE = 4;
+const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
+const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
+const int TS_PACKET_PID_PAT = 0x00;     // PAT packet, Table 2-28
+const int TS_PACKET_PID_CAT = 0x01;     // CAT packet, Table 2-28
+const int TS_PACKET_PID_TDT = 0x02;     // TDT packet, Table 2-28
+const int TS_PACKET_PID_IPMP = 0x03;    // IPMP packet, Table 2-28
+const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
+const int PES_PACKET_START_CODE_PREFIX = 0x000001; // Section 2.4.3.7
+
+
+const int PCR_SIZE = 48 / 8;
+const int OPCR_SIZE = 48 / 8;
+
+const int PAT_PACKET_OFFSET_LENGTH = 5;
+const int CRC32_SIZE = 4;
+const int PAT_PACKET_PROGRAM_SIZE = 4;
+
+const int PMT_PACKET_OFFSET_LENGTH = 9;
+const int PMT_STREAM_TYPE_LENGTH = 5;
+
 struct TsHeader
 {
     uint8_t sync_byte;
@@ -217,22 +223,97 @@ public:
 };
 
 
-/// @brief Parsed PES
-// TODO: move to own file
-class PesPacket
-{
-protected:
-};
-
 /*! @brief Table_id assignment values
+ *
  * Table 2-31 - table_id assignment values
  *
  */
-enum PsiTableId_e
+enum PsiTableId
 {
     PSI_TABLE_ID_PAT = 0x00,       /*! Program Association Table Id */
     PSI_TABLE_ID_CAT = 0x01,       /*! Conditional Access Section Table Id */
     PSI_TABLE_ID_PMT = 0x02,       /*! Program Map Table Id */
-    PSI_TABLE_ID_TDT = 0x03,       /*! Optional Transport stream Desciption Table id */
-    PSI_TABLE_ID_INCOMPLETE = 0xff /*! section under construction */
+    PSI_TABLE_ID_TDT = 0x03,       /*! Transport stream Desciption Table id */
+    PSI_TABLE_ID_SDT = 0x04,       /*! ISO_IEC_14496_scene_description_section */
+    PSI_TABLE_ID_ODT = 0x05,       /*! ISO_IEC_14496_object_descriptor_section */
+    PSI_TABLE_ID_METADATA = 0x06,  /*! Metadata_section */
+    PSI_TABLE_ID_IPMP = 0x07,      /*! IPMP Control Information Section */
+    PSI_TABLE_ID_14496 = 0x08,     /*! ISO_IEC_14496_section */
+    PSI_TABLE_ID_INCOMPLETE = 0xfe, /*! User defined */
+    PSI_TABLE_ID_FORBIDDEN = 0xff /*! Forbidden */
+};
+
+static std::map<PsiTableId, std::string> PsiTableToString =
+        {
+                { PSI_TABLE_ID_PAT, "PSI_TABLE_ID_PAT"},
+                { PSI_TABLE_ID_CAT, "PSI_TABLE_ID_CAT"},
+                { PSI_TABLE_ID_PMT, "PSI_TABLE_ID_PMT"},
+                { PSI_TABLE_ID_TDT, "PSI_TABLE_ID_TDT"},
+                { PSI_TABLE_ID_SDT, "PSI_TABLE_ID_SDT"},
+                { PSI_TABLE_ID_ODT, "PSI_TABLE_ID_ODT"},
+                { PSI_TABLE_ID_METADATA, "PSI_TABLE_ID_METADATA"},
+                { PSI_TABLE_ID_IPMP, "PSI_TABLE_ID_IPMP"},
+                { PSI_TABLE_ID_14496, "PSI_TABLE_ID_14496"},
+                { PSI_TABLE_ID_FORBIDDEN, "PSI_TABLE_ID_FORBIDDEN"}};
+
+/*! @brief Stream type
+ *
+ * Table 2-34 - Stream type assignments.
+ *
+ */
+enum StreamType
+{
+    STREAMTYPE_RESERVED    = 0x00,
+    STREAMTYPE_VIDEO_MPEG1 = 0X01,
+    STREAMTYPE_VIDEO_MPEG2 = 0x02,
+    STREAMTYPE_AUDIO_MPEG1 = 0X03,
+    STREAMTYPE_AUDIO_MPEG2 = 0x04,
+    STREAMTYPE_PRIVATE_TABLE = 0x05,
+    STREAMTYPE_PRIVATE_PES = 0X06,
+    STREAMTYPE_MHEG        = 0X07,
+    STREAMTYPE_VIDEO_MPEG4 = 0X10,
+    STREAMTYPE_AUDIO_ADTS  = 0x0F,
+    STREAMTYPE_VIDEO_H264  = 0x1B,
+    STREAMTYPE_VIDEO_H265  = 0X24,
+    STREAMTYPE_AUDIO_AC3   = 0X81,
+    STREAMTYPE_Any         = 0xFF // User private
+};
+
+static std::map<StreamType, std::string> StreamTypeToString =
+        {
+                { STREAMTYPE_RESERVED, "STREAMTYPE_RESERVED"},
+                { STREAMTYPE_VIDEO_MPEG1, "STREAMTYPE_VIDEO_MPEG1"},
+                { STREAMTYPE_VIDEO_MPEG2, "STREAMTYPE_VIDEO_MPEG2"},
+                { STREAMTYPE_AUDIO_MPEG1, "STREAMTYPE_AUDIO_MPEG1"},
+                { STREAMTYPE_AUDIO_MPEG2, "STREAMTYPE_AUDIO_MPEG2"},
+                { STREAMTYPE_PRIVATE_TABLE, "STREAMTYPE_PRIVATE_TABLE"},
+                { STREAMTYPE_PRIVATE_PES, "STREAMTYPE_PRIVATE_PES"},
+                { STREAMTYPE_MHEG, "STREAMTYPE_MHEG"},
+                { STREAMTYPE_VIDEO_MPEG4, "STREAMTYPE_VIDEO_MPEG4"},
+                { STREAMTYPE_AUDIO_ADTS, "STREAMTYPE_AUDIO_ADTS"},
+                { STREAMTYPE_VIDEO_H264, "STREAMTYPE_VIDEO_H264"},
+                { STREAMTYPE_VIDEO_H265, "STREAMTYPE_VIDEO_H265"},
+                { STREAMTYPE_AUDIO_AC3, "STREAMTYPE_AUDIO_AC3"},
+                { STREAMTYPE_Any, "STREAMTYPE_Any"}
+        };
+
+
+/*! @brief Stream_id assignments
+ *
+ *[ISO 13818-1] Table 2-22 – Stream_id assignments
+ *
+ */
+enum StreamId
+{
+    STREAM_ID_program_stream_map = 0xBC,
+    STREAM_ID_private_stream_1 = 0xBD,
+    STREAM_ID_padding_stream = 0xBE,
+    STREAM_ID_private_stream_2 = 0xBF,
+    STREAM_ID_pes_audio_stream = 0xC0,
+    STREAM_ID_pes_video_stream = 0xE0,
+    STREAM_ID_ECM_stream = 0xF0,
+    STREAM_ID_EMM_stream = 0xF1,
+    STREAM_ID_DSMCC_stream = 0xF2,
+    STREAM_ID_ITU_T_Rec_H222_1_type_E_stream = 0xF8,
+    STREAM_ID_program_stream_directory = 0xFF
 };

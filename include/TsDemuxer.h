@@ -32,6 +32,7 @@ public:
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap; // TODO: make cb generic
+    std::map<int, PesCallBackFnc> mPesCallbackMap;
 
 
 private:

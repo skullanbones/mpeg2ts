@@ -42,9 +42,26 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             mPsiCallbackMap[tsPacketInfo.pid](&pmt);
         }
     }
+
+    if (mPesCallbackMap.find(tsPacketInfo.pid) != mPesCallbackMap.end())
+    {
+        // TODO remove
+        //std::cout << "Trying parse PES PID:" << tsPacketInfo.pid << std::endl;
+        PesPacket pkt;
+
+        if (mParser.collectPes(tsPacket, tsPacketInfo))
+        {
+            mPesCallbackMap[tsPacketInfo.pid](mParser.getPesPacket());
+        }
+    }
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)
 {
     mPsiCallbackMap[pid] = cb;
+}
+
+void TsDemuxer::addPesPid(int pid, PesCallBackFnc cb)
+{
+    mPesCallbackMap[pid] = cb;
 }

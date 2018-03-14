@@ -2,9 +2,13 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
-#include "TsParser.h"
 #include <iostream>
 #include <stdio.h>
+
+// Project files
+#include "TsParser.h"
+#include "CommonTypes.h"
+
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
@@ -71,6 +75,7 @@ bool TsParser::checkHasAdaptationField(TsHeader hdr)
     }
 }
 
+
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
     if (hdr.adaptation_field_control == ts_adaptation_field_control_payload_only ||
@@ -83,6 +88,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
         return false;
     }
 }
+
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
 {
@@ -172,6 +178,7 @@ uint64_t TsParser::parsePcr(const uint8_t* buffer)
     return pcr_base;
 }
 
+
 void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
@@ -191,7 +198,45 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
                                                                     tableInfo.table_id;
 }
 
-void TsParser::parsePsiTable(const std::vector<uint8_t>& table, PsiTable& tableInfo)
+
+bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
+{
+    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+
+    //std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
+    //std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
+
+    if (tsPacketInfo.isPayloadStart)
+    {
+        // Return previous assembled packet
+        PesPacket pkt = mPesPacket;
+
+        // Create new PES
+        mPesPacket = PesPacket();
+        mPesPacket.mPesBuffer.clear();
+
+        //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
+
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+
+        parsePesPacket();
+        return true;
+    }
+    else {
+        // Assemble packet
+        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+    }
+    return false;
+}
+
+
+PesPacket& TsParser::getPesPacket()
+{
+    return mPesPacket;
+}
+
+
+void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {
     resetBits(table.data(), TS_PACKET_SIZE, 0);
 
@@ -228,6 +273,7 @@ PatTable TsParser::parsePatPacket()
     return pat;
 }
 
+
 PmtTable TsParser::parsePmtPacket()
 {
     PmtTable pmt;
@@ -256,4 +302,94 @@ PmtTable TsParser::parsePmtPacket()
     }
 
     return pmt;
+}
+
+
+void TsParser::parsePesPacket()
+{
+    resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
+
+    mPesPacket.packet_start_code_prefix = getBits(24);
+    mPesPacket.stream_id = getBits(8);
+    mPesPacket.PES_packet_length = getBits(16);
+
+    // ISO/IEC 13818-1:2015: Table 2-21 PES packet
+    if (mPesPacket.stream_id != STREAM_ID_program_stream_map
+        && mPesPacket.stream_id != STREAM_ID_padding_stream
+        && mPesPacket.stream_id != STREAM_ID_private_stream_2
+        && mPesPacket.stream_id != STREAM_ID_ECM_stream
+        && mPesPacket.stream_id != STREAM_ID_EMM_stream
+        && mPesPacket.stream_id != STREAM_ID_program_stream_directory
+        && mPesPacket.stream_id != STREAM_ID_DSMCC_stream
+        && mPesPacket.stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
+    {
+        getBits(2); // '10'
+        mPesPacket.PES_scrambling_control = getBits(2);
+
+        mPesPacket.PES_priority = getBits(1);
+        mPesPacket.data_alignment_indicator = getBits(1);
+        mPesPacket.copyright = getBits(1);
+        mPesPacket.original_or_copy = getBits(1);
+        mPesPacket.PTS_DTS_flags = getBits(2);
+        mPesPacket.ESCR_flag = getBits(1);
+        mPesPacket.ES_rate_flag = getBits(1);
+        mPesPacket.DSM_trick_mode_flag = getBits(1);
+        mPesPacket.additional_copy_info_flag = getBits(1);
+        mPesPacket.PES_CRC_flag = getBits(1);
+        mPesPacket.PES_extension_flag = getBits(1);
+
+        mPesPacket.PES_header_data_length = getBits(8);
+
+        // Forbidden value
+        if (mPesPacket.PTS_DTS_flags == 0x01)
+        {
+            std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket.PTS_DTS_flags << std::endl;
+            mPesPacket.pts = -1;
+            mPesPacket.dts = -1;
+        }
+        else if (mPesPacket.PTS_DTS_flags == 0x02) // Only PTS value
+        {
+            getBits(4);
+            uint64_t pts = 0;
+            uint64_t pts_32_30 = getBits(3);
+            getBits(1); // marker_bit
+            uint64_t pts_29_15 = getBits(15);
+            getBits(1); // marker_bit
+            uint64_t pts_14_0 = getBits(15);
+            getBits(1); // marker_bit
+
+            pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
+
+            mPesPacket.pts = pts;
+            mPesPacket.dts = -1;
+        }
+        else if (mPesPacket.PTS_DTS_flags == 0x03) // Both PTS and DTS
+        {
+            getBits(4);
+            uint64_t pts = 0;
+            uint64_t pts_32_30 = getBits(3);
+            getBits(1); // marker_bit
+            uint64_t pts_29_15 = getBits(15);
+            getBits(1); // marker_bit
+            uint64_t pts_14_0 = getBits(15);
+            getBits(1); // marker_bit
+
+            pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
+
+            mPesPacket.pts = pts;
+
+            getBits(4);
+            uint64_t dts = 0;
+            uint64_t dts_32_30 = getBits(3);
+            getBits(1); // marker_bit
+            uint64_t dts_29_15 = getBits(15);
+            getBits(1); // marker_bit
+            uint64_t dts_14_0 = getBits(15);
+            getBits(1); // marker_bit
+
+            dts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
+
+            mPesPacket.dts = dts;
+        }
+    }
 }
