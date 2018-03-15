@@ -11,17 +11,8 @@ cat test1.ts | ./tsparser
 ## Docker image
 To just use the latest image just pull from our private registry/repository @ DockerHub:
 ```
-docker pull skullanbones/ts-lib:v1
+docker pull heliconwave/circleci:v1
 ```
-If you get a security message like this:
-```
-Error response from daemon: pull access denied for heliconave/ts-lib, repository does not exist or may require 'docker login'
-```
-it means you must first login:
-```
-docker login
-```
-Ask for username/password from kohnech.
 To build the image your self:
 ```
 make docker-image
@@ -39,3 +30,18 @@ In order to run all unit tests just type:
 make test
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
+
+## Continuous integration (CI)
+For CI we use CircleCI which will automatically run all unit tests after a commit either
+in a branch, pull-request or integration to master. You can check the status tests in any
+branch by the portal:
+```
+[CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
+```
+
+## Static code analysis
+For static and feedback in pull-requests we use a tool called Codacy which will run different
+tools to check for mistakes and coding quality/best practises. You can check that status here:
+```
+[Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
+```
