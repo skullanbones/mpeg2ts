@@ -35,13 +35,9 @@ This will spin up a docker container with gtest/gmock and execute all tests.
 For CI we use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
-```
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
-```
 
 ## Static code analysis
 For static and feedback in pull-requests we use a tool called Codacy which will run different
 tools to check for mistakes and coding quality/best practises. You can check that status here:
-```
 [Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
-```
