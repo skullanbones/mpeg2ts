@@ -283,6 +283,17 @@ TEST(TsParserTests, TestParsePesPacket)
     EXPECT_EQ(689090704, pes.dts);
 }
 
+TEST(TsParserTests, TestParsePcr)
+{
+    TsParser parser;
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(packet_2, info);
+    EXPECT_EQ(599, info.pid);
+    EXPECT_EQ(600035807394, info.pcr);
+    EXPECT_EQ(0, info.opcr);
+
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
