@@ -97,10 +97,10 @@ struct TsAdaptationFieldHeader
  */
 enum TsAdaptationFieldControl
 {
-    ts_adaptation_field_control_reserved = 0x00,
-    ts_adaptation_field_control_payload_only = 0x01,
-    ts_adaptation_field_control_adaptation_only = 0x02,
-    ts_adaptation_field_control_adaptation_payload = 0x03
+    TS_ADAPATION_FIELD_CONTROL_RESERVED = 0x00,
+    TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY = 0x01,
+    TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY = 0x02,
+    TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD = 0x03
 };
 
 
