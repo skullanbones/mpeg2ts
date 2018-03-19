@@ -292,6 +292,9 @@ TEST(TsParserTests, TestParsePcr)
     EXPECT_EQ(600035807394, info.pcr);
     EXPECT_EQ(0, info.opcr);
 
+    parser.parseTsPacketInfo(pcr_packet_1, info);
+    EXPECT_EQ(0x30, info.pid);
+    EXPECT_EQ(31571712, info.pcr);
 }
 
 int main(int argc, char** argv)
