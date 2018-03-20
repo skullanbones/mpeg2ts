@@ -131,11 +131,11 @@ public:
      * several TS-Packets for generating a complete PES-Packet. This function is used
      * internally by collectPes().
      */
-    void parsePesPacket();
+    void parsePesPacket(int16_t pid);
 
 private:
     ByteVector mSectionBuffer;
-    PesPacket mPesPacket;
+    std::map<uint16_t, PesPacket> mPesPacket;
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };
