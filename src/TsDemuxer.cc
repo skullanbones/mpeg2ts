@@ -45,13 +45,10 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
     if (mPesCallbackMap.find(tsPacketInfo.pid) != mPesCallbackMap.end())
     {
-        // TODO remove
-        //std::cout << "Trying parse PES PID:" << tsPacketInfo.pid << std::endl;
-        PesPacket pkt;
-
-        if (mParser.collectPes(tsPacket, tsPacketInfo))
+        PesPacket pes;
+        if (mParser.collectPes(tsPacket, tsPacketInfo, pes))
         {
-            mPesCallbackMap[tsPacketInfo.pid](mParser.getPesPacket());
+            mPesCallbackMap[tsPacketInfo.pid](pes);
         }
     }
 }

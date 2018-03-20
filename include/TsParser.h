@@ -124,7 +124,7 @@ public:
      * @param tsPacketInfo Pre-parsed metadata about this TS-Packet.
      * @return True if found 1 finished PES-Packet false in all other cases
      */
-    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
+    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket);
 
     /*!
      * Parses the start of a new PES-Packet. This is typically done before collecting
@@ -132,14 +132,6 @@ public:
      * internally by collectPes().
      */
     void parsePesPacket();
-
-    /*!
-     * Returns the state of the collected PES-Packet. Should be use with care. Should
-     * only be used when collectPes finished collecting many TS-Packets for generating
-     * a complete PES-Packet.
-     * @return The collected PES-Packet
-     */
-    PesPacket& getPesPacket();
 
 private:
     ByteVector mSectionBuffer;

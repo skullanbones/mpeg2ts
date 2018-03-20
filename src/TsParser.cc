@@ -115,7 +115,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* pack
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
     TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
-    printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    //printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -199,42 +199,49 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 }
 
 
-bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
+bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket)
 {
+    bool ret = false;
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
-
+    static int pid = 0;
+    
     //std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
     //std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
 
     if (tsPacketInfo.isPayloadStart)
     {
-        // Return previous assembled packet
-        PesPacket pkt = mPesPacket;
+        // We have start. So if we have any cached data it's time to return it.
+        if (!mPesPacket.mPesBuffer.empty())
+        {
+            if (mPesPacket.PES_packet_length &&
+                mPesPacket.mPesBuffer.size() < mPesPacket.PES_packet_length)
+            {
+                std::cerr << "Not returning incomplete PES packet\n";
+            }else
+            {
+                pesPacket = mPesPacket; //TODO: must copy as we override it below.
+                ret = true;
+            }
+        }
 
         // Create new PES
         mPesPacket = PesPacket();
-        mPesPacket.mPesBuffer.clear();
-
-        //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
-
+        pid = tsPacketInfo.pid;
+        
         mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket();
-        return true;
     }
     else {
         // Assemble packet
+        if (pid != tsPacketInfo.pid)
+            std::cerr << "KUUUUUUUTTAAAS\n";
         mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        //TODO: check if we have boud PES and return it if it is coplete
     }
-    return false;
+
+    return ret;
 }
-
-
-PesPacket& TsParser::getPesPacket()
-{
-    return mPesPacket;
-}
-
 
 void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {

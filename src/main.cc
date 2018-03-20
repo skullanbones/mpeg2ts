@@ -5,8 +5,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdint.h>
-
+#include <getopt.h>
 #include <unistd.h>
+#include <algorithm> 
 
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
@@ -14,11 +15,28 @@
 #include "TsStandards.h"
 
 #include <type_traits>
+#include <map>
+#include <string>
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 uint32_t g_SPPID = 0; // Single Program PID
-uint32_t g_ESPID1 = 0; // Test 1 ES
+std::vector<uint16_t> g_ESPIDS;
+
+enum OptionWriteInfo
+{
+    NOTHING = 0,
+    TS = 1,
+    PES = 2,
+    ES = 3,
+    PSI = 4
+};
+std::map<std::string, std::vector<int> > g_Options;
+struct option longOptions[] = {
+            {"write", 1, 0, 'w' },
+            {"info",  1, 0, 'i' },
+            {0,       0, 0,  0 }
+        };
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -28,24 +46,35 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    std::cout << "demuxed PAT table \n" << table->table_id;
+    std::cout << "demuxed PAT table \n";
 
-    // std::cout << "Got PSI table:" << std::endl << table << std::endl;
     PatTable* pat = static_cast<PatTable*>(table);
-    // std::cout << "Got PAT packet:" << std::endl << *pat << std::endl;
+    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), 0))
+    {
+        std::cout << *pat << std::endl;
+    }
+    
     g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
 }
 
 void PMTCallback(PsiTable* table)
 {
-    std::cout << "demuxed PMT table \n" << table->table_id;
+    std::cout << "demuxed PMT table \n";
 
-    std::cout << "Got PSI table:" << std::endl << *table << std::endl;
     PmtTable* pmt = static_cast<PmtTable*>(table);
-    std::cout << "Got PMT packet:" << std::endl << *pmt << std::endl;
+    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), g_SPPID))
+    {
+        std::cout << *pmt << std::endl;
+    }
 
-    std::cout << "pmt streams size:" << pmt->streams.size() << std::endl;
-    g_ESPID1 = pmt->streams[0].elementary_PID; // Use 1st ES
+    for (auto& stream : pmt->streams)
+    {
+        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), stream.elementary_PID) ||
+            std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
+        {
+            g_ESPIDS.push_back(stream.elementary_PID);
+        }
+    }
 }
 
 void PESCallback(const PesPacket& pes)
@@ -57,6 +86,11 @@ void PESCallback(const PesPacket& pes)
 int main(int argc, char** argv)
 {
     std::cout << "Staring parser of stdout" << std::endl;
+    
+    int opt, optInx;
+    while ((opt = getopt_long(argc, argv, "", longOptions, &optInx)) != -1){
+        g_Options[longOptions[optInx].name].push_back(std::atoi(optarg));
+    }
 
     uint64_t count;
 
@@ -142,10 +176,11 @@ int main(int argc, char** argv)
             tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 
-        if (g_ESPID1)
+        for (auto pid : g_ESPIDS)
         {
-            tsDemux.addPesPid(g_ESPID1, std::bind(&PESCallback, std::placeholders::_1));
+            tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1));
         }
+        g_ESPIDS.clear();
 
         if (tsPacketInfo.hasAdaptationField)
         {
