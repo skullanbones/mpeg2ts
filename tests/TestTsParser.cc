@@ -207,10 +207,14 @@ TEST(TsParserTests, CheckParseTsHeader)
     TsParser parser;
     TsHeader hdr = parser.parseTsHeader(packet_3);
 
+    EXPECT_EQ(0x47, hdr.sync_byte);
+    EXPECT_FALSE(hdr.transport_error_indicator);
+    EXPECT_TRUE(hdr.payload_unit_start_indicator);
+    EXPECT_FALSE(hdr.transport_priority);
     EXPECT_EQ(289, hdr.PID);
-    // parser.parseTsPacketInfo(packet_4, info);
-    // EXPECT_EQ(481, info.pid);
-    // TODO add more tests...
+    EXPECT_EQ(0, hdr.transport_scrambling_control);
+    EXPECT_EQ(TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY, hdr.adaptation_field_control);
+    EXPECT_EQ(0xc, hdr.continuity_counter);
 }
 
 TEST(TsParserTests, CheckParselargePmtTable)
@@ -277,6 +281,20 @@ TEST(TsParserTests, TestParsePesPacket)
     EXPECT_EQ(10, pes.PES_header_data_length);
     EXPECT_EQ(689094304, pes.pts);
     EXPECT_EQ(689090704, pes.dts);
+}
+
+TEST(TsParserTests, TestParsePcr)
+{
+    TsParser parser;
+    TsPacketInfo info;
+    parser.parseTsPacketInfo(packet_2, info);
+    EXPECT_EQ(599, info.pid);
+    EXPECT_EQ(600035807394, info.pcr);
+    EXPECT_EQ(0, info.opcr);
+
+    parser.parseTsPacketInfo(pcr_packet_1, info);
+    EXPECT_EQ(0x30, info.pid);
+    EXPECT_EQ(31571712, info.pcr);
 }
 
 int main(int argc, char** argv)

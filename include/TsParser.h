@@ -21,6 +21,8 @@
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
 #include "PesPacket.h"
+#include "PsiTables.h"
+
 
 
 class TsParser : GetBits
