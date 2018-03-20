@@ -19,7 +19,7 @@ class TsDemuxer
 {
 public:
     typedef std::function<void(PsiTable* table)> PsiCallBackFnc;
-    typedef std::function<void(const PesPacket& table)> PesCallBackFnc;
+    typedef std::function<void(const PesPacket& table, uint16_t pid)> PesCallBackFnc;
     typedef std::function<void(const TsHeader& hdr)> TsCallBackFnc;
 
     TsDemuxer();

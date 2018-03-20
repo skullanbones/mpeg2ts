@@ -48,7 +48,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         PesPacket pes;
         if (mParser.collectPes(tsPacket, tsPacketInfo, pes))
         {
-            mPesCallbackMap[tsPacketInfo.pid](pes);
+            mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid);
         }
     }
 }

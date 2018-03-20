@@ -8,6 +8,7 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <algorithm> 
+#include <fstream>
 
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
@@ -23,18 +24,17 @@ uint64_t countAdaptPacket = 0;
 uint32_t g_SPPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 
-enum OptionWriteInfo
+enum OptionWriteLevel
 {
-    NOTHING = 0,
     TS = 1,
     PES = 2,
-    ES = 3,
-    PSI = 4
+    ES = 3
 };
 std::map<std::string, std::vector<int> > g_Options;
 struct option longOptions[] = {
             {"write", 1, 0, 'w' },
             {"info",  1, 0, 'i' },
+            {"level", 1, 0, 'l' },
             {0,       0, 0,  0 }
         };
 
@@ -77,10 +77,28 @@ void PMTCallback(PsiTable* table)
     }
 }
 
-void PESCallback(const PesPacket& pes)
+void PESCallback(const PesPacket& pes, uint16_t pid)
 {
-    std::cout << "demuxed PES packet \n";
-    std::cout << "Got PesPacket start: " << std::endl << pes << std::endl;
+    std::cout << "demuxed PES packet on pid " << pid << "\n";
+    
+    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pid))
+    {
+        std::cout << pes << std::endl;
+    }
+    
+    if (std::count(g_Options["write"].begin(), g_Options["write"].end(), pid))
+    {
+        static std::map<uint16_t, std::ofstream> outFiles;
+        auto fit = outFiles.find(pid);
+        if (fit == outFiles.end())
+        {
+            outFiles[pid] = std::ofstream("/tmp/out" + std::to_string(pid) + ".pes", std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
+        }
+        
+        std::copy(pes.mPesBuffer.begin(), pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
+        
+        std::cout << "Write " << pes.mPesBuffer.size() << " B of PesPacket on pid: " << pid << std::endl;
+    }
 }
 
 int main(int argc, char** argv)
@@ -178,7 +196,7 @@ int main(int argc, char** argv)
 
         for (auto pid : g_ESPIDS)
         {
-            tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1));
+            tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
         }
         g_ESPIDS.clear();
 
