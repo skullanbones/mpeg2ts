@@ -39,7 +39,7 @@ struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "info", 1, nullptr, 'i' },
                              { "level", 1, nullptr, 'l' },
                              { "help", 0, nullptr, 'h' },
-                             {nullptr, 0, nullptr, 0 } };
+                             { nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
@@ -54,8 +54,8 @@ void display_usage()
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
-                 "        -i [ --info ]        print PSI tables info with PID\n"
-                 "        -w [ --write ]       writes PES packets with PID to file"
+                 "        -i [ --info PID]        print PSI tables info with PID\n"
+                 "        -w [ --write PID]       writes PES packets with PID to file"
               << std::endl;
 }
 

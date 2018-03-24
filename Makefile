@@ -48,7 +48,7 @@ lint:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 clang:
-	clang-tidy-5.0 -checks='*' -header-filter="^include" -p . src/*.cc
+	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/
 
 run: tsparser
 	cat bbc_one.ts | ./tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
