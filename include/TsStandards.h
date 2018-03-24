@@ -15,8 +15,8 @@
  */
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
 // Project files
 #include "CommonTypes.h"
@@ -29,11 +29,11 @@ const int TS_PACKET_SIZE = 188;
 const int TS_PACKET_HEADER_SIZE = 4;
 const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
 const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
-const int TS_PACKET_PID_PAT = 0x00;     // PAT packet, Table 2-28
-const int TS_PACKET_PID_CAT = 0x01;     // CAT packet, Table 2-28
-const int TS_PACKET_PID_TDT = 0x02;     // TDT packet, Table 2-28
-const int TS_PACKET_PID_IPMP = 0x03;    // IPMP packet, Table 2-28
-const int TS_PACKET_PID_NULL = 0x1fff; // Null Packet
+const int TS_PACKET_PID_PAT = 0x00;                // PAT packet, Table 2-28
+const int TS_PACKET_PID_CAT = 0x01;                // CAT packet, Table 2-28
+const int TS_PACKET_PID_TDT = 0x02;                // TDT packet, Table 2-28
+const int TS_PACKET_PID_IPMP = 0x03;               // IPMP packet, Table 2-28
+const int TS_PACKET_PID_NULL = 0x1fff;             // Null Packet
 const int PES_PACKET_START_CODE_PREFIX = 0x000001; // Section 2.4.3.7
 
 
@@ -122,31 +122,30 @@ struct TsAdaptationFieldExtensionHeader
  */
 enum PsiTableId
 {
-    PSI_TABLE_ID_PAT = 0x00,       /*! Program Association Table Id */
-    PSI_TABLE_ID_CAT = 0x01,       /*! Conditional Access Section Table Id */
-    PSI_TABLE_ID_PMT = 0x02,       /*! Program Map Table Id */
-    PSI_TABLE_ID_TDT = 0x03,       /*! Transport stream Desciption Table id */
-    PSI_TABLE_ID_SDT = 0x04,       /*! ISO_IEC_14496_scene_description_section */
-    PSI_TABLE_ID_ODT = 0x05,       /*! ISO_IEC_14496_object_descriptor_section */
-    PSI_TABLE_ID_METADATA = 0x06,  /*! Metadata_section */
-    PSI_TABLE_ID_IPMP = 0x07,      /*! IPMP Control Information Section */
-    PSI_TABLE_ID_14496 = 0x08,     /*! ISO_IEC_14496_section */
+    PSI_TABLE_ID_PAT = 0x00,        /*! Program Association Table Id */
+    PSI_TABLE_ID_CAT = 0x01,        /*! Conditional Access Section Table Id */
+    PSI_TABLE_ID_PMT = 0x02,        /*! Program Map Table Id */
+    PSI_TABLE_ID_TDT = 0x03,        /*! Transport stream Desciption Table id */
+    PSI_TABLE_ID_SDT = 0x04,        /*! ISO_IEC_14496_scene_description_section */
+    PSI_TABLE_ID_ODT = 0x05,        /*! ISO_IEC_14496_object_descriptor_section */
+    PSI_TABLE_ID_METADATA = 0x06,   /*! Metadata_section */
+    PSI_TABLE_ID_IPMP = 0x07,       /*! IPMP Control Information Section */
+    PSI_TABLE_ID_14496 = 0x08,      /*! ISO_IEC_14496_section */
     PSI_TABLE_ID_INCOMPLETE = 0xfe, /*! User defined */
-    PSI_TABLE_ID_FORBIDDEN = 0xff /*! Forbidden */
+    PSI_TABLE_ID_FORBIDDEN = 0xff   /*! Forbidden */
 };
 
 static std::map<PsiTableId, std::string> PsiTableToString =
-        {
-                { PSI_TABLE_ID_PAT, "PSI_TABLE_ID_PAT"},
-                { PSI_TABLE_ID_CAT, "PSI_TABLE_ID_CAT"},
-                { PSI_TABLE_ID_PMT, "PSI_TABLE_ID_PMT"},
-                { PSI_TABLE_ID_TDT, "PSI_TABLE_ID_TDT"},
-                { PSI_TABLE_ID_SDT, "PSI_TABLE_ID_SDT"},
-                { PSI_TABLE_ID_ODT, "PSI_TABLE_ID_ODT"},
-                { PSI_TABLE_ID_METADATA, "PSI_TABLE_ID_METADATA"},
-                { PSI_TABLE_ID_IPMP, "PSI_TABLE_ID_IPMP"},
-                { PSI_TABLE_ID_14496, "PSI_TABLE_ID_14496"},
-                { PSI_TABLE_ID_FORBIDDEN, "PSI_TABLE_ID_FORBIDDEN"}};
+{ { PSI_TABLE_ID_PAT, "PSI_TABLE_ID_PAT" },
+  { PSI_TABLE_ID_CAT, "PSI_TABLE_ID_CAT" },
+  { PSI_TABLE_ID_PMT, "PSI_TABLE_ID_PMT" },
+  { PSI_TABLE_ID_TDT, "PSI_TABLE_ID_TDT" },
+  { PSI_TABLE_ID_SDT, "PSI_TABLE_ID_SDT" },
+  { PSI_TABLE_ID_ODT, "PSI_TABLE_ID_ODT" },
+  { PSI_TABLE_ID_METADATA, "PSI_TABLE_ID_METADATA" },
+  { PSI_TABLE_ID_IPMP, "PSI_TABLE_ID_IPMP" },
+  { PSI_TABLE_ID_14496, "PSI_TABLE_ID_14496" },
+  { PSI_TABLE_ID_FORBIDDEN, "PSI_TABLE_ID_FORBIDDEN" } };
 
 /*! @brief Stream type
  *
@@ -155,39 +154,37 @@ static std::map<PsiTableId, std::string> PsiTableToString =
  */
 enum StreamType
 {
-    STREAMTYPE_RESERVED    = 0x00,
+    STREAMTYPE_RESERVED = 0x00,
     STREAMTYPE_VIDEO_MPEG1 = 0X01,
     STREAMTYPE_VIDEO_MPEG2 = 0x02,
     STREAMTYPE_AUDIO_MPEG1 = 0X03,
     STREAMTYPE_AUDIO_MPEG2 = 0x04,
     STREAMTYPE_PRIVATE_TABLE = 0x05,
     STREAMTYPE_PRIVATE_PES = 0X06,
-    STREAMTYPE_MHEG        = 0X07,
+    STREAMTYPE_MHEG = 0X07,
     STREAMTYPE_VIDEO_MPEG4 = 0X10,
-    STREAMTYPE_AUDIO_ADTS  = 0x0F,
-    STREAMTYPE_VIDEO_H264  = 0x1B,
-    STREAMTYPE_VIDEO_H265  = 0X24,
-    STREAMTYPE_AUDIO_AC3   = 0X81,
-    STREAMTYPE_Any         = 0xFF // User private
+    STREAMTYPE_AUDIO_ADTS = 0x0F,
+    STREAMTYPE_VIDEO_H264 = 0x1B,
+    STREAMTYPE_VIDEO_H265 = 0X24,
+    STREAMTYPE_AUDIO_AC3 = 0X81,
+    STREAMTYPE_Any = 0xFF // User private
 };
 
 static std::map<int, std::string> StreamTypeToString =
-        {
-                { STREAMTYPE_RESERVED, "STREAMTYPE_RESERVED"},
-                { STREAMTYPE_VIDEO_MPEG1, "STREAMTYPE_VIDEO_MPEG1"},
-                { STREAMTYPE_VIDEO_MPEG2, "STREAMTYPE_VIDEO_MPEG2"},
-                { STREAMTYPE_AUDIO_MPEG1, "STREAMTYPE_AUDIO_MPEG1"},
-                { STREAMTYPE_AUDIO_MPEG2, "STREAMTYPE_AUDIO_MPEG2"},
-                { STREAMTYPE_PRIVATE_TABLE, "STREAMTYPE_PRIVATE_TABLE"},
-                { STREAMTYPE_PRIVATE_PES, "STREAMTYPE_PRIVATE_PES"},
-                { STREAMTYPE_MHEG, "STREAMTYPE_MHEG"},
-                { STREAMTYPE_VIDEO_MPEG4, "STREAMTYPE_VIDEO_MPEG4"},
-                { STREAMTYPE_AUDIO_ADTS, "STREAMTYPE_AUDIO_ADTS"},
-                { STREAMTYPE_VIDEO_H264, "STREAMTYPE_VIDEO_H264"},
-                { STREAMTYPE_VIDEO_H265, "STREAMTYPE_VIDEO_H265"},
-                { STREAMTYPE_AUDIO_AC3, "STREAMTYPE_AUDIO_AC3"},
-                { STREAMTYPE_Any, "STREAMTYPE_Any"}
-        };
+{ { STREAMTYPE_RESERVED, "STREAMTYPE_RESERVED" },
+  { STREAMTYPE_VIDEO_MPEG1, "STREAMTYPE_VIDEO_MPEG1" },
+  { STREAMTYPE_VIDEO_MPEG2, "STREAMTYPE_VIDEO_MPEG2" },
+  { STREAMTYPE_AUDIO_MPEG1, "STREAMTYPE_AUDIO_MPEG1" },
+  { STREAMTYPE_AUDIO_MPEG2, "STREAMTYPE_AUDIO_MPEG2" },
+  { STREAMTYPE_PRIVATE_TABLE, "STREAMTYPE_PRIVATE_TABLE" },
+  { STREAMTYPE_PRIVATE_PES, "STREAMTYPE_PRIVATE_PES" },
+  { STREAMTYPE_MHEG, "STREAMTYPE_MHEG" },
+  { STREAMTYPE_VIDEO_MPEG4, "STREAMTYPE_VIDEO_MPEG4" },
+  { STREAMTYPE_AUDIO_ADTS, "STREAMTYPE_AUDIO_ADTS" },
+  { STREAMTYPE_VIDEO_H264, "STREAMTYPE_VIDEO_H264" },
+  { STREAMTYPE_VIDEO_H265, "STREAMTYPE_VIDEO_H265" },
+  { STREAMTYPE_AUDIO_AC3, "STREAMTYPE_AUDIO_AC3" },
+  { STREAMTYPE_Any, "STREAMTYPE_Any" } };
 
 
 /*! @brief Stream_id assignments

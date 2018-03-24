@@ -2,22 +2,22 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
+#include <algorithm>
 #include <cstdlib>
+#include <fstream>
+#include <getopt.h>
 #include <iostream>
 #include <stdint.h>
-#include <getopt.h>
 #include <unistd.h>
-#include <algorithm> 
-#include <fstream>
 
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsParser.h"
 #include "TsStandards.h"
 
-#include <type_traits>
 #include <map>
 #include <string>
+#include <type_traits>
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
@@ -31,17 +31,15 @@ enum OptionWriteLevel
     ES = 3
 };
 
-std::map<std::string, std::vector<int> > g_Options;
+std::map<std::string, std::vector<int>> g_Options;
 
-static const char *optString = "wil:h?";
+static const char* optString = "wil:h?";
 
-struct option longOpts[] = {
-            {"write", 1, 0, 'w' },
-            {"info",  1, 0, 'i' },
-            {"level", 1, 0, 'l' },
-            {"help",  0, 0, 'h' },
-            {0,       0, 0,  0 }
-        };
+struct option longOpts[] = { { "write", 1, 0, 'w' },
+                             { "info", 1, 0, 'i' },
+                             { "level", 1, 0, 'l' },
+                             { "help", 0, 0, 'h' },
+                             { 0, 0, 0, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
@@ -55,9 +53,10 @@ void display_usage()
     std::cout << "USAGE: ./tsparser [-h] [-w PID] [-i PID] [-l log-level]" << std::endl;
 
     std::cout << "Option Arguments:\n"
-            "        -h [ --help ]        Print help messages\n"
-            "        -i [ --info ]        print PSI tables info with PID\n"
-            "        -w [ --write ]       writes PES packets with PID to file" << std::endl;
+                 "        -h [ --help ]        Print help messages\n"
+                 "        -i [ --info ]        print PSI tables info with PID\n"
+                 "        -w [ --write ]       writes PES packets with PID to file"
+              << std::endl;
 }
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
@@ -73,7 +72,7 @@ void PATCallback(PsiTable* table)
     {
         std::cout << *pat << std::endl;
     }
-    
+
     g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
 }
 
@@ -98,23 +97,24 @@ void PMTCallback(PsiTable* table)
 void PESCallback(const PesPacket& pes, uint16_t pid)
 {
     std::cout << "demuxed PES packet on pid " << pid << "\n";
-    
+
     if (hasPid("info", pid))
     {
         std::cout << pes << std::endl;
     }
-    
+
     if (hasPid("write", pid))
     {
         static std::map<uint16_t, std::ofstream> outFiles;
         auto fit = outFiles.find(pid);
         if (fit == outFiles.end())
         {
-            outFiles[pid] = std::ofstream(std::to_string(pid) + ".pes", std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
+            outFiles[pid] = std::ofstream(std::to_string(pid) + ".pes",
+                                          std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
-        
+
         std::copy(pes.mPesBuffer.begin(), pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
-        
+
         std::cout << "Write " << pes.mPesBuffer.size() << " B of PesPacket on pid: " << pid << std::endl;
     }
 }
@@ -124,26 +124,28 @@ int main(int argc, char** argv)
     std::cout << "Staring parser of stdout" << std::endl;
 
     int longIndex;
-    int opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
-    while( opt != -1 ) {
+    int opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
+    while (opt != -1)
+    {
 
-        switch( opt ) {
-            case 'h':   /* fall-through is intentional */
-            case '?':
-                display_usage();
-                break;
-            case 'w':
-            case 'i':
-            case 'l':
-                g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
-                break;
+        switch (opt)
+        {
+        case 'h': /* fall-through is intentional */
+        case '?':
+            display_usage();
+            break;
+        case 'w':
+        case 'i':
+        case 'l':
+            g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
+            break;
 
-            default:
-                /* You won't actually get here. */
-                break;
+        default:
+            /* You won't actually get here. */
+            break;
         }
 
-        opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
+        opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
 
     uint64_t count;

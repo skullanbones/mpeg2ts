@@ -260,11 +260,12 @@ TEST(TsParserTests, TestParsePesPacket)
     parser.parseTsPacketInfo(pes_packet_1, info);
     EXPECT_EQ(481, info.pid);
 
-    EXPECT_FALSE(parser.collectPes(pes_packet_1, info, pes));// parse and buffer this one
-    EXPECT_TRUE(parser.collectPes(pes_packet_1, info, pes));// here we send next pusi so it's time to release the first one
+    EXPECT_FALSE(parser.collectPes(pes_packet_1, info, pes)); // parse and buffer this one
+    EXPECT_TRUE(parser.collectPes(pes_packet_1, info, pes));  // here we send next pusi so it's time
+                                                              // to release the first one
     EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
     EXPECT_EQ(STREAM_ID_pes_video_stream, pes.stream_id);
-    EXPECT_EQ(0, pes.PES_packet_length); // Unbounded video packet.
+    EXPECT_EQ(0, pes.PES_packet_length);      // Unbounded video packet.
     EXPECT_FALSE(pes.PES_scrambling_control); // Unscrambled.
     EXPECT_FALSE(pes.PES_priority);
     EXPECT_TRUE(pes.data_alignment_indicator);

@@ -6,8 +6,8 @@
 #include <stdio.h>
 
 // Project files
-#include "TsParser.h"
 #include "CommonTypes.h"
+#include "TsParser.h"
 
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
@@ -115,7 +115,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* pack
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
     TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
-    //printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -204,9 +204,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     bool ret = false;
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
-    
-    //std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
-    //std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
+
+    // std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset <<
+    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart <<
+    // std::endl;
 
     if (tsPacketInfo.isPayloadStart)
     {
@@ -220,7 +221,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             }
             else
             {
-                pesPacket = mPesPacket[pid]; //TODO: must copy as we override it below.
+                pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
                 ret = true;
             }
         }
@@ -228,15 +229,18 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
         // Create new PES
         mPesPacket[pid] = PesPacket();
         pid = tsPacketInfo.pid;
-        
-        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+
+        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
     }
-    else {
+    else
+    {
         // Assemble packet
-        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
-        //TODO: check if we have boud PES and return it if it is coplete
+        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        // TODO: check if we have boud PES and return it if it is coplete
     }
 
     return ret;
@@ -320,14 +324,12 @@ void TsParser::parsePesPacket(int16_t pid)
     mPesPacket[pid].PES_packet_length = getBits(16);
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
-    if (mPesPacket[pid].stream_id != STREAM_ID_program_stream_map
-        && mPesPacket[pid].stream_id != STREAM_ID_padding_stream
-        && mPesPacket[pid].stream_id != STREAM_ID_private_stream_2
-        && mPesPacket[pid].stream_id != STREAM_ID_ECM_stream
-        && mPesPacket[pid].stream_id != STREAM_ID_EMM_stream
-        && mPesPacket[pid].stream_id != STREAM_ID_program_stream_directory
-        && mPesPacket[pid].stream_id != STREAM_ID_DSMCC_stream
-        && mPesPacket[pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
+    if (mPesPacket[pid].stream_id != STREAM_ID_program_stream_map &&
+        mPesPacket[pid].stream_id != STREAM_ID_padding_stream && mPesPacket[pid].stream_id != STREAM_ID_private_stream_2 &&
+        mPesPacket[pid].stream_id != STREAM_ID_ECM_stream && mPesPacket[pid].stream_id != STREAM_ID_EMM_stream &&
+        mPesPacket[pid].stream_id != STREAM_ID_program_stream_directory &&
+        mPesPacket[pid].stream_id != STREAM_ID_DSMCC_stream &&
+        mPesPacket[pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
         getBits(2); // '10'
         mPesPacket[pid].PES_scrambling_control = getBits(2);

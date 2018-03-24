@@ -18,11 +18,10 @@
 
 // Project files
 #include "GetBits.h"
-#include "TsPacketInfo.h"
-#include "TsStandards.h"
 #include "PesPacket.h"
 #include "PsiTables.h"
-
+#include "TsPacketInfo.h"
+#include "TsStandards.h"
 
 
 class TsParser : GetBits
@@ -98,7 +97,7 @@ public:
      * @param info
      * @param psiTable
      */
-    void parsePsiTable(const ByteVector & table, PsiTable& tableInfo);
+    void parsePsiTable(const ByteVector& table, PsiTable& tableInfo);
 
     /*!
      * Parses PAT table
