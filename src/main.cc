@@ -111,7 +111,8 @@ int main(int argc, char** argv)
     std::cout << "Staring parser of stdout" << std::endl;
     
     int opt, optInx;
-    while ((opt = getopt_long(argc, argv, "", longOptions, &optInx)) != -1){
+    while (((opt = getopt_long(argc, argv, "", longOptions, &optInx)) != -1) && optarg)
+    {
         g_Options[longOptions[optInx].name].push_back(std::atoi(optarg));
     }
 
