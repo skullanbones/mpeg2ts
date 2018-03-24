@@ -30,17 +30,34 @@ enum OptionWriteLevel
     PES = 2,
     ES = 3
 };
+
 std::map<std::string, std::vector<int> > g_Options;
-struct option longOptions[] = {
+
+static const char *optString = "wil:h?";
+
+struct option longOpts[] = {
             {"write", 1, 0, 'w' },
             {"info",  1, 0, 'i' },
             {"level", 1, 0, 'l' },
+            {"help",  0, 0, 'h' },
             {0,       0, 0,  0 }
         };
 
 bool hasPid(std::string param, uint32_t pid)
 {
     return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+}
+
+void display_usage()
+{
+    std::cout << "Ts-lib simple command-line:" << std::endl;
+
+    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-i PID] [-l log-level]" << std::endl;
+
+    std::cout << "Option Arguments:\n"
+            "        -h [ --help ]        Print help messages\n"
+            "        -i [ --info ]        print PSI tables info with PID\n"
+            "        -w [ --write ]       writes PES packets with PID to file" << std::endl;
 }
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
@@ -51,8 +68,6 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    std::cout << "demuxed PAT table \n";
-
     PatTable* pat = static_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
@@ -64,8 +79,6 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    std::cout << "demuxed PMT table \n";
-
     PmtTable* pmt = static_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
@@ -109,11 +122,28 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 int main(int argc, char** argv)
 {
     std::cout << "Staring parser of stdout" << std::endl;
-    
-    int opt, optInx;
-    while (((opt = getopt_long(argc, argv, "", longOptions, &optInx)) != -1) && optarg)
-    {
-        g_Options[longOptions[optInx].name].push_back(std::atoi(optarg));
+
+    int longIndex;
+    int opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
+    while( opt != -1 ) {
+
+        switch( opt ) {
+            case 'h':   /* fall-through is intentional */
+            case '?':
+                display_usage();
+                break;
+            case 'w':
+            case 'i':
+            case 'l':
+                g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
+                break;
+
+            default:
+                /* You won't actually get here. */
+                break;
+        }
+
+        opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
     }
 
     uint64_t count;
