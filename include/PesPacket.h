@@ -1,5 +1,8 @@
 #pragma once
 
+/// Project files
+#include "CommonTypes.h"
+
 /*!
  * @class PES-Packet prototype containing buffer
  *

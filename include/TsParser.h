@@ -121,7 +121,8 @@ public:
      * it returns false. No errors are considered at the moment.
      * @param tsPacket The packet to collect.
      * @param tsPacketInfo Pre-parsed metadata about this TS-Packet.
-     * @return True if found 1 finished PES-Packet false in all other cases
+     * @param pesPacket collected PES but only ready/complete/collected when true
+     * @return True if collected a complete PES-Packet false in all other cases
      */
     bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket);
 

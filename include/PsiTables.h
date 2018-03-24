@@ -1,4 +1,8 @@
 #pragma once
+
+/// Project files
+#include "TsStandards.h"
+
 /*!
  * @brief Base class for all tables
  */
