@@ -38,6 +38,11 @@ struct option longOptions[] = {
             {0,       0, 0,  0 }
         };
 
+bool hasPid(std::string param, uint32_t pid)
+{
+    return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+}
+
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
     (void)packet;
@@ -49,7 +54,7 @@ void PATCallback(PsiTable* table)
     std::cout << "demuxed PAT table \n";
 
     PatTable* pat = static_cast<PatTable*>(table);
-    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), 0))
+    if (hasPid("info", 0))
     {
         std::cout << *pat << std::endl;
     }
@@ -62,7 +67,7 @@ void PMTCallback(PsiTable* table)
     std::cout << "demuxed PMT table \n";
 
     PmtTable* pmt = static_cast<PmtTable*>(table);
-    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), g_SPPID))
+    if (hasPid("info", g_SPPID))
     {
         std::cout << *pmt << std::endl;
     }
@@ -81,18 +86,18 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 {
     std::cout << "demuxed PES packet on pid " << pid << "\n";
     
-    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pid))
+    if (hasPid("info", pid))
     {
         std::cout << pes << std::endl;
     }
     
-    if (std::count(g_Options["write"].begin(), g_Options["write"].end(), pid))
+    if (hasPid("write", pid))
     {
         static std::map<uint16_t, std::ofstream> outFiles;
         auto fit = outFiles.find(pid);
         if (fit == outFiles.end())
         {
-            outFiles[pid] = std::ofstream("/tmp/out" + std::to_string(pid) + ".pes", std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
+            outFiles[pid] = std::ofstream(std::to_string(pid) + ".pes", std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
         
         std::copy(pes.mPesBuffer.begin(), pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));

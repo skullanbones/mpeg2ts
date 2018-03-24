@@ -47,6 +47,9 @@ $(STATIC): $(OBJS) $(HDRS)
 lint:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
+run: tsparser
+	cat bbc_one.ts | ./tsparser
+
 docker-image:
 	docker build \
 		--file=Dockerfile \

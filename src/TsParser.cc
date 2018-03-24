@@ -217,7 +217,8 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
                 mPesPacket[pid].mPesBuffer.size() < mPesPacket[pid].PES_packet_length)
             {
                 std::cerr << "Not returning incomplete PES packet on pid " << pid << "\n";
-            }else
+            }
+            else
             {
                 pesPacket = mPesPacket[pid]; //TODO: must copy as we override it below.
                 ret = true;
