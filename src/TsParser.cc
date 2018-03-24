@@ -6,8 +6,8 @@
 #include <stdio.h>
 
 // Project files
-#include "TsParser.h"
 #include "CommonTypes.h"
+#include "TsParser.h"
 
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
@@ -115,7 +115,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* pack
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
     TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
-    printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -199,42 +199,52 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 }
 
 
-bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo)
+bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket)
 {
+    bool ret = false;
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    auto pid = tsPacketInfo.pid;
 
-    //std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset << std::endl;
-    //std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart << std::endl;
+    // std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset <<
+    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart <<
+    // std::endl;
 
     if (tsPacketInfo.isPayloadStart)
     {
-        // Return previous assembled packet
-        PesPacket pkt = mPesPacket;
+        // We have start. So if we have any cached data it's time to return it.
+        if (!mPesPacket[pid].mPesBuffer.empty())
+        {
+            if (mPesPacket[pid].PES_packet_length &&
+                mPesPacket[pid].mPesBuffer.size() < mPesPacket[pid].PES_packet_length)
+            {
+                std::cerr << "Not returning incomplete PES packet on pid " << pid << "\n";
+            }
+            else
+            {
+                pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
+                ret = true;
+            }
+        }
 
         // Create new PES
-        mPesPacket = PesPacket();
-        mPesPacket.mPesBuffer.clear();
+        mPesPacket[pid] = PesPacket();
+        pid = tsPacketInfo.pid;
 
-        //std::cout << "pointerOffset:" << (int)pointerOffset << std::endl;
+        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
-        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
-
-        parsePesPacket();
-        return true;
+        parsePesPacket(pid);
     }
-    else {
+    else
+    {
         // Assemble packet
-        mPesPacket.mPesBuffer.insert(mPesPacket.mPesBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        // TODO: check if we have boud PES and return it if it is coplete
     }
-    return false;
+
+    return ret;
 }
-
-
-PesPacket& TsParser::getPesPacket()
-{
-    return mPesPacket;
-}
-
 
 void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {
@@ -305,49 +315,47 @@ PmtTable TsParser::parsePmtPacket()
 }
 
 
-void TsParser::parsePesPacket()
+void TsParser::parsePesPacket(int16_t pid)
 {
-    resetBits(mPesPacket.mPesBuffer.data(), TS_PACKET_SIZE, 0);
+    resetBits(mPesPacket[pid].mPesBuffer.data(), TS_PACKET_SIZE, 0);
 
-    mPesPacket.packet_start_code_prefix = getBits(24);
-    mPesPacket.stream_id = getBits(8);
-    mPesPacket.PES_packet_length = getBits(16);
+    mPesPacket[pid].packet_start_code_prefix = getBits(24);
+    mPesPacket[pid].stream_id = getBits(8);
+    mPesPacket[pid].PES_packet_length = getBits(16);
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
-    if (mPesPacket.stream_id != STREAM_ID_program_stream_map
-        && mPesPacket.stream_id != STREAM_ID_padding_stream
-        && mPesPacket.stream_id != STREAM_ID_private_stream_2
-        && mPesPacket.stream_id != STREAM_ID_ECM_stream
-        && mPesPacket.stream_id != STREAM_ID_EMM_stream
-        && mPesPacket.stream_id != STREAM_ID_program_stream_directory
-        && mPesPacket.stream_id != STREAM_ID_DSMCC_stream
-        && mPesPacket.stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
+    if (mPesPacket[pid].stream_id != STREAM_ID_program_stream_map &&
+        mPesPacket[pid].stream_id != STREAM_ID_padding_stream && mPesPacket[pid].stream_id != STREAM_ID_private_stream_2 &&
+        mPesPacket[pid].stream_id != STREAM_ID_ECM_stream && mPesPacket[pid].stream_id != STREAM_ID_EMM_stream &&
+        mPesPacket[pid].stream_id != STREAM_ID_program_stream_directory &&
+        mPesPacket[pid].stream_id != STREAM_ID_DSMCC_stream &&
+        mPesPacket[pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
         getBits(2); // '10'
-        mPesPacket.PES_scrambling_control = getBits(2);
+        mPesPacket[pid].PES_scrambling_control = getBits(2);
 
-        mPesPacket.PES_priority = getBits(1);
-        mPesPacket.data_alignment_indicator = getBits(1);
-        mPesPacket.copyright = getBits(1);
-        mPesPacket.original_or_copy = getBits(1);
-        mPesPacket.PTS_DTS_flags = getBits(2);
-        mPesPacket.ESCR_flag = getBits(1);
-        mPesPacket.ES_rate_flag = getBits(1);
-        mPesPacket.DSM_trick_mode_flag = getBits(1);
-        mPesPacket.additional_copy_info_flag = getBits(1);
-        mPesPacket.PES_CRC_flag = getBits(1);
-        mPesPacket.PES_extension_flag = getBits(1);
+        mPesPacket[pid].PES_priority = getBits(1);
+        mPesPacket[pid].data_alignment_indicator = getBits(1);
+        mPesPacket[pid].copyright = getBits(1);
+        mPesPacket[pid].original_or_copy = getBits(1);
+        mPesPacket[pid].PTS_DTS_flags = getBits(2);
+        mPesPacket[pid].ESCR_flag = getBits(1);
+        mPesPacket[pid].ES_rate_flag = getBits(1);
+        mPesPacket[pid].DSM_trick_mode_flag = getBits(1);
+        mPesPacket[pid].additional_copy_info_flag = getBits(1);
+        mPesPacket[pid].PES_CRC_flag = getBits(1);
+        mPesPacket[pid].PES_extension_flag = getBits(1);
 
-        mPesPacket.PES_header_data_length = getBits(8);
+        mPesPacket[pid].PES_header_data_length = getBits(8);
 
         // Forbidden value
-        if (mPesPacket.PTS_DTS_flags == 0x01)
+        if (mPesPacket[pid].PTS_DTS_flags == 0x01)
         {
-            std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket.PTS_DTS_flags << std::endl;
-            mPesPacket.pts = -1;
-            mPesPacket.dts = -1;
+            std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags << std::endl;
+            mPesPacket[pid].pts = -1;
+            mPesPacket[pid].dts = -1;
         }
-        else if (mPesPacket.PTS_DTS_flags == 0x02) // Only PTS value
+        else if (mPesPacket[pid].PTS_DTS_flags == 0x02) // Only PTS value
         {
             getBits(4);
             uint64_t pts = 0;
@@ -360,10 +368,10 @@ void TsParser::parsePesPacket()
 
             pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
 
-            mPesPacket.pts = pts;
-            mPesPacket.dts = -1;
+            mPesPacket[pid].pts = pts;
+            mPesPacket[pid].dts = -1;
         }
-        else if (mPesPacket.PTS_DTS_flags == 0x03) // Both PTS and DTS
+        else if (mPesPacket[pid].PTS_DTS_flags == 0x03) // Both PTS and DTS
         {
             getBits(4);
             uint64_t pts = 0;
@@ -376,7 +384,7 @@ void TsParser::parsePesPacket()
 
             pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
 
-            mPesPacket.pts = pts;
+            mPesPacket[pid].pts = pts;
 
             getBits(4);
             uint64_t dts = 0;
@@ -389,7 +397,7 @@ void TsParser::parsePesPacket()
 
             dts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
 
-            mPesPacket.dts = dts;
+            mPesPacket[pid].dts = dts;
         }
     }
 }

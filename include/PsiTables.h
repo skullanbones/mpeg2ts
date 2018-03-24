@@ -1,4 +1,8 @@
 #pragma once
+
+/// Project files
+#include "TsStandards.h"
+
 /*!
  * @brief Base class for all tables
  */
@@ -95,7 +99,8 @@ public:
         for (unsigned int i = 0; i < rhs.streams.size(); i++)
         {
             ss << "-------------stream " << i << "--------------" << std::endl;
-            ss << "stream_type: " << (int)rhs.streams[i].stream_type << std::endl;
+            ss << "stream_type: " << StreamTypeToString[(int)rhs.streams[i].stream_type] << ",  ("
+               << (int)rhs.streams[i].stream_type << ")" << std::endl;
             ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
             ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
         }

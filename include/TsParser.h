@@ -18,11 +18,10 @@
 
 // Project files
 #include "GetBits.h"
-#include "TsPacketInfo.h"
-#include "TsStandards.h"
 #include "PesPacket.h"
 #include "PsiTables.h"
-
+#include "TsPacketInfo.h"
+#include "TsStandards.h"
 
 
 class TsParser : GetBits
@@ -98,7 +97,7 @@ public:
      * @param info
      * @param psiTable
      */
-    void parsePsiTable(const ByteVector & table, PsiTable& tableInfo);
+    void parsePsiTable(const ByteVector& table, PsiTable& tableInfo);
 
     /*!
      * Parses PAT table
@@ -122,28 +121,21 @@ public:
      * it returns false. No errors are considered at the moment.
      * @param tsPacket The packet to collect.
      * @param tsPacketInfo Pre-parsed metadata about this TS-Packet.
-     * @return True if found 1 finished PES-Packet false in all other cases
+     * @param pesPacket collected PES but only ready/complete/collected when true
+     * @return True if collected a complete PES-Packet false in all other cases
      */
-    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo);
+    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket);
 
     /*!
      * Parses the start of a new PES-Packet. This is typically done before collecting
      * several TS-Packets for generating a complete PES-Packet. This function is used
      * internally by collectPes().
      */
-    void parsePesPacket();
-
-    /*!
-     * Returns the state of the collected PES-Packet. Should be use with care. Should
-     * only be used when collectPes finished collecting many TS-Packets for generating
-     * a complete PES-Packet.
-     * @return The collected PES-Packet
-     */
-    PesPacket& getPesPacket();
+    void parsePesPacket(int16_t pid);
 
 private:
     ByteVector mSectionBuffer;
-    PesPacket mPesPacket;
+    std::map<uint16_t, PesPacket> mPesPacket;
     uint64_t mPacketErrorCounter;              // Wrong sync byte
     uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };

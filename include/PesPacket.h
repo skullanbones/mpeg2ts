@@ -1,5 +1,8 @@
 #pragma once
 
+/// Project files
+#include "CommonTypes.h"
+
 /*!
  * @class PES-Packet prototype containing buffer
  *
@@ -7,7 +10,6 @@
 class PesPacket
 {
 public:
-
     uint32_t packet_start_code_prefix;
     uint8_t stream_id;
     uint16_t PES_packet_length;
@@ -31,7 +33,6 @@ public:
 
     int64_t pts;
     int64_t dts;
-
 
 
     friend std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs)
