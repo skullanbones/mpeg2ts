@@ -171,7 +171,7 @@ enum StreamType
     STREAMTYPE_Any         = 0xFF // User private
 };
 
-static std::map<StreamType, std::string> StreamTypeToString =
+static std::map<int, std::string> StreamTypeToString =
         {
                 { STREAMTYPE_RESERVED, "STREAMTYPE_RESERVED"},
                 { STREAMTYPE_VIDEO_MPEG1, "STREAMTYPE_VIDEO_MPEG1"},

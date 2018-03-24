@@ -48,7 +48,7 @@ lint:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 run: tsparser
-	cat bbc_one.ts | ./tsparser
+	cat bbc_one.ts | ./tsparser --info 258 --write 2304
 
 docker-image:
 	docker build \
@@ -73,6 +73,7 @@ gtests:
 clean:
 	rm -f $(OBJS)
 	rm -f tsparser
+	rm -f main.o
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
