@@ -39,7 +39,7 @@ struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "info", 1, nullptr, 'i' },
                              { "level", 1, nullptr, 'l' },
                              { "help", 0, nullptr, 'h' },
-                             { 0, 0, 0, 0 } };
+                             {nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
