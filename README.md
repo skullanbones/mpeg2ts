@@ -7,6 +7,10 @@ Make video great again!
 make
 cat test1.ts | ./tsparser
 ```
+Check help in command line (CLI):
+```
+cat test1.ts | ./tsparser --help
+```
 Add option --write with the PES PID for writing PES packets to file.
 ```
 cat bbc_one.ts | ./tsparser --write 2504

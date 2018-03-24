@@ -35,10 +35,10 @@ std::map<std::string, std::vector<int>> g_Options;
 
 static const char* optString = "wil:h?";
 
-struct option longOpts[] = { { "write", 1, 0, 'w' },
-                             { "info", 1, 0, 'i' },
-                             { "level", 1, 0, 'l' },
-                             { "help", 0, 0, 'h' },
+struct option longOpts[] = { { "write", 1, nullptr, 'w' },
+                             { "info", 1, nullptr, 'i' },
+                             { "level", 1, nullptr, 'l' },
+                             { "help", 0, nullptr, 'h' },
                              { 0, 0, 0, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
         //        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet);
-        if (g_SPPID)
+        if (g_SPPID != 0u)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
             tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
