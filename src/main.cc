@@ -3,15 +3,15 @@
  * permission from authors
  */
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
-#include <cstdint>
-#include <unistd.h>
 #include <map>
 #include <string>
 #include <type_traits>
+#include <unistd.h>
 
 /// Project files
 #include "TsDemuxer.h"
