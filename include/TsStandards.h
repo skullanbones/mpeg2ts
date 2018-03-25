@@ -76,20 +76,20 @@ struct TsHeader
 
 /*!
  * adaptation field header
- * 2 bytes
+ * 2 bytes, see table 2-6 Transport stream adaptation field
  */
 struct TsAdaptationFieldHeader
 {
     uint8_t adaptation_field_length;
 
-    uint8_t adaptation_field_extension_flag : 1;
-    uint8_t transport_private_data_flag : 1;
-    uint8_t splicing_point_flag : 1;
-    uint8_t OPCR_flag : 1;
-    uint8_t PCR_flag : 1;
-    uint8_t elementary_stream_priority_indicator : 1;
-    uint8_t random_access_indicator : 1;
-    uint8_t discontinuity_indicator : 1;
+    bool discontinuity_indicator;
+    bool random_access_indicator;
+    bool elementary_stream_priority_indicator;
+    bool PCR_flag;
+    bool OPCR_flag;
+    bool splicing_point_flag;
+    bool transport_private_data_flag;
+    bool adaptation_field_extension_flag;
 };
 
 /*!

@@ -16,9 +16,6 @@
 #include "GetBits.h"
 #include <cstdint>
 
-TsDemuxer::TsDemuxer()
-{
-}
 
 void TsDemuxer::demux(const uint8_t* tsPacket)
 {

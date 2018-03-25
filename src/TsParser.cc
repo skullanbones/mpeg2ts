@@ -3,7 +3,6 @@
  * permission from authors
  */
 #include <iostream>
-#include <stdio.h>
 
 // Project files
 #include "CommonTypes.h"
@@ -73,10 +72,7 @@ bool TsParser::checkHasAdaptationField(TsHeader hdr)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 
@@ -87,10 +83,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 
@@ -130,11 +123,11 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.PCR_flag)
     {
-        outInfo.pcr = parsePcr(nullptr);
+        outInfo.pcr = parsePcr();
     }
     if (adaptHdr.OPCR_flag)
     {
-        outInfo.opcr = parsePcr(nullptr);
+        outInfo.opcr = parsePcr();
     }
     if (adaptHdr.splicing_point_flag)
     {
@@ -165,7 +158,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 }
 
 
-uint64_t TsParser::parsePcr(const uint8_t* buffer)
+uint64_t TsParser::parsePcr()
 {
     uint64_t pcr_base = 0;
     uint64_t pcr_extension = 0;

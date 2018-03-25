@@ -9,15 +9,16 @@
 #include <iostream>
 #include <cstdint>
 #include <unistd.h>
+#include <map>
+#include <string>
+#include <type_traits>
 
+/// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsParser.h"
 #include "TsStandards.h"
 
-#include <map>
-#include <string>
-#include <type_traits>
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
@@ -67,7 +68,7 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    auto pat = static_cast<PatTable*>(table);
+    auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
         std::cout << *pat << std::endl;
@@ -78,7 +79,7 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    auto pmt = static_cast<PmtTable*>(table);
+    auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
         std::cout << *pmt << std::endl;
