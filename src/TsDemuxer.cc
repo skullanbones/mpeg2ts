@@ -14,7 +14,7 @@
  */
 #include "TsDemuxer.h"
 #include "GetBits.h"
-#include <stdint.h>
+#include <cstdint>
 
 TsDemuxer::TsDemuxer()
 {

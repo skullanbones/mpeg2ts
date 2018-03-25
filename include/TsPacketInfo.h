@@ -5,7 +5,7 @@
 #pragma once
 
 #include <sstream>
-#include <stdint.h>
+#include <cstdint>
 #include <stdio.h>
 
 

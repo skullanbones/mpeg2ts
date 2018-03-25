@@ -24,7 +24,7 @@ public:
 
     TsDemuxer();
 
-    void demux(const uint8_t* packet);
+    void demux(const uint8_t* tsPacket);
 
     void addPsiPid(int pid, PsiCallBackFnc cb);
     void addPesPid(int pid, PesCallBackFnc cb);

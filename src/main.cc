@@ -7,7 +7,7 @@
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
-#include <stdint.h>
+#include <cstdint>
 #include <unistd.h>
 
 #include "TsDemuxer.h"
@@ -67,7 +67,7 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    PatTable* pat = static_cast<PatTable*>(table);
+    auto pat = static_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
         std::cout << *pat << std::endl;
@@ -78,7 +78,7 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    PmtTable* pmt = static_cast<PmtTable*>(table);
+    auto pmt = static_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
         std::cout << *pmt << std::endl;

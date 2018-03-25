@@ -27,9 +27,13 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
         parseAdaptationFieldData(packet, outInfo);
 
         if (outInfo.privateDataSize > 0)
+        {
             outInfo.hasPrivateData = true;
+        }
         else
+        {
             outInfo.hasPrivateData = false;
+        }
     }
     if (outInfo.hasPayload)
     {
@@ -90,7 +94,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
 }
 
 
-TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
+TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 {
     TsAdaptationFieldHeader hdr;
     hdr.adaptation_field_length = getBits(8);
@@ -114,7 +118,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* pack
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
+    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     if (adaptHdr.adaptation_field_length == 0)
     {

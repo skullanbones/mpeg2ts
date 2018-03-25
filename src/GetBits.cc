@@ -5,11 +5,7 @@ GetBits::GetBits()
 , mBitStore{ 0 }
 , mSrcInx{ 0 }
 , mSize{ 0 }
-, mSrcBytes{ 0 }
-{
-}
-
-GetBits::~GetBits()
+, mSrcBytes{ nullptr }
 {
 }
 
@@ -22,9 +18,9 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         throw GetBitsException("null input data");
     }
 
-    while (requestedBits)
+    while (requestedBits > 0u)
     {
-        if (mNumStoredBits == 0)
+        if (mNumStoredBits == 0u)
         {
             if (mSrcInx >= mSize)
             {
@@ -63,8 +59,4 @@ GetBitsException::GetBitsException(const std::string msg)
 size_t GetBits::getByteInx()
 {
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
-}
-
-GetBitsException::~GetBitsException()
-{
 }

@@ -14,7 +14,7 @@
  */
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // Project files
 #include "GetBits.h"
@@ -65,10 +65,9 @@ public:
 
     /*!
      * Return a copy of the TsAdaptationFieldHeader
-     * @param packet Pointer to ts-packet.
      * @return TsAdaptationFieldHeader
      */
-    TsAdaptationFieldHeader parseAdaptationFieldHeader(const uint8_t* packet);
+    TsAdaptationFieldHeader parseAdaptationFieldHeader();
 
     /*!
      * Parse adaptation field data acoording to ISO/IEC 13818-1:2015
