@@ -21,6 +21,10 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+
+    checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
+    checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // TODO Filter PID from PSI, TS, PES etc...
@@ -45,9 +49,14 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         PesPacket pes;
         if (mParser.collectPes(tsPacket, tsPacketInfo, pes))
         {
+            buildPtsHistogram(tsPacketInfo.pid, pes.pts);
+            buildDtsHistogram(tsPacketInfo.pid, pes.dts);
+
             mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid);
         }
     }
+
+    ++mTsPacketCounter;
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)

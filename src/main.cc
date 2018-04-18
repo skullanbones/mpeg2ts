@@ -195,6 +195,29 @@ int main(int argc, char** argv)
                 std::cout << "Found " << count << " ts-packets." << std::endl;
                 std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets."
                           << std::endl;
+
+                std::cout << "Statistics\n";
+                for (auto& pidStat : tsDemux.mPidStatistics)
+                {
+                    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
+                    {
+                        continue;
+                    }
+                    std::cout << "Pid: " << pidStat.first << "\n";
+                    std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
+                    std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
+                    std::cout << " Pts differences histogram:\n";
+                    for (auto& ent : pidStat.second.ptsHistogram)
+                    {
+                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+                    }
+                    
+                    std::cout << " Dts differences histogram:\n";
+                    for (auto& ent : pidStat.second.dtsHistogram)
+                    {
+                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+                    }
+                }
                 return EXIT_SUCCESS;
             }
         }

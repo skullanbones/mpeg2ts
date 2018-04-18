@@ -20,6 +20,7 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
     outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
+    outInfo.continuityCounter = hdr.continuity_counter;
 
     if (outInfo.hasAdaptationField)
     {
@@ -144,6 +145,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
             getBits(8);
         }
     }
+    outInfo.isDiscontinuity = adaptHdr.discontinuity_indicator;
 
     // 0..N stuffing bytes goes here and we have to adjust read offset
     resetBits(packet, TS_PACKET_SIZE, ofsAfterAF);
