@@ -1,6 +1,6 @@
 
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 class GetBits
@@ -8,7 +8,7 @@ class GetBits
 public:
     GetBits();
 
-    virtual ~GetBits();
+    virtual ~GetBits() = default;
     /*!
      * Parses maximum 64 bits by bit from data and returns results
      * @param requestedBits Number of bits to parse
@@ -35,7 +35,7 @@ protected:
 struct GetBitsException
 {
     GetBitsException(const std::string msg);
-    virtual ~GetBitsException();
+    virtual ~GetBitsException() = default;
 
     const std::string mMsg;
 };

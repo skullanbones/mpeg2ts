@@ -3,21 +3,22 @@
  * permission from authors
  */
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
-#include <stdint.h>
+#include <map>
+#include <string>
+#include <type_traits>
 #include <unistd.h>
 
+/// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsParser.h"
 #include "TsStandards.h"
 
-#include <map>
-#include <string>
-#include <type_traits>
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
@@ -35,11 +36,11 @@ std::map<std::string, std::vector<int>> g_Options;
 
 static const char* optString = "wil:h?";
 
-struct option longOpts[] = { { "write", 1, 0, 'w' },
-                             { "info", 1, 0, 'i' },
-                             { "level", 1, 0, 'l' },
-                             { "help", 0, 0, 'h' },
-                             { 0, 0, 0, 0 } };
+struct option longOpts[] = { { "write", 1, nullptr, 'w' },
+                             { "info", 1, nullptr, 'i' },
+                             { "level", 1, nullptr, 'l' },
+                             { "help", 0, nullptr, 'h' },
+                             { nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
@@ -54,8 +55,8 @@ void display_usage()
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
-                 "        -i [ --info ]        print PSI tables info with PID\n"
-                 "        -w [ --write ]       writes PES packets with PID to file"
+                 "        -i [ --info PID]        print PSI tables info with PID\n"
+                 "        -w [ --write PID]       writes PES packets with PID to file"
               << std::endl;
 }
 
@@ -67,7 +68,7 @@ void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    PatTable* pat = static_cast<PatTable*>(table);
+    auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
         std::cout << *pat << std::endl;
@@ -78,7 +79,7 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    PmtTable* pmt = static_cast<PmtTable*>(table);
+    auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
         std::cout << *pmt << std::endl;
@@ -226,7 +227,7 @@ int main(int argc, char** argv)
         //        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet);
-        if (g_SPPID)
+        if (g_SPPID != 0u)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
             tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));

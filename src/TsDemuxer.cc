@@ -14,15 +14,12 @@
  */
 #include "TsDemuxer.h"
 #include "GetBits.h"
-#include <stdint.h>
+#include <cstdint>
 
-TsDemuxer::TsDemuxer()
-{
-}
 
 void TsDemuxer::demux(const uint8_t* tsPacket)
 {
-    TsPacketInfo tsPacketInfo;
+    TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {

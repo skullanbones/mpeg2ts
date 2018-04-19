@@ -4,8 +4,8 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <sstream>
-#include <stdint.h>
 #include <stdio.h>
 
 

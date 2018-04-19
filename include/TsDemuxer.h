@@ -7,7 +7,6 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#include <stdio.h>
 
 /// project files
 #include "TsParser.h"
@@ -22,9 +21,9 @@ public:
     typedef std::function<void(const PesPacket& table, uint16_t pid)> PesCallBackFnc;
     typedef std::function<void(const TsHeader& hdr)> TsCallBackFnc;
 
-    TsDemuxer();
+    TsDemuxer() = default;
 
-    void demux(const uint8_t* packet);
+    void demux(const uint8_t* tsPacket);
 
     void addPsiPid(int pid, PsiCallBackFnc cb);
     void addPesPid(int pid, PesCallBackFnc cb);

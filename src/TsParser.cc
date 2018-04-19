@@ -3,7 +3,6 @@
  * permission from authors
  */
 #include <iostream>
-#include <stdio.h>
 
 // Project files
 #include "CommonTypes.h"
@@ -27,9 +26,13 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
         parseAdaptationFieldData(packet, outInfo);
 
         if (outInfo.privateDataSize > 0)
+        {
             outInfo.hasPrivateData = true;
+        }
         else
+        {
             outInfo.hasPrivateData = false;
+        }
     }
     if (outInfo.hasPayload)
     {
@@ -64,33 +67,19 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 
 bool TsParser::checkHasAdaptationField(TsHeader hdr)
 {
-    if (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
-        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
+            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
-    if (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
-        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
+            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
-TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* packet)
+TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 {
     TsAdaptationFieldHeader hdr;
     hdr.adaptation_field_length = getBits(8);
@@ -114,7 +103,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader(const uint8_t* pack
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader(nullptr);
+    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     if (adaptHdr.adaptation_field_length == 0)
     {
@@ -126,11 +115,11 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.PCR_flag)
     {
-        outInfo.pcr = parsePcr(nullptr);
+        outInfo.pcr = parsePcr();
     }
     if (adaptHdr.OPCR_flag)
     {
-        outInfo.opcr = parsePcr(nullptr);
+        outInfo.opcr = parsePcr();
     }
     if (adaptHdr.splicing_point_flag)
     {
@@ -161,7 +150,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 }
 
 
-uint64_t TsParser::parsePcr(const uint8_t* buffer)
+uint64_t TsParser::parsePcr()
 {
     uint64_t pcr_base = 0;
     uint64_t pcr_extension = 0;
@@ -206,8 +195,8 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     auto pid = tsPacketInfo.pid;
 
     // std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset <<
-    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart <<
-    // std::endl;
+    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart
+    // << std::endl;
 
     if (tsPacketInfo.isPayloadStart)
     {

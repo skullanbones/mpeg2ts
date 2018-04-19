@@ -14,7 +14,7 @@
  */
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // Project files
 #include "GetBits.h"
@@ -51,24 +51,23 @@ public:
 
     /*!
      * Checks if a pts-packet has the adaptation field.
-     * @param packet Pointer to ts-packet.
+     * @param hdr TsPacket header
      * @return True if it has adaptation field, else false.
      */
-    bool checkHasAdaptationField(TsHeader header);
+    bool checkHasAdaptationField(TsHeader hdr);
 
     /*!
      * Checks if a ts-packet has the adaptation field.
-     * @param packet Pointer to ts-packet.
+     * @param hdr TsPacket header
      * @return True if it has payload, else false.
      */
-    bool checkHasPayload(TsHeader header);
+    bool checkHasPayload(TsHeader hdr);
 
     /*!
      * Return a copy of the TsAdaptationFieldHeader
-     * @param packet Pointer to ts-packet.
      * @return TsAdaptationFieldHeader
      */
-    TsAdaptationFieldHeader parseAdaptationFieldHeader(const uint8_t* packet);
+    TsAdaptationFieldHeader parseAdaptationFieldHeader();
 
     /*!
      * Parse adaptation field data acoording to ISO/IEC 13818-1:2015
@@ -79,10 +78,9 @@ public:
 
     /*!
      * Parse PCR from a ts-packet
-     * @param ptr Pointer to start of PCR adaptation field.
      * @return The PCR value.
      */
-    uint64_t parsePcr(const uint8_t* buffer);
+    uint64_t parsePcr();
 
     /*!
      * Parses Collects all parts of table and parses basic table information (eg table id)
