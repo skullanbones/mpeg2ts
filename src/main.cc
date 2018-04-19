@@ -60,6 +60,8 @@ void display_usage()
               << std::endl;
 }
 
+TsDemuxer tsDemux;
+
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
     (void)packet;
@@ -71,6 +73,7 @@ void PATCallback(PsiTable* table)
     auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
+        std::cout << "PAT at Ts packent: " << tsDemux.mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
     }
 
@@ -82,6 +85,7 @@ void PMTCallback(PsiTable* table)
     auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
+        std::cout << "PMT at Ts packent: " << tsDemux.mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
     }
 
@@ -97,10 +101,10 @@ void PMTCallback(PsiTable* table)
 
 void PESCallback(const PesPacket& pes, uint16_t pid)
 {
-    std::cout << "demuxed PES packet on pid " << pid << "\n";
 
     if (hasPid("info", pid))
     {
+        std::cout << "PES ENDING at Ts packet " << tsDemux.mTsPacketCounter << " (" << pid << ")\n";
         std::cout << pes << std::endl;
     }
 
@@ -162,7 +166,6 @@ int main(int argc, char** argv)
     TsPacketInfo tsPacketInfo = { 0 };
     TsParser tsParser;
 
-    TsDemuxer tsDemux;
     tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
 
     //    TsAdaptationFieldHeader fieldHeader;
@@ -211,12 +214,14 @@ int main(int argc, char** argv)
                     {
                         std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
                     }
+                    std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
                     
                     std::cout << " Dts differences histogram:\n";
                     for (auto& ent : pidStat.second.dtsHistogram)
                     {
                         std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
                     }
+                    std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
                 }
                 return EXIT_SUCCESS;
             }

@@ -20,6 +20,8 @@ struct PidStatistic
     , numberOfTsDiscontinuities{0}
     , lastPts{ -1 }
     , lastDts{ -1 }
+    , numberOfMissingPts{0}
+    , numberOfMissingDts{0}
     {
     }
 
@@ -33,11 +35,16 @@ struct PidStatistic
 
     int64_t lastDts;
     std::map<int64_t, uint64_t> dtsHistogram;
+
+    uint64_t numberOfMissingPts;
+    
+    uint64_t numberOfMissingDts;
 };
 
 class Statistics
 {
 public:
+    static const int64_t TimestampJumpDiscontinuityLevel = 3 * 90000;// 3s
     Statistics()
         :mTsPacketCounter{0}
     {
@@ -74,6 +81,7 @@ public:
     {
         if (pts == -1)
         {
+            mPidStatistics[pid].numberOfMissingPts++;
             return;
         }
         if (mPidStatistics[pid].lastPts == -1)
@@ -81,7 +89,13 @@ public:
             mPidStatistics[pid].lastPts = pts;
             return;
         }
-        mPidStatistics[pid].ptsHistogram[pts - mPidStatistics[pid].lastPts]++;
+        auto diff = pts - mPidStatistics[pid].lastPts;
+        mPidStatistics[pid].ptsHistogram[diff]++;
+        if (diff > TimestampJumpDiscontinuityLevel)
+        {
+        std::cout << "PTS discontinuity at ts packet " << mTsPacketCounter
+                      << " on pid " << pid << " pts-1 " << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff << "\n";
+        }
         mPidStatistics[pid].lastPts = pts;
     }
     
@@ -89,6 +103,7 @@ public:
     {
         if (dts == -1)
         {
+            mPidStatistics[pid].numberOfMissingDts++;
             return;
         }
         if (mPidStatistics[pid].lastDts == -1)
@@ -96,7 +111,14 @@ public:
             mPidStatistics[pid].lastDts = dts;
             return;
         }
-        mPidStatistics[pid].dtsHistogram[dts - mPidStatistics[pid].lastDts]++;
+        auto diff = dts - mPidStatistics[pid].lastDts;
+        mPidStatistics[pid].dtsHistogram[diff]++;
+        if (diff > TimestampJumpDiscontinuityLevel)
+        {
+        std::cout << "DTS discontinuity at ts packet " << mTsPacketCounter
+                      << " on pid " << pid << " dts-1 " << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
+        }
+
         mPidStatistics[pid].lastDts = dts;
     }
 

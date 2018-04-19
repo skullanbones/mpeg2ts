@@ -228,6 +228,12 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     }
     else
     {
+        if (mPesPacket.count(pid) == 0)
+        {
+            //PES has not started yet. Ignoring rest
+            return false;
+        }
+
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
                                           &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
@@ -338,13 +344,13 @@ void TsParser::parsePesPacket(int16_t pid)
         mPesPacket[pid].PES_extension_flag = getBits(1);
 
         mPesPacket[pid].PES_header_data_length = getBits(8);
-
+        
+        mPesPacket[pid].pts = -1;
+        mPesPacket[pid].dts = -1;
         // Forbidden value
         if (mPesPacket[pid].PTS_DTS_flags == 0x01)
         {
             std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags << std::endl;
-            mPesPacket[pid].pts = -1;
-            mPesPacket[pid].dts = -1;
         }
         else if (mPesPacket[pid].PTS_DTS_flags == 0x02) // Only PTS value
         {

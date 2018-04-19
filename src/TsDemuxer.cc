@@ -21,6 +21,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+    //std::cout << "                                      ts " << mTsPacketCounter << " " << tsPacketInfo.pid << " " << tsPacketInfo.isPayloadStart << "\n";
 
     checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
     checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
