@@ -85,3 +85,25 @@ void TsStatistics::buildDtsHistogram(int pid, int64_t dts)
 
     mPidStatistics[pid].lastDts = dts;
 }
+
+void TsStatistics::buildPcrHistogram(int pid, int64_t pcr)
+{
+    if (pcr == -1)
+    {
+        return;
+    }
+    if (mPidStatistics[pid].lastPcr == -1)
+    {
+        mPidStatistics[pid].lastPcr = pcr;
+        return;
+    }
+    auto diff = pcr - mPidStatistics[pid].lastPcr;
+    mPidStatistics[pid].pcrHistogram[diff]++;
+    if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
+    {
+        std::cout << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
+                  << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
+    }
+
+    mPidStatistics[pid].lastPcr = pcr;
+}

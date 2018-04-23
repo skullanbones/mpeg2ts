@@ -106,6 +106,8 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 {
     TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    outInfo.pcr = -1;
+    outInfo.opcr = -1;
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -162,8 +164,6 @@ uint64_t TsParser::parsePcr()
 
     pcr_extension = getBits(9);
     pcr_base = pcr_base * 300;
-
-    // 9 bits
     pcr_base += pcr_extension;
 
     return pcr_base;
@@ -202,6 +202,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
     checkCCError(pid, tsPacketInfo.continuityCounter);
     checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    if (tsPacketInfo.hasAdaptationField)
+    {
+        buildPcrHistogram(pid, tsPacketInfo.pcr);
+    }
 
     if (tsPacketInfo.isPayloadStart)
     {

@@ -214,6 +214,11 @@ int main(int argc, char** argv)
                         std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
                     }
                     std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
+                    std::cout << " Pcr differences histogram:\n";
+                    for (auto& ent : pidStat.second.pcrHistogram)
+                    {
+                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+                    }
                 }
                 return EXIT_SUCCESS;
             }

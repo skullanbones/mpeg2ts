@@ -18,6 +18,7 @@ struct PidStatistic
     , numberOfTsDiscontinuities{ 0 }
     , lastPts{ -1 }
     , lastDts{ -1 }
+    , lastPcr{ -1 }
     , numberOfMissingPts{ 0 }
     , numberOfMissingDts{ 0 }
     {
@@ -33,6 +34,9 @@ struct PidStatistic
 
     int64_t lastDts;
     std::map<int64_t, uint64_t> dtsHistogram;
+
+    int64_t lastPcr;
+    std::map<int64_t, uint64_t> pcrHistogram;
 
     uint64_t numberOfMissingPts;
 
@@ -56,6 +60,8 @@ public:
     void buildPtsHistogram(int pid, int64_t pts);
 
     void buildDtsHistogram(int pid, int64_t dts);
+
+    void buildPcrHistogram(int pid, int64_t pcr);
 
     std::map<int, PidStatistic> mPidStatistics;
     uint64_t mTsPacketCounter;
