@@ -73,7 +73,7 @@ void PATCallback(PsiTable* table)
     auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
-        std::cout << "PAT at Ts packent: " << tsDemux.mTsPacketCounter << "\n";
+        std::cout << "PAT at Ts packent: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
     }
 
@@ -85,7 +85,7 @@ void PMTCallback(PsiTable* table)
     auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
-        std::cout << "PMT at Ts packent: " << tsDemux.mTsPacketCounter << "\n";
+        std::cout << "PMT at Ts packent: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
     }
 
@@ -104,7 +104,8 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("info", pid))
     {
-        std::cout << "PES ENDING at Ts packet " << tsDemux.mTsPacketCounter << " (" << pid << ")\n";
+        std::cout << "PES ENDING at Ts packet " << tsDemux.getTsStatistics().mTsPacketCounter
+                  << " (" << pid << ")\n";
         std::cout << pes << std::endl;
     }
 
@@ -158,17 +159,7 @@ int main(int argc, char** argv)
     // Specify input stream
     setvbuf(stdout, NULL, _IOLBF, 0);
 
-    //  char buffer[200*10224*1024];
-    //  setbuf(stdin, buffer);
-
-    // unsigned long position = 0;
-
-    TsPacketInfo tsPacketInfo = { 0 };
-    TsParser tsParser;
-
     tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
-
-    //    TsAdaptationFieldHeader fieldHeader;
 
     std::cout << std::boolalpha;
     std::cout << std::is_pod<TsHeader>::value << '\n';
@@ -200,14 +191,15 @@ int main(int argc, char** argv)
                           << std::endl;
 
                 std::cout << "Statistics\n";
-                for (auto& pidStat : tsDemux.mPidStatistics)
+                for (auto& pidStat : tsDemux.getTsStatistics().mPidStatistics)
                 {
                     if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
                     {
                         continue;
                     }
                     std::cout << "Pid: " << pidStat.first << "\n";
-                    std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
+                    std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities
+                              << "\n";
                     std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
                     std::cout << " Pts differences histogram:\n";
                     for (auto& ent : pidStat.second.ptsHistogram)
@@ -215,7 +207,7 @@ int main(int argc, char** argv)
                         std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
                     }
                     std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
-                    
+
                     std::cout << " Dts differences histogram:\n";
                     for (auto& ent : pidStat.second.dtsHistogram)
                     {
@@ -227,20 +219,6 @@ int main(int argc, char** argv)
             }
         }
 
-
-        /*
-        while (buffer[position++] != TS_PACKET_SYNC_BYTE) {
-          if (buffer[position] == EOF)
-             {
-               std::cout << "End Of File..." << std::endl;
-               std::cout << "Found " << count << " ts-packets." << std::endl;
-          std::cout << "Found Adaptation Field packets:" << countAdaptPacket
-                << " ts-packets." << std::endl;
-               return EXIT_SUCCESS;
-             }
-        }
-        */
-
         // TS Packet start
         packet[0] = b;
 
@@ -248,11 +226,6 @@ int main(int argc, char** argv)
         size_t res =
         fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
         (void)res;
-        // memcpy(packet, &buffer[position], TS_PACKET_SIZE);
-
-        // For debug purpose
-        tsParser.parseTsPacketInfo(packet, tsPacketInfo);
-        //        std::cout << tsPacketInfo.toString() << std::endl;
 
         tsDemux.demux(packet);
         if (g_SPPID != 0u)
@@ -267,18 +240,5 @@ int main(int argc, char** argv)
         }
         g_ESPIDS.clear();
 
-        if (tsPacketInfo.hasAdaptationField)
-        {
-            //      std::cout << "found packet with adaptation field";
-            countAdaptPacket++;
-
-            if (countAdaptPacket == 1)
-            {
-                for (int i = 0; i < TS_PACKET_SIZE; i++)
-                {
-                    //	  printf("0x%1x, ", packet[i]);
-                }
-            }
-        }
     } // for loop
 }

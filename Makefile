@@ -19,9 +19,10 @@ INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
 
-SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc
+SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc src/TsStatistics.cc
 HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
-		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h
+		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h \
+        include/TsStatistics.h
 OBJS = $(SRCS:.cc=.o)
 
 docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1

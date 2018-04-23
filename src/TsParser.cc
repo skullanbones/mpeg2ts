@@ -173,6 +173,10 @@ uint64_t TsParser::parsePcr()
 void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+
+    checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
+    checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+
     if (tsPacketInfo.isPayloadStart)
     {
         mSectionBuffer.clear();
@@ -196,9 +200,8 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
 
-    // std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset <<
-    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart
-    // << std::endl;
+    checkCCError(pid, tsPacketInfo.continuityCounter);
+    checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
 
     if (tsPacketInfo.isPayloadStart)
     {
@@ -213,6 +216,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             else
             {
                 pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
+
+                buildPtsHistogram(pid, pesPacket.pts);
+                buildDtsHistogram(pid, pesPacket.dts);
+
                 ret = true;
             }
         }
@@ -230,7 +237,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     {
         if (mPesPacket.count(pid) == 0)
         {
-            //PES has not started yet. Ignoring rest
+            // PES has not started yet. Ignoring rest
             return false;
         }
 
@@ -344,7 +351,7 @@ void TsParser::parsePesPacket(int16_t pid)
         mPesPacket[pid].PES_extension_flag = getBits(1);
 
         mPesPacket[pid].PES_header_data_length = getBits(8);
-        
+
         mPesPacket[pid].pts = -1;
         mPesPacket[pid].dts = -1;
         // Forbidden value
