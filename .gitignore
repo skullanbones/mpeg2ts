@@ -33,6 +33,6 @@
 
 
 # Project specific files
-tsparser
+build/
 tests/gtests
 

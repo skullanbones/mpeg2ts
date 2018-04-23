@@ -15,33 +15,39 @@ CXX = g++
 STATIC = libts.a
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 SRCDIR = $(PROJ_ROOT)/src
+BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
 
-SRCS = src/TsParser.cc src/GetBits.cc src/TsDemuxer.cc src/TsStatistics.cc
+SRCS = TsParser.cc GetBits.cc TsDemuxer.cc TsStatistics.cc
 HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
 		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h \
-        include/TsStatistics.h
-OBJS = $(SRCS:.cc=.o)
+		include/TsStatistics.h
+OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
+
+$(info $$OBJS is $(OBJS))
 
 docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
 .PHONY: all clean lint docker-image docker-bash test gtests run clang
 
-all: tsparser
+all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
-tsparser: main.o $(STATIC) $(HDRS)
-	$(CXX) -o $@ main.o -L. -lts
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
-main.o: $(SRCDIR)/main.cc $(HDRS)
-	$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
+$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
+	$(CXX) -o $@ $(BUILDDIR)/main.o -L. -lts
 
-.cc.o:
+$(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS)
+	$(CXX) -o $@ -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
+
+$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
 	@echo [Compile] $<
 	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
-$(STATIC): $(OBJS) $(HDRS)
+$(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
@@ -51,8 +57,8 @@ lint:
 clang:
 	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
-run: tsparser
-	cat bbc_one.ts | ./tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
+run: $(BUILDDIR)/tsparser
+	cat bbc_one.ts | $(BUILDDIR)/tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
 
 docker-image:
 	docker build \
@@ -67,7 +73,7 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
-test: $(STATIC)
+test: $(BUILDDIR)/$(STATIC)
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
@@ -76,8 +82,9 @@ gtests:
 
 clean:
 	rm -f $(OBJS)
-	rm -f tsparser
-	rm -f main.o
+	rm -f $(BUILDDIR)/tsparser
+	rm -f $(BUILDDIR)/main.o
+	rm -f $(BUILDDIR)/$(STATIC)
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
