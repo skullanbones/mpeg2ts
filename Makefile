@@ -38,7 +38,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L. -lts
+	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
 $(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
