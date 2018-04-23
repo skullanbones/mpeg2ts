@@ -18,6 +18,7 @@ SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
+PYTHON_VERSION ?= 3
 
 
 SRCS = TsParser.cc GetBits.cc TsDemuxer.cc TsStatistics.cc
@@ -30,7 +31,7 @@ $(info $$OBJS is $(OBJS))
 
 docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
-.PHONY: all clean lint docker-image docker-bash test gtests run clang
+.PHONY: all clean lint docker-image docker-bash test gtests run clang component_tests
 
 all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
@@ -60,6 +61,8 @@ clang:
 run: $(BUILDDIR)/tsparser
 	cat bbc_one.ts | $(BUILDDIR)/tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
 
+### docker stuff
+
 docker-image:
 	docker build \
 		--file=Dockerfile \
@@ -73,18 +76,36 @@ docker-bash:
 		--volume=$$(pwd):/tmp/workspace \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
-test: $(BUILDDIR)/$(STATIC)
+### all tests
+
+test: unit-test component_tests
+
+### unit tests
+
+unit-test: $(BUILDDIR)/$(STATIC)
+	@echo "[Running unit tests..]"
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
 gtests:
 	$(MAKE) -C tests
 
+### component tests
+
+env:
+	virtualenv -p python$(PYTHON_VERSION) $@
+	./env/bin/pip install -r component_tests/requirements.txt
+
+component_tests: env
+	@echo "[Running component tests..]"
+	./env/bin/pytest
+
 clean:
 	rm -f $(OBJS)
 	rm -f $(BUILDDIR)/tsparser
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
+	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
