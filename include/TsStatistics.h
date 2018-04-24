@@ -9,6 +9,9 @@
 #include <map>
 #include <stdio.h>
 
+const int64_t CLOCK_90_KHZ = 90000;
+const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
+
 struct PidStatistic
 {
     static const uint8_t INVALID_CC = 16;
@@ -46,8 +49,6 @@ struct PidStatistic
 class TsStatistics
 {
 public:
-    static const int64_t CLOCK_90_KHZ = 90000;
-    static const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
     TsStatistics()
     : mTsPacketCounter{ 0 }
     {

@@ -16,7 +16,12 @@ TEST(TsStatisticsTests, TwoPlusTwoEqualsFour)
     EXPECT_EQ(2 + 2, 4);
 }
 
-//EXPECT_EQ(TsStatistics::CLOCK_90_KHZ, 90000);
+
+TEST(TsStatisticsTests, TestConstants)
+{
+    EXPECT_EQ(CLOCK_90_KHZ, 90000);
+    EXPECT_EQ(TIME_STAMP_JUMP_DISCONTINUITY_LEVEL, 3 * 90000);
+}
 
 /*!
  * Test verify that we count number of discontinuous packets correctly.
