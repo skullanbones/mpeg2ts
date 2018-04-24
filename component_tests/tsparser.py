@@ -2,7 +2,7 @@ import os
 import time
 import sys
 import git
-from subprocess import PIPE, Popen
+import subprocess
 
 
 def git_root(path):
@@ -41,8 +41,9 @@ class TsParser(object):
         arguments"""
         cmd = self.start_cmd(**kwargs)
 
-        self.proc = Popen(cmd, stdout=PIPE, stderr=PIPE,
-                          universal_newlines=True)
+        self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE,
+                                     universal_newlines=True)
         out, err, exitcode = self.wait()
 
         print(out)
