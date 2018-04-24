@@ -26,7 +26,7 @@ uint32_t g_SPPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 
-enum OptionWriteLevel
+enum OptionWriteMode
 {
     TS = 1,
     PES = 2,
@@ -38,6 +38,7 @@ std::map<std::string, std::vector<int>> g_Options;
 static const char* optString = "wil:h?";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' },
+                             { "wrmode", 1, nullptr, 'm' },
                              { "info", 1, nullptr, 'i' },
                              { "level", 1, nullptr, 'l' },
                              { "help", 0, nullptr, 'h' },
@@ -58,6 +59,7 @@ void display_usage()
                  "        -h [ --help ]        Print help messages\n"
                  "        -i [ --info PID]     Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file"
+                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]"
               << std::endl;
 }
 
@@ -96,10 +98,32 @@ void display_statistics(TsDemuxer demuxer)
 
 
 
-void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
+void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
-    (void)packet;
+    auto pid = tsPacketInfo.pid;
     std::cout << "demuxed TS packet \n" << tsPacketInfo;
+    if (hasPid("info", pid))
+    {
+        std::cout << tsPacketInfo << "\n";
+    }
+
+    if (hasPid("write", pid))
+    {
+        static std::map<uint16_t, std::ofstream> outFiles;
+        auto fit = outFiles.find(pid);
+        if (fit == outFiles.end())
+        {
+            outFiles[pid] = std::ofstream(std::to_string(pid) + ".ts",
+                                          std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
+        }
+        if (g_Options["wrmode"].front() != OptionWriteMode::TS)
+        {
+            return;
+        }
+        std::copy(packet, packet + TS_PACKET_SIZE, std::ostreambuf_iterator<char>(outFiles[pid]));
+
+        std::cout << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
+    }
 }
 
 void PATCallback(PsiTable* table)
@@ -112,6 +136,7 @@ void PATCallback(PsiTable* table)
     }
 
     g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
+    //TODO: add writing of table
 }
 
 void PMTCallback(PsiTable* table)
@@ -131,6 +156,7 @@ void PMTCallback(PsiTable* table)
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
+    //TODO: add writing of table
 }
 
 void PESCallback(const PesPacket& pes, uint16_t pid)
@@ -145,17 +171,32 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("write", pid))
     {
+        auto writeOfffset = 0;
+        auto writeModeString = "";
+        if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+        {
+            return;
+        }
+        else if (g_Options["wrmode"].front() == OptionWriteMode::PES)
+        {
+            writeOfffset = 0;
+            writeModeString = "PES";
+        }else{
+            writeOfffset = pes.elementary_data_offset;
+            writeModeString = "ES";
+        }
+
         static std::map<uint16_t, std::ofstream> outFiles;
         auto fit = outFiles.find(pid);
         if (fit == outFiles.end())
         {
-            outFiles[pid] = std::ofstream(std::to_string(pid) + ".pes",
+            outFiles[pid] = std::ofstream(std::to_string(pid) + "." + writeModeString,
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(pes.mPesBuffer.begin(), pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
+        std::copy(pes.mPesBuffer.begin() + writeOfffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << pes.mPesBuffer.size() << " B of PesPacket on pid: " << pid << std::endl;
+        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOfffset << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -164,10 +205,10 @@ int main(int argc, char** argv)
     std::cout << "Staring parser of stdout" << std::endl;
 
     int longIndex;
+
     int opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     while (opt != -1)
     {
-
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
@@ -181,7 +222,27 @@ int main(int argc, char** argv)
         case 'l':
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
-
+        case 'm':
+            {
+            OptionWriteMode writeMode = OptionWriteMode::PES;
+            if (std::string(optarg) == "ts")
+            {
+                writeMode = OptionWriteMode::TS;
+            }
+            else if (std::string(optarg) == "pes")
+            {
+                writeMode = OptionWriteMode::PES;
+            }
+            else if (std::string(optarg) == "es")
+            {
+                writeMode = OptionWriteMode::ES;
+            }else{
+                std::cerr << "Allowed values for write mode are: ts, pes, es";
+                return -1;
+            }
+            g_Options["wrmode"].push_back(writeMode);
+            }
+            break;
         default:
             /* You won't actually get here. */
             break;
@@ -189,7 +250,19 @@ int main(int argc, char** argv)
 
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-
+    if (g_Options["wrmode"].empty())
+    {
+        g_Options["wrmode"].push_back(OptionWriteMode::PES);
+    }
+    
+    if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+    {
+        for (auto pid : g_Options["write"])
+        {
+            g_tsDemux.addTsPid(pid, std::bind(&TsCallback, std::placeholders::_1, std::placeholders::_2));
+        }
+    }
+    
     uint64_t count;
 
     // Specify input stream

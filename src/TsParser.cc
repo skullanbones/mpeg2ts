@@ -330,6 +330,7 @@ void TsParser::parsePesPacket(int16_t pid)
     mPesPacket[pid].packet_start_code_prefix = getBits(24);
     mPesPacket[pid].stream_id = getBits(8);
     mPesPacket[pid].PES_packet_length = getBits(16);
+    mPesPacket[pid].elementary_data_offset = 0;
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
     if (mPesPacket[pid].stream_id != STREAM_ID_program_stream_map &&
@@ -355,6 +356,7 @@ void TsParser::parsePesPacket(int16_t pid)
         mPesPacket[pid].PES_extension_flag = getBits(1);
 
         mPesPacket[pid].PES_header_data_length = getBits(8);
+        mPesPacket[pid].elementary_data_offset = mPesPacket[pid].PES_header_data_length + getByteInx();
 
         mPesPacket[pid].pts = -1;
         mPesPacket[pid].dts = -1;
