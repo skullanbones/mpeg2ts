@@ -2,7 +2,7 @@ CXX = g++
 INC := -I$(PROJ_ROOT) -I$(CURDIR) -I$(INCDIR)
 COMPONENT_NAME := gtests
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
-SRCS = TsParser_Tests.cc
+SRCS = TsParser_Tests.cc TsStatistics_Tests.cc
 
 .PHONY: all clean
 

@@ -25,6 +25,7 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
     {
         if (((mPidStatistics[pid].lastCC + 1) & 0x0f) != cc)
         {
+            ++mPidStatistics[pid].numberOfCCErrors;
             std::cout << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
                       << pid << "\n";
         }

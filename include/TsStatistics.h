@@ -53,14 +53,39 @@ public:
     {
     }
 
+    /*!
+     * Calculates Continuity errors.
+     * @param pid Filtered PID.
+     * @param cc Current TS packets Continuity Counter.
+     */
     void checkCCError(int pid, uint8_t cc);
 
-    void checkTsDiscontinuity(int pid, bool dis);
+    /*!
+     * Book keep flagged TS packets discontinuities.
+     * @param pid Filtered PID.
+     * @param isDiscontinuous Whether or not this is a discontinuity.
+     */
+    void checkTsDiscontinuity(int pid, bool isDiscontinuous);
 
+    /*!
+     * Build a histogram of PTS differences between 2 time samples.
+     * @param pid Filtered PID.
+     * @param pts Program Time Stamp value.
+     */
     void buildPtsHistogram(int pid, int64_t pts);
 
+    /*!
+    * Build a histogram of DTS differences between 2 time samples.
+    * @param pid Filtered PID.
+    * @param pts Display Time Stamp value.
+    */
     void buildDtsHistogram(int pid, int64_t dts);
 
+    /*!
+    * Build a histogram of PCR differences between 2 time samples.
+    * @param pid Filtered PID.
+    * @param pts Program Clock Reference value.
+    */
     void buildPcrHistogram(int pid, int64_t pcr);
 
     std::map<int, PidStatistic> mPidStatistics;
