@@ -17,7 +17,7 @@ def project_root():
 
 class TsParser(object):
     """This object reflects TsParser executable."""
-    parser = os.path.join(project_root(), 'tsparser')
+    parser = os.path.join(project_root(), 'build/tsparser')
 
     def __init__(self):
         self.proc = None

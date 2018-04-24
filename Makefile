@@ -99,7 +99,7 @@ env:
 	virtualenv -p python$(PYTHON_VERSION) $@
 	./env/bin/pip install -r component_tests/requirements.txt
 
-component_tests: env tsparser
+component_tests: env $(BUILDDIR)/tsparser
 	@echo "[Running component tests..]"
 	./env/bin/pytest
 
