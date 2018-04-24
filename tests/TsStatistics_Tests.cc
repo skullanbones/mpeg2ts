@@ -8,6 +8,8 @@
 
 /// Project files
 #include "TsStatistics.h"
+#include "TsDemuxer.h"
+#include "TsPacketTestData.h"
 
 TEST(TsStatisticsTests, TwoPlusTwoEqualsFour)
 {
@@ -133,4 +135,34 @@ TEST(TsStatisticsTests, TestPcrHistogram)
     EXPECT_EQ(statistics.mPidStatistics[0].pcrHistogram[0], 0u);
     EXPECT_EQ(statistics.mPidStatistics[0].pcrHistogram[time_step], 3);
     EXPECT_EQ(statistics.mPidStatistics[1].pcrHistogram[5 * time_step], 1);
+}
+
+/*!
+ * Test ts-packet counter works.
+ */
+TEST(TsStatisticsTests, TestTsPacketCounter)
+{
+    TsDemuxer demuxer;
+    TsStatistics statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 0u);
+
+    demuxer.demux(packet_1);
+    statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 1u);
+
+    demuxer.demux(packet_2);
+    statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 2u);
+
+    demuxer.demux(packet_3);
+    statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 3u);
+
+    demuxer.demux(packet_4);
+    statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 4u);
+
+    demuxer.demux(pat_packet_1);
+    statistics = demuxer.getTsStatistics();
+    EXPECT_EQ(statistics.mTsPacketCounter, 5u);
 }
