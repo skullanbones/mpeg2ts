@@ -24,6 +24,7 @@ uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 uint32_t g_SPPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
+TsDemuxer g_tsDemux;
 
 enum OptionWriteLevel
 {
@@ -60,7 +61,40 @@ void display_usage()
               << std::endl;
 }
 
-TsDemuxer tsDemux;
+void display_statistics(TsDemuxer demuxer)
+{
+    for (auto& pidStat : demuxer.getTsStatistics().mPidStatistics)
+    {
+        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
+        {
+            continue;
+        }
+        std::cout << "Pid: " << pidStat.first << "\n";
+        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities
+                  << "\n";
+        std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
+        std::cout << " Pts differences histogram:\n";
+        for (auto& ent : pidStat.second.ptsHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+        std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
+
+        std::cout << " Dts differences histogram:\n";
+        for (auto& ent : pidStat.second.dtsHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+        std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
+        std::cout << " Pcr differences histogram:\n";
+        for (auto& ent : pidStat.second.pcrHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+    }
+}
+
+
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -73,7 +107,7 @@ void PATCallback(PsiTable* table)
     auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
-        std::cout << "PAT at Ts packet: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
     }
 
@@ -85,7 +119,7 @@ void PMTCallback(PsiTable* table)
     auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
-        std::cout << "PMT at Ts packet: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
     }
 
@@ -104,7 +138,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("info", pid))
     {
-        std::cout << "PES ENDING at Ts packet " << tsDemux.getTsStatistics().mTsPacketCounter
+        std::cout << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
                   << " (" << pid << ")\n";
         std::cout << pes << std::endl;
     }
@@ -161,7 +195,7 @@ int main(int argc, char** argv)
     // Specify input stream
     setvbuf(stdout, NULL, _IOLBF, 0);
 
-    tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
 
     for (count = 0;; ++count)
     {
@@ -183,35 +217,7 @@ int main(int argc, char** argv)
                           << std::endl;
 
                 std::cout << "Statistics\n";
-                for (auto& pidStat : tsDemux.getTsStatistics().mPidStatistics)
-                {
-                    if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
-                    {
-                        continue;
-                    }
-                    std::cout << "Pid: " << pidStat.first << "\n";
-                    std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities
-                              << "\n";
-                    std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
-                    std::cout << " Pts differences histogram:\n";
-                    for (auto& ent : pidStat.second.ptsHistogram)
-                    {
-                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
-                    }
-                    std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
-
-                    std::cout << " Dts differences histogram:\n";
-                    for (auto& ent : pidStat.second.dtsHistogram)
-                    {
-                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
-                    }
-                    std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
-                    std::cout << " Pcr differences histogram:\n";
-                    for (auto& ent : pidStat.second.pcrHistogram)
-                    {
-                        std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
-                    }
-                }
+                display_statistics(g_tsDemux);
                 return EXIT_SUCCESS;
             }
         }
@@ -224,16 +230,16 @@ int main(int argc, char** argv)
         fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
         (void)res;
 
-        tsDemux.demux(packet);
+        g_tsDemux.demux(packet);
         if (g_SPPID != 0u)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
-            tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+            g_tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 
         for (auto pid : g_ESPIDS)
         {
-            tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
+            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
         }
         g_ESPIDS.clear();
 
