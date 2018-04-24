@@ -54,3 +54,12 @@ branch by the portal:
 For static and feedback in pull-requests we use a tool called Codacy which will run different
 tools to check for mistakes and coding quality/best practises. You can check that status here:
 [Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
+
+## Acronyms
+| Abbreviation  | Meaning                             |
+|---------------|-------------------------------------|
+| VCS           | Version Control System              |
+| DVCS          | Distributed Version Control System  |
+| SW            | Software                            |
+| MC            | Multicast                           |
+| CI            | Continuous Integration              |
