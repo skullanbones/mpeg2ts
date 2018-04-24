@@ -31,7 +31,7 @@ $(info $$OBJS is $(OBJS))
 
 docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
 
-.PHONY: all clean lint docker-image docker-bash test gtests run clang unit-test component_tests
+.PHONY: all clean lint flake docker-image docker-bash test gtests run clang unit-test component_tests
 
 all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
@@ -52,8 +52,11 @@ $(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
-lint:
+lint: flake
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
+
+flake:
+	flake8 component_tests
 
 clang:
 	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include

@@ -10,6 +10,7 @@ def git_root(path):
     git_root = git_repo.git.rev_parse("--show-toplevel")
     return git_root
 
+
 def project_root():
     return "%s" % git_root("./")
 
