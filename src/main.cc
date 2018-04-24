@@ -55,8 +55,8 @@ void display_usage()
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
-                 "        -i [ --info PID]        print PSI tables info with PID\n"
-                 "        -w [ --write PID]       writes PES packets with PID to file"
+                 "        -i [ --info PID]     Print PSI tables info with PID\n"
+                 "        -w [ --write PID]    Writes PES packets with PID to file"
               << std::endl;
 }
 
@@ -73,7 +73,7 @@ void PATCallback(PsiTable* table)
     auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
-        std::cout << "PAT at Ts packent: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        std::cout << "PAT at Ts packet: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
     }
 
@@ -85,7 +85,7 @@ void PMTCallback(PsiTable* table)
     auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
-        std::cout << "PMT at Ts packent: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        std::cout << "PMT at Ts packet: " << tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
     }
 
@@ -137,9 +137,11 @@ int main(int argc, char** argv)
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
-        case '?':
+        case '?': {
             display_usage();
+            exit(EXIT_SUCCESS);
             break;
+        }
         case 'w':
         case 'i':
         case 'l':
@@ -160,16 +162,6 @@ int main(int argc, char** argv)
     setvbuf(stdout, NULL, _IOLBF, 0);
 
     tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
-
-    std::cout << std::boolalpha;
-    std::cout << std::is_pod<TsHeader>::value << '\n';
-    std::cout << std::is_pod<TsAdaptationFieldHeader>::value << '\n';
-
-    /*
-    TODO: move it to gtest
-    tsParser.parseTsPacketInfo(packet_3, tsPacketInfo);
-    std::cout << tsPacketInfo.toString() << std::endl;
-    return 0;*/
 
     for (count = 0;; ++count)
     {

@@ -14,6 +14,7 @@
  */
 
 #include "TsStatistics.h"
+
 void TsStatistics::checkCCError(int pid, uint8_t cc)
 {
     if (mPidStatistics[pid].lastCC == PidStatistic::INVALID_CC)
