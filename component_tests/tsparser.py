@@ -1,15 +1,17 @@
 import os
 import time
 import sys
-from subprocess import check_output
+import git
 from subprocess import PIPE, Popen
 
-def git_root():
-    return check_output(['git', 'rev-parse', '--show-toplevel'],
-                        universal_newlines=True).rstrip()
+
+def git_root(path):
+    git_repo = git.Repo(path, search_parent_directories=True)
+    git_root = git_repo.git.rev_parse("--show-toplevel")
+    return git_root
 
 def project_root():
-    return "%s" % git_root()
+    return "%s" % git_root("./")
 
 
 class TsParser(object):
@@ -63,13 +65,14 @@ class TsParser(object):
         exitcode = self.proc.returncode
         return out, err, exitcode
 
-    def _collect_args(self, input=None, extra_args=None):
+    @classmethod
+    def _collect_args(self, info=None, extra_args=None):
         """Collects all the input arguments for the process."""
         args = []
 
-        if input:
-            args.append('--input')
-            args.append(input)
+        if info:
+            args.append('--info')
+            args.append(info)
         if extra_args:
             args.extend(extra_args)
 
