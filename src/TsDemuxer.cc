@@ -21,6 +21,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // TODO Filter PID from PSI, TS, PES etc...
@@ -48,6 +49,8 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid);
         }
     }
+
+    ++mParser.mTsPacketCounter;
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)

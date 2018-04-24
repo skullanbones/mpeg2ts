@@ -22,9 +22,10 @@
 #include "PsiTables.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
+#include "TsStatistics.h"
 
 
-class TsParser : GetBits
+class TsParser : GetBits, public TsStatistics
 {
 public:
     /*!

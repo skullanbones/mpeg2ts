@@ -21,6 +21,7 @@ public:
     bool hasPrivateData;     // If this packet contains private data.
     bool hasRandomAccess;    // If this packet contain aid random access.
     bool isScrambled;        // If this packet is scrambled
+    bool isDiscontinuity;    // If this packet has discontinuity flag set
 
     uint8_t continuityCounter : 4; // 4-bit continuity counter
 

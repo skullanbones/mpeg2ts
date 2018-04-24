@@ -20,6 +20,7 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
     outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
+    outInfo.continuityCounter = hdr.continuity_counter;
 
     if (outInfo.hasAdaptationField)
     {
@@ -105,6 +106,8 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 {
     TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
+    outInfo.pcr = -1;
+    outInfo.opcr = -1;
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -144,6 +147,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
             getBits(8);
         }
     }
+    outInfo.isDiscontinuity = adaptHdr.discontinuity_indicator;
 
     // 0..N stuffing bytes goes here and we have to adjust read offset
     resetBits(packet, TS_PACKET_SIZE, ofsAfterAF);
@@ -160,8 +164,6 @@ uint64_t TsParser::parsePcr()
 
     pcr_extension = getBits(9);
     pcr_base = pcr_base * 300;
-
-    // 9 bits
     pcr_base += pcr_extension;
 
     return pcr_base;
@@ -171,6 +173,10 @@ uint64_t TsParser::parsePcr()
 void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+
+    checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
+    checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+
     if (tsPacketInfo.isPayloadStart)
     {
         mSectionBuffer.clear();
@@ -194,9 +200,12 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
 
-    // std::cout << "tsPacketInfo.payloadStartOffset:" << (int)tsPacketInfo.payloadStartOffset <<
-    // std::endl;  std::cout << "tsPacketInfo.isPayloadStart:" << (int)tsPacketInfo.isPayloadStart
-    // << std::endl;
+    checkCCError(pid, tsPacketInfo.continuityCounter);
+    checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    if (tsPacketInfo.hasAdaptationField)
+    {
+        buildPcrHistogram(pid, tsPacketInfo.pcr);
+    }
 
     if (tsPacketInfo.isPayloadStart)
     {
@@ -211,6 +220,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             else
             {
                 pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
+
+                buildPtsHistogram(pid, pesPacket.pts);
+                buildDtsHistogram(pid, pesPacket.dts);
+
                 ret = true;
             }
         }
@@ -226,6 +239,12 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     }
     else
     {
+        if (mPesPacket.count(pid) == 0)
+        {
+            // PES has not started yet. Ignoring rest
+            return false;
+        }
+
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
                                           &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
@@ -337,12 +356,12 @@ void TsParser::parsePesPacket(int16_t pid)
 
         mPesPacket[pid].PES_header_data_length = getBits(8);
 
+        mPesPacket[pid].pts = -1;
+        mPesPacket[pid].dts = -1;
         // Forbidden value
         if (mPesPacket[pid].PTS_DTS_flags == 0x01)
         {
             std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags << std::endl;
-            mPesPacket[pid].pts = -1;
-            mPesPacket[pid].dts = -1;
         }
         else if (mPesPacket[pid].PTS_DTS_flags == 0x02) // Only PTS value
         {

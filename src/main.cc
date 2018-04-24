@@ -24,6 +24,7 @@ uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 uint32_t g_SPPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
+TsDemuxer g_tsDemux;
 
 enum OptionWriteLevel
 {
@@ -55,10 +56,45 @@ void display_usage()
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
-                 "        -i [ --info PID]        print PSI tables info with PID\n"
-                 "        -w [ --write PID]       writes PES packets with PID to file"
+                 "        -i [ --info PID]     Print PSI tables info with PID\n"
+                 "        -w [ --write PID]    Writes PES packets with PID to file"
               << std::endl;
 }
+
+void display_statistics(TsDemuxer demuxer)
+{
+    for (auto& pidStat : demuxer.getTsStatistics().mPidStatistics)
+    {
+        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
+        {
+            continue;
+        }
+        std::cout << "Pid: " << pidStat.first << "\n";
+        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities
+                  << "\n";
+        std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
+        std::cout << " Pts differences histogram:\n";
+        for (auto& ent : pidStat.second.ptsHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+        std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
+
+        std::cout << " Dts differences histogram:\n";
+        for (auto& ent : pidStat.second.dtsHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+        std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
+        std::cout << " Pcr differences histogram:\n";
+        for (auto& ent : pidStat.second.pcrHistogram)
+        {
+            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+        }
+    }
+}
+
+
 
 void TsCallback(unsigned char packet, TsPacketInfo tsPacketInfo)
 {
@@ -71,6 +107,7 @@ void PATCallback(PsiTable* table)
     auto pat = dynamic_cast<PatTable*>(table);
     if (hasPid("info", 0))
     {
+        std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
     }
 
@@ -82,6 +119,7 @@ void PMTCallback(PsiTable* table)
     auto pmt = dynamic_cast<PmtTable*>(table);
     if (hasPid("info", g_SPPID))
     {
+        std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
     }
 
@@ -97,10 +135,11 @@ void PMTCallback(PsiTable* table)
 
 void PESCallback(const PesPacket& pes, uint16_t pid)
 {
-    std::cout << "demuxed PES packet on pid " << pid << "\n";
 
     if (hasPid("info", pid))
     {
+        std::cout << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
+                  << " (" << pid << ")\n";
         std::cout << pes << std::endl;
     }
 
@@ -132,9 +171,11 @@ int main(int argc, char** argv)
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
-        case '?':
+        case '?': {
             display_usage();
+            exit(EXIT_SUCCESS);
             break;
+        }
         case 'w':
         case 'i':
         case 'l':
@@ -154,28 +195,7 @@ int main(int argc, char** argv)
     // Specify input stream
     setvbuf(stdout, NULL, _IOLBF, 0);
 
-    //  char buffer[200*10224*1024];
-    //  setbuf(stdin, buffer);
-
-    // unsigned long position = 0;
-
-    TsPacketInfo tsPacketInfo = { 0 };
-    TsParser tsParser;
-
-    TsDemuxer tsDemux;
-    tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
-
-    //    TsAdaptationFieldHeader fieldHeader;
-
-    std::cout << std::boolalpha;
-    std::cout << std::is_pod<TsHeader>::value << '\n';
-    std::cout << std::is_pod<TsAdaptationFieldHeader>::value << '\n';
-
-    /*
-    TODO: move it to gtest
-    tsParser.parseTsPacketInfo(packet_3, tsPacketInfo);
-    std::cout << tsPacketInfo.toString() << std::endl;
-    return 0;*/
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
 
     for (count = 0;; ++count)
     {
@@ -195,23 +215,12 @@ int main(int argc, char** argv)
                 std::cout << "Found " << count << " ts-packets." << std::endl;
                 std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets."
                           << std::endl;
+
+                std::cout << "Statistics\n";
+                display_statistics(g_tsDemux);
                 return EXIT_SUCCESS;
             }
         }
-
-
-        /*
-        while (buffer[position++] != TS_PACKET_SYNC_BYTE) {
-          if (buffer[position] == EOF)
-             {
-               std::cout << "End Of File..." << std::endl;
-               std::cout << "Found " << count << " ts-packets." << std::endl;
-          std::cout << "Found Adaptation Field packets:" << countAdaptPacket
-                << " ts-packets." << std::endl;
-               return EXIT_SUCCESS;
-             }
-        }
-        */
 
         // TS Packet start
         packet[0] = b;
@@ -220,37 +229,19 @@ int main(int argc, char** argv)
         size_t res =
         fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
         (void)res;
-        // memcpy(packet, &buffer[position], TS_PACKET_SIZE);
 
-        // For debug purpose
-        tsParser.parseTsPacketInfo(packet, tsPacketInfo);
-        //        std::cout << tsPacketInfo.toString() << std::endl;
-
-        tsDemux.demux(packet);
+        g_tsDemux.demux(packet);
         if (g_SPPID != 0u)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
-            tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+            g_tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 
         for (auto pid : g_ESPIDS)
         {
-            tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
+            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
         }
         g_ESPIDS.clear();
 
-        if (tsPacketInfo.hasAdaptationField)
-        {
-            //      std::cout << "found packet with adaptation field";
-            countAdaptPacket++;
-
-            if (countAdaptPacket == 1)
-            {
-                for (int i = 0; i < TS_PACKET_SIZE; i++)
-                {
-                    //	  printf("0x%1x, ", packet[i]);
-                }
-            }
-        }
     } // for loop
 }

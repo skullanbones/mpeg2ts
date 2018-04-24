@@ -41,8 +41,8 @@ TEST(TsParserTests, CheckParserInfo)
     TsPacketInfo info;
     parser.parseTsPacketInfo(packet_1, info);
 
-    EXPECT_EQ(0, info.pcr);
-    EXPECT_EQ(0, info.opcr);
+    EXPECT_EQ(-1, info.pcr);
+    EXPECT_EQ(-1, info.opcr);
     EXPECT_EQ(47, info.payloadSize);
     EXPECT_EQ(141, info.payloadStartOffset);
     EXPECT_TRUE(info.hasAdaptationField);
@@ -291,7 +291,7 @@ TEST(TsParserTests, TestParsePcr)
     parser.parseTsPacketInfo(packet_2, info);
     EXPECT_EQ(599, info.pid);
     EXPECT_EQ(600035807394, info.pcr);
-    EXPECT_EQ(0, info.opcr);
+    EXPECT_EQ(-1, info.opcr);
 
     parser.parseTsPacketInfo(pcr_packet_1, info);
     EXPECT_EQ(0x30, info.pid);
