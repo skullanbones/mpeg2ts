@@ -18,7 +18,7 @@ class TsDemuxer
 public:
     typedef std::function<void(PsiTable* table)> PsiCallBackFnc;
     typedef std::function<void(const PesPacket& table, uint16_t pid)> PesCallBackFnc;
-    typedef std::function<void(const TsHeader& hdr)> TsCallBackFnc;
+    typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo)> TsCallBackFnc;
 
     TsDemuxer() = default;
 
@@ -61,6 +61,7 @@ public:
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap; // TODO: make cb generic
     std::map<int, PesCallBackFnc> mPesCallbackMap;
+    std::map<int, TsCallBackFnc> mTsCallbackMap;
 
 private:
     TsParser mParser;

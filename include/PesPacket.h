@@ -30,6 +30,7 @@ public:
     bool PES_extension_flag;
 
     uint8_t PES_header_data_length;
+    uint16_t elementary_data_offset; // where ES data begins
 
     int64_t pts;
     int64_t dts;

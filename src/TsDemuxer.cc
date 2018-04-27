@@ -21,6 +21,11 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+    
+    if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
+    {
+        mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo);
+    }
 
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
@@ -61,4 +66,9 @@ void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)
 void TsDemuxer::addPesPid(int pid, PesCallBackFnc cb)
 {
     mPesCallbackMap[pid] = cb;
+}
+
+void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb)
+{
+    mTsCallbackMap[pid] = cb;
 }
