@@ -156,6 +156,14 @@ void PMTCallback(PsiTable* table)
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
+    if (pmt->PCR_PID != 0)
+    {
+        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pmt->PCR_PID) ||
+            std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
+        {
+            g_ESPIDS.push_back(pmt->PCR_PID);
+        }        
+    }
     //TODO: add writing of table
 }
 
