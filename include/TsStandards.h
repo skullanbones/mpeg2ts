@@ -9,10 +9,6 @@
  * All references here after reference to this document.
  */
 
-/*!
- * transport stream header
- * 4 bytes
- */
 #pragma once
 
 #include <map>
@@ -24,16 +20,16 @@
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
-const int TS_PACKET_SYNC_BYTE = 0x47;
-const int TS_PACKET_SIZE = 188;
-const int TS_PACKET_HEADER_SIZE = 4;
+const int TS_PACKET_SYNC_BYTE = 0x47;              // Section 2.4.3.3
+const int TS_PACKET_SIZE = 188;                    // Section 2.4.3
+const int TS_PACKET_HEADER_SIZE = 4;               // Table 2-2
 const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
 const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
 const int TS_PACKET_PID_PAT = 0x00;                // PAT packet, Table 2-28
 const int TS_PACKET_PID_CAT = 0x01;                // CAT packet, Table 2-28
 const int TS_PACKET_PID_TDT = 0x02;                // TDT packet, Table 2-28
 const int TS_PACKET_PID_IPMP = 0x03;               // IPMP packet, Table 2-28
-const int TS_PACKET_PID_NULL = 0x1fff;             // Null Packet
+const int TS_PACKET_PID_NULL = 0x1fff;             // Null Packet, Section 2.4.1
 const int PES_PACKET_START_CODE_PREFIX = 0x000001; // Section 2.4.3.7
 
 
@@ -47,6 +43,10 @@ const int PAT_PACKET_PROGRAM_SIZE = 4;
 const int PMT_PACKET_OFFSET_LENGTH = 9;
 const int PMT_STREAM_TYPE_LENGTH = 5;
 
+/*!
+ * transport stream header
+ * 4 bytes, see Table 2-2 – Transport packet of this Recommendation.
+ */
 struct TsHeader
 {
     uint8_t sync_byte;
@@ -145,6 +145,7 @@ static std::map<PsiTableId, std::string> PsiTableToString =
   { PSI_TABLE_ID_METADATA, "PSI_TABLE_ID_METADATA" },
   { PSI_TABLE_ID_IPMP, "PSI_TABLE_ID_IPMP" },
   { PSI_TABLE_ID_14496, "PSI_TABLE_ID_14496" },
+  { PSI_TABLE_ID_INCOMPLETE, "PSI_TABLE_ID_INCOMPLETE" },
   { PSI_TABLE_ID_FORBIDDEN, "PSI_TABLE_ID_FORBIDDEN" } };
 
 /*! @brief Stream type
