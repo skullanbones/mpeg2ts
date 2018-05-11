@@ -12,11 +12,12 @@
 #include <string>
 #include <type_traits>
 #include <unistd.h>
+#include <list>
+#include <cstdlib> // EXIT_SUCCESS
 
 /// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
-#include "TsParser.h"
 #include "TsStandards.h"
 
 
@@ -26,16 +27,17 @@ uint32_t g_SPPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 
-enum OptionWriteMode
+enum class OptionWriteMode
 {
-    TS = 1,
-    PES = 2,
-    ES = 3
+    TS,
+    PES,
+    ES
 };
 
 std::map<std::string, std::vector<int>> g_Options;
+std::list<OptionWriteMode> g_WriteMode;
 
-static const char* optString = "wil:h?";
+static const char* optString = "m:w:i:l:h?";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "wrmode", 1, nullptr, 'm' },
@@ -116,7 +118,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
             outFiles[pid] = std::ofstream(std::to_string(pid) + ".ts",
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
-        if (g_Options["wrmode"].front() != OptionWriteMode::TS)
+        if (g_WriteMode.front() != OptionWriteMode::TS)
         {
             return;
         }
@@ -181,15 +183,16 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
     {
         auto writeOfffset = 0;
         auto writeModeString = "";
-        if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+        if (g_WriteMode.front() == OptionWriteMode::TS)
         {
             return;
         }
-        else if (g_Options["wrmode"].front() == OptionWriteMode::PES)
+        else if (g_WriteMode.front() == OptionWriteMode::PES)
         {
             writeOfffset = 0;
             writeModeString = "PES";
-        }else{
+        }
+        else{
             writeOfffset = pes.elementary_data_offset;
             writeModeString = "ES";
         }
@@ -244,11 +247,13 @@ int main(int argc, char** argv)
             else if (std::string(optarg) == "es")
             {
                 writeMode = OptionWriteMode::ES;
-            }else{
-                std::cerr << "Allowed values for write mode are: ts, pes, es";
-                return -1;
             }
-            g_Options["wrmode"].push_back(writeMode);
+            else{
+                std::cerr << "Allowed values for write mode are: ts, pes, es";
+                display_usage();
+                exit(EXIT_FAILURE);
+            }
+                g_WriteMode.push_back(writeMode);
             }
             break;
         default:
@@ -258,12 +263,12 @@ int main(int argc, char** argv)
 
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    if (g_Options["wrmode"].empty())
+    if (g_WriteMode.empty())
     {
-        g_Options["wrmode"].push_back(OptionWriteMode::PES);
+        g_WriteMode.push_back(OptionWriteMode::PES);
     }
     
-    if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+    if (g_WriteMode.front() == OptionWriteMode::TS)
     {
         for (auto pid : g_Options["write"])
         {
@@ -325,4 +330,5 @@ int main(int argc, char** argv)
         g_ESPIDS.clear();
 
     } // for loop
+    return EXIT_SUCCESS;
 }
