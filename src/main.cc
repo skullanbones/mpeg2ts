@@ -23,7 +23,7 @@
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
-uint32_t g_SPPID = 0; // Single Program PID
+uint32_t g_PMTPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 
@@ -137,14 +137,14 @@ void PATCallback(PsiTable* table)
         std::cout << *pat << std::endl;
     }
 
-    g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
+    g_PMTPID = pat->programs[0].program_map_PID; // Assume SPTS
     //TODO: add writing of table
 }
 
 void PMTCallback(PsiTable* table)
 {
     auto pmt = dynamic_cast<PmtTable*>(table);
-    if (hasPid("info", g_SPPID))
+    if (hasPid("info", g_PMTPID))
     {
         std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
@@ -166,7 +166,6 @@ void PMTCallback(PsiTable* table)
             g_ESPIDS.push_back(pmt->PCR_PID);
         }        
     }
-    //TODO: add writing of table
 }
 
 void PESCallback(const PesPacket& pes, uint16_t pid)
@@ -317,10 +316,10 @@ int main(int argc, char** argv)
         (void)res;
 
         g_tsDemux.demux(packet);
-        if (g_SPPID != 0u)
+        if (g_PMTPID != 0u)
         {
-            // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
-            g_tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+            // std::cout << "Single Program Transport Stream PID: " << g_PMTPID << std::endl;
+            g_tsDemux.addPsiPid(g_PMTPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 
         for (auto pid : g_ESPIDS)
@@ -330,5 +329,4 @@ int main(int argc, char** argv)
         g_ESPIDS.clear();
 
     } // for loop
-    return EXIT_SUCCESS;
 }
