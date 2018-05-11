@@ -58,7 +58,7 @@ void display_usage()
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
                  "        -i [ --info PID]     Print PSI tables info with PID\n"
-                 "        -w [ --write PID]    Writes PES packets with PID to file"
+                 "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]"
               << std::endl;
 }
