@@ -181,7 +181,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("write", pid))
     {
-        auto writeOfffset = 0;
+        auto writeOffset = 0;
         auto writeModeString = "";
         if (g_WriteMode.front() == OptionWriteMode::TS)
         {
@@ -189,11 +189,11 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
         }
         else if (g_WriteMode.front() == OptionWriteMode::PES)
         {
-            writeOfffset = 0;
+            writeOffset = 0;
             writeModeString = "PES";
         }
         else{
-            writeOfffset = pes.elementary_data_offset;
+            writeOffset = pes.elementary_data_offset;
             writeModeString = "ES";
         }
 
@@ -205,9 +205,9 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(pes.mPesBuffer.begin() + writeOfffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
+        std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOfffset << " bytes, pid: " << pid << std::endl;
+        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset << " bytes, pid: " << pid << std::endl;
     }
 }
 
