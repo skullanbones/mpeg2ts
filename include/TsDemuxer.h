@@ -10,7 +10,6 @@
 
 /// project files
 #include "TsParser.h"
-#include "TsStandards.h"
 
 /// @brief Demux ts packets into PSI and PES (plus TS pass through)
 class TsDemuxer
@@ -59,7 +58,7 @@ public:
     }
 
 protected:
-    std::map<int, PsiCallBackFnc> mPsiCallbackMap; // TODO: make cb generic
+    std::map<int, PsiCallBackFnc> mPsiCallbackMap;
     std::map<int, PesCallBackFnc> mPesCallbackMap;
     std::map<int, TsCallBackFnc> mTsCallbackMap;
 
