@@ -12,30 +12,32 @@
 #include <string>
 #include <type_traits>
 #include <unistd.h>
+#include <list>
+#include <cstdlib> // EXIT_SUCCESS
 
 /// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
-#include "TsParser.h"
 #include "TsStandards.h"
 
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
-uint32_t g_SPPID = 0; // Single Program PID
+uint32_t g_PMTPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 
-enum OptionWriteMode
+enum class OptionWriteMode
 {
-    TS = 1,
-    PES = 2,
-    ES = 3
+    TS,
+    PES,
+    ES
 };
 
 std::map<std::string, std::vector<int>> g_Options;
+std::list<OptionWriteMode> g_WriteMode;
 
-static const char* optString = "wil:h?";
+static const char* optString = "m:w:i:l:h?";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "wrmode", 1, nullptr, 'm' },
@@ -58,7 +60,7 @@ void display_usage()
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
                  "        -i [ --info PID]     Print PSI tables info with PID\n"
-                 "        -w [ --write PID]    Writes PES packets with PID to file"
+                 "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]"
               << std::endl;
 }
@@ -116,7 +118,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
             outFiles[pid] = std::ofstream(std::to_string(pid) + ".ts",
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
-        if (g_Options["wrmode"].front() != OptionWriteMode::TS)
+        if (g_WriteMode.front() != OptionWriteMode::TS)
         {
             return;
         }
@@ -135,14 +137,14 @@ void PATCallback(PsiTable* table)
         std::cout << *pat << std::endl;
     }
 
-    g_SPPID = pat->programs[0].program_map_PID; // Assume SPTS
+    g_PMTPID = pat->programs[0].program_map_PID; // Assume SPTS
     //TODO: add writing of table
 }
 
 void PMTCallback(PsiTable* table)
 {
     auto pmt = dynamic_cast<PmtTable*>(table);
-    if (hasPid("info", g_SPPID))
+    if (hasPid("info", g_PMTPID))
     {
         std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
@@ -164,7 +166,6 @@ void PMTCallback(PsiTable* table)
             g_ESPIDS.push_back(pmt->PCR_PID);
         }        
     }
-    //TODO: add writing of table
 }
 
 void PESCallback(const PesPacket& pes, uint16_t pid)
@@ -179,18 +180,19 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("write", pid))
     {
-        auto writeOfffset = 0;
+        auto writeOffset = 0;
         auto writeModeString = "";
-        if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+        if (g_WriteMode.front() == OptionWriteMode::TS)
         {
             return;
         }
-        else if (g_Options["wrmode"].front() == OptionWriteMode::PES)
+        else if (g_WriteMode.front() == OptionWriteMode::PES)
         {
-            writeOfffset = 0;
+            writeOffset = 0;
             writeModeString = "PES";
-        }else{
-            writeOfffset = pes.elementary_data_offset;
+        }
+        else{
+            writeOffset = pes.elementary_data_offset;
             writeModeString = "ES";
         }
 
@@ -202,9 +204,9 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(pes.mPesBuffer.begin() + writeOfffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
+        std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOfffset << " bytes, pid: " << pid << std::endl;
+        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -244,11 +246,13 @@ int main(int argc, char** argv)
             else if (std::string(optarg) == "es")
             {
                 writeMode = OptionWriteMode::ES;
-            }else{
-                std::cerr << "Allowed values for write mode are: ts, pes, es";
-                return -1;
             }
-            g_Options["wrmode"].push_back(writeMode);
+            else{
+                std::cerr << "Allowed values for write mode are: ts, pes, es";
+                display_usage();
+                exit(EXIT_FAILURE);
+            }
+                g_WriteMode.push_back(writeMode);
             }
             break;
         default:
@@ -258,12 +262,12 @@ int main(int argc, char** argv)
 
         opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
     }
-    if (g_Options["wrmode"].empty())
+    if (g_WriteMode.empty())
     {
-        g_Options["wrmode"].push_back(OptionWriteMode::PES);
+        g_WriteMode.push_back(OptionWriteMode::PES);
     }
     
-    if (g_Options["wrmode"].front() == OptionWriteMode::TS)
+    if (g_WriteMode.front() == OptionWriteMode::TS)
     {
         for (auto pid : g_Options["write"])
         {
@@ -312,10 +316,10 @@ int main(int argc, char** argv)
         (void)res;
 
         g_tsDemux.demux(packet);
-        if (g_SPPID != 0u)
+        if (g_PMTPID != 0u)
         {
-            // std::cout << "Single Program Transport Stream PID: " << g_SPPID << std::endl;
-            g_tsDemux.addPsiPid(g_SPPID, std::bind(&PMTCallback, std::placeholders::_1));
+            // std::cout << "Single Program Transport Stream PID: " << g_PMTPID << std::endl;
+            g_tsDemux.addPsiPid(g_PMTPID, std::bind(&PMTCallback, std::placeholders::_1));
         }
 
         for (auto pid : g_ESPIDS)
