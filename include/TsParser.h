@@ -135,6 +135,4 @@ public:
 private:
     ByteVector mSectionBuffer;
     std::map<uint16_t, PesPacket> mPesPacket;
-    uint64_t mPacketErrorCounter;              // Wrong sync byte
-    uint64_t mPacketDiscontinuityErrorCounter; // Wrong continuity
 };

@@ -62,7 +62,7 @@ clang:
 	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
 run: $(BUILDDIR)/tsparser
-	cat bbc_one.ts | $(BUILDDIR)/tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
+	cat $(PROJ_ROOT)/assets/bbc_one.ts | $(BUILDDIR)/tsparser --info 258 --write 2304 --write 2305 --write 2306 --write 2342
 
 ### docker stuff
 
