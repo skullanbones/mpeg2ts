@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: make
+          command: make all
       - run:
           name: Test
           command: make gtests
