@@ -6,20 +6,28 @@
 # Strictly Confidential - Do not duplicate or distribute without written
 # permission from skullanbones™ and authors
 
+## Project
 COMPONENT_NAME ?= ts-lib
-DOCKER_IMAGE_VER ?= v1
-DOCKER_IMAGE_NAME ?= heliconwave/circleci
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
-CXX = g++
-STATIC = libts.a
-CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
-PYTHON_VERSION ?= 3
 
+## Docker
+DOCKER_IMAGE_VER ?= v1
+DOCKER_IMAGE_NAME ?= heliconwave/circleci
+
+## Compiler
+CXX = g++
+STATIC = libts.a
+DYNAMIC = libts.so
+CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
+LDFLAGS = -shared -Wl
+
+## Python
+PYTHON_VERSION ?= 3
 
 SRCS = TsParser.cc GetBits.cc TsDemuxer.cc TsStatistics.cc
 HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
@@ -50,7 +58,7 @@ help:
 	@echo '  clean                 - deletes build content.'
 	@echo
 
-all: $(BUILDDIR) $(BUILDDIR)/tsparser
+all: $(BUILDDIR) $(BUILDDIR)/tsparser $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
@@ -68,6 +76,10 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
 $(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
+
+$(BUILDDIR)/$(DYNAMIC): $(OBJS)
+	@echo "[Link (Dynamic)]"
+	$(CXX) ${LDFLAGS} -o $@ $^
 
 lint: flake
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
