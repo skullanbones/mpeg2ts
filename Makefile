@@ -33,6 +33,23 @@ docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$
 
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang unit-test component_tests
 
+help:
+	@echo
+	@echo '  all                   - build and create tsparser main executable.'
+	@echo '  lint                  - run clang formating for c++ and flake8 for python'
+	@echo '  flake                 - run flake8 on python files.'
+	@echo '  clang                 - run clang-tidy on c++ files.'
+	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
+	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
+	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
+	@echo '  test                  - run all tests unit & component.'
+	@echo '  unit-test             - run all unit tests.'
+	@echo '  gtest                 - execute gtest executable with unit test suite.'
+	@echo '  env                   - build python virtual environment for pytest.'
+	@echo '  component_tests       - run all component tests.'
+	@echo '  clean                 - deletes build content.'
+	@echo
+
 all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
 $(BUILDDIR):
