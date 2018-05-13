@@ -25,6 +25,7 @@ STATIC = libts.a
 DYNAMIC = libts.so
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
 LDFLAGS = -shared
+export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
 
 ## Python
 PYTHON_VERSION ?= 3
