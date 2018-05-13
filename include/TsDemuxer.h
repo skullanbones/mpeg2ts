@@ -15,9 +15,9 @@
 class TsDemuxer
 {
 public:
-    typedef std::function<void(PsiTable* table)> PsiCallBackFnc;
-    typedef std::function<void(const PesPacket& table, uint16_t pid)> PesCallBackFnc;
-    typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo)> TsCallBackFnc;
+    typedef std::function<void(PsiTable* table, void* hdl)> PsiCallBackFnc;
+    typedef std::function<void(const PesPacket& table, uint16_t pid, void* hdl)> PesCallBackFnc;
+    typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
     TsDemuxer() = default;
 
@@ -31,22 +31,25 @@ public:
      * Outputs to callback function when found a PSI table with PID.
      * @param pid The PID to filter PSI tables.
      * @param cb Returns a complete PSI table to this callback function.
+     * @param hdl Custom handler
      */
-    void addPsiPid(int pid, PsiCallBackFnc cb);
+    void addPsiPid(int pid, PsiCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete PES packet with PID.
      * @param pid The PID to filter PES packets.
      * @param cb  Callback when found a complete PES packet.
+     * @param hdl Custom handler
      */
-    void addPesPid(int pid, PesCallBackFnc cb);
+    void addPesPid(int pid, PesCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete TS packet filtered on PID.
      * @param pid The PID to filter TS packets.
      * @param cb Callback when found a TS packet.
+     * @param hdl Custom handler
      */
-    void addTsPid(int pid, TsCallBackFnc cb);
+    void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
 
     /*!
     * Returns statistics on parsed transport stream packets.
@@ -61,6 +64,7 @@ protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
     std::map<int, PesCallBackFnc> mPesCallbackMap;
     std::map<int, TsCallBackFnc> mTsCallbackMap;
+    std::map<int, void*> mHandlers;
 
 private:
     TsParser mParser;

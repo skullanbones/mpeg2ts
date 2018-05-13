@@ -24,7 +24,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {
-        mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo);
+        mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo, mHandlers[tsPacketInfo.pid]);
     }
 
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
@@ -37,12 +37,12 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         if (table_id == PSI_TABLE_ID_PAT)
         {
             PatTable pat = mParser.parsePatPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pat);
+            mPsiCallbackMap[tsPacketInfo.pid](&pat, mHandlers[tsPacketInfo.pid]);
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
             PmtTable pmt = mParser.parsePmtPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pmt);
+            mPsiCallbackMap[tsPacketInfo.pid](&pmt, mHandlers[tsPacketInfo.pid]);
         }
     }
 
@@ -51,24 +51,27 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         PesPacket pes;
         if (mParser.collectPes(tsPacket, tsPacketInfo, pes))
         {
-            mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid);
+            mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 
     ++mParser.mTsPacketCounter;
 }
 
-void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb)
+void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb, void* hdl)
 {
     mPsiCallbackMap[pid] = cb;
+    mHandlers[pid] = hdl;
 }
 
-void TsDemuxer::addPesPid(int pid, PesCallBackFnc cb)
+void TsDemuxer::addPesPid(int pid, PesCallBackFnc cb, void* hdl)
 {
     mPesCallbackMap[pid] = cb;
+    mHandlers[pid] = hdl;
 }
 
-void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb)
+void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
 {
     mTsCallbackMap[pid] = cb;
+    mHandlers[pid] = hdl;
 }

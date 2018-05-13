@@ -271,7 +271,7 @@ int main(int argc, char** argv)
     {
         for (auto pid : g_Options["write"])
         {
-            g_tsDemux.addTsPid(pid, std::bind(&TsCallback, std::placeholders::_1, std::placeholders::_2));
+            g_tsDemux.addTsPid(pid, std::bind(&TsCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
     }
     
@@ -280,7 +280,7 @@ int main(int argc, char** argv)
     // Specify input stream
     setvbuf(stdout, NULL, _IOLBF, 0);
 
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1));
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
     for (count = 0;; ++count)
     {
@@ -319,12 +319,12 @@ int main(int argc, char** argv)
         if (g_PMTPID != 0u)
         {
             // std::cout << "Single Program Transport Stream PID: " << g_PMTPID << std::endl;
-            g_tsDemux.addPsiPid(g_PMTPID, std::bind(&PMTCallback, std::placeholders::_1));
+            g_tsDemux.addPsiPid(g_PMTPID, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
         }
 
         for (auto pid : g_ESPIDS)
         {
-            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2));
+            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
         g_ESPIDS.clear();
 
