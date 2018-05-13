@@ -24,7 +24,7 @@ CXX = g++
 STATIC = libts.a
 DYNAMIC = libts.so
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
-LDFLAGS = -shared -Wl
+LDFLAGS = -shared
 
 ## Python
 PYTHON_VERSION ?= 3
