@@ -73,7 +73,7 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
 	@echo [Compile] $<
 	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
 
-$(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
+$(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
@@ -137,6 +137,7 @@ clean:
 	rm -f $(BUILDDIR)/tsparser
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
+	rm -f $(BUILDDIR)/$(DYNAMIC)
 	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
