@@ -25,7 +25,8 @@ STATIC = libts.a
 DYNAMIC = libts.so
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
 LDFLAGS = -shared
-export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
+# Only needed if linkage to libts.so
+#export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
 
 ## Python
 PYTHON_VERSION ?= 3
@@ -56,10 +57,11 @@ help:
 	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component_tests       - run all component tests.'
+	@echo '  so                    - make shared object as dynamic linkage library.'
 	@echo '  clean                 - deletes build content.'
 	@echo
 
-all: $(BUILDDIR) $(BUILDDIR)/tsparser $(BUILDDIR)/$(DYNAMIC)
+all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
@@ -77,6 +79,8 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
+
+so: $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
