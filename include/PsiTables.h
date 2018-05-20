@@ -6,14 +6,6 @@
 /*!
  * @brief Base class for all tables
  */
-/* Taken from ISO-IEC 13818-1 Table 2-30 – Program association section */
-struct Program
-{
-    uint16_t program_number;
-    // uint16_t network_PID; only for program_number=0
-    uint16_t program_map_PID;
-};
-
 
 class PsiTable
 {

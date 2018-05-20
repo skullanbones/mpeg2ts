@@ -114,6 +114,18 @@ struct TsAdaptationFieldExtensionHeader
     uint8_t ltw_flag : 1;
 };
 
+/*! @brief Program streams
+ *
+ * Table 2-30 – Program association section *
+ *
+ */
+struct Program
+{
+    uint16_t program_number;
+    // uint16_t network_PID; only for program_number=0
+    uint16_t program_map_PID;
+};
+
 
 /*! @brief Table_id assignment values
  *
