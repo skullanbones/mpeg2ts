@@ -6,8 +6,14 @@ SRCS = TsParser_Tests.cc TsStatistics_Tests.cc
 
 .PHONY: all clean
 
-all:
+all: gtests
+
+gtests:
 	$(CXX) $(CXXFLAGS) $(SRCS) $(INC) -lgtest -lpthread -L$(PROJ_ROOT)/build -lts -o $(COMPONENT_NAME)
+
+unit-tests: gtests
+	./$(COMPONENT_NAME)
+
 
 clean:
 	rm -f $(COMPONENT_NAME)
