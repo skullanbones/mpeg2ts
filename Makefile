@@ -16,8 +16,9 @@ INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
 ## Docker
-DOCKER_IMAGE_VER ?= v1
+DOCKER_IMAGE_VER ?= v2
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
+DOCKER_USER_ID ?= $(USER)
 
 ## Compiler
 CXX = g++
@@ -39,7 +40,12 @@ OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
 $(info $$OBJS is $(OBJS))
 
-docker_command = docker run -e CXX="$(CXX)" -e CXXFLAGS="$(CXXFLAGS)" --rm -v $$(pwd):/tmp/workspace -w /tmp/workspace $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) make $1
+docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
+					--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
+ 					--rm -v $$(pwd):/tmp/workspace \
+ 					--workdir /tmp/workspace \
+ 					$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
+ 					make $1
 
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang unit-test component_tests
 
