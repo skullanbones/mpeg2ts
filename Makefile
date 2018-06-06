@@ -129,6 +129,7 @@ unit-test: $(BUILDDIR)/$(STATIC)
 	@echo "[Running unit tests..]"
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
+	./tests/gtests
 
 gtests:
 	$(MAKE) -C tests

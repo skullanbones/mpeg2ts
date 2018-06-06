@@ -8,7 +8,6 @@ SRCS = TsParser_Tests.cc TsStatistics_Tests.cc
 
 all:
 	$(CXX) $(CXXFLAGS) $(SRCS) $(INC) -lgtest -lpthread -L$(PROJ_ROOT)/build -lts -o $(COMPONENT_NAME)
-	./$(COMPONENT_NAME)
 
 clean:
 	rm -f $(COMPONENT_NAME)
