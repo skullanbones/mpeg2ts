@@ -131,9 +131,12 @@ build-unit-tests: $(BUILDDIR)/$(STATIC)
 
 unit-tests: build-unit-tests
 	@echo "[Running unit tests..]"
-	./tests/gtests
+	$(MAKE) -C tests unit-tests
 
 gtests:
+	$(MAKE) -C tests gtests
+
+run-gtests:
 	$(MAKE) -C tests unit-tests
 
 ### component tests
