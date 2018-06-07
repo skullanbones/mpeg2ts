@@ -10,4 +10,4 @@ jobs:
           command: make all
       - run:
           name: Test
-          command: make gtests
+          command: make run-gtests

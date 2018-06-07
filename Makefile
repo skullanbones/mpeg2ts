@@ -121,17 +121,23 @@ docker-bash:
 
 ### all tests
 
-test: unit-test component_tests
+test: unit-tests component_tests
 
 ### unit tests
 
-unit-test: $(BUILDDIR)/$(STATIC)
-	@echo "[Running unit tests..]"
+build-unit-tests: $(BUILDDIR)/$(STATIC)
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
+unit-tests: build-unit-tests
+	@echo "[Running unit tests..]"
+	$(MAKE) -C tests unit-tests
+
 gtests:
-	$(MAKE) -C tests
+	$(MAKE) -C tests gtests
+
+run-gtests:
+	$(MAKE) -C tests unit-tests
 
 ### component tests
 
