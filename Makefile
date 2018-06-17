@@ -32,14 +32,25 @@ LDFLAGS = -shared
 ## Python
 PYTHON_VERSION ?= 3
 
-SRCS = TsParser.cc GetBits.cc TsDemuxer.cc TsStatistics.cc
-HDRS = include/GetBits.h include/GetBits.hh include/TsDemuxer.h \
-		include/TsPacketInfo.h include/TsParser.h include/TsStandards.h \
+## Sources
+SRCS = 	TsParser.cc \
+		GetBits.cc \
+		TsDemuxer.cc \
+		TsStatistics.cc
+
+HDRS = 	include/GetBits.h \
+		include/GetBits.hh \
+		include/TsDemuxer.h \
+		include/TsPacketInfo.h \
+		include/TsParser.h \
+		include/TsStandards.h \
 		include/TsStatistics.h
+
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
 $(info $$OBJS is $(OBJS))
 
+## Commands
 docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
 					--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
  					--rm -v $$(pwd):/tmp/workspace \
@@ -58,8 +69,8 @@ help:
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
 	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
-	@echo '  test                  - run all tests unit & component.'
-	@echo '  unit-test             - run all unit tests.'
+	@echo '  tests                 - run all tests unit & component.'
+	@echo '  unit-tests            - run all unit tests.'
 	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component_tests       - run all component tests.'
@@ -121,7 +132,7 @@ docker-bash:
 
 ### all tests
 
-test: unit-tests component_tests
+tests: unit-tests component_tests
 
 ### unit tests
 
