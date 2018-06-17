@@ -1,5 +1,5 @@
-
 #pragma once
+
 #include <cstdint>
 #include <string>
 
@@ -17,7 +17,19 @@ public:
      */
     uint64_t getBits(uint8_t requestedBits);
 
+    /*!
+     * Resets bit reader to start over reading from a buffer with
+     * start index and buffer size as parameters settings.
+     * @param srcBytes The buffer to read from
+     * @param srcSize The buffer size to read from
+     * @param inx The start byte offset to start read from
+     */
     void resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx = 0);
+
+    /*!
+     * Skip amount of bits for next bit read out
+     */
+    void skipBits(uint8_t skipBits);
 
     /*!
      * Return offset to current byte
