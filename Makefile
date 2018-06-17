@@ -39,7 +39,6 @@ SRCS = 	TsParser.cc \
 		TsStatistics.cc
 
 HDRS = 	include/GetBits.h \
-		include/GetBits.hh \
 		include/TsDemuxer.h \
 		include/TsPacketInfo.h \
 		include/TsParser.h \
