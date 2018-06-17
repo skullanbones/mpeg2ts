@@ -18,7 +18,10 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         throw GetBitsException("null input data");
     }
 
-    // TODO add exception for requestedBits > 64
+    if (requestedBits > 64)
+    {
+        throw GetBitsException("Cannot parse more than 64 individual bits at a time.");
+    }
 
     while (requestedBits > 0u)
     {
@@ -68,7 +71,12 @@ void GetBits::skipBits(uint8_t skipBits)
     {
         mNumStoredBits = 0;
         mBitStore = 0;
-        mSrcInx += 8; // TODO check out of bounds...
+        mSrcInx += 8;
+
+        if (mSrcInx >= mSize)
+        {
+            throw GetBitsException("Out of bound read");
+        }
     }
 
     getBits(rem);

@@ -49,5 +49,10 @@ struct GetBitsException
     GetBitsException(const std::string msg);
     virtual ~GetBitsException() = default;
 
+    std::string what()
+    {
+        return mMsg;
+    }
+
     const std::string mMsg;
 };
