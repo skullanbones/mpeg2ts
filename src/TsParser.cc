@@ -301,7 +301,7 @@ PmtTable TsParser::parsePmtPacket()
     pmt.PCR_PID = getBits(13);
     getBits(4); // reserved
     pmt.program_info_length = getBits(12);
-    getBits(8 * pmt.program_info_length); // skip descriptors for now
+    skipBits(8 * pmt.program_info_length); // skip descriptors for now
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
 
@@ -314,7 +314,7 @@ PmtTable TsParser::parsePmtPacket()
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved
         hdr.ES_info_length = getBits(12);
-        getBits(hdr.ES_info_length * 8); // Skip for now
+        skipBits(hdr.ES_info_length * 8); // Skip for now
         readSize += hdr.ES_info_length + PMT_STREAM_TYPE_LENGTH;
         pmt.streams.push_back(hdr);
     }

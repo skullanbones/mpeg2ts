@@ -18,6 +18,11 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         throw GetBitsException("null input data");
     }
 
+    if (requestedBits > 64)
+    {
+        throw GetBitsException("Cannot parse more than 64 individual bits at a time.");
+    }
+
     while (requestedBits > 0u)
     {
         if (mNumStoredBits == 0u)
@@ -36,7 +41,7 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
 
         requestedBits -= bitsToFromStore;
         mNumStoredBits -= bitsToFromStore;
-        mBitStore <<= bitsToFromStore;
+        mBitStore = mBitStore << bitsToFromStore;
     }
 
     return ret;
@@ -49,6 +54,32 @@ void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
     mSrcInx = inx;
     mSize = srcSize;
     mSrcBytes = srcBytes;
+}
+
+void GetBits::skipBits(uint8_t skipBits)
+{
+    if(skipBits <= 64)
+    {
+        getBits(skipBits);
+        return;
+    }
+
+    int n = skipBits / 64;
+    int rem = skipBits % 64;
+
+    for (int i = 0; i < n; i++)
+    {
+        mNumStoredBits = 0;
+        mBitStore = 0;
+        mSrcInx += 8;
+
+        if (mSrcInx >= mSize)
+        {
+            throw GetBitsException("Out of bound read");
+        }
+    }
+
+    getBits(rem);
 }
 
 GetBitsException::GetBitsException(const std::string msg)
