@@ -101,6 +101,8 @@ def asset_h264_dolby_atmos(request, downloader):
     name, streams = request.param
     url = BASE_URL + "/" + name
     status = downloader.download_file(url, name)
-    # TODO do something with status
+    print(status)
+    if not status:
+        print("Error downloading asset..")
     return Asset(downloader.get_path(name), streams)
 
