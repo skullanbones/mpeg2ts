@@ -5,6 +5,10 @@ import pytest
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
 
 class Downloader():
+    """
+    Download with curl file over HTTP for any chunk_size.
+    Settings include chunk_size, timeout and download folder.
+    """
     def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir="downloaded_files"):
         self.timeout = timeout
         self.chunk_size = chunk_size
@@ -30,12 +34,21 @@ class Downloader():
 
 @pytest.fixture(scope='session')
 def downloader():
+    """
+    Fixture for downloading files over HTTP
+    :return:
+    """
     downloader_dir = 'downloaded_files/'
     yield Downloader(download_dir=downloader_dir)
 
 
 @pytest.fixture(scope='session')
 def asset_list(downloader):
+    """
+    Returns the list of assets stored in AWS
+    :param downloader:
+    :return: A list with assets to use for testing
+    """
     downloader.download_file(BASE_URL, "assets.xml")
     assets = []
     with open('downloaded_files/assets.xml') as fd:
@@ -55,8 +68,12 @@ def asset_list(downloader):
       {"Pid": 4353, "MediaType": "audio"}])
 ])
 def asset_h264_dolby_atmos(request, downloader):
-    """Provides some reasonable test assets to use for most tests that require
-    ts input."""
+    """
+    Asset for dolby atmos
+    :param request:
+    :param downloader:
+    :return: Returns the asset
+    """
     asset, tracks = request.param
     url = BASE_URL + "/" + asset
     #return Asset(downloader.download_file(url, asset), tracks)
