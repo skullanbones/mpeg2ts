@@ -259,7 +259,7 @@ int main(int argc, char** argv)
             }
             break;
         case 'i': {
-            std::cout << "Got file input: " << std::string(optarg);
+            std::cout << "Got file input: " << std::string(optarg) << std::endl;
             g_InputFile = std::string(optarg);
             break;
         }

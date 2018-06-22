@@ -1,11 +1,15 @@
 import pytest
+import logging
+
+logging.basicConfig(filename='cmdline_test.log',level=logging.DEBUG)
+log = logging.getLogger("cmdline_test")
 
 @pytest.fixture
 def parser():
     """Get access to the TsParser binary to allow running it for
     testing or to get the command to start it."""
     from .tsparser import TsParser
-    return TsParser()
+    return TsParser(log)
 
 def test_help_message(parser):
     """Verify that help option is displayed"""
@@ -38,3 +42,16 @@ def test_asset(asset_h264_dolby_atmos):
 
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
+
+def test_parse_asset(parser, asset_h264_dolby_atmos):
+    """Test we can parse the first asset"""
+    asset = asset_h264_dolby_atmos.get_asset()
+    assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
+    arg = '--input %s' % asset
+    log.debug("use arg: %s" % arg)
+    out = parser.start(extra_args=['--input', asset, '--pid', 0])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "programs.size(): 2" in out[1]
+    assert "program_map_PID: 31" in out[1]
+    assert "program_map_PID: 256" in out[1]
