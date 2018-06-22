@@ -11,7 +11,7 @@ def test_help_message(parser):
     """Verify that help option is displayed"""
     out = parser.start(extra_args=['--help'])
     assert "Ts-lib simple command-line:" in out[1], "No help text in output"
-    assert "USAGE: ./tsparser [-h] [-w PID] [-i PID] [-l log-level]" in \
+    assert "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" in \
            out[1], "Wrong help output"
 
 def test_asset_list(asset_list):

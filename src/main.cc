@@ -36,13 +36,15 @@ enum class OptionWriteMode
 
 std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
+std::string g_InputFile;
 
 static const char* optString = "m:w:i:l:h?";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "wrmode", 1, nullptr, 'm' },
-                             { "info", 1, nullptr, 'i' },
+                             { "pid", 1, nullptr, 'p' },
                              { "level", 1, nullptr, 'l' },
+                             { "input", 1, nullptr, 'i' },
                              { "help", 0, nullptr, 'h' },
                              { nullptr, 0, nullptr, 0 } };
 
@@ -55,13 +57,14 @@ void display_usage()
 {
     std::cout << "Ts-lib simple command-line:" << std::endl;
 
-    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-i PID] [-l log-level]" << std::endl;
+    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" << std::endl;
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
-                 "        -i [ --info PID]     Print PSI tables info with PID\n"
+                 "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
-                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]"
+                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
+                 "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
 
@@ -69,7 +72,7 @@ void display_statistics(TsDemuxer demuxer)
 {
     for (auto& pidStat : demuxer.getTsStatistics().mPidStatistics)
     {
-        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pidStat.first) == 0)
+        if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pidStat.first) == 0)
         {
             continue;
         }
@@ -104,7 +107,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
     auto pid = tsPacketInfo.pid;
     std::cout << "demuxed TS packet \n" << tsPacketInfo;
-    if (hasPid("info", pid))
+    if (hasPid("pid", pid))
     {
         std::cout << tsPacketInfo << "\n";
     }
@@ -131,7 +134,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 void PATCallback(PsiTable* table)
 {
     auto pat = dynamic_cast<PatTable*>(table);
-    if (hasPid("info", 0))
+    if (hasPid("pid", 0))
     {
         std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
@@ -144,7 +147,7 @@ void PATCallback(PsiTable* table)
 void PMTCallback(PsiTable* table)
 {
     auto pmt = dynamic_cast<PmtTable*>(table);
-    if (hasPid("info", g_PMTPID))
+    if (hasPid("pid", g_PMTPID))
     {
         std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
@@ -152,7 +155,7 @@ void PMTCallback(PsiTable* table)
 
     for (auto& stream : pmt->streams)
     {
-        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), stream.elementary_PID) ||
+        if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), stream.elementary_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
         {
             g_ESPIDS.push_back(stream.elementary_PID);
@@ -160,7 +163,7 @@ void PMTCallback(PsiTable* table)
     }
     if (pmt->PCR_PID != 0)
     {
-        if (std::count(g_Options["info"].begin(), g_Options["info"].end(), pmt->PCR_PID) ||
+        if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
             g_ESPIDS.push_back(pmt->PCR_PID);
@@ -171,7 +174,7 @@ void PMTCallback(PsiTable* table)
 void PESCallback(const PesPacket& pes, uint16_t pid)
 {
 
-    if (hasPid("info", pid))
+    if (hasPid("pid", pid))
     {
         std::cout << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
                   << " (" << pid << ")\n";
@@ -212,7 +215,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
 int main(int argc, char** argv)
 {
-    std::cout << "Staring parser of stdout" << std::endl;
+    std::cout << "Staring parser of file" << std::endl;
 
     int longIndex;
 
@@ -228,7 +231,7 @@ int main(int argc, char** argv)
             break;
         }
         case 'w':
-        case 'i':
+        case 'p':
         case 'l':
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
@@ -255,6 +258,11 @@ int main(int argc, char** argv)
                 g_WriteMode.push_back(writeMode);
             }
             break;
+        case 'i': {
+            std::cout << "Got file input: " << std::string(optarg);
+            g_InputFile = std::string(optarg);
+            break;
+        }
         default:
             /* You won't actually get here. */
             break;
@@ -277,8 +285,9 @@ int main(int argc, char** argv)
     
     uint64_t count;
 
-    // Specify input stream
-    setvbuf(stdout, NULL, _IOLBF, 0);
+    // FILE
+    FILE *fptr;
+    fptr = fopen(g_InputFile.c_str(), "rb");
 
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
@@ -290,10 +299,10 @@ int main(int argc, char** argv)
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
 
-        b = getchar();
+        b = getc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
-            b = getchar();
+            b = getc(fptr);
             if (b == EOF)
             {
                 std::cout << "End Of File..." << std::endl;
@@ -312,7 +321,7 @@ int main(int argc, char** argv)
 
         // Read TS Packet from stdin
         size_t res =
-        fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
         (void)res;
 
         g_tsDemux.demux(packet);
