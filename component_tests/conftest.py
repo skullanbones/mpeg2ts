@@ -1,6 +1,7 @@
 import xmltodict
 import subprocess
 import pytest
+import os.path
 
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
 
@@ -14,13 +15,24 @@ class Downloader():
         self.chunk_size = chunk_size
         self.download_dir = download_dir
 
-    def download_file(self, url, file_name = "file_name"):
+    def file_exist(self, file_name):
+        path = self.download_dir + "/" + file_name
+        return os.path.isfile(path)
+
+    def download_file(self, url, file_name):
         print("Downloading asset %s" % url)
         #threading.Thread(target=self._wget_dl, args=(url, destination, try_number, time_out, log_file)).start()
-        if self.curl_dl(url, file_name) == 0:
-            return True
+        if not self.file_exist(file_name):
+            if self.curl_dl(url, file_name) == 0:
+                return True
+            else:
+                return False
         else:
-            return False
+            return True
+
+    def get_path(self, file_name):
+        abspath = os.path.abspath("./")
+        return abspath + "/" + self.download_dir + "/" + file_name
 
     def curl_dl(self, url, file_name):
         # TODO Check curl command exists
@@ -32,13 +44,25 @@ class Downloader():
             print(e)
         return download_state
 
+class Asset(object):
+    def __init__(self, path, elementary_streams):
+        self.path = path
+        self.streams = elementary_streams
+
+    def get_asset(self):
+        return self.path
+
+    def get_streams(self):
+        return self.streams
+
+
 @pytest.fixture(scope='session')
 def downloader():
     """
     Fixture for downloading files over HTTP
     :return:
     """
-    downloader_dir = 'downloaded_files/'
+    downloader_dir = 'downloaded_files'
     yield Downloader(download_dir=downloader_dir)
 
 
@@ -63,9 +87,9 @@ def asset_list(downloader):
 
 @pytest.fixture(scope='session', params=[
     ('Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts',
-     [{"Pid": 4113, "MediaType": "video"},
-      {"Pid": 4352, "MediaType": "audio"},
-      {"Pid": 4353, "MediaType": "audio"}])
+     [{"Pid": 4113, "StreamType": "video"},
+      {"Pid": 4352, "StreamType": "audio"},
+      {"Pid": 4353, "StreamType": "audio"}])
 ])
 def asset_h264_dolby_atmos(request, downloader):
     """
@@ -74,7 +98,9 @@ def asset_h264_dolby_atmos(request, downloader):
     :param downloader:
     :return: Returns the asset
     """
-    asset, tracks = request.param
-    url = BASE_URL + "/" + asset
-    #return Asset(downloader.download_file(url, asset), tracks)
+    name, streams = request.param
+    url = BASE_URL + "/" + name
+    status = downloader.download_file(url, name)
+    # TODO do something with status
+    return Asset(downloader.get_path(name), streams)
 
