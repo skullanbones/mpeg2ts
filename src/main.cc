@@ -36,6 +36,7 @@ enum class OptionWriteMode
 
 std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
+std::string g_InputFile;
 
 static const char* optString = "m:w:i:l:h?";
 
@@ -43,6 +44,7 @@ struct option longOpts[] = { { "write", 1, nullptr, 'w' },
                              { "wrmode", 1, nullptr, 'm' },
                              { "pid", 1, nullptr, 'p' },
                              { "level", 1, nullptr, 'l' },
+                             { "input", 1, nullptr, 'i' },
                              { "help", 0, nullptr, 'h' },
                              { nullptr, 0, nullptr, 0 } };
 
@@ -55,13 +57,14 @@ void display_usage()
 {
     std::cout << "Ts-lib simple command-line:" << std::endl;
 
-    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level]" << std::endl;
+    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" << std::endl;
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
-                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]"
+                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
+                 "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
 
@@ -212,7 +215,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
 int main(int argc, char** argv)
 {
-    std::cout << "Staring parser of stdout" << std::endl;
+    std::cout << "Staring parser of file" << std::endl;
 
     int longIndex;
 
@@ -255,6 +258,11 @@ int main(int argc, char** argv)
                 g_WriteMode.push_back(writeMode);
             }
             break;
+        case 'i': {
+            std::cout << "Got file input: " << std::string(optarg);
+            g_InputFile = std::string(optarg);
+            break;
+        }
         default:
             /* You won't actually get here. */
             break;
@@ -277,8 +285,9 @@ int main(int argc, char** argv)
     
     uint64_t count;
 
-    // Specify input stream
-    setvbuf(stdout, NULL, _IOLBF, 0);
+    // FILE
+    FILE *fptr;
+    fptr = fopen(g_InputFile.c_str(), "rb");
 
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
@@ -290,10 +299,10 @@ int main(int argc, char** argv)
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
 
-        b = getchar();
+        b = getc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
-            b = getchar();
+            b = getc(fptr);
             if (b == EOF)
             {
                 std::cout << "End Of File..." << std::endl;
@@ -312,7 +321,7 @@ int main(int argc, char** argv)
 
         // Read TS Packet from stdin
         size_t res =
-        fread(packet + 1, 1, TS_PACKET_SIZE - 1, stdin); // Copy only packet-size - sync byte
+        fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
         (void)res;
 
         g_tsDemux.demux(packet);
