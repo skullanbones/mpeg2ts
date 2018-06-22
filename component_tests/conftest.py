@@ -1,5 +1,6 @@
 import xmltodict
 import subprocess
+import pytest
 
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
 
@@ -17,7 +18,6 @@ class Downloader():
         else:
             return False
 
-
     def curl_dl(self, url, file_name):
         # TODO Check curl command exists
         output = self.download_dir + "/" + file_name
@@ -28,21 +28,36 @@ class Downloader():
             print(e)
         return download_state
 
+@pytest.fixture(scope='session')
+def downloader():
+    downloader_dir = 'downloaded_files/'
+    yield Downloader(download_dir=downloader_dir)
 
-dwnl = Downloader()
 
-# 1. Download xml
-dwnl.download_file(BASE_URL, "assets.xml")
+@pytest.fixture(scope='session')
+def asset_list(downloader):
+    downloader.download_file(BASE_URL, "assets.xml")
+    assets = []
+    with open('downloaded_files/assets.xml') as fd:
+        data = xmltodict.parse(fd.read())
+        contents = data['ListBucketResult']['Contents']
 
-# 2. Parse asset list
-assets = []
-with open('downloaded_files/assets.xml') as fd:
-    data = xmltodict.parse(fd.read())
-    contents = data['ListBucketResult']['Contents']
+        for asset in contents:
+            assets.append(asset['Key'])
+        print(assets)
+    return assets
 
-    for asset in contents:
-        assets.append(asset['Key'])
-print(assets)
 
-# 3. Download assets
-dwnl.download_file(BASE_URL + "/" + assets[0], "asset0.m2ts")
+@pytest.fixture(scope='session', params=[
+    ('Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts',
+     [{"Pid": 4113, "MediaType": "video"},
+      {"Pid": 4352, "MediaType": "audio"},
+      {"Pid": 4353, "MediaType": "audio"}])
+])
+def asset_h264_dolby_atmos(request, downloader):
+    """Provides some reasonable test assets to use for most tests that require
+    ts input."""
+    asset, tracks = request.param
+    url = BASE_URL + "/" + asset
+    #return Asset(downloader.download_file(url, asset), tracks)
+
