@@ -15,6 +15,11 @@ BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
 
+## Machine
+CORES ?= $(shell nproc)
+MAKEFLAGS+="-j $(CORES)"
+$(info MAKEFLAGS= $(MAKEFLAGS))
+
 ## Docker
 DOCKER_IMAGE_VER ?= v2
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
