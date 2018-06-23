@@ -23,11 +23,11 @@
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
-uint32_t g_PMTPID = 0; // Single Program PID
+std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 PatTable g_prevPat;
-PmtTable g_prevPmt;
+std::list<PmtTable> g_prevPmts;
 
 enum class OptionWriteMode
 {
@@ -53,6 +53,26 @@ struct option longOpts[] = { { "write", 1, nullptr, 'w' },
 bool hasPid(std::string param, uint32_t pid)
 {
     return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+}
+
+bool hasPids(std::string param, std::vector<uint16_t> pids)
+{
+    bool ret;
+    for (auto pid : pids)
+    {
+        ret = std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+    }
+    return ret;
+}
+
+bool hasPmt(const PmtTable& pmt)
+{
+    for(auto prevPmt : g_prevPmts) {
+        if (pmt == prevPmt) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void display_usage()
@@ -160,13 +180,14 @@ void PATCallback(PsiTable* table)
     else if (numPrograms == 1) // SPTS
     {
         std::cout << "Found Single Program Transport Stream (SPTS)." << std::endl;
-        g_PMTPID = pat->programs[0].program_map_PID;
+        g_PMTPIDS.push_back(pat->programs[0].program_map_PID);
     }
     else if (numPrograms >= 1) // MPTS
     {
         std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
-        // TODO
-        exit(EXIT_SUCCESS);
+        for(auto program : pat->programs) {
+            g_PMTPIDS.push_back(program.program_map_PID);
+        }
     }
 
 
@@ -177,14 +198,14 @@ void PMTCallback(PsiTable* table)
 {
     auto pmt = dynamic_cast<PmtTable*>(table);
 
-    // Do nothing if same PAT
-    if (g_prevPmt == *pmt)
+    // Do nothing if same PMT
+    if (hasPmt(*pmt))
     {
         return;
     }
-    g_prevPmt = *pmt;
+    g_prevPmts.push_back(*pmt);
 
-    if (hasPid("pid", g_PMTPID))
+    if (hasPids("pid", g_PMTPIDS))
     {
         std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pmt << std::endl;
@@ -362,10 +383,12 @@ int main(int argc, char** argv)
         (void)res;
 
         g_tsDemux.demux(packet);
-        if (g_PMTPID != 0u)
+        if (g_PMTPIDS.size() != 0u)
         {
-            // std::cout << "Single Program Transport Stream PID: " << g_PMTPID << std::endl;
-            g_tsDemux.addPsiPid(g_PMTPID, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
+            for (auto pid : g_PMTPIDS)
+            {
+                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
+            }
         }
 
         for (auto pid : g_ESPIDS)
