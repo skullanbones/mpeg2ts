@@ -10,6 +10,18 @@
 class PsiTable
 {
 public:
+    PsiTable() {
+        table_id = 0;
+        section_syntax_indicator = false;
+        section_length = 0;
+        transport_stream_id = 0;
+        version_number = 0;
+        current_next_indicator = false;
+        section_number = 0;
+        last_section_number = 0;
+        CRC_32 = 0;
+    }
+
     virtual ~PsiTable() = default;
 
     uint8_t table_id;
@@ -84,7 +96,10 @@ public:
     /// @brief Comparison operator for comparing 2 PatTables
     bool operator==(const PatTable &rhs) const
     {
-        // TODO check PsiTable base class...
+        bool psi = PsiTable::operator==(rhs);
+        if (psi == false) {
+            return false;
+        }
 
         // 1. First check CRC 32
         if (this->CRC_32 != rhs.CRC_32)
