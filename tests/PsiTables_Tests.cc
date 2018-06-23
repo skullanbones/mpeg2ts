@@ -169,3 +169,89 @@ TEST(PsiTablesTests, PatTableTestComparisonOperatorPrograms)
 
     EXPECT_FALSE(pat1 == pat2);
 }
+
+TEST(PsiTablesTests, PmtTableTestComparisonOperatorPCR_PID)
+{
+    PmtTable pmt1;
+    PmtTable pmt2;
+
+    StreamTypeHeader stream;
+    stream.stream_type = 1;
+    stream.elementary_PID = 258;
+    stream.ES_info_length = 0;
+
+    pmt1.streams.push_back(stream);
+    pmt2.streams.push_back(stream);
+
+    pmt1.PCR_PID = 0;
+    pmt1.program_info_length = 0;
+    pmt2.PCR_PID = 0;
+    pmt2.program_info_length = 0;
+
+    EXPECT_TRUE(pmt1 == pmt2);
+
+    pmt1.PCR_PID = 1;
+    pmt2.PCR_PID = 0;
+
+    EXPECT_FALSE(pmt1 == pmt2);
+
+    pmt1.PCR_PID = 0;
+    pmt2.program_info_length = 1;
+    EXPECT_FALSE(pmt1 == pmt2);
+}
+
+TEST(PsiTablesTests, PmtTableTestComparisonOperatorNumStreams)
+{
+    PmtTable pmt1;
+    PmtTable pmt2;
+
+    pmt1.PCR_PID = 0;
+    pmt1.program_info_length = 0;
+    pmt2.PCR_PID = 0;
+    pmt2.program_info_length = 0;
+
+    StreamTypeHeader stream;
+    stream.stream_type = 1;
+    stream.elementary_PID = 258;
+    stream.ES_info_length = 0;
+
+    pmt1.streams.push_back(stream);
+    pmt2.streams.push_back(stream);
+
+    EXPECT_TRUE(pmt1 == pmt2);
+
+    StreamTypeHeader stream2;
+    stream.stream_type = 2;
+    stream.elementary_PID = 32;
+    stream.ES_info_length = 0;
+
+    pmt2.streams.push_back(stream2);
+
+    EXPECT_FALSE(pmt1 == pmt2);
+}
+
+TEST(PsiTablesTests, StreamTypeHeaderComparisonOperator)
+{
+    StreamTypeHeader hdr1;
+    StreamTypeHeader hdr2;
+
+    hdr1.stream_type = 0;
+    hdr1.elementary_PID = 0;
+    hdr1.ES_info_length = 0;
+
+    hdr2.stream_type = 0;
+    hdr2.elementary_PID = 0;
+    hdr2.ES_info_length = 0;
+
+    EXPECT_TRUE(hdr1 == hdr2);
+
+    hdr2.elementary_PID = 1;
+    EXPECT_FALSE(hdr1 == hdr2);
+
+    hdr2.elementary_PID = 0;
+    hdr2.ES_info_length = 1;
+    EXPECT_FALSE(hdr1 == hdr2);
+
+    hdr2.ES_info_length = 0;
+    EXPECT_TRUE(hdr1 == hdr2);
+}

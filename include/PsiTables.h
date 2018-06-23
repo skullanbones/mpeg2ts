@@ -75,7 +75,7 @@ class PatTable : public PsiTable
 {
 public:
     std::vector<Program> programs;
-    uint32_t CRC_32;
+    uint32_t CRC_32; // ALready exist in PsiTable, TODO remove!
 
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
@@ -137,6 +137,18 @@ struct StreamTypeHeader
     uint8_t stream_type;
     uint16_t elementary_PID;
     uint16_t ES_info_length;
+
+    bool operator==(const StreamTypeHeader &rhs) const
+    {
+        return stream_type   == rhs.stream_type &&
+                elementary_PID == rhs.elementary_PID &&
+                ES_info_length == rhs.ES_info_length;
+    }
+
+    bool operator!=(const StreamTypeHeader &rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 /*!
@@ -167,6 +179,56 @@ public:
         }
 
         return ss;
+    }
+
+    /// @brief Comparison operator for comparing 2 PmtTables
+    bool operator==(const PmtTable &rhs) const
+    {
+        bool psi = PsiTable::operator==(rhs);
+        if (psi == false) {
+            return false;
+        }
+
+        // 1. First check CRC 32
+        if (this->CRC_32 != rhs.CRC_32)
+        {
+            std::cout << "PmtTable CRC_32 unequal." << std::endl;
+            return false;
+        }
+        // 2. Secondly check PCR_PID
+        if (this->PCR_PID != rhs.PCR_PID)
+        {
+            std::cout << "PmtTable PCR_PID unequal." << std::endl;
+            return false;
+        }
+        // 3. Thirdly check program_info_length
+        if (this->program_info_length != rhs.program_info_length)
+        {
+            std::cout << "PmtTable program_info_length unequal." << std::endl;
+            return false;
+        }
+        // 4. check number of streams
+        if (this->streams.size() != rhs.streams.size())
+        {
+            std::cout << "PmtTable number of streams unequal." << std::endl;
+            return false;
+        }
+        // 5. check content of each streams
+        unsigned i = 0;
+        for (auto stream : streams)
+        {
+            if (stream != rhs.streams.at(i)) {
+                std::cout << "PmtTable stream content unequal for stream_type: " << stream.stream_type << std::endl;
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+
+    bool operator!=(const PmtTable &rhs) const
+    {
+        return !operator==(rhs);
     }
 };
 

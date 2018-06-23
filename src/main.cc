@@ -27,6 +27,7 @@ uint32_t g_PMTPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 PatTable g_prevPat;
+PmtTable g_prevPmt;
 
 enum class OptionWriteMode
 {
@@ -175,6 +176,14 @@ void PATCallback(PsiTable* table)
 void PMTCallback(PsiTable* table)
 {
     auto pmt = dynamic_cast<PmtTable*>(table);
+
+    // Do nothing if same PAT
+    if (g_prevPmt == *pmt)
+    {
+        return;
+    }
+    g_prevPmt = *pmt;
+
     if (hasPid("pid", g_PMTPID))
     {
         std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
