@@ -124,6 +124,18 @@ struct Program
     uint16_t program_number;
     // uint16_t network_PID; only for program_number=0
     uint16_t program_map_PID;
+
+    /// @brief Comparison operator for comparing 2 PatTables
+    bool operator==(const Program &rhs) const
+    {
+        return program_number   == rhs.program_number &&
+                program_map_PID == rhs.program_map_PID;
+    }
+
+    bool operator!=(const Program &rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 

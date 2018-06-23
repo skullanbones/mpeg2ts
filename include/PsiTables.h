@@ -4,7 +4,7 @@
 #include "TsStandards.h"
 
 /*!
- * @brief Base class for all tables
+ * @brief Base class for all PSI tables
  */
 
 class PsiTable
@@ -34,6 +34,25 @@ public:
         ss << "section_number: " << (int)rhs.section_number << std::endl;
         ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
         return ss;
+    }
+
+    /// @brief Comparison operator for comparing 2 PsiTables
+    bool operator==(const PsiTable &rhs) const
+    {
+        return CRC_32 == rhs.CRC_32 &&
+                table_id == rhs.table_id &&
+                section_syntax_indicator == rhs.section_syntax_indicator &&
+                section_length == rhs.section_length &&
+                transport_stream_id == rhs.transport_stream_id &&
+                version_number == rhs.version_number &&
+                current_next_indicator == rhs.current_next_indicator &&
+                section_number == rhs.section_number &&
+                last_section_number == rhs.last_section_number;
+    }
+
+    bool operator!=(const PsiTable &rhs) const
+    {
+        return !operator==(rhs);
     }
 };
 
@@ -65,12 +84,36 @@ public:
     /// @brief Comparison operator for comparing 2 PatTables
     bool operator==(const PatTable &rhs) const
     {
+        // TODO check PsiTable base class...
+
+        // 1. First check CRC 32
         if (this->CRC_32 != rhs.CRC_32)
         {
-            std::cout << "PatTable CRC_32 unequal.";
+            std::cout << "PatTable CRC_32 unequal." << std::endl;
             return false;
         }
+        // 2. Secondly check number of programs
+        if (this->programs.size() != rhs.programs.size())
+        {
+            std::cout << "PatTable number of programs unequal." << std::endl;
+            return false;
+        }
+        // 3. Thirdly check content of each programs
+        unsigned i = 0;
+        for (auto prg : programs)
+        {
+            if (prg != rhs.programs.at(i)) {
+                std::cout << "PatTable programs content unequal for program: " << prg.program_number << std::endl;
+                return false;
+            }
+            i++;
+        }
         return true;
+    }
+
+    bool operator!=(const PatTable &rhs) const
+    {
+        return !operator==(rhs);
     }
 };
 
