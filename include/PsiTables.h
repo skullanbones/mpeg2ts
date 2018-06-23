@@ -75,7 +75,6 @@ class PatTable : public PsiTable
 {
 public:
     std::vector<Program> programs;
-    uint32_t CRC_32; // ALready exist in PsiTable, TODO remove!
 
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
@@ -101,19 +100,13 @@ public:
             return false;
         }
 
-        // 1. First check CRC 32
-        if (this->CRC_32 != rhs.CRC_32)
-        {
-            std::cout << "PatTable CRC_32 unequal." << std::endl;
-            return false;
-        }
-        // 2. Secondly check number of programs
+        // 1. check number of programs
         if (this->programs.size() != rhs.programs.size())
         {
             std::cout << "PatTable number of programs unequal." << std::endl;
             return false;
         }
-        // 3. Thirdly check content of each programs
+        // 2. check content of each programs
         unsigned i = 0;
         for (auto prg : programs)
         {
