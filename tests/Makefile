@@ -7,7 +7,8 @@ BUILDDIR = $(PROJ_ROOT)/build
 ## Tests
 SRCS = 	TsParser_Tests.cc \
 		TsStatistics_Tests.cc \
-		GetBits_Tests.cc
+		GetBits_Tests.cc \
+		PsiTables_Tests.cc
 
 
 

@@ -61,6 +61,17 @@ public:
 
         return ss;
     }
+
+    /// @brief Comparison operator for comparing 2 PatTables
+    bool operator==(const PatTable &rhs) const
+    {
+        if (this->CRC_32 != rhs.CRC_32)
+        {
+            std::cout << "PatTable CRC_32 unequal.";
+            return false;
+        }
+        return true;
+    }
 };
 
 struct StreamTypeHeader

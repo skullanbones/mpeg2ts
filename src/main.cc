@@ -140,7 +140,26 @@ void PATCallback(PsiTable* table)
         std::cout << *pat << std::endl;
     }
 
-    g_PMTPID = pat->programs[0].program_map_PID; // Assume SPTS
+    // Check if MPTS or SPTS
+    int numPrograms = pat->programs.size();
+    if (numPrograms == 0)
+    {
+        std::cout << "No programs found in PAT, exiting..." << std::endl;
+        exit(EXIT_SUCCESS);
+    }
+    else if (numPrograms == 1) // SPTS
+    {
+        std::cout << "Found Single Program Transport Stream (SPTS)." << std::endl;
+        g_PMTPID = pat->programs[0].program_map_PID;
+    }
+    else if (numPrograms >= 1) // MPTS
+    {
+        std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
+        // TODO
+        exit(EXIT_SUCCESS);
+    }
+
+
     //TODO: add writing of table
 }
 
