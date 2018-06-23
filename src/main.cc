@@ -26,6 +26,7 @@ uint64_t countAdaptPacket = 0;
 uint32_t g_PMTPID = 0; // Single Program PID
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
+PatTable g_prevPat;
 
 enum class OptionWriteMode
 {
@@ -134,6 +135,14 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 void PATCallback(PsiTable* table)
 {
     auto pat = dynamic_cast<PatTable*>(table);
+
+    // Do nothing if same PAT
+    if (g_prevPat == *pat)
+    {
+        return;
+    }
+    g_prevPat = *pat;
+
     if (hasPid("pid", 0))
     {
         std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
