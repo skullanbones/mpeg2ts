@@ -28,6 +28,7 @@ std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::list<PmtTable> g_prevPmts;
+bool addedPmts = false;
 
 enum class OptionWriteMode
 {
@@ -164,7 +165,7 @@ void PATCallback(PsiTable* table)
     }
     g_prevPat = *pat;
 
-    if (hasPid("pid", 0))
+    if (hasPid("pid", TS_PACKET_PID_PAT))
     {
         std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
         std::cout << *pat << std::endl;
@@ -216,6 +217,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), stream.elementary_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
         {
+            std::cout << "Add ES PID: " << stream.elementary_PID << std::endl;
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
@@ -224,6 +226,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
+            std::cout << "Add PCR PID: " << pmt->PCR_PID << std::endl;
             g_ESPIDS.push_back(pmt->PCR_PID);
         }        
     }
@@ -273,7 +276,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
 int main(int argc, char** argv)
 {
-    std::cout << "Staring parser of file" << std::endl;
+    std::cout << "Starting parser of file" << std::endl;
 
     int longIndex;
 
@@ -347,6 +350,7 @@ int main(int argc, char** argv)
     FILE *fptr;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
+    // Find PAT
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
     for (count = 0;; ++count)
@@ -357,11 +361,12 @@ int main(int argc, char** argv)
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
 
-        b = getc(fptr);
+        b = fgetc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
-            b = getc(fptr);
-            if (b == EOF)
+            b = fgetc(fptr);
+            int eof = feof(fptr);
+            if (eof != 0)
             {
                 std::cout << "End Of File..." << std::endl;
                 std::cout << "Found " << count << " ts-packets." << std::endl;
@@ -377,22 +382,24 @@ int main(int argc, char** argv)
         // TS Packet start
         packet[0] = b;
 
-        // Read TS Packet from stdin
-        size_t res =
-        fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
+        // Read TS Packet from file
+        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
         (void)res;
 
         g_tsDemux.demux(packet);
-        if (g_PMTPIDS.size() != 0u)
+        if (!addedPmts && (g_PMTPIDS.size() != 0u))
         {
             for (auto pid : g_PMTPIDS)
             {
+                std::cout << "Adding PSI PID for parsing: " << pid << std::endl;
                 g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
             }
+            addedPmts = true;
         }
 
         for (auto pid : g_ESPIDS)
         {
+            std::cout << "Adding PES PID for parsing: " << pid << std::endl;
             g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
         g_ESPIDS.clear();
