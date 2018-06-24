@@ -4,12 +4,26 @@
 #include "TsStandards.h"
 
 /*!
- * @brief Base class for all tables
+ * @brief Base class for all PSI tables
  */
+
+#include <iostream>
 
 class PsiTable
 {
 public:
+    PsiTable() {
+        table_id = 0;
+        section_syntax_indicator = false;
+        section_length = 0;
+        transport_stream_id = 0;
+        version_number = 0;
+        current_next_indicator = false;
+        section_number = 0;
+        last_section_number = 0;
+        CRC_32 = 0;
+    }
+
     virtual ~PsiTable() = default;
 
     uint8_t table_id;
@@ -35,6 +49,25 @@ public:
         ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
         return ss;
     }
+
+    /// @brief Comparison operator for comparing 2 PsiTables
+    bool operator==(const PsiTable &rhs) const
+    {
+        return CRC_32 == rhs.CRC_32 &&
+                table_id == rhs.table_id &&
+                section_syntax_indicator == rhs.section_syntax_indicator &&
+                section_length == rhs.section_length &&
+                transport_stream_id == rhs.transport_stream_id &&
+                version_number == rhs.version_number &&
+                current_next_indicator == rhs.current_next_indicator &&
+                section_number == rhs.section_number &&
+                last_section_number == rhs.last_section_number;
+    }
+
+    bool operator!=(const PsiTable &rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 /*!
@@ -44,7 +77,6 @@ class PatTable : public PsiTable
 {
 public:
     std::vector<Program> programs;
-    uint32_t CRC_32;
 
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
@@ -61,6 +93,38 @@ public:
 
         return ss;
     }
+
+    /// @brief Comparison operator for comparing 2 PatTables
+    bool operator==(const PatTable &rhs) const
+    {
+        bool psi = PsiTable::operator==(rhs);
+        if (psi == false) {
+            return false;
+        }
+
+        // 1. check number of programs
+        if (this->programs.size() != rhs.programs.size())
+        {
+            std::cout << "PatTable number of programs unequal." << std::endl;
+            return false;
+        }
+        // 2. check content of each programs
+        unsigned i = 0;
+        for (auto prg : programs)
+        {
+            if (prg != rhs.programs.at(i)) {
+                std::cout << "PatTable programs content unequal for program: " << prg.program_number << std::endl;
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+
+    bool operator!=(const PatTable &rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 struct StreamTypeHeader
@@ -68,6 +132,18 @@ struct StreamTypeHeader
     uint8_t stream_type;
     uint16_t elementary_PID;
     uint16_t ES_info_length;
+
+    bool operator==(const StreamTypeHeader &rhs) const
+    {
+        return stream_type   == rhs.stream_type &&
+                elementary_PID == rhs.elementary_PID &&
+                ES_info_length == rhs.ES_info_length;
+    }
+
+    bool operator!=(const StreamTypeHeader &rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 /*!
@@ -98,6 +174,56 @@ public:
         }
 
         return ss;
+    }
+
+    /// @brief Comparison operator for comparing 2 PmtTables
+    bool operator==(const PmtTable &rhs) const
+    {
+        bool psi = PsiTable::operator==(rhs);
+        if (psi == false) {
+            return false;
+        }
+
+        // 1. First check CRC 32
+        if (this->CRC_32 != rhs.CRC_32)
+        {
+            std::cout << "PmtTable CRC_32 unequal." << std::endl;
+            return false;
+        }
+        // 2. Secondly check PCR_PID
+        if (this->PCR_PID != rhs.PCR_PID)
+        {
+            std::cout << "PmtTable PCR_PID unequal." << std::endl;
+            return false;
+        }
+        // 3. Thirdly check program_info_length
+        if (this->program_info_length != rhs.program_info_length)
+        {
+            std::cout << "PmtTable program_info_length unequal." << std::endl;
+            return false;
+        }
+        // 4. check number of streams
+        if (this->streams.size() != rhs.streams.size())
+        {
+            std::cout << "PmtTable number of streams unequal." << std::endl;
+            return false;
+        }
+        // 5. check content of each streams
+        unsigned i = 0;
+        for (auto stream : streams)
+        {
+            if (stream != rhs.streams.at(i)) {
+                std::cout << "PmtTable stream content unequal for stream_type: " << stream.stream_type << std::endl;
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+
+    bool operator!=(const PmtTable &rhs) const
+    {
+        return !operator==(rhs);
     }
 };
 
