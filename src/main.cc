@@ -187,7 +187,9 @@ void PATCallback(PsiTable* table)
     {
         std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
         for(auto program : pat->programs) {
-            g_PMTPIDS.push_back(program.program_map_PID);
+            if (program.type == ProgramType::PMT) {
+                g_PMTPIDS.push_back(program.program_map_PID);
+            }
         }
     }
 

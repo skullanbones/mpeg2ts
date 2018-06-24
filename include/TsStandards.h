@@ -115,6 +115,11 @@ struct TsAdaptationFieldExtensionHeader
     uint8_t ltw_flag : 1;
 };
 
+enum class ProgramType
+{
+    NIT, PMT, UserDefined
+};
+
 /*! @brief Program streams
  *
  * Table 2-30 – Program association section *
@@ -123,8 +128,14 @@ struct TsAdaptationFieldExtensionHeader
 struct Program
 {
     uint16_t program_number;
-    // uint16_t network_PID; only for program_number=0
-    uint16_t program_map_PID;
+
+    union
+    {
+        uint16_t network_PID; // only for program_number=0
+        uint16_t program_map_PID;
+    };
+
+    ProgramType type; // 2.4.4.5 Semantics
 
     /// @brief Comparison operator for comparing 2 PatTables
     bool operator==(const Program &rhs) const

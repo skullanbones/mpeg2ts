@@ -88,7 +88,11 @@ public:
         {
             ss << "-------------program " << i << "--------------" << std::endl;
             ss << "program_number: " << rhs.programs[i].program_number << std::endl;
-            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
+            if (rhs.programs[i].type == ProgramType::PMT) {
+                ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
+            } else if (rhs.programs[i].type == ProgramType::NIT) {
+                ss << "network_PID: " << rhs.programs[i].network_PID << std::endl;
+            }
         }
 
         return ss;

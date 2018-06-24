@@ -307,7 +307,16 @@ PatTable TsParser::parsePatPacket()
         Program prg;
         prg.program_number = getBits(16);
         getBits(3); // reserved
-        prg.program_map_PID = getBits(13);
+        uint16_t pid = getBits(13);
+
+        if (prg.program_number == 0) {
+            prg.type = ProgramType::NIT;
+            prg.network_PID = pid;
+        } else {
+            prg.type = ProgramType::PMT;
+            prg.program_map_PID = pid;
+        }
+
         pat.programs.push_back(prg);
     }
 
