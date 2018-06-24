@@ -8,6 +8,9 @@
 #include <sstream>
 #include <stdio.h>
 
+// Project files
+#include "TsStandards.h" // For TsHeader
+
 
 class TsPacketInfo
 {
