@@ -7,6 +7,8 @@
  * @brief Base class for all PSI tables
  */
 
+#include <iostream>
+
 class PsiTable
 {
 public:

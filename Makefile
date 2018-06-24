@@ -14,6 +14,7 @@ SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
 export INCDIR
+BUILD_TYPE ?= DEBUG
 
 ## Machine
 CORES ?= $(shell nproc)
@@ -30,6 +31,11 @@ CXX = g++
 STATIC = libts.a
 DYNAMIC = libts.so
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
+ifeq ($(BUILD_TYPE),DEBUG)
+	CXXFLAGS += -g -O0
+else ifeq ($(BUILD_TYPE),RELEASE)
+	CXXFLAGS += -O3
+endif
 LDFLAGS = -shared
 # Only needed if linkage to libts.so
 #export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH

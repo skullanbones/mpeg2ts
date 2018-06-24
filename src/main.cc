@@ -386,7 +386,14 @@ int main(int argc, char** argv)
         size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
         (void)res;
 
-        g_tsDemux.demux(packet);
+        try {
+            g_tsDemux.demux(packet);
+        }
+        catch(GetBitsException &e)
+        {
+            std::cout << "Got exception: " << e.what() << std::endl;
+            exit(EXIT_FAILURE);
+        }
         if (!addedPmts && (g_PMTPIDS.size() != 0u))
         {
             for (auto pid : g_PMTPIDS)

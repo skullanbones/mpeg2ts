@@ -13,6 +13,7 @@
 
 #include <map>
 #include <vector>
+#include <iostream>
 
 // Project files
 #include "CommonTypes.h"
