@@ -386,12 +386,17 @@ int main(int argc, char** argv)
         size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
         (void)res;
 
+        TsPacketInfo info;
+        TsParser parser;
         try {
+            parser.parseTsPacketInfo(packet, info);
             g_tsDemux.demux(packet);
         }
         catch(GetBitsException &e)
         {
             std::cout << "Got exception: " << e.what() << std::endl;
+            std::cout << "Got header: " << info.hdr << std::endl;
+            std::cout << "Got packet: " << info << std::endl;
             exit(EXIT_FAILURE);
         }
         if (!addedPmts && (g_PMTPIDS.size() != 0u))

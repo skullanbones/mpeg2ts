@@ -91,4 +91,6 @@ public:
 
     std::map<int, PidStatistic> mPidStatistics;
     uint64_t mTsPacketCounter;
+    uint64_t mTsPacketNullPacketCounter;
+    uint64_t mTsPacketErrorIndicator;
 };

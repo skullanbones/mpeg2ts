@@ -16,11 +16,18 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 
     TsHeader hdr = parseTsHeader(packet);
     outInfo.pid = hdr.PID;
+    outInfo.hdr = hdr;
     outInfo.errorIndicator = hdr.transport_error_indicator;
     outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
     outInfo.continuityCounter = hdr.continuity_counter;
+
+    // TODO not correct. please help. How to handle this????
+    if (outInfo.errorIndicator)
+    {
+        return;
+    }
 
     if (outInfo.hasAdaptationField)
     {
@@ -133,6 +140,14 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     {
         outInfo.privateDataSize = getBits(8);
         outInfo.privateDataOffset = getByteInx();
+
+        // Check if data size is within boundary of a TS Packet
+        if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset)) {
+            std::cout << "ERROR: Found out of bound private data. Error in input." << std::endl;
+            outInfo.isError = true;
+            return;
+        }
+
         for (uint32_t i = 0; i < outInfo.privateDataSize; i++) // skip it for now
         {
             getBits(8);
@@ -142,6 +157,14 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     if (adaptHdr.adaptation_field_extension_flag)
     {
         uint8_t adaptation_field_extension_length = getBits(8);
+
+        // Check if data size is within boundary of a TS Packet
+        if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx())) {
+            std::cout << "ERROR: Found out of bound adaptation field extension data. Error in input." << std::endl;
+            outInfo.isError = true;
+            return;
+        }
+
         for (uint8_t i = 0; i < adaptation_field_extension_length; i++) // skip it for now
         {
             getBits(8);

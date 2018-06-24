@@ -21,6 +21,20 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+
+    // TODO not sure this is handled correctly. Please help!!!!!!!!!!!!
+    if (tsPacketInfo.errorIndicator)
+    {
+        ++mParser.mTsPacketErrorIndicator;
+        return; // TODO For now skip since packet PID: 4167 will cause segmentation fault
+        // because adaptation_field_extension_length is 231 for asset Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts
+    }
+
+    if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
+    {
+        ++mParser.mTsPacketNullPacketCounter;
+        return; // Skip null packets, they contain no info
+    }
     
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {
