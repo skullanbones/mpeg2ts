@@ -53,5 +53,5 @@ def test_parse_asset(parser, asset_h264_dolby_atmos):
     log.debug(out[0])
     log.debug(out[1])
     assert "programs.size(): 2" in out[1]
-    assert "program_map_PID: 31" in out[1]
+    assert "network_PID: 31" in out[1]
     assert "program_map_PID: 256" in out[1]
