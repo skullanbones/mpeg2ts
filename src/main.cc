@@ -397,6 +397,7 @@ int main(int argc, char** argv)
         b = fgetc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
+            std::cout << "ERROR: Sync error!!!" << std::endl;
             b = fgetc(fptr);
             int eof = feof(fptr);
             if (eof != 0)
@@ -417,9 +418,14 @@ int main(int argc, char** argv)
         packet[0] = b;
 
         // Read TS Packet from file
-        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
-        if (res != TS_PACKET_SIZE - 1) {
+        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
+        if (res != TS_PACKET_SIZE) {
             std::cout << "ERROR: Could not read a complete TS-Packet" << std::endl; // May be last packet end of file.
+        }
+        fseek(fptr, -1, SEEK_CUR);  // reset file pointer
+        if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE) {
+            std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<  (int)packet[TS_PACKET_SIZE] << std::endl;
+            continue; // Skip this packet since it's not synced.
         }
 
         TsPacketInfo info;
