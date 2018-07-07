@@ -381,6 +381,7 @@ int main(int argc, char** argv)
 
     if (fptr == NULL) {
         std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
+        fclose (fptr);
         exit(EXIT_FAILURE);
     }
 
@@ -389,7 +390,6 @@ int main(int argc, char** argv)
 
     for (count = 0;; ++count)
     {
-
         unsigned char packet[TS_PACKET_SIZE];
         // SYNC
         // Check for the sync byte. When found start a new ts-packet parser...
@@ -409,6 +409,7 @@ int main(int argc, char** argv)
 
                 std::cout << "Statistics\n";
                 display_statistics(g_tsDemux);
+                fclose (fptr);
                 return EXIT_SUCCESS;
             }
         }
@@ -418,7 +419,9 @@ int main(int argc, char** argv)
 
         // Read TS Packet from file
         size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
-        (void)res;
+        if (res != TS_PACKET_SIZE - 1) {
+            std::cout << "ERROR: Could not read a complete TS-Packet" << std::endl; // May be last packet end of file.
+        }
 
         TsPacketInfo info;
         TsParser parser;
