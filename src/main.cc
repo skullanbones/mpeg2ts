@@ -156,7 +156,15 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    auto pat = dynamic_cast<PatTable*>(table);
+    PatTable* pat;
+    try {
+        pat = dynamic_cast<PatTable*>(table);
+    }
+    catch (std::exception& ex) {
+        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        return;
+    }
+
 
     // Do nothing if same PAT
     if (g_prevPat == *pat)
@@ -199,7 +207,16 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    auto pmt = dynamic_cast<PmtTable*>(table);
+    PmtTable* pmt;
+
+    try {
+        pmt = dynamic_cast<PmtTable*>(table);
+    }
+    catch (std::exception& ex) {
+        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        return;
+    }
+
 
     // Do nothing if same PMT
     if (hasPmt(*pmt))
