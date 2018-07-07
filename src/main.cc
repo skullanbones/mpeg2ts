@@ -352,6 +352,11 @@ int main(int argc, char** argv)
     FILE *fptr;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
+    if (fptr == NULL) {
+        std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     // Find PAT
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
