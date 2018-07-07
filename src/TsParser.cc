@@ -287,7 +287,7 @@ void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
     getBits(2); // reserved
     tableInfo.section_length = getBits(12);
     tableInfo.transport_stream_id = getBits(16);
-    getBits(2);
+    getBits(2); // reserved
     tableInfo.version_number = getBits(5);
     tableInfo.current_next_indicator = getBits(1);
     tableInfo.section_number = getBits(8);

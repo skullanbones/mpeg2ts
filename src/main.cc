@@ -165,6 +165,11 @@ void PATCallback(PsiTable* table)
         return;
     }
 
+    if (pat == NULL) {
+        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        return;
+    }
+
 
     // Do nothing if same PAT
     if (g_prevPat == *pat)
@@ -214,6 +219,11 @@ void PMTCallback(PsiTable* table)
     }
     catch (std::exception& ex) {
         std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        return;
+    }
+
+    if (pmt == NULL) {
+        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
         return;
     }
 
