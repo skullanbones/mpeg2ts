@@ -381,7 +381,6 @@ int main(int argc, char** argv)
 
     if (fptr == NULL) {
         std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
-        fclose (fptr);
         exit(EXIT_FAILURE);
     }
 
