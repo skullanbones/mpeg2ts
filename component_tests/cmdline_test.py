@@ -59,10 +59,12 @@ def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
 def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
     asset = asset_h264_dolby_atmos.get_asset()
+    pmt = asset_h264_dolby_atmos.get_pmt()
+    log.debug(pmt)
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     arg = '--input %s' % asset
     log.debug("use arg: %s" % arg)
-    out = parser.start(extra_args=['--input', asset, '--pid', 256])
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
     log.debug(out[0])
     log.debug(out[1])
     assert "PMT at Ts packet: 1" in out[1]
@@ -81,3 +83,20 @@ def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     assert "stream_type: STREAMTYPE_AUDIO_AC3_PLUS,  (132)" in out[1]
     assert "elementary_PID: 4353" in out[1]
     assert "ES_info_length: 12" in out[1]
+
+def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
+    """
+    Test new asset
+    :param parser:
+    :param asset_h2646_aac_rubeatles_atmos:
+    :return:
+    """
+    asset = asset_h2646_aac_rubeatles_atmos.get_asset()
+    pmt = asset_h2646_aac_rubeatles_atmos.get_pmt()
+    log.debug(pmt)
+    assert "RuBeatles_h265_aac_short.ts" in asset
+    arg = '--input %s' % asset
+    log.debug("use arg: %s" % arg)
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    log.debug(out[0])
+    log.debug(out[1])

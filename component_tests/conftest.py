@@ -55,6 +55,11 @@ class Asset(object):
     def get_streams(self):
         return self.streams
 
+    def get_pmt(self):
+        for stream in self.streams:
+            if stream["StreamType"] == "pmt":
+                return stream
+
 
 @pytest.fixture(scope='session')
 def downloader():
@@ -89,7 +94,8 @@ def asset_list(downloader):
     ('Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts',
      [{"Pid": 4113, "StreamType": "video"},
       {"Pid": 4352, "StreamType": "audio"},
-      {"Pid": 4353, "StreamType": "audio"}])
+      {"Pid": 4353, "StreamType": "audio"},
+      {"Pid": 256, "StreamType": "pmt"}])
 ])
 def asset_h264_dolby_atmos(request, downloader):
     """
@@ -106,3 +112,23 @@ def asset_h264_dolby_atmos(request, downloader):
         print("Error downloading asset..")
     return Asset(downloader.get_path(name), streams)
 
+@pytest.fixture(scope='session', params=[
+    ('RuBeatles_h265_aac_short.ts',
+     [{"Pid": 301, "StreamType": "video"},
+      {"Pid": 302, "StreamType": "audio"},
+      {"Pid": 300, "StreamType": "pmt"}])
+])
+def asset_h2646_aac_rubeatles_atmos(request, downloader):
+    """
+    Asset for dolby atmos
+    :param request:
+    :param downloader:
+    :return: Returns the asset
+    """
+    name, streams = request.param
+    url = BASE_URL + "/" + name
+    status = downloader.download_file(url, name)
+    print(status)
+    if not status:
+        print("Error downloading asset..")
+    return Asset(downloader.get_path(name), streams)
