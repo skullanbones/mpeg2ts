@@ -441,6 +441,7 @@ int main(int argc, char** argv)
             std::cout << "Got exception: " << e.what() << std::endl;
             std::cout << "Got header: " << info.hdr << std::endl;
             std::cout << "Got packet: " << info << std::endl;
+            fclose(fptr);
             exit(EXIT_FAILURE);
         }
         if (!addedPmts && (g_PMTPIDS.size() != 0u))
