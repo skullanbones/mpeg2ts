@@ -20,7 +20,18 @@ class Downloader():
         path = self.download_dir + "/" + file_name
         return os.path.isfile(path)
 
-    def download_file(self, url, file_name):
+    def download_asset(self, name, streams):
+        status = self.download_file(name)
+        print(status)
+        if not status:
+            print("Error downloading asset..")
+        return Asset(self.get_path(name), streams)
+
+    def download_file(self, file_name, asset_list=False):
+        if asset_list:
+            url = BASE_URL
+        else:
+            url = BASE_URL + "/" + file_name
         print("Downloading asset %s" % url)
         #threading.Thread(target=self._wget_dl, args=(url, destination, try_number, time_out, log_file)).start()
         if not self.file_exist(file_name):
@@ -79,7 +90,7 @@ def asset_list(downloader):
     :param downloader:
     :return: A list with assets to use for testing
     """
-    downloader.download_file(BASE_URL, "assets.xml")
+    downloader.download_file("assets.xml", asset_list=True)
     assets = []
     with open(DOWNLOAD_DIR + '/assets.xml') as fd:
         data = xmltodict.parse(fd.read())
@@ -106,12 +117,7 @@ def asset_h264_dolby_atmos(request, downloader):
     :return: Returns the asset
     """
     name, streams = request.param
-    url = BASE_URL + "/" + name
-    status = downloader.download_file(url, name)
-    print(status)
-    if not status:
-        print("Error downloading asset..")
-    return Asset(downloader.get_path(name), streams)
+    return downloader.download_asset(name, streams)
 
 @pytest.fixture(scope='session', params=[
     ('RuBeatles_h265_aac_short.ts',
@@ -127,9 +133,4 @@ def asset_h2646_aac_rubeatles_atmos(request, downloader):
     :return: Returns the asset
     """
     name, streams = request.param
-    url = BASE_URL + "/" + name
-    status = downloader.download_file(url, name)
-    print(status)
-    if not status:
-        print("Error downloading asset..")
-    return Asset(downloader.get_path(name), streams)
+    return downloader.download_asset(name, streams)
