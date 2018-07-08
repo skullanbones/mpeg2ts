@@ -4,13 +4,14 @@ import pytest
 import os.path
 
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
+DOWNLOAD_DIR = "component_tests/downloaded_files"
 
 class Downloader():
     """
     Download with curl file over HTTP for any chunk_size.
     Settings include chunk_size, timeout and download folder.
     """
-    def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir="downloaded_files"):
+    def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir=DOWNLOAD_DIR):
         self.timeout = timeout
         self.chunk_size = chunk_size
         self.download_dir = download_dir
@@ -67,7 +68,7 @@ def downloader():
     Fixture for downloading files over HTTP
     :return:
     """
-    downloader_dir = 'downloaded_files'
+    downloader_dir = DOWNLOAD_DIR
     yield Downloader(download_dir=downloader_dir)
 
 
@@ -80,7 +81,7 @@ def asset_list(downloader):
     """
     downloader.download_file(BASE_URL, "assets.xml")
     assets = []
-    with open('downloaded_files/assets.xml') as fd:
+    with open(DOWNLOAD_DIR + '/assets.xml') as fd:
         data = xmltodict.parse(fd.read())
         contents = data['ListBucketResult']['Contents']
 
