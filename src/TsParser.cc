@@ -22,13 +22,7 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
     outInfo.continuityCounter = hdr.continuity_counter;
-
-    // TODO not correct. please help. How to handle this????
-    if (outInfo.errorIndicator)
-    {
-        return;
-    }
-
+    
     if (outInfo.hasAdaptationField)
     {
         parseAdaptationFieldData(packet, outInfo);
