@@ -32,7 +32,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         ++mParser.mTsPacketNullPacketCounter;
         return; // Skip null packets, they contain no info
     }
-    
+
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {
         mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo, mHandlers[tsPacketInfo.pid]);

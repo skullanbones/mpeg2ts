@@ -12,7 +12,8 @@
 class PsiTable
 {
 public:
-    PsiTable() {
+    PsiTable()
+    {
         table_id = 0;
         section_syntax_indicator = false;
         section_length = 0;
@@ -51,20 +52,16 @@ public:
     }
 
     /// @brief Comparison operator for comparing 2 PsiTables
-    bool operator==(const PsiTable &rhs) const
+    bool operator==(const PsiTable& rhs) const
     {
-        return CRC_32 == rhs.CRC_32 &&
-                table_id == rhs.table_id &&
-                section_syntax_indicator == rhs.section_syntax_indicator &&
-                section_length == rhs.section_length &&
-                transport_stream_id == rhs.transport_stream_id &&
-                version_number == rhs.version_number &&
-                current_next_indicator == rhs.current_next_indicator &&
-                section_number == rhs.section_number &&
-                last_section_number == rhs.last_section_number;
+        return CRC_32 == rhs.CRC_32 && table_id == rhs.table_id &&
+               section_syntax_indicator == rhs.section_syntax_indicator &&
+               section_length == rhs.section_length && transport_stream_id == rhs.transport_stream_id &&
+               version_number == rhs.version_number && current_next_indicator == rhs.current_next_indicator &&
+               section_number == rhs.section_number && last_section_number == rhs.last_section_number;
     }
 
-    bool operator!=(const PsiTable &rhs) const
+    bool operator!=(const PsiTable& rhs) const
     {
         return !operator==(rhs);
     }
@@ -88,9 +85,12 @@ public:
         {
             ss << "-------------program " << i << "--------------" << std::endl;
             ss << "program_number: " << rhs.programs[i].program_number << std::endl;
-            if (rhs.programs[i].type == ProgramType::PMT) {
+            if (rhs.programs[i].type == ProgramType::PMT)
+            {
                 ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
-            } else if (rhs.programs[i].type == ProgramType::NIT) {
+            }
+            else if (rhs.programs[i].type == ProgramType::NIT)
+            {
                 ss << "network_PID: " << rhs.programs[i].network_PID << std::endl;
             }
         }
@@ -99,10 +99,11 @@ public:
     }
 
     /// @brief Comparison operator for comparing 2 PatTables
-    bool operator==(const PatTable &rhs) const
+    bool operator==(const PatTable& rhs) const
     {
         bool psi = PsiTable::operator==(rhs);
-        if (psi == false) {
+        if (psi == false)
+        {
             return false;
         }
 
@@ -116,8 +117,10 @@ public:
         unsigned i = 0;
         for (auto prg : programs)
         {
-            if (prg != rhs.programs.at(i)) {
-                std::cout << "PatTable programs content unequal for program: " << prg.program_number << std::endl;
+            if (prg != rhs.programs.at(i))
+            {
+                std::cout << "PatTable programs content unequal for program: " << prg.program_number
+                          << std::endl;
                 return false;
             }
             i++;
@@ -125,7 +128,7 @@ public:
         return true;
     }
 
-    bool operator!=(const PatTable &rhs) const
+    bool operator!=(const PatTable& rhs) const
     {
         return !operator==(rhs);
     }
@@ -137,14 +140,13 @@ struct StreamTypeHeader
     uint16_t elementary_PID;
     uint16_t ES_info_length;
 
-    bool operator==(const StreamTypeHeader &rhs) const
+    bool operator==(const StreamTypeHeader& rhs) const
     {
-        return stream_type   == rhs.stream_type &&
-                elementary_PID == rhs.elementary_PID &&
-                ES_info_length == rhs.ES_info_length;
+        return stream_type == rhs.stream_type && elementary_PID == rhs.elementary_PID &&
+               ES_info_length == rhs.ES_info_length;
     }
 
-    bool operator!=(const StreamTypeHeader &rhs) const
+    bool operator!=(const StreamTypeHeader& rhs) const
     {
         return !operator==(rhs);
     }
@@ -181,10 +183,11 @@ public:
     }
 
     /// @brief Comparison operator for comparing 2 PmtTables
-    bool operator==(const PmtTable &rhs) const
+    bool operator==(const PmtTable& rhs) const
     {
         bool psi = PsiTable::operator==(rhs);
-        if (psi == false) {
+        if (psi == false)
+        {
             return false;
         }
 
@@ -216,8 +219,10 @@ public:
         unsigned i = 0;
         for (auto stream : streams)
         {
-            if (stream != rhs.streams.at(i)) {
-                std::cout << "PmtTable stream content unequal for stream_type: " << stream.stream_type << std::endl;
+            if (stream != rhs.streams.at(i))
+            {
+                std::cout << "PmtTable stream content unequal for stream_type: " << stream.stream_type
+                          << std::endl;
                 return false;
             }
             i++;
@@ -225,7 +230,7 @@ public:
         return true;
     }
 
-    bool operator!=(const PmtTable &rhs) const
+    bool operator!=(const PmtTable& rhs) const
     {
         return !operator==(rhs);
     }

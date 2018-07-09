@@ -52,9 +52,9 @@ public:
     void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
 
     /*!
-    * Returns statistics on parsed transport stream packets.
-    * @return TsStatistics containing collected statistics for all demuxed packets.
-    */
+     * Returns statistics on parsed transport stream packets.
+     * @return TsStatistics containing collected statistics for all demuxed packets.
+     */
     const TsStatistics getTsStatistics() const
     {
         return static_cast<TsStatistics>(mParser);

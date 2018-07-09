@@ -13,6 +13,7 @@ SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 INCDIR = $(PROJ_ROOT)/include
+TOOLSDIR = $(PROJ_ROOT)/tools
 export INCDIR
 BUILD_TYPE ?= DEBUG
 
@@ -68,14 +69,15 @@ docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
  					$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
  					make $1
 
-.PHONY: all clean lint flake docker-image docker-bash test gtests run clang unit-test component_tests
+.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component_tests
 
 help:
 	@echo
 	@echo '  all                   - build and create tsparser main executable.'
 	@echo '  lint                  - run clang formating for c++ and flake8 for python'
 	@echo '  flake                 - run flake8 on python files.'
-	@echo '  clang                 - run clang-tidy on c++ files.'
+	@echo '  clang-tidy            - run clang-tidy on c++ files.'
+	@echo '  clang-format          - run clang-format on c++ files following rules specified in tools dir.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
 	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
@@ -113,13 +115,15 @@ $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
 	$(CXX) ${LDFLAGS} -o $@ $^
 
-lint: flake
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
+lint: flake clang-format
 
 flake:
 	flake8 component_tests
 
-clang:
+clang-format:
+	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
+
+clang-tidy:
 	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
 run: $(BUILDDIR)/tsparser
@@ -129,7 +133,7 @@ run: $(BUILDDIR)/tsparser
 
 docker-image:
 	docker build \
-		--file=Dockerfile \
+		--file=$(TOOLSDIR)/Dockerfile \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) .
 
 docker-bash:

@@ -11,9 +11,9 @@
 
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
 
 // Project files
 #include "CommonTypes.h"
@@ -21,9 +21,9 @@
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
-const int TS_PACKET_SYNC_BYTE = 0x47;              // Section 2.4.3.3
-const int TS_PACKET_SIZE = 188;                    // Section 2.4.3
-const int TS_PACKET_HEADER_SIZE = 4;               // Table 2-2
+const int TS_PACKET_SYNC_BYTE = 0x47; // Section 2.4.3.3
+const int TS_PACKET_SIZE = 188;       // Section 2.4.3
+const int TS_PACKET_HEADER_SIZE = 4;  // Table 2-2
 const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
 const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
 const int TS_PACKET_PID_PAT = 0x00;                // PAT packet, Table 2-28
@@ -117,7 +117,9 @@ struct TsAdaptationFieldExtensionHeader
 
 enum class ProgramType
 {
-    NIT, PMT, UserDefined
+    NIT,
+    PMT,
+    UserDefined
 };
 
 /*! @brief Program streams
@@ -129,8 +131,7 @@ struct Program
 {
     uint16_t program_number;
 
-    union
-    {
+    union {
         uint16_t network_PID; // only for program_number=0
         uint16_t program_map_PID;
     };
@@ -138,13 +139,12 @@ struct Program
     ProgramType type; // 2.4.4.5 Semantics
 
     /// @brief Comparison operator for comparing 2 PatTables
-    bool operator==(const Program &rhs) const
+    bool operator==(const Program& rhs) const
     {
-        return program_number   == rhs.program_number &&
-                program_map_PID == rhs.program_map_PID;
+        return program_number == rhs.program_number && program_map_PID == rhs.program_map_PID;
     }
 
-    bool operator!=(const Program &rhs) const
+    bool operator!=(const Program& rhs) const
     {
         return !operator==(rhs);
     }

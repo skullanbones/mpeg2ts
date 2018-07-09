@@ -76,17 +76,17 @@ public:
     void buildPtsHistogram(int pid, int64_t pts);
 
     /*!
-    * Build a histogram of DTS differences between 2 time samples.
-    * @param pid Filtered PID.
-    * @param pts Display Time Stamp value.
-    */
+     * Build a histogram of DTS differences between 2 time samples.
+     * @param pid Filtered PID.
+     * @param pts Display Time Stamp value.
+     */
     void buildDtsHistogram(int pid, int64_t dts);
 
     /*!
-    * Build a histogram of PCR differences between 2 time samples.
-    * @param pid Filtered PID.
-    * @param pts Program Clock Reference value.
-    */
+     * Build a histogram of PCR differences between 2 time samples.
+     * @param pid Filtered PID.
+     * @param pts Program Clock Reference value.
+     */
     void buildPcrHistogram(int pid, int64_t pcr);
 
     std::map<int, PidStatistic> mPidStatistics;

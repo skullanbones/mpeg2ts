@@ -22,7 +22,7 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
     outInfo.continuityCounter = hdr.continuity_counter;
-    
+
     if (outInfo.hasAdaptationField)
     {
         parseAdaptationFieldData(packet, outInfo);
@@ -136,7 +136,8 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         outInfo.privateDataOffset = getByteInx();
 
         // Check if data size is within boundary of a TS Packet
-        if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset)) {
+        if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset))
+        {
             std::cout << "ERROR: Found out of bound private data. Error in input." << std::endl;
             outInfo.isError = true;
             return;
@@ -153,8 +154,10 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         uint8_t adaptation_field_extension_length = getBits(8);
 
         // Check if data size is within boundary of a TS Packet
-        if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx())) {
-            std::cout << "ERROR: Found out of bound adaptation field extension data. Error in input." << std::endl;
+        if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
+        {
+            std::cout
+            << "ERROR: Found out of bound adaptation field extension data. Error in input." << std::endl;
             outInfo.isError = true;
             return;
         }
@@ -303,10 +306,13 @@ PatTable TsParser::parsePatPacket()
         getBits(3); // reserved
         uint16_t pid = getBits(13);
 
-        if (prg.program_number == 0) {
+        if (prg.program_number == 0)
+        {
             prg.type = ProgramType::NIT;
             prg.network_PID = pid;
-        } else {
+        }
+        else
+        {
             prg.type = ProgramType::PMT;
             prg.program_map_PID = pid;
         }

@@ -58,7 +58,7 @@ void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
 
 void GetBits::skipBits(uint8_t skipBits)
 {
-    if(skipBits <= 64)
+    if (skipBits <= 64)
     {
         getBits(skipBits);
         return;
