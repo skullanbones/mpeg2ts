@@ -23,7 +23,7 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Docker
-DOCKER_IMAGE_VER ?= v2
+DOCKER_IMAGE_VER ?= v3
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
 DOCKER_USER_ID ?= $(USER)
 
@@ -142,6 +142,7 @@ docker-bash:
 		--interactive \
 		--tty=true \
 		--volume=$$(pwd):/tmp/workspace \
+		--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
 ### all tests
