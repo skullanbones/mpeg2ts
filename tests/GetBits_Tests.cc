@@ -122,12 +122,13 @@ TEST(GetBitsTests, TestGetBitsMoreThan64)
     parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
-    try {
+    try
+    {
         parser.getBits(65);
         FAIL() << "Expected std::out_of_range";
     }
-    catch(GetBitsException & err) {
-        EXPECT_EQ(err.what(),std::string("Cannot parse more than 64 individual bits at a time."));
+    catch (GetBitsException& err)
+    {
+        EXPECT_EQ(err.what(), std::string("Cannot parse more than 64 individual bits at a time."));
     }
-
 }

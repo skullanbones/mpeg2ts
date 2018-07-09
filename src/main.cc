@@ -5,15 +5,15 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
+#include <cstdlib> // EXIT_SUCCESS
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
+#include <list>
 #include <map>
 #include <string>
 #include <type_traits>
 #include <unistd.h>
-#include <list>
-#include <cstdlib> // EXIT_SUCCESS
 
 /// Project files
 #include "TsDemuxer.h"
@@ -43,12 +43,9 @@ std::string g_InputFile;
 
 static const char* optString = "m:w:i:l:h?";
 
-struct option longOpts[] = { { "write", 1, nullptr, 'w' },
-                             { "wrmode", 1, nullptr, 'm' },
-                             { "pid", 1, nullptr, 'p' },
-                             { "level", 1, nullptr, 'l' },
-                             { "input", 1, nullptr, 'i' },
-                             { "help", 0, nullptr, 'h' },
+struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
+                             { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
+                             { "input", 1, nullptr, 'i' }, { "help", 0, nullptr, 'h' },
                              { nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
@@ -68,8 +65,10 @@ bool hasPids(std::string param, std::vector<uint16_t> pids)
 
 bool hasPmt(const PmtTable& pmt)
 {
-    for(auto prevPmt : g_prevPmts) {
-        if (pmt == prevPmt) {
+    for (auto prevPmt : g_prevPmts)
+    {
+        if (pmt == prevPmt)
+        {
             return true;
         }
     }
@@ -100,8 +99,7 @@ void display_statistics(TsDemuxer demuxer)
             continue;
         }
         std::cout << "Pid: " << pidStat.first << "\n";
-        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities
-                  << "\n";
+        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
         std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
         std::cout << " Pts differences histogram:\n";
         for (auto& ent : pidStat.second.ptsHistogram)
@@ -123,7 +121,6 @@ void display_statistics(TsDemuxer demuxer)
         }
     }
 }
-
 
 
 void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
@@ -157,15 +154,18 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 void PATCallback(PsiTable* table)
 {
     PatTable* pat;
-    try {
+    try
+    {
         pat = dynamic_cast<PatTable*>(table);
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
         return;
     }
 
-    if (pat == NULL) {
+    if (pat == NULL)
+    {
         std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
         return;
     }
@@ -199,30 +199,35 @@ void PATCallback(PsiTable* table)
     else if (numPrograms >= 1) // MPTS
     {
         std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
-        for(auto program : pat->programs) {
-            if (program.type == ProgramType::PMT) {
+        for (auto program : pat->programs)
+        {
+            if (program.type == ProgramType::PMT)
+            {
                 g_PMTPIDS.push_back(program.program_map_PID);
             }
         }
     }
 
 
-    //TODO: add writing of table
+    // TODO: add writing of table
 }
 
 void PMTCallback(PsiTable* table)
 {
     PmtTable* pmt;
 
-    try {
+    try
+    {
         pmt = dynamic_cast<PmtTable*>(table);
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
         return;
     }
 
-    if (pmt == NULL) {
+    if (pmt == NULL)
+    {
         std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
         return;
     }
@@ -257,7 +262,7 @@ void PMTCallback(PsiTable* table)
         {
             std::cout << "Add PCR PID: " << pmt->PCR_PID << std::endl;
             g_ESPIDS.push_back(pmt->PCR_PID);
-        }        
+        }
     }
 }
 
@@ -284,7 +289,8 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
             writeOffset = 0;
             writeModeString = "PES";
         }
-        else{
+        else
+        {
             writeOffset = pes.elementary_data_offset;
             writeModeString = "ES";
         }
@@ -297,9 +303,11 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
+        std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(),
+                  std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset << " bytes, pid: " << pid << std::endl;
+        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
+                  << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -315,7 +323,8 @@ int main(int argc, char** argv)
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
-        case '?': {
+        case '?':
+        {
             display_usage();
             exit(EXIT_SUCCESS);
             break;
@@ -326,7 +335,7 @@ int main(int argc, char** argv)
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
         case 'm':
-            {
+        {
             OptionWriteMode writeMode = OptionWriteMode::PES;
             if (std::string(optarg) == "ts")
             {
@@ -340,15 +349,17 @@ int main(int argc, char** argv)
             {
                 writeMode = OptionWriteMode::ES;
             }
-            else{
+            else
+            {
                 std::cerr << "Allowed values for write mode are: ts, pes, es";
                 display_usage();
                 exit(EXIT_FAILURE);
             }
-                g_WriteMode.push_back(writeMode);
-            }
-            break;
-        case 'i': {
+            g_WriteMode.push_back(writeMode);
+        }
+        break;
+        case 'i':
+        {
             std::cout << "Got file input: " << std::string(optarg) << std::endl;
             g_InputFile = std::string(optarg);
             break;
@@ -364,7 +375,7 @@ int main(int argc, char** argv)
     {
         g_WriteMode.push_back(OptionWriteMode::PES);
     }
-    
+
     if (g_WriteMode.front() == OptionWriteMode::TS)
     {
         for (auto pid : g_Options["write"])
@@ -372,14 +383,15 @@ int main(int argc, char** argv)
             g_tsDemux.addTsPid(pid, std::bind(&TsCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
     }
-    
+
     uint64_t count;
 
     // FILE
-    FILE *fptr;
+    FILE* fptr;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
-    if (fptr == NULL) {
+    if (fptr == NULL)
+    {
         std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -397,7 +409,7 @@ int main(int argc, char** argv)
         b = fgetc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
-            //std::cout << "ERROR: Sync error!!!" << std::endl;
+            // std::cout << "ERROR: Sync error!!!" << std::endl;
             b = fgetc(fptr);
             int eof = feof(fptr);
             if (eof != 0)
@@ -409,7 +421,7 @@ int main(int argc, char** argv)
 
                 std::cout << "Statistics\n";
                 display_statistics(g_tsDemux);
-                fclose (fptr);
+                fclose(fptr);
                 return EXIT_SUCCESS;
             }
         }
@@ -418,25 +430,30 @@ int main(int argc, char** argv)
         packet[0] = b;
 
         // Read TS Packet from file
-        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
-        if (res != TS_PACKET_SIZE) {
+        size_t res =
+        fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
+        if (res != TS_PACKET_SIZE)
+        {
             std::cout << "ERROR: Could not read a complete TS-Packet, read: " << res << std::endl; // May be last packet end of file.
         }
-        // TODO fix this. We are almost always in here where we dont have 2 consecutive synced packets...
-        if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE) {
-            //std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<  (int)packet[TS_PACKET_SIZE] << std::endl;
-            //fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
-            //continue; // Skip this packet since it's not synced.
+        // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
+        // packets...
+        if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
+        {
+            // std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<
+            // (int)packet[TS_PACKET_SIZE] << std::endl;  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
+            // continue; // Skip this packet since it's not synced.
         }
-        fseek(fptr, -1, SEEK_CUR);  // reset file pointer and skip sync after packet
+        fseek(fptr, -1, SEEK_CUR); // reset file pointer and skip sync after packet
 
         TsPacketInfo info;
         TsParser parser;
-        try {
+        try
+        {
             parser.parseTsPacketInfo(packet, info);
             g_tsDemux.demux(packet);
         }
-        catch(GetBitsException &e)
+        catch (GetBitsException& e)
         {
             std::cout << "Got exception: " << e.what() << std::endl;
             std::cout << "Got header: " << info.hdr << std::endl;
