@@ -35,6 +35,7 @@ RUN apt-get install --yes --no-install-recommends git
 RUN apt-get install --yes --no-install-recommends gdb
 RUN apt-get install --yes --no-install-recommends gdbserver
 RUN apt-get install --yes --no-install-recommends cmake
+RUN apt-get install --yes --no-install-recommends python-virtualenv
 
 # Install gtest/gmock
 RUN git clone -q https://github.com/google/googletest.git /googletest \
