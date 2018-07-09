@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 /// Project files
 #include "CommonTypes.h"
 

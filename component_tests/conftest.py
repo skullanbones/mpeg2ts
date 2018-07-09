@@ -4,13 +4,14 @@ import pytest
 import os.path
 
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
+DOWNLOAD_DIR = "component_tests/downloaded_files"
 
 class Downloader():
     """
     Download with curl file over HTTP for any chunk_size.
     Settings include chunk_size, timeout and download folder.
     """
-    def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir="downloaded_files"):
+    def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir=DOWNLOAD_DIR):
         self.timeout = timeout
         self.chunk_size = chunk_size
         self.download_dir = download_dir
@@ -19,7 +20,18 @@ class Downloader():
         path = self.download_dir + "/" + file_name
         return os.path.isfile(path)
 
-    def download_file(self, url, file_name):
+    def download_asset(self, name, streams):
+        status = self.download_file(name)
+        print(status)
+        if not status:
+            print("Error downloading asset..")
+        return Asset(self.get_path(name), streams)
+
+    def download_file(self, file_name, asset_list=False):
+        if asset_list:
+            url = BASE_URL
+        else:
+            url = BASE_URL + "/" + file_name
         print("Downloading asset %s" % url)
         #threading.Thread(target=self._wget_dl, args=(url, destination, try_number, time_out, log_file)).start()
         if not self.file_exist(file_name):
@@ -55,6 +67,11 @@ class Asset(object):
     def get_streams(self):
         return self.streams
 
+    def get_pmt(self):
+        for stream in self.streams:
+            if stream["StreamType"] == "pmt":
+                return stream
+
 
 @pytest.fixture(scope='session')
 def downloader():
@@ -62,7 +79,7 @@ def downloader():
     Fixture for downloading files over HTTP
     :return:
     """
-    downloader_dir = 'downloaded_files'
+    downloader_dir = DOWNLOAD_DIR
     yield Downloader(download_dir=downloader_dir)
 
 
@@ -73,9 +90,9 @@ def asset_list(downloader):
     :param downloader:
     :return: A list with assets to use for testing
     """
-    downloader.download_file(BASE_URL, "assets.xml")
+    downloader.download_file("assets.xml", asset_list=True)
     assets = []
-    with open('downloaded_files/assets.xml') as fd:
+    with open(DOWNLOAD_DIR + '/assets.xml') as fd:
         data = xmltodict.parse(fd.read())
         contents = data['ListBucketResult']['Contents']
 
@@ -89,7 +106,8 @@ def asset_list(downloader):
     ('Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts',
      [{"Pid": 4113, "StreamType": "video"},
       {"Pid": 4352, "StreamType": "audio"},
-      {"Pid": 4353, "StreamType": "audio"}])
+      {"Pid": 4353, "StreamType": "audio"},
+      {"Pid": 256, "StreamType": "pmt"}])
 ])
 def asset_h264_dolby_atmos(request, downloader):
     """
@@ -99,10 +117,20 @@ def asset_h264_dolby_atmos(request, downloader):
     :return: Returns the asset
     """
     name, streams = request.param
-    url = BASE_URL + "/" + name
-    status = downloader.download_file(url, name)
-    print(status)
-    if not status:
-        print("Error downloading asset..")
-    return Asset(downloader.get_path(name), streams)
+    return downloader.download_asset(name, streams)
 
+@pytest.fixture(scope='session', params=[
+    ('RuBeatles_h265_aac_short.ts',
+     [{"Pid": 301, "StreamType": "video"},
+      {"Pid": 302, "StreamType": "audio"},
+      {"Pid": 300, "StreamType": "pmt"}])
+])
+def asset_h2646_aac_rubeatles_atmos(request, downloader):
+    """
+    Asset for dolby atmos
+    :param request:
+    :param downloader:
+    :return: Returns the asset
+    """
+    name, streams = request.param
+    return downloader.download_asset(name, streams)

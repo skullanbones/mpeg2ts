@@ -21,6 +21,17 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+
+    if (tsPacketInfo.errorIndicator)
+    {
+        ++mParser.mTsPacketErrorIndicator;
+    }
+
+    if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
+    {
+        ++mParser.mTsPacketNullPacketCounter;
+        return; // Skip null packets, they contain no info
+    }
     
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {

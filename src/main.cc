@@ -156,7 +156,20 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table)
 {
-    auto pat = dynamic_cast<PatTable*>(table);
+    PatTable* pat;
+    try {
+        pat = dynamic_cast<PatTable*>(table);
+    }
+    catch (std::exception& ex) {
+        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        return;
+    }
+
+    if (pat == NULL) {
+        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        return;
+    }
+
 
     // Do nothing if same PAT
     if (g_prevPat == *pat)
@@ -187,7 +200,9 @@ void PATCallback(PsiTable* table)
     {
         std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
         for(auto program : pat->programs) {
-            g_PMTPIDS.push_back(program.program_map_PID);
+            if (program.type == ProgramType::PMT) {
+                g_PMTPIDS.push_back(program.program_map_PID);
+            }
         }
     }
 
@@ -197,7 +212,21 @@ void PATCallback(PsiTable* table)
 
 void PMTCallback(PsiTable* table)
 {
-    auto pmt = dynamic_cast<PmtTable*>(table);
+    PmtTable* pmt;
+
+    try {
+        pmt = dynamic_cast<PmtTable*>(table);
+    }
+    catch (std::exception& ex) {
+        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        return;
+    }
+
+    if (pmt == NULL) {
+        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        return;
+    }
+
 
     // Do nothing if same PMT
     if (hasPmt(*pmt))
@@ -350,12 +379,16 @@ int main(int argc, char** argv)
     FILE *fptr;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
+    if (fptr == NULL) {
+        std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     // Find PAT
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
 
     for (count = 0;; ++count)
     {
-
         unsigned char packet[TS_PACKET_SIZE];
         // SYNC
         // Check for the sync byte. When found start a new ts-packet parser...
@@ -364,6 +397,7 @@ int main(int argc, char** argv)
         b = fgetc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
+            //std::cout << "ERROR: Sync error!!!" << std::endl;
             b = fgetc(fptr);
             int eof = feof(fptr);
             if (eof != 0)
@@ -375,6 +409,7 @@ int main(int argc, char** argv)
 
                 std::cout << "Statistics\n";
                 display_statistics(g_tsDemux);
+                fclose (fptr);
                 return EXIT_SUCCESS;
             }
         }
@@ -383,15 +418,30 @@ int main(int argc, char** argv)
         packet[0] = b;
 
         // Read TS Packet from file
-        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE - 1, fptr); // Copy only packet-size - sync byte
-        (void)res;
+        size_t res = fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
+        if (res != TS_PACKET_SIZE) {
+            std::cout << "ERROR: Could not read a complete TS-Packet, read: " << res << std::endl; // May be last packet end of file.
+        }
+        // TODO fix this. We are almost always in here where we dont have 2 consecutive synced packets...
+        if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE) {
+            //std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<  (int)packet[TS_PACKET_SIZE] << std::endl;
+            //fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
+            //continue; // Skip this packet since it's not synced.
+        }
+        fseek(fptr, -1, SEEK_CUR);  // reset file pointer and skip sync after packet
 
+        TsPacketInfo info;
+        TsParser parser;
         try {
+            parser.parseTsPacketInfo(packet, info);
             g_tsDemux.demux(packet);
         }
         catch(GetBitsException &e)
         {
             std::cout << "Got exception: " << e.what() << std::endl;
+            std::cout << "Got header: " << info.hdr << std::endl;
+            std::cout << "Got packet: " << info << std::endl;
+            fclose(fptr);
             exit(EXIT_FAILURE);
         }
         if (!addedPmts && (g_PMTPIDS.size() != 0u))

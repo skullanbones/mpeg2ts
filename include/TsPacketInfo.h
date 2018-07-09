@@ -8,11 +8,15 @@
 #include <sstream>
 #include <stdio.h>
 
+// Project files
+#include "TsStandards.h" // For TsHeader
+
 
 class TsPacketInfo
 {
 public:
     uint16_t pid; // This Packet Identifier.
+    TsHeader hdr; // This packet Ts Header
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
     bool isPayloadStart;     // If this packet is the first in a PES-packet.
@@ -41,12 +45,22 @@ public:
     size_t payloadSize;         // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
+    bool isError; // If a parser error or TS not following standards.
+
 
     friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
     {
         ss << "-------------TsPacketInfo------------- " << std::endl;
         ss << "PID: " << rhs.pid << std::endl;
+        ss << "errorIndicator: " << (int)rhs.errorIndicator << std::endl;
+        ss << "isPayloadStart: " << (int)rhs.isPayloadStart << std::endl;
         ss << "hasAdaptationField: " << rhs.hasAdaptationField << std::endl;
+        ss << "hasPayload: " << rhs.hasPayload << std::endl;
+        ss << "hasPrivateData: " << rhs.hasPrivateData << std::endl;
+        ss << "hasRandomAccess: " << rhs.hasRandomAccess << std::endl;
+        ss << "isScrambled: " << rhs.isScrambled << std::endl;
+        ss << "isDiscontinuity: " << rhs.isDiscontinuity << std::endl;
+
         ss << "pcr: " << rhs.pcr << std::endl;
         ss << "opcr: " << rhs.opcr << std::endl;
         if (rhs.hasPrivateData)
@@ -59,6 +73,7 @@ public:
             ss << "payloadSize: " << rhs.payloadSize << std::endl;
             ss << "payloadStartOffset: " << (int)rhs.payloadStartOffset << std::endl;
         }
+        ss << "isError: " << rhs.isError << std::endl;
         return ss;
     }
 };

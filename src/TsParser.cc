@@ -16,12 +16,13 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 
     TsHeader hdr = parseTsHeader(packet);
     outInfo.pid = hdr.PID;
+    outInfo.hdr = hdr;
     outInfo.errorIndicator = hdr.transport_error_indicator;
     outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
     outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
     outInfo.hasPayload = checkHasPayload(hdr);
     outInfo.continuityCounter = hdr.continuity_counter;
-
+    
     if (outInfo.hasAdaptationField)
     {
         parseAdaptationFieldData(packet, outInfo);
@@ -133,6 +134,14 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     {
         outInfo.privateDataSize = getBits(8);
         outInfo.privateDataOffset = getByteInx();
+
+        // Check if data size is within boundary of a TS Packet
+        if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset)) {
+            std::cout << "ERROR: Found out of bound private data. Error in input." << std::endl;
+            outInfo.isError = true;
+            return;
+        }
+
         for (uint32_t i = 0; i < outInfo.privateDataSize; i++) // skip it for now
         {
             getBits(8);
@@ -142,6 +151,14 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     if (adaptHdr.adaptation_field_extension_flag)
     {
         uint8_t adaptation_field_extension_length = getBits(8);
+
+        // Check if data size is within boundary of a TS Packet
+        if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx())) {
+            std::cout << "ERROR: Found out of bound adaptation field extension data. Error in input." << std::endl;
+            outInfo.isError = true;
+            return;
+        }
+
         for (uint8_t i = 0; i < adaptation_field_extension_length; i++) // skip it for now
         {
             getBits(8);
@@ -264,7 +281,7 @@ void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
     getBits(2); // reserved
     tableInfo.section_length = getBits(12);
     tableInfo.transport_stream_id = getBits(16);
-    getBits(2);
+    getBits(2); // reserved
     tableInfo.version_number = getBits(5);
     tableInfo.current_next_indicator = getBits(1);
     tableInfo.section_number = getBits(8);
@@ -284,7 +301,16 @@ PatTable TsParser::parsePatPacket()
         Program prg;
         prg.program_number = getBits(16);
         getBits(3); // reserved
-        prg.program_map_PID = getBits(13);
+        uint16_t pid = getBits(13);
+
+        if (prg.program_number == 0) {
+            prg.type = ProgramType::NIT;
+            prg.network_PID = pid;
+        } else {
+            prg.type = ProgramType::PMT;
+            prg.program_map_PID = pid;
+        }
+
         pat.programs.push_back(prg);
     }
 
