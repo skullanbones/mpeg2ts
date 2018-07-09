@@ -1,8 +1,9 @@
 import pytest
 import logging
 
-logging.basicConfig(filename='cmdline_test.log',level=logging.DEBUG)
+logging.basicConfig(filename='cmdline_test.log', level=logging.DEBUG)
 log = logging.getLogger("cmdline_test")
+
 
 @pytest.fixture
 def parser():
@@ -11,12 +12,14 @@ def parser():
     from .tsparser import TsParser
     return TsParser(log)
 
+
 def test_help_message(parser):
     """Verify that help option is displayed"""
     out = parser.start(extra_args=['--help'])
     assert "Ts-lib simple command-line:" in out[1], "No help text in output"
-    assert "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" in \
-           out[1], "Wrong help output"
+    assert "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" \
+           in out[1], "Wrong help output"
+
 
 def test_asset_list(asset_list):
     """Test we have all assets"""
@@ -27,6 +30,7 @@ def test_asset_list(asset_list):
     assert "Safari_ Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.m2ts" in asset_list[3]
     assert "avsync_mpeg2_ac3LR.ts" in asset_list[4]
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset_list[5]
+
 
 def test_asset(asset_h264_dolby_atmos):
     """Test we can get the first asset"""
@@ -43,6 +47,7 @@ def test_asset(asset_h264_dolby_atmos):
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
 
+
 def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
     asset = asset_h264_dolby_atmos.get_asset()
@@ -53,6 +58,7 @@ def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
     assert "programs.size(): 2" in out[1]
     assert "network_PID: 31" in out[1]
     assert "program_map_PID: 256" in out[1]
+
 
 def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
@@ -79,6 +85,7 @@ def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     assert "stream_type: STREAMTYPE_AUDIO_AC3_PLUS,  (132)" in out[1]
     assert "elementary_PID: 4353" in out[1]
     assert "ES_info_length: 12" in out[1]
+
 
 def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
     """

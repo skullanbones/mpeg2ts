@@ -6,12 +6,14 @@ import os.path
 BASE_URL = "https://s3-us-west-2.amazonaws.com/tslibteststreams"
 DOWNLOAD_DIR = "component_tests/downloaded_files"
 
+
 class Downloader():
     """
     Download with curl file over HTTP for any chunk_size.
     Settings include chunk_size, timeout and download folder.
     """
-    def __init__(self, timeout = "20", chunk_size = "0-10000000", download_dir=DOWNLOAD_DIR):
+    def __init__(self, timeout="20", chunk_size="0-10000000",
+                 download_dir=DOWNLOAD_DIR):
         self.timeout = timeout
         self.chunk_size = chunk_size
         self.download_dir = download_dir
@@ -33,7 +35,7 @@ class Downloader():
         else:
             url = BASE_URL + "/" + file_name
         print("Downloading asset %s" % url)
-        #threading.Thread(target=self._wget_dl, args=(url, destination, try_number, time_out, log_file)).start()
+        # threading.Thread(target=self._wget_dl, args=(url, destination, try_number, time_out, log_file)).start()
         if not self.file_exist(file_name):
             if self.curl_dl(url, file_name) == 0:
                 return True
@@ -49,12 +51,14 @@ class Downloader():
     def curl_dl(self, url, file_name):
         # TODO Check curl command exists
         output = self.download_dir + "/" + file_name
-        command=["curl", url, "--range", self.chunk_size,"--output", output,  "--create-dirs", "--connect-timeout", self.timeout]
+        command=["curl", url, "--range", self.chunk_size, "--output", output,
+                 "--create-dirs", "--connect-timeout", self.timeout]
         try:
             download_state=subprocess.call(command)
         except Exception as e:
             print(e)
         return download_state
+
 
 class Asset(object):
     def __init__(self, path, elementary_streams):
@@ -118,6 +122,7 @@ def asset_h264_dolby_atmos(request, downloader):
     """
     name, streams = request.param
     return downloader.download_asset(name, streams)
+
 
 @pytest.fixture(scope='session', params=[
     ('RuBeatles_h265_aac_short.ts',
