@@ -9,7 +9,7 @@ jobs:
           name: Build
           command: make all
       - run:
-          name: Test
+          name: Unit Test
           command: make gtests && make run-gtests
       - run:
           name: Component Tests
