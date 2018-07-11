@@ -103,26 +103,26 @@ void display_statistics(TsDemuxer demuxer)
         {
             continue;
         }
-        std::cout << "Pid: " << pidStat.first << "\n";
-        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
-        std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
-        std::cout << " Pts differences histogram:\n";
+        LOGD << "Pid: " << pidStat.first << "\n";
+        LOGD << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
+        LOGD << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
+        LOGD << " Pts differences histogram:\n";
         for (auto& ent : pidStat.second.ptsHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
-        std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
+        LOGD << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
 
-        std::cout << " Dts differences histogram:\n";
+        LOGD << " Dts differences histogram:\n";
         for (auto& ent : pidStat.second.dtsHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
-        std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
-        std::cout << " Pcr differences histogram:\n";
+        LOGD << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
+        LOGD << " Pcr differences histogram:\n";
         for (auto& ent : pidStat.second.pcrHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
     }
 }
@@ -134,7 +134,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     LOGD << "demuxed TS packet \n" << tsPacketInfo;
     if (hasPid("pid", pid))
     {
-        std::cout << tsPacketInfo << "\n";
+        LOGN << tsPacketInfo;
     }
 
     if (hasPid("write", pid))
@@ -152,7 +152,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
         }
         std::copy(packet, packet + TS_PACKET_SIZE, std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
+        LOGD << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -185,8 +185,8 @@ void PATCallback(PsiTable* table)
 
     if (hasPid("pid", TS_PACKET_PID_PAT))
     {
-        std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
-        std::cout << *pat << std::endl;
+        LOGN << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        LOGN << *pat << std::endl;
     }
 
     // Check if MPTS or SPTS
@@ -247,8 +247,8 @@ void PMTCallback(PsiTable* table)
 
     if (hasPids("pid", g_PMTPIDS))
     {
-        LOGD << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter;
-        LOGD << *pmt;
+        LOGN << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter;
+        LOGN << *pmt;
     }
 
     for (auto& stream : pmt->streams)
@@ -256,7 +256,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), stream.elementary_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
         {
-            std::cout << "Add ES PID: " << stream.elementary_PID << std::endl;
+            LOGD << "Add ES PID: " << stream.elementary_PID << std::endl;
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
@@ -265,7 +265,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
-            std::cout << "Add PCR PID: " << pmt->PCR_PID << std::endl;
+            LOGD << "Add PCR PID: " << pmt->PCR_PID << std::endl;
             g_ESPIDS.push_back(pmt->PCR_PID);
         }
     }
@@ -276,9 +276,9 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("pid", pid))
     {
-        std::cout << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
+        LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
                   << " (" << pid << ")\n";
-        std::cout << pes << std::endl;
+        LOGN << pes << std::endl;
     }
 
     if (hasPid("write", pid))
@@ -311,7 +311,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
         std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(),
                   std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
+        LOGD << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
                   << " bytes, pid: " << pid << std::endl;
     }
 }
@@ -436,11 +436,11 @@ int main(int argc, char** argv)
             int eof = feof(fptr);
             if (eof != 0)
             {
-                std::cout << "End Of File..." << std::endl;
-                std::cout << "Found " << count << " ts-packets." << std::endl;
-                std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
+                LOGD << "End Of File..." << std::endl;
+                LOGD << "Found " << count << " ts-packets." << std::endl;
+                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
-                std::cout << "Statistics\n";
+                LOGD << "Statistics\n";
                 display_statistics(g_tsDemux);
                 fclose(fptr);
                 return EXIT_SUCCESS;

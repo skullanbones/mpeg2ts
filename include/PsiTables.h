@@ -39,7 +39,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
-        ss << "-------------PsiTable------------- " << std::endl;
+        ss << std::endl << "-------------PsiTable------------- " << std::endl;
         ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
         ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
         ss << "section_length: " << (int)rhs.section_length << std::endl;
@@ -77,7 +77,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
-        ss << "-------------PatTable------------- " << std::endl;
+        ss << std::endl << "-------------PatTable------------- " << std::endl;
         // ss << static_cast<const PsiTable&>(rhs) << std::endl;
         // ss << PsiTable::operator<<(rhs) << std::endl;
         ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
@@ -166,7 +166,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
     {
-        ss << "-------------PmtTable------------- " << std::endl;
+        ss << std::endl << "-------------PmtTable------------- " << std::endl;
         ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
         ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
         ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;
