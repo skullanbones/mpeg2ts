@@ -15,8 +15,11 @@ BUILDDIR = $(PROJ_ROOT)/build
 TOOLSDIR = $(PROJ_ROOT)/tools
 3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
 
+## 3rd-party settings
+PLOG_VERSION=1.1.4
+
 INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-1.1.4/include
+				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include
 
 export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
@@ -192,14 +195,12 @@ component_tests: env $(BUILDDIR)/tsparser
 	./env/bin/pytest
 
 ### 3rd-party stuff
-$(INCLUDE_DIRS) += -I$(3RDPARTYDIR)/plog-1.1.4/include
+$(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
+	wget https://github.com/SergiusTheBest/plog/archive/$(PLOG_VERSION).tar.gz -O $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 
-$(3RDPARTYDIR)/plog-1.1.4.tar.gz:
-	wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O $(3RDPARTYDIR)/plog-1.1.4.tar.gz
-
-$(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+$(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	cd $(3RDPARTYDIR)
-	tar xvf $(3RDPARTYDIR)/plog-1.1.4.tar.gz -C $(3RDPARTYDIR)
+	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
 	touch $(3RDPARTYDIR)/.plog_extracted
 
 3rd-party: plog
@@ -219,7 +220,7 @@ clean:
 
 ### Will force clean download cache
 clean-all: clean
-	rm -f $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+	rm -f $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	rm -f $(3RDPARTYDIR)/.plog_extracted
-	rm -rf $(3RDPARTYDIR)/plog-1.1.4
+	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
 
