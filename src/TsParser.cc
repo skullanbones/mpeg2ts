@@ -4,8 +4,10 @@
  */
 #include <iostream>
 
+/// 3rd-party
+#include <plog/Log.h>
 
-// Project files
+/// Project files
 #include "CommonTypes.h"
 #include "TsParser.h"
 #include "Logging.h"

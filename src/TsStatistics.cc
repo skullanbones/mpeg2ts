@@ -13,6 +13,10 @@
  * permission from authors
  */
 
+/// 3rd-party
+#include <plog/Log.h>
+
+/// project files
 #include "TsStatistics.h"
 #include "Logging.h"
 

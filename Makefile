@@ -114,10 +114,10 @@ $(BUILDDIR):
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
-$(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS) plog
+$(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
-$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
+$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc, plog
 	@echo [Compile] $<
 	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
 
