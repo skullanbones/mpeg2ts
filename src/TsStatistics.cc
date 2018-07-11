@@ -64,7 +64,7 @@ void TsStatistics::buildPtsHistogram(int pid, int64_t pts)
     mPidStatistics[pid].ptsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        std::cout << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
+        LOGD_(FileLog) << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
                   << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff << "\n";
     }
     mPidStatistics[pid].lastPts = pts;
@@ -86,7 +86,7 @@ void TsStatistics::buildDtsHistogram(int pid, int64_t dts)
     mPidStatistics[pid].dtsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        std::cout << "DTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " dts-1 "
+        LOGD_(FileLog) << "DTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " dts-1 "
                   << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
     }
 
@@ -108,7 +108,7 @@ void TsStatistics::buildPcrHistogram(int pid, int64_t pcr)
     mPidStatistics[pid].pcrHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
     {
-        std::cout << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
+        LOGD_(FileLog) << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
                   << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
     }
 
