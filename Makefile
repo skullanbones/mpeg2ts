@@ -73,6 +73,15 @@ docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
  					$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
  					make $1
 
+docker_run = docker run \
+				--rm \
+				--interactive \
+				--tty=true \
+				--volume=$$(pwd):/tmp/workspace \
+				--workdir /tmp/workspace \
+				--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
+				$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash -c $1
+
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component_tests
 
 help:
@@ -185,7 +194,7 @@ component_tests: env $(BUILDDIR)/tsparser
 $(INCLUDE_DIRS) += -I$(3RDPARTYDIR)/plog-1.1.4/include
 
 $(3RDPARTYDIR)/plog-1.1.4.tar.gz:
-	wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+	$(call docker_run, "wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O /tmp/workspace/3rd-party/plog-1.1.4.tar.gz")
 
 $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-1.1.4.tar.gz
 	cd $(3RDPARTYDIR)
