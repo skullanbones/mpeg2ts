@@ -50,8 +50,8 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             // Error check
             if (tsPacketInfo.pid != TS_PACKET_PID_PAT)
             {
-                std::cout << "ERROR: Stream does not conform to 13818-1 TS standard. Using table_id for PAT but when,"
-                        "its not a PAT." << std::endl;
+                LOGE_(FileLog) << "ERROR: Stream does not conform to 13818-1 TS standard. Using table_id for PAT but when,"
+                        "its not a PAT.";
                 PmtTable pmt = mParser.parsePmtPacket();
                 mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
                 return;

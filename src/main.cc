@@ -149,7 +149,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 
 void PATCallback(PsiTable* table, uint16_t pid)
 {
-    std::cout << "PATCallback pid:" << pid << std::endl;
+    LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
     try
     {
@@ -170,7 +170,7 @@ void PATCallback(PsiTable* table, uint16_t pid)
     // Do nothing if same PAT
     if (g_prevPat == *pat)
     {
-        std::cout << "Got same PAT..." << std::endl;
+        LOGV << "Got same PAT...";
         return;
     }
     g_prevPat = *pat;
@@ -211,7 +211,7 @@ void PATCallback(PsiTable* table, uint16_t pid)
 
 void PMTCallback(PsiTable* table, uint16_t pid)
 {
-    std::cout << "PMTCallback... pid:" << pid << std::endl;
+    LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
 
     try
@@ -234,7 +234,7 @@ void PMTCallback(PsiTable* table, uint16_t pid)
     // Do nothing if same PMT
     if (g_prevPmts.find(pid) != g_prevPmts.end())
     {
-        std::cout << "Got same PMT..." << std::endl;
+        LOGV << "Got same PMT...";
         return;
     }
 
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
         case 'w':
         case 'p':
         case 'l':
-            std::cout << "Got pid listener pid:" << std::atoi(optarg) << std::endl;
+            LOGD << "Got pid listener pid:" << std::atoi(optarg);
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
         case 'm':
