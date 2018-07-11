@@ -12,9 +12,16 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
-INCDIR = $(PROJ_ROOT)/include
 TOOLSDIR = $(PROJ_ROOT)/tools
-export INCDIR
+3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
+
+## 3rd-party settings
+PLOG_VERSION=1.1.4
+
+INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
+				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include
+
+export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
 
 ## Machine
@@ -23,7 +30,7 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Docker
-DOCKER_IMAGE_VER ?= v3
+DOCKER_IMAGE_VER ?= v4
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
 DOCKER_USER_ID ?= $(USER)
 
@@ -69,6 +76,15 @@ docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
  					$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
  					make $1
 
+docker_run = docker run \
+				--rm \
+				--interactive \
+				--tty=true \
+				--volume=$$(pwd):/tmp/workspace \
+				--workdir /tmp/workspace \
+				--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
+				$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash -c $1
+
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component_tests
 
 help:
@@ -87,7 +103,10 @@ help:
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component_tests       - run all component tests.'
 	@echo '  so                    - make shared object as dynamic linkage library.'
+	@echo '  3rd-party             - install 3rd-party dependencies.'
+	@echo '  plog                  - install 3rd-party plog logging library.'
 	@echo '  clean                 - deletes build content.'
+	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
 all: $(BUILDDIR) $(BUILDDIR)/tsparser
@@ -98,12 +117,12 @@ $(BUILDDIR):
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
-$(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS)
-	$(CXX) -o $@ -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
+$(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
+	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
-$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
+$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc plog
 	@echo [Compile] $<
-	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
+	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
 
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
@@ -175,6 +194,19 @@ component_tests: env $(BUILDDIR)/tsparser
 	@echo "[Running component tests..]"
 	./env/bin/pytest
 
+### 3rd-party stuff
+$(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
+	wget https://github.com/SergiusTheBest/plog/archive/$(PLOG_VERSION).tar.gz -O $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
+
+$(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
+	cd $(3RDPARTYDIR)
+	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
+	touch $(3RDPARTYDIR)/.plog_extracted
+
+3rd-party: plog
+
+plog: $(3RDPARTYDIR)/.plog_extracted
+
 clean:
 	rm -f $(OBJS)
 	rm -f $(BUILDDIR)/tsparser
@@ -185,3 +217,10 @@ clean:
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
+
+### Will force clean download cache
+clean-all: clean
+	rm -f $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
+	rm -f $(3RDPARTYDIR)/.plog_extracted
+	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
+

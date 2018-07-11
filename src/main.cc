@@ -15,10 +15,15 @@
 #include <type_traits>
 #include <unistd.h>
 
+/// 3rd-party
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
 /// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
+#include "Logging.h"
 
 
 uint64_t count = 0;
@@ -29,6 +34,9 @@ TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::list<PmtTable> g_prevPmts;
 bool addedPmts = false;
+
+int LOGFILE_MAXSIZE = 100 * 1024;
+int LOGFILE_MAXNUMBEROF = 10;
 
 enum class OptionWriteMode
 {
@@ -98,26 +106,26 @@ void display_statistics(TsDemuxer demuxer)
         {
             continue;
         }
-        std::cout << "Pid: " << pidStat.first << "\n";
-        std::cout << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
-        std::cout << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
-        std::cout << " Pts differences histogram:\n";
+        LOGD << "Pid: " << pidStat.first << "\n";
+        LOGD << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << "\n";
+        LOGD << " CC error: " << pidStat.second.numberOfCCErrors << "\n";
+        LOGD << " Pts differences histogram:\n";
         for (auto& ent : pidStat.second.ptsHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
-        std::cout << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
+        LOGD << " Pts missing: " << pidStat.second.numberOfMissingPts << "\n";
 
-        std::cout << " Dts differences histogram:\n";
+        LOGD << " Dts differences histogram:\n";
         for (auto& ent : pidStat.second.dtsHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
-        std::cout << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
-        std::cout << " Pcr differences histogram:\n";
+        LOGD << " Dts missing: " << pidStat.second.numberOfMissingDts << "\n";
+        LOGD << " Pcr differences histogram:\n";
         for (auto& ent : pidStat.second.pcrHistogram)
         {
-            std::cout << "  diff: " << ent.first << " quantity " << ent.second << "\n";
+            LOGD << "  diff: " << ent.first << " quantity " << ent.second << "\n";
         }
     }
 }
@@ -126,10 +134,10 @@ void display_statistics(TsDemuxer demuxer)
 void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
     auto pid = tsPacketInfo.pid;
-    std::cout << "demuxed TS packet \n" << tsPacketInfo;
+    LOGD << "demuxed TS packet \n" << tsPacketInfo;
     if (hasPid("pid", pid))
     {
-        std::cout << tsPacketInfo << "\n";
+        LOGN << tsPacketInfo;
     }
 
     if (hasPid("write", pid))
@@ -147,7 +155,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
         }
         std::copy(packet, packet + TS_PACKET_SIZE, std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
+        LOGD << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -160,13 +168,13 @@ void PATCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pat == NULL)
     {
-        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -180,25 +188,25 @@ void PATCallback(PsiTable* table)
 
     if (hasPid("pid", TS_PACKET_PID_PAT))
     {
-        std::cout << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
-        std::cout << *pat << std::endl;
+        LOGN << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        LOGN << *pat << std::endl;
     }
 
     // Check if MPTS or SPTS
     int numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
-        std::cout << "No programs found in PAT, exiting..." << std::endl;
+        LOGD << "No programs found in PAT, exiting...";
         exit(EXIT_SUCCESS);
     }
     else if (numPrograms == 1) // SPTS
     {
-        std::cout << "Found Single Program Transport Stream (SPTS)." << std::endl;
+        LOGD << "Found Single Program Transport Stream (SPTS).";
         g_PMTPIDS.push_back(pat->programs[0].program_map_PID);
     }
     else if (numPrograms >= 1) // MPTS
     {
-        std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
+        LOGD << "Found Multiple Program Transport Stream (MPTS).";
         for (auto program : pat->programs)
         {
             if (program.type == ProgramType::PMT)
@@ -222,13 +230,13 @@ void PMTCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pmt == NULL)
     {
-        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -242,8 +250,8 @@ void PMTCallback(PsiTable* table)
 
     if (hasPids("pid", g_PMTPIDS))
     {
-        std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
-        std::cout << *pmt << std::endl;
+        LOGN << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter;
+        LOGN << *pmt;
     }
 
     for (auto& stream : pmt->streams)
@@ -251,7 +259,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), stream.elementary_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
         {
-            std::cout << "Add ES PID: " << stream.elementary_PID << std::endl;
+            LOGD << "Add ES PID: " << stream.elementary_PID << std::endl;
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
@@ -260,7 +268,7 @@ void PMTCallback(PsiTable* table)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
-            std::cout << "Add PCR PID: " << pmt->PCR_PID << std::endl;
+            LOGD << "Add PCR PID: " << pmt->PCR_PID << std::endl;
             g_ESPIDS.push_back(pmt->PCR_PID);
         }
     }
@@ -271,9 +279,9 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("pid", pid))
     {
-        std::cout << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
+        LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
                   << " (" << pid << ")\n";
-        std::cout << pes << std::endl;
+        LOGN << pes << std::endl;
     }
 
     if (hasPid("write", pid))
@@ -306,14 +314,31 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
         std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(),
                   std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        std::cout << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
+        LOGD << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
                   << " bytes, pid: " << pid << std::endl;
     }
 }
 
 int main(int argc, char** argv)
 {
-    std::cout << "Starting parser of file" << std::endl;
+    // Initialize the logger
+    /// Short macros list
+    ///LOGV << "verbose";
+    ///LOGD << "debug";
+    ///LOGI << "info";
+    ///LOGW << "warning";
+    ///LOGE << "error";
+    ///LOGF << "fatal";
+    ///LOGN << "none";
+    //plog::init(plog::debug, "tsparser.csv");
+
+
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
+    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(plog::debug, &fileAppender); // Initialize the 2nd logger instance.
+
+    LOGD << "Starting parser of file";
 
     int longIndex;
 
@@ -360,7 +385,7 @@ int main(int argc, char** argv)
         break;
         case 'i':
         {
-            std::cout << "Got file input: " << std::string(optarg) << std::endl;
+            LOGD << "Got file input: " << std::string(optarg);
             g_InputFile = std::string(optarg);
             break;
         }
@@ -392,7 +417,7 @@ int main(int argc, char** argv)
 
     if (fptr == NULL)
     {
-        std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
+        LOGE << "ERROR: Invalid file! Exiting...";
         exit(EXIT_FAILURE);
     }
 
@@ -414,12 +439,11 @@ int main(int argc, char** argv)
             int eof = feof(fptr);
             if (eof != 0)
             {
-                std::cout << "End Of File..." << std::endl;
-                std::cout << "Found " << count << " ts-packets." << std::endl;
-                std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets."
-                          << std::endl;
+                LOGD << "End Of File..." << std::endl;
+                LOGD << "Found " << count << " ts-packets." << std::endl;
+                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
-                std::cout << "Statistics\n";
+                LOGD << "Statistics\n";
                 display_statistics(g_tsDemux);
                 fclose(fptr);
                 return EXIT_SUCCESS;
@@ -434,7 +458,7 @@ int main(int argc, char** argv)
         fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
         if (res != TS_PACKET_SIZE)
         {
-            std::cout << "ERROR: Could not read a complete TS-Packet, read: " << res << std::endl; // May be last packet end of file.
+            LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
         }
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
@@ -455,9 +479,9 @@ int main(int argc, char** argv)
         }
         catch (GetBitsException& e)
         {
-            std::cout << "Got exception: " << e.what() << std::endl;
-            std::cout << "Got header: " << info.hdr << std::endl;
-            std::cout << "Got packet: " << info << std::endl;
+            LOGE_(FileLog) << "Got exception: " << e.what();
+            LOGE_(FileLog) << "Got header: " << info.hdr;
+            LOGE_(FileLog) << "Got packet: " << info;
             fclose(fptr);
             exit(EXIT_FAILURE);
         }
@@ -465,7 +489,7 @@ int main(int argc, char** argv)
         {
             for (auto pid : g_PMTPIDS)
             {
-                std::cout << "Adding PSI PID for parsing: " << pid << std::endl;
+                LOGD << "Adding PSI PID for parsing: " << pid;
                 g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
             }
             addedPmts = true;
@@ -473,7 +497,7 @@ int main(int argc, char** argv)
 
         for (auto pid : g_ESPIDS)
         {
-            std::cout << "Adding PES PID for parsing: " << pid << std::endl;
+            LOGD << "Adding PES PID for parsing: " << pid;
             g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
         g_ESPIDS.clear();

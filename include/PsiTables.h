@@ -9,6 +9,12 @@
 
 #include <iostream>
 
+/// 3rd-party
+#include <plog/Log.h>
+
+/// project files
+#include "Logging.h"
+
 class PsiTable
 {
 public:
@@ -39,7 +45,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
     {
-        ss << "-------------PsiTable------------- " << std::endl;
+        ss << std::endl << "-------------PsiTable------------- " << std::endl;
         ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
         ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
         ss << "section_length: " << (int)rhs.section_length << std::endl;
@@ -77,7 +83,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     {
-        ss << "-------------PatTable------------- " << std::endl;
+        ss << std::endl << "-------------PatTable------------- " << std::endl;
         // ss << static_cast<const PsiTable&>(rhs) << std::endl;
         // ss << PsiTable::operator<<(rhs) << std::endl;
         ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
@@ -110,7 +116,7 @@ public:
         // 1. check number of programs
         if (this->programs.size() != rhs.programs.size())
         {
-            std::cout << "PatTable number of programs unequal." << std::endl;
+            LOGD_(FileLog) << "PatTable number of programs unequal." << std::endl;
             return false;
         }
         // 2. check content of each programs
@@ -119,7 +125,7 @@ public:
         {
             if (prg != rhs.programs.at(i))
             {
-                std::cout << "PatTable programs content unequal for program: " << prg.program_number
+                LOGD_(FileLog) << "PatTable programs content unequal for program: " << prg.program_number
                           << std::endl;
                 return false;
             }
@@ -166,7 +172,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
     {
-        ss << "-------------PmtTable------------- " << std::endl;
+        ss << std::endl << "-------------PmtTable------------- " << std::endl;
         ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
         ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
         ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;
@@ -194,25 +200,25 @@ public:
         // 1. First check CRC 32
         if (this->CRC_32 != rhs.CRC_32)
         {
-            std::cout << "PmtTable CRC_32 unequal." << std::endl;
+            LOGD_(FileLog) << "PmtTable CRC_32 unequal." << std::endl;
             return false;
         }
         // 2. Secondly check PCR_PID
         if (this->PCR_PID != rhs.PCR_PID)
         {
-            std::cout << "PmtTable PCR_PID unequal." << std::endl;
+            LOGD_(FileLog) << "PmtTable PCR_PID unequal." << std::endl;
             return false;
         }
         // 3. Thirdly check program_info_length
         if (this->program_info_length != rhs.program_info_length)
         {
-            std::cout << "PmtTable program_info_length unequal." << std::endl;
+            LOGD_(FileLog) << "PmtTable program_info_length unequal." << std::endl;
             return false;
         }
         // 4. check number of streams
         if (this->streams.size() != rhs.streams.size())
         {
-            std::cout << "PmtTable number of streams unequal." << std::endl;
+            LOGD_(FileLog) << "PmtTable number of streams unequal." << std::endl;
             return false;
         }
         // 5. check content of each streams
@@ -221,7 +227,7 @@ public:
         {
             if (stream != rhs.streams.at(i))
             {
-                std::cout << "PmtTable stream content unequal for stream_type: " << stream.stream_type
+                LOGD_(FileLog) << "PmtTable stream content unequal for stream_type: " << stream.stream_type
                           << std::endl;
                 return false;
             }
