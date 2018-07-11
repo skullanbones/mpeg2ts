@@ -17,11 +17,13 @@
 
 /// 3rd-party
 #include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
 
 /// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
+#include "Logging.h"
 
 
 uint64_t count = 0;
@@ -163,13 +165,13 @@ void PATCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        LOGE << "ERROR: dynamic_cast ex: " << ex.what();
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pat == NULL)
     {
-        LOGE << "ERROR: This should not happen. You have some corrupt stream!!!";
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -225,13 +227,13 @@ void PMTCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        LOGE << "ERROR: dynamic_cast ex: " << ex.what();
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pmt == NULL)
     {
-        LOGE << "ERROR: This should not happen. You have some corrupt stream!!!";
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -245,8 +247,8 @@ void PMTCallback(PsiTable* table)
 
     if (hasPids("pid", g_PMTPIDS))
     {
-        std::cout << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
-        std::cout << *pmt << std::endl;
+        LOGD << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter;
+        LOGD << *pmt;
     }
 
     for (auto& stream : pmt->streams)
@@ -325,7 +327,14 @@ int main(int argc, char** argv)
     ///LOGE << "error";
     ///LOGF << "fatal";
     ///LOGN << "none";
-    plog::init(plog::debug, "tsparser.csv");
+    //plog::init(plog::debug, "tsparser.csv");
+
+
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", 8000, 3); // Create the 1st appender.
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
+    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(plog::debug, &fileAppender); // Initialize the 2nd logger instance.
+
     LOGD << "Starting parser of file";
 
     int longIndex;
@@ -405,7 +414,7 @@ int main(int argc, char** argv)
 
     if (fptr == NULL)
     {
-        LOGE << "ERROR: Invalid file! Exiting...";
+        LOGE_(FileLog) << "ERROR: Invalid file! Exiting...";
         exit(EXIT_FAILURE);
     }
 
@@ -446,7 +455,7 @@ int main(int argc, char** argv)
         fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
         if (res != TS_PACKET_SIZE)
         {
-            LOGE << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
+            LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
         }
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
@@ -467,9 +476,9 @@ int main(int argc, char** argv)
         }
         catch (GetBitsException& e)
         {
-            LOGE << "Got exception: " << e.what();
-            LOGE << "Got header: " << info.hdr;
-            LOGE << "Got packet: " << info;
+            LOGE_(FileLog) << "Got exception: " << e.what();
+            LOGE_(FileLog) << "Got header: " << info.hdr;
+            LOGE_(FileLog) << "Got packet: " << info;
             fclose(fptr);
             exit(EXIT_FAILURE);
         }

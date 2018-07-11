@@ -4,12 +4,11 @@
  */
 #include <iostream>
 
-/// 3rd-party
-#include <plog/Log.h>
 
 // Project files
 #include "CommonTypes.h"
 #include "TsParser.h"
+#include "Logging.h"
 
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
@@ -141,7 +140,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         // Check if data size is within boundary of a TS Packet
         if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset))
         {
-            LOGE << "Found out of bound private data. Error in input.";
+            LOGE_(FileLog) << "Found out of bound private data. Error in input.";
             outInfo.isError = true;
             return;
         }
@@ -159,7 +158,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         // Check if data size is within boundary of a TS Packet
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
         {
-            LOGE << "Found out of bound adaptation field extension data. Error in input.";
+            LOGE_(FileLog) << "Found out of bound adaptation field extension data. Error in input.";
             outInfo.isError = true;
             return;
         }
@@ -397,7 +396,7 @@ void TsParser::parsePesPacket(int16_t pid)
         // Forbidden value
         if (mPesPacket[pid].PTS_DTS_flags == 0x01)
         {
-            std::cout << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags << std::endl;
+            LOGE_(FileLog) << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags;
         }
         else if (mPesPacket[pid].PTS_DTS_flags == 0x02) // Only PTS value
         {

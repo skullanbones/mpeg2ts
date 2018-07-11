@@ -14,6 +14,7 @@
  */
 
 #include "TsStatistics.h"
+#include "Logging.h"
 
 void TsStatistics::checkCCError(int pid, uint8_t cc)
 {
@@ -26,7 +27,7 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
         if (((mPidStatistics[pid].lastCC + 1) & 0x0f) != cc)
         {
             ++mPidStatistics[pid].numberOfCCErrors;
-            std::cout << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
+            LOGD_(FileLog) << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
                       << pid << "\n";
         }
         mPidStatistics[pid].lastCC = cc;
@@ -38,7 +39,7 @@ void TsStatistics::checkTsDiscontinuity(int pid, bool dis)
     if (dis)
     {
         ++mPidStatistics[pid].numberOfTsDiscontinuities;
-        std::cout << "Transport stream discontinuity at ts packet " << mTsPacketCounter
+        LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mTsPacketCounter
                   << " on pid " << pid << "\n";
     }
 }
