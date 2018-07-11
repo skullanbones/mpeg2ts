@@ -12,9 +12,13 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
-INCDIR = $(PROJ_ROOT)/include
 TOOLSDIR = $(PROJ_ROOT)/tools
-export INCDIR
+3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
+
+INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
+				-I$(3RDPARTYDIR)/plog-1.1.4/include
+
+export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
 
 ## Machine
@@ -87,6 +91,8 @@ help:
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component_tests       - run all component tests.'
 	@echo '  so                    - make shared object as dynamic linkage library.'
+	@echo '  3rd-party             - make 3rd-party dependencies and include dirs currently only plog.'
+	@echo '  plog                  - make plog lib...'
 	@echo '  clean                 - deletes build content.'
 	@echo
 
@@ -99,11 +105,11 @@ $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
 $(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS)
-	$(CXX) -o $@ -I$(INCDIR) -c $(CXXFLAGS) $(SRCDIR)/main.cc
+	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
 $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
 	@echo [Compile] $<
-	@$(CXX) -I$(INCDIR) -c $(CXXFLAGS) $< -o $@
+	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
 
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
@@ -174,6 +180,21 @@ env:
 component_tests: env $(BUILDDIR)/tsparser
 	@echo "[Running component tests..]"
 	./env/bin/pytest
+
+### 3rd-party stuff
+$(INCLUDE_DIRS) += -I$(3RDPARTYDIR)/plog-1.1.4/include
+
+$(3RDPARTYDIR)/plog-1.1.4.tar.gz:
+	wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+
+$(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+	cd $(3RDPARTYDIR)
+	tar xvf $(3RDPARTYDIR)/plog-1.1.4.tar.gz -C $(3RDPARTYDIR)
+	touch $(3RDPARTYDIR)/.plog_extracted
+
+3rd-party: plog
+
+plog: $(3RDPARTYDIR)/.plog_extracted
 
 clean:
 	rm -f $(OBJS)

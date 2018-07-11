@@ -15,6 +15,9 @@
 #include <type_traits>
 #include <unistd.h>
 
+/// 3rd-party
+#include <plog/Log.h>
+
 /// Project files
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
@@ -313,7 +316,17 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
 int main(int argc, char** argv)
 {
-    std::cout << "Starting parser of file" << std::endl;
+    // Initialize the logger
+    /// Short macros list
+    ///LOGV << "verbose";
+    ///LOGD << "debug";
+    ///LOGI << "info";
+    ///LOGW << "warning";
+    ///LOGE << "error";
+    ///LOGF << "fatal";
+    ///LOGN << "none";
+    plog::init(plog::debug, "tsparser.csv");
+    LOGD << "Starting parser of file";
 
     int longIndex;
 
@@ -360,7 +373,7 @@ int main(int argc, char** argv)
         break;
         case 'i':
         {
-            std::cout << "Got file input: " << std::string(optarg) << std::endl;
+            LOGD << "Got file input: " << std::string(optarg);
             g_InputFile = std::string(optarg);
             break;
         }
@@ -392,7 +405,7 @@ int main(int argc, char** argv)
 
     if (fptr == NULL)
     {
-        std::cout << "ERROR: Invalid file! Exiting..." << std::endl;
+        LOGE << "ERROR: Invalid file! Exiting...";
         exit(EXIT_FAILURE);
     }
 
@@ -414,12 +427,11 @@ int main(int argc, char** argv)
             int eof = feof(fptr);
             if (eof != 0)
             {
-                std::cout << "End Of File..." << std::endl;
-                std::cout << "Found " << count << " ts-packets." << std::endl;
-                std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets."
-                          << std::endl;
+                LOGD << "End Of File...";
+                LOGD << "Found " << count << " ts-packets.";
+                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets.";
 
-                std::cout << "Statistics\n";
+                LOGD << "Statistics\n";
                 display_statistics(g_tsDemux);
                 fclose(fptr);
                 return EXIT_SUCCESS;
@@ -434,7 +446,7 @@ int main(int argc, char** argv)
         fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
         if (res != TS_PACKET_SIZE)
         {
-            std::cout << "ERROR: Could not read a complete TS-Packet, read: " << res << std::endl; // May be last packet end of file.
+            LOGE << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
         }
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
@@ -455,9 +467,9 @@ int main(int argc, char** argv)
         }
         catch (GetBitsException& e)
         {
-            std::cout << "Got exception: " << e.what() << std::endl;
-            std::cout << "Got header: " << info.hdr << std::endl;
-            std::cout << "Got packet: " << info << std::endl;
+            LOGE << "Got exception: " << e.what();
+            LOGE << "Got header: " << info.hdr;
+            LOGE << "Got packet: " << info;
             fclose(fptr);
             exit(EXIT_FAILURE);
         }
@@ -465,7 +477,7 @@ int main(int argc, char** argv)
         {
             for (auto pid : g_PMTPIDS)
             {
-                std::cout << "Adding PSI PID for parsing: " << pid << std::endl;
+                LOGD << "Adding PSI PID for parsing: " << pid;
                 g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
             }
             addedPmts = true;
@@ -473,7 +485,7 @@ int main(int argc, char** argv)
 
         for (auto pid : g_ESPIDS)
         {
-            std::cout << "Adding PES PID for parsing: " << pid << std::endl;
+            LOGD << "Adding PES PID for parsing: " << pid;
             g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
         }
         g_ESPIDS.clear();
