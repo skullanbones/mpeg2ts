@@ -27,7 +27,7 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Docker
-DOCKER_IMAGE_VER ?= v3
+DOCKER_IMAGE_VER ?= v4
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
 DOCKER_USER_ID ?= $(USER)
 
