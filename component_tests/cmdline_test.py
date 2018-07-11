@@ -101,3 +101,17 @@ def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
     out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
     log.debug(out[0])
     log.debug(out[1])
+
+
+def test_parse_got_hbo_pat(parser, asset_h264_138183_got_hbo):
+    """
+    Test HBO asset
+    :param parser:
+    :param asset_got_hbo_unknown:
+    :return:
+    """
+    asset = asset_h264_138183_got_hbo.get_asset()
+    assert "GoT-HBO.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 0])
+    log.debug(out[0])
+    log.debug(out[1])
