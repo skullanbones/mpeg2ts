@@ -47,13 +47,24 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
         if (table_id == PSI_TABLE_ID_PAT)
         {
+            // Error check
+            if (tsPacketInfo.pid != TS_PACKET_PID_PAT)
+            {
+                std::cout << "ERROR: Stream does not conform to 13818-1 TS standard. Using table_id for PAT but when,"
+                        "its not a PAT." << std::endl;
+                PmtTable pmt = mParser.parsePmtPacket();
+                mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+                return;
+            }
+
             PatTable pat = mParser.parsePatPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pat, mHandlers[tsPacketInfo.pid]);
+            mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
+
             PmtTable pmt = mParser.parsePmtPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pmt, mHandlers[tsPacketInfo.pid]);
+            mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 

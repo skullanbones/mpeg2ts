@@ -32,7 +32,7 @@ std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 PatTable g_prevPat;
-std::list<PmtTable> g_prevPmts;
+std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
 int LOGFILE_MAXSIZE = 100 * 1024;
@@ -63,24 +63,12 @@ bool hasPid(std::string param, uint32_t pid)
 
 bool hasPids(std::string param, std::vector<uint16_t> pids)
 {
-    bool ret;
+    bool ret = 0;
     for (auto pid : pids)
     {
-        ret = std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+        ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);
     }
     return ret;
-}
-
-bool hasPmt(const PmtTable& pmt)
-{
-    for (auto prevPmt : g_prevPmts)
-    {
-        if (pmt == prevPmt)
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 void display_usage()
@@ -159,8 +147,9 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(PsiTable* table)
+void PATCallback(PsiTable* table, uint16_t pid)
 {
+    std::cout << "PATCallback pid:" << pid << std::endl;
     PatTable* pat;
     try
     {
@@ -178,10 +167,10 @@ void PATCallback(PsiTable* table)
         return;
     }
 
-
     // Do nothing if same PAT
     if (g_prevPat == *pat)
     {
+        std::cout << "Got same PAT..." << std::endl;
         return;
     }
     g_prevPat = *pat;
@@ -220,8 +209,9 @@ void PATCallback(PsiTable* table)
     // TODO: add writing of table
 }
 
-void PMTCallback(PsiTable* table)
+void PMTCallback(PsiTable* table, uint16_t pid)
 {
+    std::cout << "PMTCallback... pid:" << pid << std::endl;
     PmtTable* pmt;
 
     try
@@ -242,11 +232,13 @@ void PMTCallback(PsiTable* table)
 
 
     // Do nothing if same PMT
-    if (hasPmt(*pmt))
+    if (g_prevPmts.find(pid) != g_prevPmts.end())
     {
+        std::cout << "Got same PMT..." << std::endl;
         return;
     }
-    g_prevPmts.push_back(*pmt);
+
+    g_prevPmts[pid] = *pmt;
 
     if (hasPids("pid", g_PMTPIDS))
     {
@@ -357,6 +349,7 @@ int main(int argc, char** argv)
         case 'w':
         case 'p':
         case 'l':
+            std::cout << "Got pid listener pid:" << std::atoi(optarg) << std::endl;
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
         case 'm':
@@ -422,7 +415,7 @@ int main(int argc, char** argv)
     }
 
     // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
 
     for (count = 0;; ++count)
     {
@@ -490,7 +483,7 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
+                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
             }
             addedPmts = true;
         }
