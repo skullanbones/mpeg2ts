@@ -104,7 +104,7 @@ $(BUILDDIR):
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
-$(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS)
+$(BUILDDIR)/main.o: $(SRCDIR)/main.cc $(HDRS) plog
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
 $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc
@@ -202,6 +202,9 @@ clean:
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)
+	rm -f $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+	rm -f $(3RDPARTYDIR)/.plog_extracted
+	rm -rf $(3RDPARTYDIR)/plog-1.1.4
 	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
