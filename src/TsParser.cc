@@ -4,6 +4,9 @@
  */
 #include <iostream>
 
+/// 3rd-party
+#include <plog/Log.h>
+
 // Project files
 #include "CommonTypes.h"
 #include "TsParser.h"
@@ -138,7 +141,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         // Check if data size is within boundary of a TS Packet
         if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset))
         {
-            std::cout << "ERROR: Found out of bound private data. Error in input." << std::endl;
+            LOGE << "Found out of bound private data. Error in input.";
             outInfo.isError = true;
             return;
         }
@@ -156,8 +159,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         // Check if data size is within boundary of a TS Packet
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
         {
-            std::cout
-            << "ERROR: Found out of bound adaptation field extension data. Error in input." << std::endl;
+            LOGE << "Found out of bound adaptation field extension data. Error in input.";
             outInfo.isError = true;
             return;
         }

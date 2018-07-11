@@ -100,9 +100,10 @@ help:
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component_tests       - run all component tests.'
 	@echo '  so                    - make shared object as dynamic linkage library.'
-	@echo '  3rd-party             - make 3rd-party dependencies and include dirs currently only plog.'
-	@echo '  plog                  - make plog lib...'
+	@echo '  3rd-party             - install 3rd-party dependencies.'
+	@echo '  plog                  - install 3rd-party plog logging library.'
 	@echo '  clean                 - deletes build content.'
+	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
 all: $(BUILDDIR) $(BUILDDIR)/tsparser
@@ -211,10 +212,14 @@ clean:
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)
-	rm -f $(3RDPARTYDIR)/plog-1.1.4.tar.gz
-	rm -f $(3RDPARTYDIR)/.plog_extracted
-	rm -rf $(3RDPARTYDIR)/plog-1.1.4
 	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
+
+### Will force clean download cache
+clean-all: clean
+	rm -f $(3RDPARTYDIR)/plog-1.1.4.tar.gz
+	rm -f $(3RDPARTYDIR)/.plog_extracted
+	rm -rf $(3RDPARTYDIR)/plog-1.1.4
+

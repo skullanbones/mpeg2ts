@@ -129,7 +129,7 @@ void display_statistics(TsDemuxer demuxer)
 void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
     auto pid = tsPacketInfo.pid;
-    std::cout << "demuxed TS packet \n" << tsPacketInfo;
+    LOGD << "demuxed TS packet \n" << tsPacketInfo;
     if (hasPid("pid", pid))
     {
         std::cout << tsPacketInfo << "\n";
@@ -163,13 +163,13 @@ void PATCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        LOGE << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pat == NULL)
     {
-        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        LOGE << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -191,17 +191,17 @@ void PATCallback(PsiTable* table)
     int numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
-        std::cout << "No programs found in PAT, exiting..." << std::endl;
+        LOGD << "No programs found in PAT, exiting...";
         exit(EXIT_SUCCESS);
     }
     else if (numPrograms == 1) // SPTS
     {
-        std::cout << "Found Single Program Transport Stream (SPTS)." << std::endl;
+        LOGD << "Found Single Program Transport Stream (SPTS).";
         g_PMTPIDS.push_back(pat->programs[0].program_map_PID);
     }
     else if (numPrograms >= 1) // MPTS
     {
-        std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
+        LOGD << "Found Multiple Program Transport Stream (MPTS).";
         for (auto program : pat->programs)
         {
             if (program.type == ProgramType::PMT)
@@ -225,13 +225,13 @@ void PMTCallback(PsiTable* table)
     }
     catch (std::exception& ex)
     {
-        std::cout << "ERROR: dynamic_cast ex: " << ex.what() << std::endl;
+        LOGE << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pmt == NULL)
     {
-        std::cout << "ERROR: This should not happen. You have some corrupt stream!!!" << std::endl;
+        LOGE << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -427,11 +427,11 @@ int main(int argc, char** argv)
             int eof = feof(fptr);
             if (eof != 0)
             {
-                LOGD << "End Of File...";
-                LOGD << "Found " << count << " ts-packets.";
-                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets.";
+                std::cout << "End Of File..." << std::endl;
+                std::cout << "Found " << count << " ts-packets." << std::endl;
+                std::cout << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
-                LOGD << "Statistics\n";
+                std::cout << "Statistics\n";
                 display_statistics(g_tsDemux);
                 fclose(fptr);
                 return EXIT_SUCCESS;
