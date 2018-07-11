@@ -35,6 +35,9 @@ PatTable g_prevPat;
 std::list<PmtTable> g_prevPmts;
 bool addedPmts = false;
 
+int LOGFILE_MAXSIZE = 100 * 1024;
+int LOGFILE_MAXNUMBEROF = 10;
+
 enum class OptionWriteMode
 {
     TS,
@@ -330,7 +333,7 @@ int main(int argc, char** argv)
     //plog::init(plog::debug, "tsparser.csv");
 
 
-    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", 8000, 3); // Create the 1st appender.
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
     plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
     plog::init<FileLog>(plog::debug, &fileAppender); // Initialize the 2nd logger instance.
@@ -414,7 +417,7 @@ int main(int argc, char** argv)
 
     if (fptr == NULL)
     {
-        LOGE_(FileLog) << "ERROR: Invalid file! Exiting...";
+        LOGE << "ERROR: Invalid file! Exiting...";
         exit(EXIT_FAILURE);
     }
 
