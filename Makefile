@@ -194,7 +194,7 @@ component_tests: env $(BUILDDIR)/tsparser
 $(INCLUDE_DIRS) += -I$(3RDPARTYDIR)/plog-1.1.4/include
 
 $(3RDPARTYDIR)/plog-1.1.4.tar.gz:
-	$(call docker_run, "wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O /tmp/workspace/3rd-party/plog-1.1.4.tar.gz")
+	wget https://github.com/SergiusTheBest/plog/archive/1.1.4.tar.gz -O $(3RDPARTYDIR)/plog-1.1.4.tar.gz
 
 $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-1.1.4.tar.gz
 	cd $(3RDPARTYDIR)
