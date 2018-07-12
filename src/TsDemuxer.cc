@@ -54,11 +54,12 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
                         "its not a PAT.";
                 PmtTable pmt = mParser.parsePmtPacket();
                 mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
-                return;
             }
-
-            PatTable pat = mParser.parsePatPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            else
+            {
+                PatTable pat = mParser.parsePatPacket();
+                mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            }
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {

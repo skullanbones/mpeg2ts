@@ -311,6 +311,15 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
     }
 }
 
+extern void printTsPacket(const uint8_t* packet)
+{
+    for (int i = 0; i < 188; i++)
+    {
+        printf ("0x%02x\n", packet[i]);
+    }
+    printf ("\n");
+}
+
 int main(int argc, char** argv)
 {
     // Initialize the logger
@@ -453,11 +462,12 @@ int main(int argc, char** argv)
         {
             LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
         }
+        //printTsPacket(packet);
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
         if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
         {
-            // std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<
+            LOGE << "ERROR: Ts-packet Sync error. Next packet sync: ";
             // (int)packet[TS_PACKET_SIZE] << std::endl;  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
             // continue; // Skip this packet since it's not synced.
         }
