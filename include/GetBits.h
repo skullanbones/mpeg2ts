@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <string>
 
+#include <stdexcept>
+
 class GetBits
 {
 public:
@@ -50,15 +52,9 @@ protected:
     const uint8_t* mSrcBytes;
 };
 
-struct GetBitsException
+class GetBitsException : public std::runtime_error
 {
+public:
     GetBitsException(const std::string msg);
     virtual ~GetBitsException() = default;
-
-    std::string what()
-    {
-        return mMsg;
-    }
-
-    const std::string mMsg;
 };

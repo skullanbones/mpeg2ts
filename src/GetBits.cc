@@ -82,12 +82,11 @@ void GetBits::skipBits(uint8_t skipBits)
     getBits(rem);
 }
 
-GetBitsException::GetBitsException(const std::string msg)
-: mMsg{ msg }
-{
-}
-
 size_t GetBits::getByteInx()
 {
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
 }
+
+GetBitsException::GetBitsException(const std::string msg)
+        : std::runtime_error(msg)
+{}

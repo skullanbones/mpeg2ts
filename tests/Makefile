@@ -1,5 +1,5 @@
 CXX = g++
-INC := -I$(PROJ_ROOT) -I$(CURDIR) $(INCLUDE_DIRS)
+INC := -I$(CURDIR) $(INCLUDE_DIRS)
 COMPONENT_NAME := gtests
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
 BUILDDIR = $(PROJ_ROOT)/build
