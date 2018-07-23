@@ -21,7 +21,18 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
     mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
-    
+
+    if (tsPacketInfo.errorIndicator)
+    {
+        ++mParser.mTsPacketErrorIndicator;
+    }
+
+    if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
+    {
+        ++mParser.mTsPacketNullPacketCounter;
+        return; // Skip null packets, they contain no info
+    }
+
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {
         mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo, mHandlers[tsPacketInfo.pid]);
@@ -29,20 +40,28 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
-        // TODO Filter PID from PSI, TS, PES etc...
         // Check what table
         uint8_t table_id;
         mParser.collectTable(tsPacket, tsPacketInfo, table_id);
 
         if (table_id == PSI_TABLE_ID_PAT)
         {
-            PatTable pat = mParser.parsePatPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pat, mHandlers[tsPacketInfo.pid]);
+            // Error check
+            if (tsPacketInfo.pid != TS_PACKET_PID_PAT)
+            {
+                LOGE_(FileLog) << "ERROR: Stream does not conform to 13818-1 TS standard.";
+            }
+            else
+            {
+                PatTable pat = mParser.parsePatPacket(tsPacketInfo.pid);
+                mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            }
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
-            PmtTable pmt = mParser.parsePmtPacket();
-            mPsiCallbackMap[tsPacketInfo.pid](&pmt, mHandlers[tsPacketInfo.pid]);
+
+            PmtTable pmt = mParser.parsePmtPacket(tsPacketInfo.pid);
+            mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 

@@ -4,20 +4,20 @@ Make video great again!
 ## How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
-make
-cat assets/test1.ts | ./tsparser
+make all
+./tsparser --input assets/test1.ts
 ```
 Check help in command line (CLI):
 ```
-cat assets/test1.ts | build/tsparser --help
+./tsparser --help --input assets/test1.ts
 ```
 Add option --write with the PES PID for writing PES packets to file.
 ```
-cat assets/bbc_one.ts | build/tsparser --write 2504
+./tsparser --write 2504 --input assets/bbc_one.ts
 ```
-Just print PSI tables / PES header can be done by --info option and the PID.
+Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
-cat assets/bbc_one.ts | build/tsparser --info 258
+./tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
 

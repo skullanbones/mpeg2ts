@@ -37,3 +37,6 @@ build/
 tests/gtests
 .idea/
 
+downloaded_files/
+cmdline_test.log
+*~

@@ -19,8 +19,9 @@ class TsParser(object):
     """This object reflects TsParser executable."""
     parser = os.path.join(project_root(), 'build/tsparser')
 
-    def __init__(self):
+    def __init__(self, logger):
         self.proc = None
+        self.log = logger
 
     def __enter__(self):
         return self
@@ -40,13 +41,16 @@ class TsParser(object):
         """Internal function that forks a new process of executable with given
         arguments"""
         cmd = self.start_cmd(**kwargs)
+        self.log.info("start command: %s" % cmd)
 
         self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE,
                                      universal_newlines=True)
         out, err, exitcode = self.wait()
 
-        print(out)
+        #self.log.info(out)
+        if err is not "":
+            self.log.error(err)
         sys.stderr.write(err)
 
         return exitcode, out, err

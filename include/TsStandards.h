@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <vector>
 
@@ -20,9 +21,9 @@
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
-const int TS_PACKET_SYNC_BYTE = 0x47;              // Section 2.4.3.3
-const int TS_PACKET_SIZE = 188;                    // Section 2.4.3
-const int TS_PACKET_HEADER_SIZE = 4;               // Table 2-2
+const int TS_PACKET_SYNC_BYTE = 0x47; // Section 2.4.3.3
+const int TS_PACKET_SIZE = 188;       // Section 2.4.3
+const int TS_PACKET_HEADER_SIZE = 4;  // Table 2-2
 const int TS_PACKET_MAX_PAYLOAD_SIZE = (TS_PACKET_SIZE - TS_PACKET_HEADER_SIZE);
 const int TS_PACKET_ADAPTATION_FIELD_SIZE = 2;
 const int TS_PACKET_PID_PAT = 0x00;                // PAT packet, Table 2-28
@@ -114,6 +115,13 @@ struct TsAdaptationFieldExtensionHeader
     uint8_t ltw_flag : 1;
 };
 
+enum class ProgramType
+{
+    NIT,
+    PMT,
+    UserDefined
+};
+
 /*! @brief Program streams
  *
  * Table 2-30 – Program association section *
@@ -122,8 +130,24 @@ struct TsAdaptationFieldExtensionHeader
 struct Program
 {
     uint16_t program_number;
-    // uint16_t network_PID; only for program_number=0
-    uint16_t program_map_PID;
+
+    union {
+        uint16_t network_PID; // only for program_number=0
+        uint16_t program_map_PID;
+    };
+
+    ProgramType type; // 2.4.4.5 Semantics
+
+    /// @brief Comparison operator for comparing 2 PatTables
+    bool operator==(const Program& rhs) const
+    {
+        return program_number == rhs.program_number && program_map_PID == rhs.program_map_PID;
+    }
+
+    bool operator!=(const Program& rhs) const
+    {
+        return !operator==(rhs);
+    }
 };
 
 
@@ -180,6 +204,9 @@ enum StreamType
     STREAMTYPE_VIDEO_H264 = 0x1B,
     STREAMTYPE_VIDEO_H265 = 0X24,
     STREAMTYPE_AUDIO_AC3 = 0X81,
+    STREAMTYPE_AUDIO_DTS = 0X82,
+    STREAMTYPE_AUDIO_DOLBY_TRUE_HD = 0X83,
+    STREAMTYPE_AUDIO_AC3_PLUS = 0X84,
     STREAMTYPE_AUDIO_EAC3 = 0X87,
     STREAMTYPE_Any = 0xFF // User private
 };
@@ -198,6 +225,9 @@ static std::map<int, std::string> StreamTypeToString =
   { STREAMTYPE_VIDEO_H264, "STREAMTYPE_VIDEO_H264" },
   { STREAMTYPE_VIDEO_H265, "STREAMTYPE_VIDEO_H265" },
   { STREAMTYPE_AUDIO_AC3, "STREAMTYPE_AUDIO_AC3" },
+  { STREAMTYPE_AUDIO_DTS, "STREAMTYPE_AUDIO_DTS" },
+  { STREAMTYPE_AUDIO_DOLBY_TRUE_HD, "STREAMTYPE_AUDIO_DOLBY_TRUE_HD" },
+  { STREAMTYPE_AUDIO_AC3_PLUS, "STREAMTYPE_AUDIO_AC3_PLUS" },
   { STREAMTYPE_AUDIO_EAC3, "STREAMTYPE_AUDIO_EAC3" },
   { STREAMTYPE_Any, "STREAMTYPE_Any" } };
 

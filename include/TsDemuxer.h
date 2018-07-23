@@ -15,7 +15,7 @@
 class TsDemuxer
 {
 public:
-    typedef std::function<void(PsiTable* table, void* hdl)> PsiCallBackFnc;
+    typedef std::function<void(PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
     typedef std::function<void(const PesPacket& table, uint16_t pid, void* hdl)> PesCallBackFnc;
     typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
@@ -52,9 +52,9 @@ public:
     void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
 
     /*!
-    * Returns statistics on parsed transport stream packets.
-    * @return TsStatistics containing collected statistics for all demuxed packets.
-    */
+     * Returns statistics on parsed transport stream packets.
+     * @return TsStatistics containing collected statistics for all demuxed packets.
+     */
     const TsStatistics getTsStatistics() const
     {
         return static_cast<TsStatistics>(mParser);

@@ -1,14 +1,29 @@
 CXX = g++
-INC := -I$(PROJ_ROOT) -I$(CURDIR) -I$(INCDIR)
+INC := -I$(CURDIR) $(INCLUDE_DIRS)
 COMPONENT_NAME := gtests
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
-SRCS = TsParser_Tests.cc TsStatistics_Tests.cc
+BUILDDIR = $(PROJ_ROOT)/build
+
+## Tests
+SRCS = 	TsParser_Tests.cc \
+		TsStatistics_Tests.cc \
+		GetBits_Tests.cc \
+		PsiTables_Tests.cc \
+		TsDemuxer_Tests.cc
+
+
 
 .PHONY: all clean
 
-all:
-	$(CXX) $(CXXFLAGS) $(SRCS) $(INC) -lgtest -lpthread -L$(PROJ_ROOT)/build -lts -o $(COMPONENT_NAME)
-	./$(COMPONENT_NAME)
+all: gtests
+
+## Note this command must be run inside a docker container with gtest/gmock unless you have it installed natively
+gtests:
+	$(CXX) $(CXXFLAGS) $(SRCS) $(INC) -lgtest -lgmock -lpthread -lts -L$(PROJ_ROOT)/build -o $(BUILDDIR)/$(COMPONENT_NAME)
+
+unit-tests:
+	$(BUILDDIR)/$(COMPONENT_NAME)
+
 
 clean:
-	rm -f $(COMPONENT_NAME)
+	rm -f $(BUILDDIR)/$(COMPONENT_NAME)

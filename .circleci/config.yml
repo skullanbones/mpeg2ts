@@ -2,12 +2,15 @@ version: 2
 jobs:
   build:
     docker:
-      - image: heliconwave/circleci:v1
+      - image: heliconwave/circleci:v4
     steps:
       - checkout
       - run:
           name: Build
           command: make all
       - run:
-          name: Test
-          command: make gtests
+          name: Unit Test
+          command: make gtests && make run-gtests
+      - run:
+          name: Component Tests
+          command: make component_tests
