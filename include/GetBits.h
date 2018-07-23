@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <string>
-
 #include <stdexcept>
 
 class GetBits
@@ -43,6 +42,17 @@ public:
      * Return offset to current byte
      */
     size_t getByteInx();
+
+    /*!
+     * Skips entire bytes instead of bits. Good to use when skip large block of data.
+     * @param skipBytes Number of bytes to skip.
+     */
+    void skipBytes(uint16_t skipBytes);
+
+    /*!
+     * For debugging the data in store up to current parsed index.
+     */
+    void printSrcBytes();
 
 protected:
     uint8_t mNumStoredBits;

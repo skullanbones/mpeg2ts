@@ -156,6 +156,15 @@ struct StreamTypeHeader
     {
         return !operator==(rhs);
     }
+
+    friend std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
+    {
+        ss << std::endl << "-------------StreamTypeHeader------------- " << std::endl;
+        ss << "stream_type: " << (int)rhs.stream_type << std::endl;
+        ss << "elementary_PID: " << rhs.elementary_PID << std::endl;
+        ss << "ES_info_length: " << rhs.ES_info_length << std::endl;
+        return ss;
+    }
 };
 
 /*!
