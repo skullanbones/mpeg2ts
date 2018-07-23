@@ -100,3 +100,54 @@ TEST(TsDemuxerTests, TestDemuxPmtPacket)
         std::cout << "Got exception: " << e.what() << std::endl;
     }
 }
+
+/*!
+ * Test we can demux a big PMT packet
+ */
+TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
+{
+    try
+    {
+        TsDemuxer demuxer;
+        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
+
+        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
+        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        demuxer.demux(large_pmt_ts_packet_1);
+        demuxer.demux(large_pmt_ts_packet_2);
+        demuxer.demux(large_pmt_ts_packet_3);
+    }
+    catch(std::exception& e)
+    {
+        std::cout << "Got exception: " << e.what() << std::endl;
+    }
+}
+
+/*!
+ * Test we can demux a big PMT packet with alternating of other PAT tables
+ */
+TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
+{
+    try
+    {
+        TsDemuxer demuxer;
+        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
+
+        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
+        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        demuxer.demux(large_pmt_ts_packet_1); // This is the start of the PMT
+        demuxer.demux(pat_packet_1);
+        demuxer.demux(pat_packet_2);
+        demuxer.demux(large_pmt_ts_packet_2); // continuation of PMT
+        demuxer.demux(pat_packet_1);
+        demuxer.demux(pat_packet_2);
+        demuxer.demux(packet_1);
+        demuxer.demux(large_pmt_ts_packet_3); // last PMT packet
+        demuxer.demux(packet_2);
+    }
+    catch(std::exception& e)
+    {
+        std::cout << "Got exception: " << e.what() << std::endl;
+    }
+}
+
