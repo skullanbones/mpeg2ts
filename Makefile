@@ -85,7 +85,7 @@ docker_run = docker run \
 				--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
 				$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash -c $1
 
-.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component_tests
+.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests
 
 help:
 	@echo
@@ -101,7 +101,7 @@ help:
 	@echo '  unit-tests            - run all unit tests.'
 	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
-	@echo '  component_tests       - run all component tests.'
+	@echo '  component-tests       - run all component tests.'
 	@echo '  so                    - make shared object as dynamic linkage library.'
 	@echo '  3rd-party             - install 3rd-party dependencies.'
 	@echo '  plog                  - install 3rd-party plog logging library.'
@@ -166,7 +166,7 @@ docker-bash:
 
 ### all tests
 
-tests: unit-tests component_tests
+tests: unit-tests component-tests
 
 ### unit tests
 
@@ -190,7 +190,7 @@ env:
 	virtualenv -p python$(PYTHON_VERSION) $@
 	./env/bin/pip install -r component_tests/requirements.txt
 
-component_tests: env $(BUILDDIR)/tsparser
+component-tests: env $(BUILDDIR)/tsparser
 	@echo "[Running component tests..]"
 	./env/bin/pytest
 

@@ -115,3 +115,64 @@ def test_parse_got_hbo_pat(parser, asset_h264_138183_got_hbo):
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
     log.debug(out[0])
     log.debug(out[1])
+    assert "programs.size(): 15" in out[1]
+
+    assert "program 0" in out[1]
+    assert "program_number: 0" in out[1]
+    assert "network_PID: 16" in out[1]
+
+    assert "program 1" in out[1]
+    assert "program_number: 10501" in out[1]
+    assert "program_map_PID: 41" in out[1]
+
+    assert "program 2" in out[1]
+    assert "program_number: 10502" in out[1]
+    assert "program_map_PID: 42" in out[1]
+
+    assert "program 3" in out[1]
+    assert "program_number: 10503" in out[1]
+    assert "program_map_PID: 43" in out[1]
+
+    assert "program 4" in out[1]
+    assert "program_number: 10504" in out[1]
+    assert "program_map_PID: 44" in out[1]
+
+    assert "program 5" in out[1]
+    assert "program_number: 10505" in out[1]
+    assert "program_map_PID: 45" in out[1]
+
+    assert "program 6" in out[1]
+    assert "program_number: 10506" in out[1]
+    assert "program_map_PID: 46" in out[1]
+
+    assert "program 7" in out[1]
+    assert "program_number: 10507" in out[1]
+    assert "program_map_PID: 47" in out[1]
+
+    assert "program 8" in out[1]
+    assert "program_number: 10508" in out[1]
+    assert "program_map_PID: 48" in out[1]
+
+    assert "program 9" in out[1]
+    assert "program_number: 10509" in out[1]
+    assert "program_map_PID: 49" in out[1]
+
+    assert "program 10" in out[1]
+    assert "program_number: 10510" in out[1]
+    assert "program_map_PID: 50" in out[1]
+
+    assert "program 11" in out[1]
+    assert "program_number: 10511" in out[1]
+    assert "program_map_PID: 93" in out[1]
+
+    assert "program 12" in out[1]
+    assert "program_number: 10552" in out[1]
+    assert "program_map_PID: 52" in out[1]
+
+    assert "program 13" in out[1]
+    assert "program_number: 10512" in out[1]
+    assert "program_map_PID: 51" in out[1]
+
+    assert "program 14" in out[1]
+    assert "program_number: 10513" in out[1]
+    assert "program_map_PID: 53" in out[1]
