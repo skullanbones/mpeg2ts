@@ -29,7 +29,7 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         {
             if (mSrcInx >= mSize)
             {
-                throw GetBitsException("Out of bound read");
+                throw GetBitsException("getBits: Out of bound read");
             }
 
             mNumStoredBits = 8;
@@ -75,19 +75,40 @@ void GetBits::skipBits(uint8_t skipBits)
 
         if (mSrcInx >= mSize)
         {
-            throw GetBitsException("Out of bound read");
+            throw GetBitsException("skipBits: Out of bound read");
         }
     }
 
     getBits(rem);
 }
 
-GetBitsException::GetBitsException(const std::string msg)
-: mMsg{ msg }
+void GetBits::skipBytes(uint16_t skipBytes)
 {
+    if ((mSrcInx + skipBytes) >= mSize)
+    {
+        throw GetBitsException("getBits: Out of bound read mSrcInx: " + std::to_string(mSrcInx));
+    }
+    else {
+        mNumStoredBits = 0;
+        mBitStore = 0;
+        mSrcInx += skipBytes;
+    }
 }
 
 size_t GetBits::getByteInx()
 {
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
+}
+
+GetBitsException::GetBitsException(const std::string msg)
+        : std::runtime_error(msg)
+{}
+
+void GetBits::printSrcBytes()
+{
+    for (size_t i = mSrcInx; i < mSize; i++)
+    {
+        printf ("%02X", mSrcBytes[i]);
+    }
+    printf ("\n");
 }

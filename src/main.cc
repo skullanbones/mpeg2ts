@@ -32,7 +32,7 @@ std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
 TsDemuxer g_tsDemux;
 PatTable g_prevPat;
-std::list<PmtTable> g_prevPmts;
+std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
 int LOGFILE_MAXSIZE = 100 * 1024;
@@ -63,24 +63,12 @@ bool hasPid(std::string param, uint32_t pid)
 
 bool hasPids(std::string param, std::vector<uint16_t> pids)
 {
-    bool ret;
+    bool ret = 0;
     for (auto pid : pids)
     {
-        ret = std::count(g_Options[param].begin(), g_Options[param].end(), pid);
+        ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);
     }
     return ret;
-}
-
-bool hasPmt(const PmtTable& pmt)
-{
-    for (auto prevPmt : g_prevPmts)
-    {
-        if (pmt == prevPmt)
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 void display_usage()
@@ -159,8 +147,9 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(PsiTable* table)
+void PATCallback(PsiTable* table, uint16_t pid)
 {
+    LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
     try
     {
@@ -178,10 +167,10 @@ void PATCallback(PsiTable* table)
         return;
     }
 
-
     // Do nothing if same PAT
     if (g_prevPat == *pat)
     {
+        LOGV << "Got same PAT...";
         return;
     }
     g_prevPat = *pat;
@@ -220,8 +209,9 @@ void PATCallback(PsiTable* table)
     // TODO: add writing of table
 }
 
-void PMTCallback(PsiTable* table)
+void PMTCallback(PsiTable* table, uint16_t pid)
 {
+    LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
 
     try
@@ -242,11 +232,13 @@ void PMTCallback(PsiTable* table)
 
 
     // Do nothing if same PMT
-    if (hasPmt(*pmt))
+    if (g_prevPmts.find(pid) != g_prevPmts.end())
     {
+        LOGV << "Got same PMT...";
         return;
     }
-    g_prevPmts.push_back(*pmt);
+
+    g_prevPmts[pid] = *pmt;
 
     if (hasPids("pid", g_PMTPIDS))
     {
@@ -319,6 +311,15 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
     }
 }
 
+extern void printTsPacket(const uint8_t* packet)
+{
+    for (int i = 0; i < 188; i++)
+    {
+        printf ("0x%02x\n", packet[i]);
+    }
+    printf ("\n");
+}
+
 int main(int argc, char** argv)
 {
     // Initialize the logger
@@ -357,6 +358,7 @@ int main(int argc, char** argv)
         case 'w':
         case 'p':
         case 'l':
+            LOGD << "Got pid listener pid:" << std::atoi(optarg);
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
         case 'm':
@@ -422,7 +424,7 @@ int main(int argc, char** argv)
     }
 
     // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1), nullptr);
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
 
     for (count = 0;; ++count)
     {
@@ -460,11 +462,12 @@ int main(int argc, char** argv)
         {
             LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
         }
+        //printTsPacket(packet);
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
         if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
         {
-            // std::cout << "ERROR: Ts-packet Sync error. Next packet sync: " <<
+            LOGE << "ERROR: Ts-packet Sync error. Next packet sync: ";
             // (int)packet[TS_PACKET_SIZE] << std::endl;  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
             // continue; // Skip this packet since it's not synced.
         }
@@ -490,7 +493,7 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1), nullptr);
+                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
             }
             addedPmts = true;
         }

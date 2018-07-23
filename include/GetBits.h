@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <stdexcept>
 
 class GetBits
 {
@@ -42,6 +43,17 @@ public:
      */
     size_t getByteInx();
 
+    /*!
+     * Skips entire bytes instead of bits. Good to use when skip large block of data.
+     * @param skipBytes Number of bytes to skip.
+     */
+    void skipBytes(uint16_t skipBytes);
+
+    /*!
+     * For debugging the data in store up to current parsed index.
+     */
+    void printSrcBytes();
+
 protected:
     uint8_t mNumStoredBits;
     uint8_t mBitStore;
@@ -50,15 +62,9 @@ protected:
     const uint8_t* mSrcBytes;
 };
 
-struct GetBitsException
+class GetBitsException : public std::runtime_error
 {
+public:
     GetBitsException(const std::string msg);
     virtual ~GetBitsException() = default;
-
-    std::string what()
-    {
-        return mMsg;
-    }
-
-    const std::string mMsg;
 };

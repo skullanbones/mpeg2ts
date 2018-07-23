@@ -139,3 +139,20 @@ def asset_h2646_aac_rubeatles_atmos(request, downloader):
     """
     name, streams = request.param
     return downloader.download_asset(name, streams)
+
+
+@pytest.fixture(scope='session', params=[
+    ('GoT-HBO.ts',
+     [{"Pid": 110, "StreamType": "video"},
+      {"Pid": 210, "StreamType": "audio"},
+      {"Pid": 50, "StreamType": "pmt"}])
+])
+def asset_h264_138183_got_hbo(request, downloader):
+    """
+    Asset for HBO atmos
+    :param request:
+    :param downloader:
+    :return: Returns the asset
+    """
+    name, streams = request.param
+    return downloader.download_asset(name, streams)

@@ -195,25 +195,42 @@ uint64_t TsParser::parsePcr()
 
 void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
 {
+    // NOTE!! this is not as easy as one might think. There maybe be alternating PSI long tables and
+    // it has been confirmed by assets that some long PMT can be mixed with PAT tables in between.
+    // Therefore we need be able collect different types of tables on their PID to handle this. If we don't do it,
+    // the alternating table will reset the previous collected table since it start over all from the beginning.
+    int PID = tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
     checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
     checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
 
-    if (tsPacketInfo.isPayloadStart)
+    if (tsPacketInfo.hdr.payload_unit_start_indicator)
     {
-        mSectionBuffer.clear();
+        mSectionBuffer[PID].clear();
+        mReadSectionLength[PID] = 0;
 
         const uint8_t pointer_field = tsPacket[pointerOffset];
         pointerOffset += sizeof(pointer_field);
         pointerOffset += pointer_field;
+
+        // It does only make sense to get PSI table info when start of a PSI.
+        // Note the other payloads of PSI spans in more than 1 ts-packet will not contain
+        // any PSI table info, just continuation of their content in the ts-packet payload...
+        PsiTable tableInfo;
+        ByteVector tmpBuffer;
+        tmpBuffer.insert(tmpBuffer.begin(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        resetBits(tmpBuffer.data(), TS_PACKET_SIZE - pointerOffset, 0);
+        parsePsiTable(tmpBuffer, tableInfo);
+
+        // If PMT spans more than 1 ts-packet we need collect all of them...
+        mSectionLength[PID] = tableInfo.section_length + 3;
+        mTableId[PID] = tableInfo.table_id;
     }
 
-    mSectionBuffer.insert(mSectionBuffer.end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
-    PsiTable tableInfo;
-    parsePsiTable(mSectionBuffer, tableInfo);
-    table_id = (mSectionBuffer.size() < tableInfo.section_length) ? PSI_TABLE_ID_INCOMPLETE :
-                                                                    tableInfo.table_id;
+    mSectionBuffer[PID].insert(mSectionBuffer[PID].end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+    mReadSectionLength[PID] = mReadSectionLength[PID] + &tsPacket[TS_PACKET_SIZE] - &tsPacket[pointerOffset];
+    table_id = (mSectionLength[PID] > mReadSectionLength[PID]) ? PSI_TABLE_ID_INCOMPLETE : mTableId[PID];
 }
 
 
@@ -279,8 +296,6 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
 void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 {
-    resetBits(table.data(), TS_PACKET_SIZE, 0);
-
     tableInfo.table_id = getBits(8);
     tableInfo.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
@@ -295,10 +310,11 @@ void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
 }
 
 
-PatTable TsParser::parsePatPacket()
+PatTable TsParser::parsePatPacket(int pid)
 {
     PatTable pat;
-    parsePsiTable(mSectionBuffer, pat);
+    resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
+    parsePsiTable(mSectionBuffer[pid], pat);
 
     int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
@@ -327,20 +343,27 @@ PatTable TsParser::parsePatPacket()
 }
 
 
-PmtTable TsParser::parsePmtPacket()
+PmtTable TsParser::parsePmtPacket(int pid)
 {
     PmtTable pmt;
-    parsePsiTable(mSectionBuffer, pmt);
+    resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
+    parsePsiTable(mSectionBuffer[pid], pmt);
 
     getBits(3); // reserved
     pmt.PCR_PID = getBits(13);
     getBits(4); // reserved
     pmt.program_info_length = getBits(12);
-    skipBits(8 * pmt.program_info_length); // skip descriptors for now
+    int control_bits = pmt.program_info_length & 0xC00;
+    if ((control_bits >> 10) != 0)
+    {
+        LOGE_(FileLog) << "Stream not following ISO/IEC 13818-1 in program_info_length control bits != 0.";
+    }
+    int program_info_length = pmt.program_info_length & 0x3FF;
+    skipBytes(program_info_length); // skip descriptors for now
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
-
     int readSize = 0;
+
     while (readSize < streamsSize)
     {
         StreamTypeHeader hdr;
@@ -349,8 +372,14 @@ PmtTable TsParser::parsePmtPacket()
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved
         hdr.ES_info_length = getBits(12);
-        skipBits(hdr.ES_info_length * 8); // Skip for now
-        readSize += hdr.ES_info_length + PMT_STREAM_TYPE_LENGTH;
+        int control_bits = hdr.ES_info_length & 0xC00;
+        if ((control_bits >> 10) != 0)
+        {
+            LOGE_(FileLog) << "Stream not following ISO/IEC 13818-1 in ES_info_length control bits != 0.";
+        }
+        int ES_info_length = hdr.ES_info_length & 0x3FF;
+        skipBytes(ES_info_length);
+        readSize += (ES_info_length + PMT_STREAM_TYPE_LENGTH);
         pmt.streams.push_back(hdr);
     }
 

@@ -104,7 +104,7 @@ public:
      * @param info
      * @return
      */
-    PatTable parsePatPacket();
+    PatTable parsePatPacket(int pid);
 
     /*!
      * Parse PMT table
@@ -112,7 +112,7 @@ public:
      * @param info
      * @return
      */
-    PmtTable parsePmtPacket();
+    PmtTable parsePmtPacket(int pid);
 
     /*!
      * Collects several TS-Packets for assembling a complete PES-Packet.
@@ -133,6 +133,10 @@ public:
     void parsePesPacket(int16_t pid);
 
 private:
-    ByteVector mSectionBuffer;
+    // TODO maybe 1 parser per pid?
+    std::map<uint16_t, ByteVector> mSectionBuffer;
+    std::map<uint16_t, int> mSectionLength;
+    std::map<uint16_t, int> mTableId;
+    std::map<uint16_t, int> mReadSectionLength;
     std::map<uint16_t, PesPacket> mPesPacket;
 };

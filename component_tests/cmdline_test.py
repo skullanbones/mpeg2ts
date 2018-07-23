@@ -101,3 +101,117 @@ def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
     out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
     log.debug(out[0])
     log.debug(out[1])
+
+
+def test_parse_got_hbo_pat(parser, asset_h264_138183_got_hbo):
+    """
+    Test HBO asset PAT table
+    :param parser:
+    :param asset_h264_138183_got_hbo:
+    :return:
+    """
+    asset = asset_h264_138183_got_hbo.get_asset()
+    assert "GoT-HBO.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 0])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "programs.size(): 15" in out[1]
+
+    assert "program 0" in out[1]
+    assert "program_number: 0" in out[1]
+    assert "network_PID: 16" in out[1]
+
+    assert "program 1" in out[1]
+    assert "program_number: 10501" in out[1]
+    assert "program_map_PID: 41" in out[1]
+
+    assert "program 2" in out[1]
+    assert "program_number: 10502" in out[1]
+    assert "program_map_PID: 42" in out[1]
+
+    assert "program 3" in out[1]
+    assert "program_number: 10503" in out[1]
+    assert "program_map_PID: 43" in out[1]
+
+    assert "program 4" in out[1]
+    assert "program_number: 10504" in out[1]
+    assert "program_map_PID: 44" in out[1]
+
+    assert "program 5" in out[1]
+    assert "program_number: 10505" in out[1]
+    assert "program_map_PID: 45" in out[1]
+
+    assert "program 6" in out[1]
+    assert "program_number: 10506" in out[1]
+    assert "program_map_PID: 46" in out[1]
+
+    assert "program 7" in out[1]
+    assert "program_number: 10507" in out[1]
+    assert "program_map_PID: 47" in out[1]
+
+    assert "program 8" in out[1]
+    assert "program_number: 10508" in out[1]
+    assert "program_map_PID: 48" in out[1]
+
+    assert "program 9" in out[1]
+    assert "program_number: 10509" in out[1]
+    assert "program_map_PID: 49" in out[1]
+
+    assert "program 10" in out[1]
+    assert "program_number: 10510" in out[1]
+    assert "program_map_PID: 50" in out[1]
+
+    assert "program 11" in out[1]
+    assert "program_number: 10511" in out[1]
+    assert "program_map_PID: 93" in out[1]
+
+    assert "program 12" in out[1]
+    assert "program_number: 10552" in out[1]
+    assert "program_map_PID: 52" in out[1]
+
+    assert "program 13" in out[1]
+    assert "program_number: 10512" in out[1]
+    assert "program_map_PID: 51" in out[1]
+
+    assert "program 14" in out[1]
+    assert "program_number: 10513" in out[1]
+    assert "program_map_PID: 53" in out[1]
+
+
+def test_parse_got_hbo_pmt(parser, asset_h264_138183_got_hbo):
+    """
+    Test HBO asset PMT table
+    :param parser:
+    :param asset_h264_138183_got_hbo:
+    :return:
+    """
+    asset = asset_h264_138183_got_hbo.get_asset()
+    pmt = asset_h264_138183_got_hbo.get_pmt()
+    assert "GoT-HBO.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "PMT at Ts packet: 1260" in out[1]
+    assert "PCR_PID: 110" in out[1]
+    assert "program_info_length: 104" in out[1]
+    assert "streams.size(): 5" in out[1]
+
+    assert "stream_type: STREAMTYPE_VIDEO_H264,  (27)" in out[1]
+    assert "elementary_PID: 110" in out[1]
+    assert "ES_info_length: 97" in out[1]
+
+    assert "stream_type: STREAMTYPE_AUDIO_MPEG2,  (4)" in out[1]
+    assert "elementary_PID: 210" in out[1]
+    assert "ES_info_length: 92" in out[1]
+
+    assert "stream_type: STREAMTYPE_PRIVATE_PES,  (6)" in out[1]
+    assert "elementary_PID: 310" in out[1]
+    assert "ES_info_length: 107" in out[1]
+
+    assert "stream_type: STREAMTYPE_PRIVATE_PES,  (6)" in out[1]
+    assert "elementary_PID: 1410" in out[1]
+    assert "ES_info_length: 10" in out[1]
+
+    assert "stream_type: STREAMTYPE_PRIVATE_PES,  (6)" in out[1]
+    assert "elementary_PID: 1310" in out[1]
+    assert "ES_info_length: 20" in out[1]

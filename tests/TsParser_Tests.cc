@@ -74,7 +74,7 @@ TEST(TsParserTests, CheckParsePatTable)
     uint8_t table_id;
     parser.collectTable(pat_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
-    pat = parser.parsePatPacket();
+    pat = parser.parsePatPacket(info.pid);
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
     //    EXPECT_EQ(598, pat.network_PID);
@@ -90,7 +90,7 @@ TEST(TsParserTests, CheckParsePatTable2)
     uint8_t table_id;
     parser.collectTable(pat_packet_2, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
-    pat = parser.parsePatPacket();
+    pat = parser.parsePatPacket(info.pid);
     EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
 
@@ -154,6 +154,9 @@ TEST(TsParserTests, CheckParsePatTable2)
     EXPECT_EQ(0xbd6, pat.programs[16].program_map_PID);
 }
 
+/*!
+ * Parses a normal PMT table
+ */
 TEST(TsParserTests, CheckParsePmtTable)
 {
     TsParser parser;
@@ -164,7 +167,7 @@ TEST(TsParserTests, CheckParsePmtTable)
     uint8_t table_id;
     parser.collectTable(pmt_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
-    pmt = parser.parsePmtPacket();
+    pmt = parser.parsePmtPacket(info.pid);
     EXPECT_EQ(1010, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
 
@@ -217,7 +220,10 @@ TEST(TsParserTests, CheckParseTsHeader)
     EXPECT_EQ(0xc, hdr.continuity_counter);
 }
 
-TEST(TsParserTests, CheckParselargePmtTable)
+/*!
+ * Parses a normal PMT table
+ */
+TEST(TsParserTests, CheckParsePmtTable2)
 {
     TsParser parser;
 
@@ -230,7 +236,7 @@ TEST(TsParserTests, CheckParselargePmtTable)
     parser.collectTable(pmt_packet_2_2, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
 
-    auto pmt = parser.parsePmtPacket();
+    auto pmt = parser.parsePmtPacket(info.pid);
     EXPECT_EQ(32, info.pid);
     EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
 
@@ -245,9 +251,62 @@ TEST(TsParserTests, CheckParselargePmtTable)
     EXPECT_EQ(26, pmt.streams[8].ES_info_length);
 }
 
-TEST(MathTest, TwoPlusTwoEqualsFour)
+/*!
+ * Parses a large PMT table across 3 ts-packets
+ */
+TEST(TsParserTests, CheckParseLargePmtTable)
 {
-    EXPECT_EQ(2 + 2, 4);
+    try
+    {
+        TsParser parser;
+
+        TsPacketInfo info;
+        uint8_t table_id;
+        parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
+        EXPECT_EQ(50, info.pid);
+        parser.collectTable(large_pmt_ts_packet_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_3, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(50, info.pid);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, pmt.table_id);
+        // Extensions from PsiTable
+        EXPECT_EQ(110, pmt.PCR_PID);
+        EXPECT_EQ(104, pmt.program_info_length);
+        EXPECT_EQ(5, pmt.streams.size());
+
+        EXPECT_EQ(STREAMTYPE_VIDEO_H264, pmt.streams[0].stream_type);
+        EXPECT_EQ(110, pmt.streams[0].elementary_PID);
+        EXPECT_EQ(97, pmt.streams[0].ES_info_length);
+
+        EXPECT_EQ(STREAMTYPE_AUDIO_MPEG2, pmt.streams[1].stream_type);
+        EXPECT_EQ(210, pmt.streams[1].elementary_PID);
+        EXPECT_EQ(92, pmt.streams[1].ES_info_length);
+
+        EXPECT_EQ(STREAMTYPE_PRIVATE_PES, pmt.streams[2].stream_type);
+        EXPECT_EQ(310, pmt.streams[2].elementary_PID);
+        EXPECT_EQ(107, pmt.streams[2].ES_info_length);
+
+        EXPECT_EQ(STREAMTYPE_PRIVATE_PES, pmt.streams[3].stream_type);
+        EXPECT_EQ(1410, pmt.streams[3].elementary_PID);
+        EXPECT_EQ(10, pmt.streams[3].ES_info_length);
+
+        EXPECT_EQ(STREAMTYPE_PRIVATE_PES, pmt.streams[4].stream_type);
+        EXPECT_EQ(1310, pmt.streams[4].elementary_PID);
+        EXPECT_EQ(20, pmt.streams[4].ES_info_length);
+    }
+    catch(std::exception& e)
+    {
+        std::cout << "Got exception: " << e.what() << std::endl;
+    }
 }
 
 
@@ -301,5 +360,6 @@ TEST(TsParserTests, TestParsePcr)
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
+    ::testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
 }
