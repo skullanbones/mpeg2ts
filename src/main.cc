@@ -25,6 +25,7 @@
 #include "TsStandards.h"
 #include "Logging.h"
 
+static const std::string VERSION = "0.0.2.rc1";
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
@@ -54,7 +55,7 @@ static const char* optString = "m:w:i:l:h?";
 struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
                              { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
                              { "input", 1, nullptr, 'i' }, { "help", 0, nullptr, 'h' },
-                             { nullptr, 0, nullptr, 0 } };
+                             { "version", 0, nullptr, 'v' }, { nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
@@ -82,7 +83,8 @@ void display_usage()
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-                 "        -i [ --input FILE]   Use input file for parsing"
+                 "        -i [ --input FILE]   Use input file for parsing\n"
+                 "        -v [ --version ]     Print library version"
               << std::endl;
 }
 
@@ -352,6 +354,12 @@ int main(int argc, char** argv)
         case '?':
         {
             display_usage();
+            exit(EXIT_SUCCESS);
+            break;
+        }
+        case 'v':
+        {
+            std::cout << "version: " << VERSION << std::endl;
             exit(EXIT_SUCCESS);
             break;
         }
