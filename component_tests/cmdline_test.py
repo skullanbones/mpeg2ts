@@ -215,3 +215,17 @@ def test_parse_got_hbo_pmt(parser, asset_h264_138183_got_hbo):
     assert "stream_type: STREAMTYPE_PRIVATE_PES,  (6)" in out[1]
     assert "elementary_PID: 1310" in out[1]
     assert "ES_info_length: 20" in out[1]
+
+
+def test_parse_got_dddd(parser, asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B,
+                        asset_avsync_mpeg2_ac3LR,
+                        asset_newmobcal1920_mpeg2_ac3LR):
+    """
+    :param parser:
+    :param asset_h264_138183_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B:
+    :return:
+    """
+    asset1 = asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.get_asset()
+    asset2 = asset_avsync_mpeg2_ac3LR.get_asset()
+    asset3 = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
+
