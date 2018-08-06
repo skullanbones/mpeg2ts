@@ -50,7 +50,7 @@ std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
 
-static const char* optString = "m:w:i:l:h?";
+static const char* optString = "m:w:i:l:h?v";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
                              { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
