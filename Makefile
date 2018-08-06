@@ -201,7 +201,7 @@ $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
 $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	cd $(3RDPARTYDIR)
 	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
-	touch $(3RDPARTYDIR)/.plog_extracted
+	touch $@
 
 3rd-party: plog
 
