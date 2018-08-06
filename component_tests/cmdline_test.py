@@ -17,7 +17,7 @@ def test_help_message(parser):
     """Verify that help option is displayed"""
     out = parser.start(extra_args=['--help'])
     assert "Ts-lib simple command-line:" in out[1], "No help text in output"
-    assert "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" \
+    assert "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" \
            in out[1], "Wrong help output"
 
 
@@ -217,15 +217,103 @@ def test_parse_got_hbo_pmt(parser, asset_h264_138183_got_hbo):
     assert "ES_info_length: 20" in out[1]
 
 
-def test_parse_got_dddd(parser, asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B,
-                        asset_avsync_mpeg2_ac3LR,
-                        asset_newmobcal1920_mpeg2_ac3LR):
+#def test_parse_dolby_digital_plus(parser, asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B):
+#    """
+#    :param parser:
+#    :param asset_h264_138183_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B:
+#    :return:
+#    """
+#    asset = asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.get_asset()
+
+
+def test_parse_avsync_mpeg2_ac3LR_PAT(parser, asset_avsync_mpeg2_ac3LR):
     """
+    Test Avsync PAT table
     :param parser:
-    :param asset_h264_138183_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B:
+    :param asset_avsync_mpeg2_ac3LR
     :return:
     """
-    asset1 = asset_Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.get_asset()
-    asset2 = asset_avsync_mpeg2_ac3LR.get_asset()
-    asset3 = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
+    asset = asset_avsync_mpeg2_ac3LR.get_asset()
+    assert "avsync_mpeg2_ac3LR.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 0])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "programs.size(): 1" in out[1]
 
+    assert "program 0" in out[1]
+    assert "program_number: 1" in out[1]
+    assert "program_map_PID: 32" in out[1]
+
+
+def test_parse_avsync_mpeg2_ac3LR_PMT(parser, asset_avsync_mpeg2_ac3LR):
+    """
+    Test Avsync PMT table
+    :param parser:
+    :param asset_avsync_mpeg2_ac3LR
+    :return:
+    """
+    asset = asset_avsync_mpeg2_ac3LR.get_asset()
+    pmt = asset_avsync_mpeg2_ac3LR.get_pmt()
+    assert "avsync_mpeg2_ac3LR.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "PMT at Ts packet: 1" in out[1]
+    assert "PCR_PID: 48" in out[1]
+    assert "program_info_length: 0" in out[1]
+    assert "streams.size(): 2" in out[1]
+
+    assert "stream_type: STREAMTYPE_VIDEO_MPEG2,  (2)" in out[1]
+    assert "elementary_PID: 49" in out[1]
+    assert "ES_info_length: 3" in out[1]
+
+    assert "stream_type: STREAMTYPE_AUDIO_AC3,  (129)" in out[1]
+    assert "elementary_PID: 50" in out[1]
+    assert "ES_info_length: 3" in out[1]
+
+
+
+def test_parse_newmobcal1920_mpeg2_ac3LR_PAT(parser, asset_newmobcal1920_mpeg2_ac3LR):
+    """
+    Test Newmbcal1920 PAT table
+    :param parser:
+    :param asset_newmobcal1920_mpeg2_ac3LR:
+    :return:
+    """
+    asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
+    assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 0])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "programs.size(): 1" in out[1]
+
+    assert "program 0" in out[1]
+    assert "program_number: 1" in out[1]
+    assert "program_map_PID: 32" in out[1]
+
+
+def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_ac3LR):
+    """
+    Test Newmbcal1920 PMT table
+    :param parser:
+    :param asset_newmobcal1920_mpeg2_ac3LR:
+    :return:
+    """
+    asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
+    pmt = asset_newmobcal1920_mpeg2_ac3LR.get_pmt()
+    assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "PMT at Ts packet: 1" in out[1]
+    assert "PCR_PID: 48" in out[1]
+    assert "program_info_length: 0" in out[1]
+    assert "streams.size(): 2" in out[1]
+
+    assert "stream_type: STREAMTYPE_VIDEO_MPEG2,  (2)" in out[1]
+    assert "elementary_PID: 49" in out[1]
+    assert "ES_info_length: 3" in out[1]
+
+    assert "stream_type: STREAMTYPE_AUDIO_AC3,  (129)" in out[1]
+    assert "elementary_PID: 50" in out[1]
+    assert "ES_info_length: 3" in out[1]
