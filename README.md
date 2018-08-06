@@ -1,6 +1,30 @@
 # ts-lib
 Make video great again!
 
+## Releases
+*V0.0.2.rc1*
+
+* Add logging libary: Plog
+* Fixed bug 68: Cannot parse Hbo Asset
+* Add component-tests to CircleCi
+* Fixed bug 66: Dolby asset caused crash
+* Support Multiple Program Transport Streams (MPTS)
+* Added file input --input option to CLI
+* Fixed bug 49: Could not skip more than 64 bits in parser.
+* Added non root user to Docker containers
+
+*V0.0.1*
+
+* build so lib
+* Added es write
+* fixed PCR bug
+* Added build folder
+* Added PES parsing
+* Added multi PES cli option
+* Added PMT parsing
+* Added PAT parsing
+* Added Demuxer
+
 ## How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
