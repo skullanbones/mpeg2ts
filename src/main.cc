@@ -50,7 +50,7 @@ std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
 
-static const char* optString = "m:w:i:l:h?";
+static const char* optString = "m:w:i:l:p:h?v";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
                              { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
@@ -76,15 +76,15 @@ void display_usage()
 {
     std::cout << "Ts-lib simple command-line:" << std::endl;
 
-    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" << std::endl;
+    std::cout << "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" << std::endl;
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
+                 "        -v [ --version ]     Print library version\n"
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-                 "        -i [ --input FILE]   Use input file for parsing\n"
-                 "        -v [ --version ]     Print library version"
+                 "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
 
