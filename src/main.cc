@@ -36,8 +36,11 @@ PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
+const char LOGFILE_NAME[] = "tsparser.csv";
 int LOGFILE_MAXSIZE = 100 * 1024;
 int LOGFILE_MAXNUMBEROF = 10;
+
+const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
 
 enum class OptionWriteMode
 {
@@ -53,7 +56,7 @@ std::string g_InputFile;
 static const char* optString = "m:w:i:l:p:h?v";
 
 struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
-                             { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
+                             { "pid", 1, nullptr, 'p' },   { "log-level", 1, nullptr, 'l' },
                              { "input", 1, nullptr, 'i' }, { "help", 0, nullptr, 'h' },
                              { "version", 0, nullptr, 'v' }, { nullptr, 0, nullptr, 0 } };
 
@@ -84,6 +87,7 @@ void display_usage()
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
+                 "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose what logs are filtered, both file and stdout, default:" << plog::severityToString(DEFAULT_LOG_LEVEL) << "\n"
                  "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
@@ -333,13 +337,11 @@ int main(int argc, char** argv)
     ///LOGE << "error";
     ///LOGF << "fatal";
     ///LOGN << "none";
-    //plog::init(plog::debug, "tsparser.csv");
 
-
-    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME, LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
-    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
-    plog::init<FileLog>(plog::debug, &fileAppender); // Initialize the 2nd logger instance.
+    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
 
     LOGD << "Starting parser of file";
 
@@ -365,10 +367,20 @@ int main(int argc, char** argv)
         }
         case 'w':
         case 'p':
-        case 'l':
             LOGD << "Got pid listener pid:" << std::atoi(optarg);
             g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
             break;
+        case 'l':
+        {
+            LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
+            std::string logLevel = std::string(optarg);
+            LOGD << "Got input log-level setting: " << logLevel;
+            for (auto & c: logLevel) c = toupper(c);
+            plog::Severity severity = plog::severityFromString(logLevel.c_str());
+            plog::get()->setMaxSeverity(severity);
+            LOGD << "Use log-level: " << plog::severityToString(severity) << ", (" << severity << ")";
+            break;
+        }
         case 'm':
         {
             OptionWriteMode writeMode = OptionWriteMode::PES;
