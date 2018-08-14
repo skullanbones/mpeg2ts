@@ -25,6 +25,46 @@
 #include "TsStandards.h"
 #include "Logging.h"
 
+class EsParser
+{
+    public:
+    EsParser()
+    {
+    
+    }
+    virtual ~EsParser()
+    {
+    
+    }
+
+    virtual bool operator()(const uint8_t* from, size_t length)
+    {
+        LOGD << from << length;
+        return true;
+    }
+};
+
+class Mpeg2VideoEsParser : public EsParser
+{
+    public:
+    Mpeg2VideoEsParser()
+    {
+    
+    }
+    virtual ~Mpeg2VideoEsParser()
+    {
+    
+    }
+
+    virtual bool operator()(const uint8_t* from, size_t length)
+    {
+        // TODO: parse data
+        LOGD << "mpeg2v " << from << length;
+        return true;
+    }
+};
+
+
 static const std::string VERSION = "0.0.2.rc1";
 
 uint64_t count = 0;
@@ -35,6 +75,7 @@ TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
+std::map<StreamType, std::shared_ptr<EsParser> > g_EsParsers = {{STREAMTYPE_VIDEO_MPEG2, std::make_shared<Mpeg2VideoEsParser>()}};
 
 const char LOGFILE_NAME[] = "tsparser.csv";
 int LOGFILE_MAXSIZE = 100 * 1024;
@@ -281,7 +322,27 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                   << " (" << pid << ")\n";
         LOGN << pes << std::endl;
     }
-
+    
+    // @TODO add "if parse pid" option to cmd line
+    {
+        for (auto& pmtPid : g_PMTPIDS)
+        {
+            if (g_prevPmts.find(pmtPid) != g_prevPmts.end())
+            {
+                auto it = std::find_if(g_prevPmts[pmtPid].streams.begin(), g_prevPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream){return stream.elementary_PID == pid;});
+                if (it != g_prevPmts[pmtPid].streams.end())
+                {
+                    try
+                    {
+                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                    }catch(const std::out_of_range&){
+                        LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
+                    }
+                }
+            }
+        }
+    }
+    
     if (hasPid("write", pid))
     {
         auto writeOffset = 0;

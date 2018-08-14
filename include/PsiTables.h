@@ -142,7 +142,7 @@ public:
 
 struct StreamTypeHeader
 {
-    uint8_t stream_type;
+    StreamType stream_type;
     uint16_t elementary_PID;
     uint16_t ES_info_length;
 
