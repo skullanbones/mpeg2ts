@@ -7,6 +7,7 @@
 
 bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
 {
+    auto tmpLast = std::vector<uint8_t>(from + length - std::min(length, (ssize_t)3), from + length);
     while (length > 0)
     {
         auto onePosition = getFirstOne(from, length);
@@ -31,27 +32,19 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             }
         }else
         {
-            if ((onePosition != from + length) && *(onePosition - 1] == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
+            if ((onePosition != from + length) && *(onePosition - 1) == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
             {
                 startCodeFound = true;
             }
         }
-
-        from = onePosition + 1;
-        length -= onePosition - from - 1;
-
-
-        if (onePosition < 0)
+        if (startCodeFound)
         {
-            last = std::vector(from + length - std::min(length, 3), from + length);
-            length = 0;
-            break;
+            ++foundStartCodes;
         }
-        // TODO: process start code at onePosition;
-        LOGD << "start code " << from[onePosition] << " left in buffer " << ;
-
-        from
+        length -= (onePosition - from) + 1;
+        from = onePosition + 1;
     }
+    last = tmpLast;
 
     return true;
 }

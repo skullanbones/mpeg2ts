@@ -9,7 +9,8 @@ SRCS = 	TsParser_Tests.cc \
 		TsStatistics_Tests.cc \
 		GetBits_Tests.cc \
 		PsiTables_Tests.cc \
-		TsDemuxer_Tests.cc
+		TsDemuxer_Tests.cc \
+		Mpeg2VideoParser_Tests.cc
 
 
 

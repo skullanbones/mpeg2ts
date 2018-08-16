@@ -176,7 +176,7 @@ TEST(PsiTablesTests, PmtTableTestComparisonOperatorPCR_PID)
     PmtTable pmt2;
 
     StreamTypeHeader stream;
-    stream.stream_type = 1;
+    stream.stream_type = STREAMTYPE_VIDEO_MPEG1;
     stream.elementary_PID = 258;
     stream.ES_info_length = 0;
 
@@ -211,7 +211,7 @@ TEST(PsiTablesTests, PmtTableTestComparisonOperatorNumStreams)
     pmt2.program_info_length = 0;
 
     StreamTypeHeader stream;
-    stream.stream_type = 1;
+    stream.stream_type = STREAMTYPE_VIDEO_MPEG1;
     stream.elementary_PID = 258;
     stream.ES_info_length = 0;
 
@@ -221,7 +221,7 @@ TEST(PsiTablesTests, PmtTableTestComparisonOperatorNumStreams)
     EXPECT_TRUE(pmt1 == pmt2);
 
     StreamTypeHeader stream2;
-    stream.stream_type = 2;
+    stream.stream_type = STREAMTYPE_VIDEO_MPEG2;
     stream.elementary_PID = 32;
     stream.ES_info_length = 0;
 
@@ -235,11 +235,11 @@ TEST(PsiTablesTests, StreamTypeHeaderComparisonOperator)
     StreamTypeHeader hdr1;
     StreamTypeHeader hdr2;
 
-    hdr1.stream_type = 0;
+    hdr1.stream_type = STREAMTYPE_RESERVED;
     hdr1.elementary_PID = 0;
     hdr1.ES_info_length = 0;
 
-    hdr2.stream_type = 0;
+    hdr2.stream_type = STREAMTYPE_RESERVED;
     hdr2.elementary_PID = 0;
     hdr2.ES_info_length = 0;
 

@@ -26,46 +26,6 @@
 #include "Logging.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
 
-class EsParser
-{
-    public:
-    EsParser()
-    {
-    
-    }
-    virtual ~EsParser()
-    {
-    
-    }
-
-    virtual bool operator()(const uint8_t* from, size_t length)
-    {
-        LOGD << from << length;
-        return true;
-    }
-};
-
-class Mpeg2VideoEsParser : public EsParser
-{
-    public:
-    Mpeg2VideoEsParser()
-    {
-    
-    }
-    virtual ~Mpeg2VideoEsParser()
-    {
-    
-    }
-
-    virtual bool operator()(const uint8_t* from, size_t length)
-    {
-        // TODO: parse data
-        LOGD << "mpeg2v " << from << length;
-        return true;
-    }
-};
-
-
 static const std::string VERSION = "0.0.2.rc1";
 
 uint64_t count = 0;
