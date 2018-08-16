@@ -2,8 +2,9 @@
 
 /// Project files
 #include "EsParser.h"
+#include "GetBits.h"
 
-class Mpeg2VideoEsParser : public EsParser
+class Mpeg2VideoEsParser : GetBits, public EsParser
 {
 public:
     Mpeg2VideoEsParser()
@@ -15,6 +16,7 @@ public:
     }
 
     virtual bool operator()(const uint8_t* from, ssize_t length);
+    bool analyze();
 
     std::vector<uint8_t> last;
     int foundStartCodes;

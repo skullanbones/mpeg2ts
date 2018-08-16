@@ -19,7 +19,7 @@ class EsParser
         return (uint8_t*)std::find((char*)from, (char*)from + length, 1);
     }
     
-    virtual bool operator()(const uint8_t* from, size_t length)
+    virtual bool operator()(const uint8_t* from, ssize_t length)
     {
         return true;
     }
