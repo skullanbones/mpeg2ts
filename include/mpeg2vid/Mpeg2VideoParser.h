@@ -18,4 +18,5 @@ public:
 
     std::vector<uint8_t> last;
     int foundStartCodes;
+    std::vector<uint8_t> mPicture;
 };
