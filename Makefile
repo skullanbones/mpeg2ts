@@ -55,14 +55,16 @@ PYTHON_VERSION ?= 3
 SRCS = 	TsParser.cc \
 		GetBits.cc \
 		TsDemuxer.cc \
-		TsStatistics.cc
+		TsStatistics.cc \
+        mpeg2vid/Mpeg2VideoParser.cc
 
 HDRS = 	include/GetBits.h \
 		include/TsDemuxer.h \
 		include/TsPacketInfo.h \
 		include/TsParser.h \
 		include/TsStandards.h \
-		include/TsStatistics.h
+		include/TsStatistics.h \
+		include/mpeg2vid/Mpeg2VideoParser.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
@@ -113,6 +115,7 @@ all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/mpeg2vid
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts

@@ -24,6 +24,7 @@
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
 #include "Logging.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
 
 class EsParser
 {
