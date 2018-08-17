@@ -101,7 +101,15 @@ bool Mpeg2VideoEsParser::analyze()
                 std::cout << "user_data_start_code";
             }else if (mPicture[0] == 0xb3)
             {
-                std::cout << "sequence_header_code";
+                std::cout << "sequence_header_code ";
+                skipBits(8);
+                auto horizontal_size_value = getBits(12);
+                auto vertical_size_value = getBits(12);
+                auto aspect_ratio_information = getBits(4);
+                auto frame_rate_code = getBits(4);
+                std::cout << "size " << horizontal_size_value << " x " << vertical_size_value;
+                std::cout << ", aspect " << AspectToString[aspect_ratio_information];
+                std::cout << ", frame rate " << FrameRateToString[frame_rate_code];
             }else if (mPicture[0] == 0xb4)
             {
                 std::cout << "sequence_error_code";
@@ -121,3 +129,31 @@ bool Mpeg2VideoEsParser::analyze()
             std::cout << "\n";
             return true;
 }
+
+std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString = {{0,"forbiden"},
+{1,"square"},
+{2,"3x4"},
+{3,"9x16"},
+{4,"1x121"},
+{5,"reserved"},
+{6,"reserved"},
+{7,"reserved"}
+};
+
+std::map<uint8_t, std::string> Mpeg2VideoEsParser::FrameRateToString = {{0,"forbiden"},
+{1,"23.97"},
+{2,"24"},
+{3,"25"},
+{4,"29.97"},
+{5,"30"},
+{6,"50"},
+{7,"59.94"},
+{8,"60"},
+{9,"reserved"},
+{10,"reserved"},
+{11,"reserved"},
+{12,"reserved"},
+{13,"reserved"},
+{14,"reserved"},
+{15,"reserved"}
+};

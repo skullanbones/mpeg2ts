@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 
 /// Project files
 #include "EsParser.h"
@@ -6,9 +7,12 @@
 
 class Mpeg2VideoEsParser : GetBits, public EsParser
 {
+    static std::map<uint8_t, std::string> AspectToString;
+    static std::map<uint8_t, std::string> FrameRateToString;
 public:
     Mpeg2VideoEsParser()
         : foundStartCodes{0}
+
     {
     }
     virtual ~Mpeg2VideoEsParser()
