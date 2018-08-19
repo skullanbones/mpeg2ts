@@ -6,18 +6,17 @@
 /// Project files
 #include "EsParser.h"
 #include "GetBits.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
 
-class Mpeg2VideoEsParser : public GetBits, public EsParser
+class H264EsParser : public Mpeg2VideoEsParser
 {
-    static std::map<uint8_t, std::string> AspectToString;
-    static std::map<uint8_t, std::string> FrameRateToString;
 public:
-    Mpeg2VideoEsParser()
+    H264EsParser()
         : foundStartCodes{0}
 
     {
     }
-    virtual ~Mpeg2VideoEsParser()
+    virtual ~H264EsParser()
     {
     }
 

@@ -57,7 +57,8 @@ SRCS = 	TsParser.cc \
 		GetBits.cc \
 		TsDemuxer.cc \
 		TsStatistics.cc \
-        mpeg2vid/Mpeg2VideoParser.cc
+        mpeg2vid/Mpeg2VideoParser.cc \
+        h264/H264Parser.cc
 
 HDRS = 	include/GetBits.h \
 		include/TsDemuxer.h \
@@ -65,7 +66,8 @@ HDRS = 	include/GetBits.h \
 		include/TsParser.h \
 		include/TsStandards.h \
 		include/TsStatistics.h \
-		include/mpeg2vid/Mpeg2VideoParser.h
+		include/mpeg2vid/Mpeg2VideoParser.h \
+		include/h264/H264Parser.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
@@ -119,6 +121,7 @@ all: $(BUILDDIR) $(BUILDDIR)/tsparser
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/mpeg2vid
+	mkdir -p $(BUILDDIR)/h264
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
