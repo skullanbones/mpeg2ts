@@ -1,3 +1,5 @@
+///
+#include <sstream>
 /// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Log.h>
@@ -44,10 +46,6 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             ++foundStartCodes;
             const uint8_t* r = onePosition + 1;
             mPicture.insert(mPicture.end(), copyFrom, r);
-            /*for (auto x : mPicture)
-            {
-                std::cout << std::hex << (int)x << " ";
-            }*/
             if (!mPicture.empty())
             {
                 analyze();
@@ -73,60 +71,62 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
 bool Mpeg2VideoEsParser::analyze()
 {
             resetBits(mPicture.data(), mPicture.size());
+            std::ostringstream msg;
             if (mPicture[0] == 0 && mPicture.size() > 4) //TODO: 4 ?
             {
-                std::cout << "picture_start_code ";
+                msg << "picture_start_code ";
                 skipBits(10 + 8);
                 auto picType = getBits(3);
                 switch (picType)
                 {
-                    case 1: std::cout << "I";
+                    case 1: msg << "I";
                         break;
-                    case 2: std::cout << "P";
+                    case 2: msg << "P";
                         break;
-                    case 3: std::cout << "B";
+                    case 3: msg << "B";
                         break;
                     default:
-                            std::cout << "forbiden/reserved";
+                            msg << "forbiden/reserved";
 
                 };
+                LOGD << msg.str();
             }else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
             {
-                std::cout << "slice_start_code";
+                LOGD << "slice_start_code";
             }else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
             {
-                std::cout << "reserved";
+                LOGD << "reserved";
             }else if (mPicture[0] == 0xb2)
             {
-                std::cout << "user_data_start_code";
+                LOGD << "user_data_start_code";
             }else if (mPicture[0] == 0xb3)
             {
-                std::cout << "sequence_header_code ";
+                msg << "sequence_header_code ";
                 skipBits(8);
                 auto horizontal_size_value = getBits(12);
                 auto vertical_size_value = getBits(12);
                 auto aspect_ratio_information = getBits(4);
                 auto frame_rate_code = getBits(4);
-                std::cout << "size " << horizontal_size_value << " x " << vertical_size_value;
-                std::cout << ", aspect " << AspectToString[aspect_ratio_information];
-                std::cout << ", frame rate " << FrameRateToString[frame_rate_code];
+                msg << "size " << horizontal_size_value << " x " << vertical_size_value;
+                msg << ", aspect " << AspectToString[aspect_ratio_information];
+                msg << ", frame rate " << FrameRateToString[frame_rate_code];
+                LOGD << msg.str();
             }else if (mPicture[0] == 0xb4)
             {
-                std::cout << "sequence_error_code";
+                LOGD << "sequence_error_code";
             }else if (mPicture[0] == 0xb5)
             {
-                std::cout << "extension_start_code";
+                LOGD << "extension_start_code";
             }else if (mPicture[0] == 0xb7)
             {
-                std::cout << "sequence_end_code";
+                LOGD << "sequence_end_code";
             }else if (mPicture[0] == 0xb8)
             {
-                std::cout << "group_start_code";
+                LOGD << "group_start_code";
             }else
             {
-                std::cout << "system start code";
+                LOGD << "system start code";
             }
-            std::cout << "\n";
             return true;
 }
 
