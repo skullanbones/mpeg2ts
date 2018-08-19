@@ -205,3 +205,20 @@ def asset_newmobcal1920_mpeg2_ac3LR(request, downloader):
     """
     name, streams = request.param
     return downloader.download_asset(name, streams)
+
+@pytest.fixture(scope='session', params=[
+    ('eurosport.ts',
+     [{"Pid": 101, "StreamType": "video"},
+      {"Pid": 105, "StreamType": "audio"},
+      {"Pid": 115, "StreamType": "audio"},
+      {"Pid": 99, "StreamType": "pmt"}])
+])
+def asset_eurosport(request, downloader):
+    """
+    Asset for eurosport
+    :param request:
+    :param downloader:
+    :return: Returns the asset
+    """
+    name, streams = request.param
+    return downloader.download_asset(name, streams)
