@@ -367,7 +367,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
     while (readSize < streamsSize)
     {
         StreamTypeHeader hdr;
-        hdr.stream_type = getBits(8);
+        hdr.stream_type = (StreamType)getBits(8);
         getBits(3); // reserved
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved

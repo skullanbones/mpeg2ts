@@ -24,6 +24,7 @@
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
 #include "Logging.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
 
 static const std::string VERSION = "0.0.2.rc1";
 
@@ -35,6 +36,7 @@ TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
+std::map<StreamType, std::shared_ptr<EsParser> > g_EsParsers = {{STREAMTYPE_VIDEO_MPEG2, std::make_shared<Mpeg2VideoEsParser>()}};
 
 const char LOGFILE_NAME[] = "tsparser.csv";
 int LOGFILE_MAXSIZE = 100 * 1024;
@@ -281,7 +283,27 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                   << " (" << pid << ")\n";
         LOGN << pes << std::endl;
     }
-
+    
+    // @TODO add "if parse pid" option to cmd line
+    {
+        for (auto& pmtPid : g_PMTPIDS)
+        {
+            if (g_prevPmts.find(pmtPid) != g_prevPmts.end())
+            {
+                auto it = std::find_if(g_prevPmts[pmtPid].streams.begin(), g_prevPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream){return stream.elementary_PID == pid;});
+                if (it != g_prevPmts[pmtPid].streams.end())
+                {
+                    try
+                    {
+                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                    }catch(const std::out_of_range&){
+                        LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
+                    }
+                }
+            }
+        }
+    }
+    
     if (hasPid("write", pid))
     {
         auto writeOffset = 0;

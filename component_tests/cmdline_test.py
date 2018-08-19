@@ -29,7 +29,8 @@ def test_asset_list(asset_list):
     assert "RuBeatles_h265_aac_short.ts" in asset_list[2]
     assert "Safari_ Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.m2ts" in asset_list[3]
     assert "avsync_mpeg2_ac3LR.ts" in asset_list[4]
-    assert "newmobcal1920_mpeg2_ac3LR.ts" in asset_list[5]
+    assert "eurosport.ts" in asset_list[5]
+    assert "newmobcal1920_mpeg2_ac3LR.ts" in asset_list[6]
 
 
 def test_asset(asset_h264_dolby_atmos):
@@ -317,3 +318,18 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_a
     assert "stream_type: STREAMTYPE_AUDIO_AC3,  (129)" in out[1]
     assert "elementary_PID: 50" in out[1]
     assert "ES_info_length: 3" in out[1]
+
+def test_parse_eurosport(parser, asset_eurosport):
+    """
+    Test eurosport meg2 video parsing
+    :param parser:
+    :param asset_eurosport:
+    :return:
+    """
+    asset = asset_eurosport.get_asset()
+    assert "eurosport.ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 101, '-l', 'DEBUG'])
+    log.debug(out[0])
+    log.debug(out[1])
+    print(out[1])
+    assert "sequence_header_code size 704 x 576, aspect 3x4, frame rate 25" in out[1]
