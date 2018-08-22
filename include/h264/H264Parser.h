@@ -11,6 +11,8 @@
 class H264EsParser : public Mpeg2VideoEsParser
 {
 public:
+    H264EsParser(const H264EsParser& arg) = delete;
+    H264EsParser& operator=(const H264EsParser& arg) = delete;
     H264EsParser()
     {
     }

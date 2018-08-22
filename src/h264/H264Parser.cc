@@ -1,7 +1,6 @@
 ///
 #include <sstream>
 /// 3rd-party
-#include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Log.h>
 
 /// Project files
@@ -107,20 +106,6 @@ void H264EsParser::slice_header(bool IdrPicFlag)
 
 uint64_t H264EsParser::getBitsDecodeUGolomb()
 {
-/*    uint64_t zeros = 0;
-
-    // calculate zero bits. Will be optimized.
-    while (0 == getBits(1)) zeros++;
-
-    // insert first 1 bit
-    uint64_t info = 1 << zeros;
-
-    for (int64_t i = zeros - 1; i >= 0; i--)
-    {
-        info |= getBits(1) << i;
-    }
-
-    return (info - 1);*/
     unsigned int leading_zeros = 0;
     while (getBits(1) == 0) {
         leading_zeros++;

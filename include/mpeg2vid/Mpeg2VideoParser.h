@@ -12,6 +12,9 @@ class Mpeg2VideoEsParser : public GetBits, public EsParser
     static std::map<uint8_t, std::string> AspectToString;
     static std::map<uint8_t, std::string> FrameRateToString;
 public:
+    Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
+    Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
+
     Mpeg2VideoEsParser()
         : foundStartCodes{0}
 
