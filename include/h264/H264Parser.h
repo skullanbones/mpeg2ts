@@ -12,18 +12,20 @@ class H264EsParser : public Mpeg2VideoEsParser
 {
 public:
     H264EsParser()
-        : foundStartCodes{0}
-
     {
     }
     virtual ~H264EsParser()
     {
     }
 
-    virtual bool operator()(const uint8_t* from, ssize_t length);
-    bool analyze();
-
-    std::vector<uint8_t> last;
-    int foundStartCodes;
-    std::vector<uint8_t> mPicture;
+    bool analyze() override;
+    uint64_t getBitsDecodeUGolomb();
+    void scaling_list(uint8_t* scalingList, size_t sizeOfScalingList);
+    void seq_parameter_set_rbsp();
+    void pic_parameter_set_rbsp();
+    void slice_header(bool IdrPicFlag);
+    //sps data
+    uint64_t log2_max_frame_num_minus4;
+    uint64_t separate_colour_plane_flag;
+    uint64_t frame_mbs_only_flag;
 };

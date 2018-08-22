@@ -22,7 +22,7 @@ public:
     }
 
     virtual bool operator()(const uint8_t* from, ssize_t length);
-    bool analyze();
+    virtual bool analyze();
 
     std::vector<uint8_t> last;
     int foundStartCodes;
