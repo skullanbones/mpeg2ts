@@ -13,6 +13,7 @@
 #endif
 
 #elif __linux__
+#define TSLIB_API
 #endif
 
 
