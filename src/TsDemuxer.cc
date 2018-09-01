@@ -20,8 +20,8 @@
 namespace tslib
 {
 TsDemuxer::TsDemuxer()
+: mParser { new TsParser() }
 {
-    mParser = new TsParser();
 }
 
 TsDemuxer::~TsDemuxer()
