@@ -54,7 +54,7 @@ public:
      * Returns statistics on parsed transport stream packets.
      * @return TsStatistics containing collected statistics for all demuxed packets.
      */
-    const TsStatistics getTsStatistics() const
+    TsStatistics getTsStatistics() const
     {
         return static_cast<TsStatistics>(mParser);
     }
