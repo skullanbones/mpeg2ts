@@ -145,18 +145,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\CommonTypes.h" />
+    <ClInclude Include="..\..\..\..\include\EsParser.h" />
+    <ClInclude Include="..\..\..\..\include\GetBits.h" />
+    <ClInclude Include="..\..\..\..\include\Logging.h" />
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h" />
-    <ClInclude Include="..\..\..\include\CommonTypes.h" />
-    <ClInclude Include="..\..\..\include\EsParser.h" />
-    <ClInclude Include="..\..\..\include\GetBits.h" />
-    <ClInclude Include="..\..\..\include\Logging.h" />
-    <ClInclude Include="..\..\..\include\PesPacket.h" />
-    <ClInclude Include="..\..\..\include\PsiTables.h" />
-    <ClInclude Include="..\..\..\include\TsDemuxer.h" />
-    <ClInclude Include="..\..\..\include\TsPacketInfo.h" />
-    <ClInclude Include="..\..\..\include\TsParser.h" />
-    <ClInclude Include="..\..\..\include\TsStandards.h" />
-    <ClInclude Include="..\..\..\include\TsStatistics.h" />
+    <ClInclude Include="..\..\..\..\include\PesPacket.h" />
+    <ClInclude Include="..\..\..\..\include\PsiTables.h" />
+    <ClInclude Include="..\..\..\..\include\TsDemuxer.h" />
+    <ClInclude Include="..\..\..\..\include\TsPacketInfo.h" />
+    <ClInclude Include="..\..\..\..\include\TsParser.h" />
+    <ClInclude Include="..\..\..\..\include\TsStandards.h" />
+    <ClInclude Include="..\..\..\..\include\TsStatistics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\GetBits.cc" />
