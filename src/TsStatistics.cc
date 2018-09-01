@@ -38,9 +38,9 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
     }
 }
 
-void TsStatistics::checkTsDiscontinuity(int pid, bool dis)
+void TsStatistics::checkTsDiscontinuity(int pid, bool isDiscontinuous)
 {
-    if (dis)
+    if (isDiscontinuous)
     {
         ++mPidStatistics[pid].numberOfTsDiscontinuities;
         LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mTsPacketCounter

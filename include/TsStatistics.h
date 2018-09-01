@@ -5,9 +5,7 @@
 
 #pragma once
 #include <functional>
-#include <iostream>
 #include <map>
-#include <stdio.h>
 
 const int64_t CLOCK_90_KHZ = 90000;
 const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s

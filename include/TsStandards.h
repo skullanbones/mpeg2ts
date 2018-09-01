@@ -13,10 +13,6 @@
 
 #include <iostream>
 #include <map>
-#include <vector>
-
-// Project files
-#include "CommonTypes.h"
 
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 

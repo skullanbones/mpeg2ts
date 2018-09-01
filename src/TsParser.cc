@@ -87,7 +87,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 {
-    TsAdaptationFieldHeader hdr;
+    TsAdaptationFieldHeader hdr = {}; // zero initialization
     hdr.adaptation_field_length = getBits(8);
     if (hdr.adaptation_field_length == 0)
     {
@@ -109,7 +109,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
+    const TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     outInfo.pcr = -1;
     outInfo.opcr = -1;
@@ -155,7 +155,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.adaptation_field_extension_flag)
     {
-        uint8_t adaptation_field_extension_length = getBits(8);
+        const uint8_t adaptation_field_extension_length = getBits(8);
 
         // Check if data size is within boundary of a TS Packet
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
@@ -237,7 +237,7 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket)
 {
     bool ret = false;
-    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    const uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
 
     checkCCError(pid, tsPacketInfo.continuityCounter);
@@ -316,7 +316,7 @@ PatTable TsParser::parsePatPacket(int pid)
     resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
     parsePsiTable(mSectionBuffer[pid], pat);
 
-    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    const int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {
