@@ -20,7 +20,6 @@
 #include <public/mp2ts.h>
 #include <public/TsStandards.h>
 #include "GetBits.h"
-#include "TsStatistics.h"
 
 
 class TsParser : GetBits

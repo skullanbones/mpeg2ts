@@ -17,7 +17,7 @@
 #include <plog/Log.h>
 
 /// project files
-#include "TsStatistics.h"
+#include <public/mp2ts.h>
 #include "Logging.h"
 
 void TsStatistics::checkCCError(int pid, uint8_t cc)

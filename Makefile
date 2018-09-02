@@ -67,11 +67,8 @@ HDRS = 	include/public/mp2ts.h \
 		include/public/TsStandards.h \
 		include/GetBits.h \
 		include/TsParser.h \
-		include/TsStatistics.h \
 		include/mpeg2vid/Mpeg2VideoParser.h \
 		include/h264/H264Parser.h \
-		include/PesPacket.h \
-		include/PsiTables.h \
 		include/mpeg2vid/Mpeg2VideoParser.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))

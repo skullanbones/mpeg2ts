@@ -9,7 +9,6 @@
 /// Project files
 #include <public/mp2ts.h>
 #include "TsPacketTestData.h"
-#include "TsStatistics.h"
 
 TEST(TsStatisticsTests, TwoPlusTwoEqualsFour)
 {
