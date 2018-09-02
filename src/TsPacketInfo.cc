@@ -1,4 +1,4 @@
-#include <public/mp2ts.h>
+#include <public/mpeg2ts.h>
 
 std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
 {

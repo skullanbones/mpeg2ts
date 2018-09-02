@@ -12,7 +12,7 @@
 * Strictly Confidential - Do not duplicate or distribute without written
 * permission from authors
 */
-#include <public/mp2ts.h>
+#include <public/mpeg2ts.h>
 #include "TsParser.h"
 #include "Logging.h"
 #include "TsParser.h"

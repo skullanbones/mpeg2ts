@@ -7,7 +7,7 @@
 # permission from skullanbones™ and authors
 
 ## Project
-COMPONENT_NAME ?= mp2ts
+COMPONENT_NAME ?= mpeg2ts
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
@@ -63,7 +63,7 @@ SRCS = 	TsParser.cc \
         PsiTables.cc \
         TsPacketInfo.cc
 
-HDRS = 	include/public/mp2ts.h \
+HDRS = 	include/public/mpeg2ts.h \
 		include/public/Ts_IEC13818-1.h \
 		include/GetBits.h \
 		include/TsParser.h \
@@ -73,7 +73,7 @@ HDRS = 	include/public/mp2ts.h \
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
-$(info $$OBJS is $(OBJS))
+$(info OBJS is: $(OBJS))
 
 ## Commands
 docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \

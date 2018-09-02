@@ -1,4 +1,4 @@
-#include <public/mp2ts.h>
+#include <public/mpeg2ts.h>
 #include "Logging.h"
 
 /// 3rd-party

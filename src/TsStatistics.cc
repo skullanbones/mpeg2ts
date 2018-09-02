@@ -17,7 +17,7 @@
 #include <plog/Log.h>
 
 /// project files
-#include <public/mp2ts.h>
+#include <public/mpeg2ts.h>
 #include "Logging.h"
 
 TsStatistics::TsStatistics()
