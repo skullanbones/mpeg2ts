@@ -18,7 +18,7 @@
 
 // Project files
 #include <public/mp2ts.h>
-#include <public/TsStandards.h>
+#include <public/Ts_IEC13818-1.h>
 #include "GetBits.h"
 
 
