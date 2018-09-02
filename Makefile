@@ -65,7 +65,6 @@ SRCS = 	TsParser.cc \
 
 HDRS = 	include/public/mp2ts.h \
 		include/GetBits.h \
-		include/TsPacketInfo.h \
 		include/TsParser.h \
 		include/TsStandards.h \
 		include/TsStatistics.h \

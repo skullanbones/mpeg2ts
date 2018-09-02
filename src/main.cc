@@ -22,7 +22,6 @@
 /// Project files
 #include <public/mp2ts.h>
 #include "TsParser.h"
-#include "TsPacketInfo.h"
 #include "TsStandards.h"
 #include "Logging.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
