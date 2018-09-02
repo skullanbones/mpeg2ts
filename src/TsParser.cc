@@ -8,7 +8,6 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "CommonTypes.h"
 #include "TsParser.h"
 #include "Logging.h"
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CommonTypes.h"
 
 #include <cstdint>
 #include <algorithm>
