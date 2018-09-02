@@ -64,9 +64,9 @@ SRCS = 	TsParser.cc \
         TsPacketInfo.cc
 
 HDRS = 	include/public/mp2ts.h \
+		include/public/TsStandards.h \
 		include/GetBits.h \
 		include/TsParser.h \
-		include/TsStandards.h \
 		include/TsStatistics.h \
 		include/mpeg2vid/Mpeg2VideoParser.h \
 		include/h264/H264Parser.h \

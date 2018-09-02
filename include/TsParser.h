@@ -18,8 +18,8 @@
 
 // Project files
 #include <public/mp2ts.h>
+#include <public/TsStandards.h>
 #include "GetBits.h"
-#include "TsStandards.h"
 #include "TsStatistics.h"
 
 

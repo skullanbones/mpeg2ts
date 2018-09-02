@@ -25,7 +25,7 @@
 
 /// project files
 #include "TsStatistics.h"
-#include "TsStandards.h" // For TsHeader  Program
+#include <public/TsStandards.h> // For TsHeader  Program
 
 // forward declarations
 class TsParser;
