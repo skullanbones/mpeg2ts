@@ -14,8 +14,12 @@
 */
 #include "TsDemuxer.h"
 #include "TsParser.h"
+#include "Logging.h"
 
 #include <cstdint>
+
+/// 3rd-party
+#include <plog/Log.h>
 
 namespace tslib
 {

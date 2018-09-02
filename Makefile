@@ -58,7 +58,9 @@ SRCS = 	TsParser.cc \
 		TsDemuxer.cc \
 		TsStatistics.cc \
         mpeg2vid/Mpeg2VideoParser.cc \
-        h264/H264Parser.cc
+        h264/H264Parser.cc \
+        PesPacket.cc \
+        PsiTables.cc
 
 HDRS = 	include/GetBits.h \
 		include/TsDemuxer.h \
@@ -67,7 +69,10 @@ HDRS = 	include/GetBits.h \
 		include/TsStandards.h \
 		include/TsStatistics.h \
 		include/mpeg2vid/Mpeg2VideoParser.h \
-		include/h264/H264Parser.h
+		include/h264/H264Parser.h \
+		include/PesPacket.h \
+		include/PsiTables.h \
+		include/mpeg2vid/Mpeg2VideoParser.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
