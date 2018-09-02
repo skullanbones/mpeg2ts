@@ -7,7 +7,7 @@
 /// Project files
 #include "TsPacketInfo.h"
 #include "TsPacketTestData.h"
-#include "TsDemuxer.h"
+#include <public/mp2ts.h>
 
 
 using ::testing::StrictMock;

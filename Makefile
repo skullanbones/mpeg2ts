@@ -62,8 +62,8 @@ SRCS = 	TsParser.cc \
         PesPacket.cc \
         PsiTables.cc
 
-HDRS = 	include/GetBits.h \
-		include/TsDemuxer.h \
+HDRS = 	include/public/mp2ts.h \
+		include/GetBits.h \
 		include/TsPacketInfo.h \
 		include/TsParser.h \
 		include/TsStandards.h \

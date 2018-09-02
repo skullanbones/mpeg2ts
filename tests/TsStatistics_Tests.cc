@@ -7,7 +7,7 @@
 #include <iostream>
 
 /// Project files
-#include "TsDemuxer.h"
+#include <public/mp2ts.h>
 #include "TsPacketTestData.h"
 #include "TsStatistics.h"
 

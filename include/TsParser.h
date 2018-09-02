@@ -17,8 +17,8 @@
 #include <cstdint>
 
 // Project files
+#include <public/mp2ts.h>
 #include "GetBits.h"
-#include "PesPacket.h"
 #include "PsiTables.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
