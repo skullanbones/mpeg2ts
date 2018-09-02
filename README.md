@@ -1,6 +1,11 @@
 # ts-lib
 Make video great again!
 
+## SW Arcitechture
+There is currently only 1 set of API under the namespace tslib and its exported
+currently under TsDemuxer.h Soon there will only be 1 h-file: tslib.h
+![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
+
 ## Releases
 *V0.0.2.rc1*
 
