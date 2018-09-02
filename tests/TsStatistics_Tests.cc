@@ -147,7 +147,7 @@ TEST(TsStatisticsTests, TestPcrHistogram)
  */
 TEST(TsStatisticsTests, TestTsPacketCounter)
 {
-    TsDemuxer demuxer;
+    tslib::TsDemuxer demuxer;
     TsStatistics statistics = demuxer.getTsStatistics();
     EXPECT_EQ(statistics.mTsPacketCounter, 0u);
 
