@@ -1,5 +1,15 @@
-# ts-lib
-Make video great again!
+# tslib
+Artifacts:
+```
+Win32: tslib.dll tslib.lib
+Linux: tslib.so tslib.a
+Both: tslib.h
+```
+Applications:
+```
+Win32: None, TBD
+Linux: tsparser
+```
 
 ## SW Arcitechture
 There is currently only 1 set of API under the namespace tslib and its exported
@@ -30,7 +40,9 @@ currently under TsDemuxer.h Soon there will only be 1 h-file: tslib.h
 * Added PAT parsing
 * Added Demuxer
 
-## How to run it
+## Linux
+
+### How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
 make all
@@ -50,7 +62,7 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
 
 
-## Docker image
+### Docker image
 To just use the latest image just pull from our private registry/repository @ DockerHub:
 ```
 docker pull heliconwave/circleci:v1
@@ -66,12 +78,16 @@ make docker-bash
 From here you can use the 3rd-party dependencies like
 tstools, clang-format-5.0 etc...
 
-## How to test it
+### How to test it
 In order to run all unit tests just type:
 ```
 make test
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
+
+## Windows
+Currently only WIN32 (x86) is supported unser VC14 VS2015 compiler which has a fairly large C++11
+support. There is a VS2015 solution file unser msvc/2015 for this project. No unit tests or main application exist at current state. It's is a pure DLL project that builds tslib.dll artifacts under windows. No cross compilation exist.
 
 ## Continuous integration (CI)
 For CI we use CircleCI which will automatically run all unit tests after a commit either
