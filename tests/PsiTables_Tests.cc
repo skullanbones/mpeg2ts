@@ -7,7 +7,7 @@
 #include <iostream>
 
 /// Project files
-#include "PsiTables.h"
+#include <public/mp2ts.h>
 
 TEST(PsiTablesTests, PsiTableTestComparisonOperator)
 {

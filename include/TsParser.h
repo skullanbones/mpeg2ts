@@ -19,7 +19,6 @@
 // Project files
 #include <public/mp2ts.h>
 #include "GetBits.h"
-#include "PsiTables.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"
 #include "TsStatistics.h"
