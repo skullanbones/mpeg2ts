@@ -20,6 +20,7 @@
 #include <plog/Appenders/ConsoleAppender.h>
 
 /// Project files
+#include "TsParser.h"
 #include "TsDemuxer.h"
 #include "TsPacketInfo.h"
 #include "TsStandards.h"

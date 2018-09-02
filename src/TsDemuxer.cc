@@ -15,6 +15,7 @@
 #include "TsDemuxer.h"
 #include "TsParser.h"
 #include "Logging.h"
+#include "TsParser.h"
 
 #include <cstdint>
 
@@ -110,6 +111,11 @@ void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
 {
     mTsCallbackMap[pid] = cb;
     mHandlers[pid] = hdl;
+}
+
+TsStatistics TsDemuxer::getTsStatistics() const
+{
+    return mParser->mStatistics;
 }
 
 }
