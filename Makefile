@@ -7,7 +7,7 @@
 # permission from skullanbones™ and authors
 
 ## Project
-COMPONENT_NAME ?= ts-lib
+COMPONENT_NAME ?= ts
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
@@ -36,8 +36,9 @@ DOCKER_USER_ID ?= $(USER)
 
 ## Compiler
 CXX = g++
-STATIC = libts.a
-DYNAMIC = libts.so
+STATIC = lib$(COMPONENT_NAME).a
+DYNAMIC = lib$(COMPONENT_NAME).so
+
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
 ifeq ($(BUILD_TYPE),DEBUG)
 	CXXFLAGS += -g -O0
@@ -104,7 +105,9 @@ help:
 	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component-tests       - run all component tests.'
-	@echo '  so                    - make shared object as dynamic linkage library.'
+	@echo '  libs                  - make both static and dynamic libs.'
+	@echo '  shared                - make static object as static linkage library.'
+	@echo '  static                - make shared object as dynamic linkage library.'
 	@echo '  3rd-party             - install 3rd-party dependencies.'
 	@echo '  plog                  - install 3rd-party plog logging library.'
 	@echo '  clean                 - deletes build content.'
@@ -117,7 +120,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/mpeg2vid
 
-$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
+$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
 
 $(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
@@ -127,11 +130,15 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc plog
 	@echo [Compile] $<
 	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
 
+libs: $(BUILDDIR) static shared
+
+static: $(BUILDDIR)/$(STATIC)
+
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
-so: $(BUILDDIR)/$(DYNAMIC)
+shared: $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
@@ -173,7 +180,7 @@ tests: unit-tests component-tests
 
 ### unit tests
 
-build-unit-tests: $(BUILDDIR)/$(STATIC)
+build-unit-tests: static
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
