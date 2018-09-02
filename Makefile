@@ -60,7 +60,8 @@ SRCS = 	TsParser.cc \
         mpeg2vid/Mpeg2VideoParser.cc \
         h264/H264Parser.cc \
         PesPacket.cc \
-        PsiTables.cc
+        PsiTables.cc \
+        TsPacketInfo.cc
 
 HDRS = 	include/public/mp2ts.h \
 		include/GetBits.h \
