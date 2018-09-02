@@ -25,7 +25,7 @@
 #include "TsStatistics.h"
 
 
-class TsParser : GetBits, public TsStatistics
+class TsParser : GetBits
 {
 public:
     /*!
@@ -132,6 +132,7 @@ public:
      */
     void parsePesPacket(int16_t pid);
 
+    TsStatistics mStatistics;
 private:
     // TODO maybe 1 parser per pid?
     std::map<uint16_t, ByteVector> mSectionBuffer;

@@ -95,7 +95,7 @@ void GetBits::skipBytes(uint16_t skipBytes)
     }
 }
 
-size_t GetBits::getByteInx()
+size_t GetBits::getByteInx() const
 {
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
 }
@@ -104,7 +104,7 @@ GetBitsException::GetBitsException(const std::string msg)
         : std::runtime_error(msg)
 {}
 
-void GetBits::printSrcBytes()
+void GetBits::printSrcBytes() const
 {
     for (size_t i = mSrcInx; i < mSize; i++)
     {

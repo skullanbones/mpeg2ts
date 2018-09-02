@@ -47,7 +47,7 @@ TEST(TsDemuxerTests, TestDemuxPatPacket)
 {
     try
     {
-        TsDemuxer demuxer;
+        tslib::TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
         demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
@@ -67,7 +67,7 @@ TEST(TsDemuxerTests, TestDemux2PatPacket)
 {
     try
     {
-        TsDemuxer demuxer;
+        tslib::TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
         demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
@@ -88,7 +88,7 @@ TEST(TsDemuxerTests, TestDemuxPmtPacket)
 {
     try
     {
-        TsDemuxer demuxer;
+        tslib::TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
         demuxer.addPsiPid(1010, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
@@ -108,7 +108,7 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
 {
     try
     {
-        TsDemuxer demuxer;
+        tslib::TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
         demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
@@ -130,7 +130,7 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
 {
     try
     {
-        TsDemuxer demuxer;
+        tslib::TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
         demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), mcallback.get());
