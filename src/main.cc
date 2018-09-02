@@ -32,7 +32,7 @@ uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
-TsDemuxer g_tsDemux;
+tslib::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
@@ -94,9 +94,9 @@ void display_usage()
               << std::endl;
 }
 
-void display_statistics(TsDemuxer demuxer)
+void display_statistics(TsStatistics statistics)
 {
-    for (auto& pidStat : demuxer.getTsStatistics().mPidStatistics)
+    for (auto& pidStat : statistics.mPidStatistics)
     {
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pidStat.first) == 0)
         {
@@ -488,7 +488,7 @@ int main(int argc, char** argv)
                 LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
                 LOGD << "Statistics\n";
-                display_statistics(g_tsDemux);
+                display_statistics(g_tsDemux.getTsStatistics());
                 fclose(fptr);
                 return EXIT_SUCCESS;
             }

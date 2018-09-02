@@ -25,7 +25,8 @@
 #include "PsiTables.h"
 #include "PesPacket.h"
 #include "TsPacketInfo.h"
-//#include "TsStatistics.h"
+#include "TsParser.h"
+#include "TsStatistics.h"
 
 // forward declarations
 class TsParser;
@@ -78,10 +79,10 @@ public:
     * Returns statistics on parsed transport stream packets.
     * @return TsStatistics containing collected statistics for all demuxed packets.
     */
-    /*TSLIB_API TsStatistics getTsStatistics() const
+    TSLIB_API TsStatistics getTsStatistics() const
     {
-    	return static_cast<TsStatistics>(*mParser.get());
-    }*/
+    	return mParser->mStatistics;
+    }
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;

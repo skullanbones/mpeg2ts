@@ -37,12 +37,12 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
     if (tsPacketInfo.errorIndicator)
     {
-        ++mParser->mTsPacketErrorIndicator;
+        ++mParser->mStatistics.mTsPacketErrorIndicator;
     }
 
     if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
     {
-        ++mParser->mTsPacketNullPacketCounter;
+        ++mParser->mStatistics.mTsPacketNullPacketCounter;
         return; // Skip null packets, they contain no info
     }
 
@@ -87,7 +87,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         }
     }
 
-    ++mParser->mTsPacketCounter;
+    ++mParser->mStatistics.mTsPacketCounter;
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb, void* hdl)

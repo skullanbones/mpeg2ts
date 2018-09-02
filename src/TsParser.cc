@@ -202,8 +202,8 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
     int PID = tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
-    checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
-    checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
 
     if (tsPacketInfo.hdr.payload_unit_start_indicator)
     {
@@ -240,11 +240,11 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
     const uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
 
-    checkCCError(pid, tsPacketInfo.continuityCounter);
-    checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkCCError(pid, tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
     if (tsPacketInfo.hasAdaptationField)
     {
-        buildPcrHistogram(pid, tsPacketInfo.pcr);
+        mStatistics.buildPcrHistogram(pid, tsPacketInfo.pcr);
     }
 
     if (tsPacketInfo.isPayloadStart)
@@ -261,8 +261,8 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             {
                 pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
 
-                buildPtsHistogram(pid, pesPacket.pts);
-                buildDtsHistogram(pid, pesPacket.dts);
+                mStatistics.buildPtsHistogram(pid, pesPacket.pts);
+                mStatistics.buildDtsHistogram(pid, pesPacket.dts);
 
                 ret = true;
             }

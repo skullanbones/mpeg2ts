@@ -221,9 +221,10 @@ clean:
 		$(MAKE) -C $$dir clean; \
 	done
 
-### Will force clean download cache
+### Will force clean download cache & build directory
 clean-all: clean
 	rm -f $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	rm -f $(3RDPARTYDIR)/.plog_extracted
 	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
+	rm -rf $(BUILDDIR)
 
