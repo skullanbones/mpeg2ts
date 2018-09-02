@@ -107,7 +107,13 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 | Abbreviation  | Meaning                             |
 |---------------|-------------------------------------|
 | VCS           | Version Control System              |
-| DVCS          | Distributed Version Control System  |
-| SW            | Software                            |
-| MC            | Multicast                           |
 | CI            | Continuous Integration              |
+| DVCS          | Distributed Version Control System  |
+| IEC           | International Electrotechnical Commission  |
+| ISO           | International Organization for Standardization  |
+| MC            | Multicast                           |
+| MPEG          | Moving Picture Experts Group        |
+| PS            | Program Stream                      |
+| SDK           | Software Development Kit            |
+| SW            | Software                            |
+| TS            | Transport Stream                    |
