@@ -1,9 +1,12 @@
-# tslib
+# MPEG-2 Transport Stream utility library
+A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
+international specification ISO/IEC 13818-1.
+
 Artifacts:
 ```
-Win32: tslib.dll tslib.lib
-Linux: tslib.so tslib.a
-Both: tslib.h
+Win32: mp2ts.dll mp2ts.lib
+Linux: libmp2ts.so libmp2ts.a
+Both: mp2ts.h
 ```
 Applications:
 ```
@@ -12,8 +15,8 @@ Linux: tsparser
 ```
 
 ## SW Architecture
-There is currently only 1 set of API under the namespace tslib and its exported
-currently under TsDemuxer.h Soon there will only be 1 h-file: tslib.h
+There is currently only 1 set of API under the namespace mp2ts and its exported
+currently under TsDemuxer.h Soon there will only be 1 h-file: mp2ts.h
 ![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
 
 ## Releases

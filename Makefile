@@ -7,7 +7,7 @@
 # permission from skullanbones™ and authors
 
 ## Project
-COMPONENT_NAME ?= ts
+COMPONENT_NAME ?= mp2ts
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
@@ -129,7 +129,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)/h264
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
+	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l$(COMPONENT_NAME)
 
 $(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
