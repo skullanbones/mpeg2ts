@@ -20,6 +20,11 @@
 #include <public/mp2ts.h>
 #include "Logging.h"
 
+TsStatistics::TsStatistics()
+: mTsPacketCounter{ 0 }
+{
+}
+
 void TsStatistics::checkCCError(int pid, uint8_t cc)
 {
     if (mPidStatistics[pid].lastCC == PidStatistic::INVALID_CC)

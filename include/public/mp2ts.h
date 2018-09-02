@@ -255,10 +255,7 @@ struct PidStatistic
 class TsStatistics
 {
 public:
-    TsStatistics()
-            : mTsPacketCounter{ 0 }
-    {
-    }
+    explicit TsStatistics();
 
     /*!
      * Calculates Continuity errors.
@@ -315,7 +312,7 @@ typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, voi
 class TsDemuxer
 {
 public:
-    TSLIB_API TsDemuxer();
+    TSLIB_API explicit TsDemuxer();
 
     TSLIB_API ~TsDemuxer();
 
