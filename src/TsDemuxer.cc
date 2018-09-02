@@ -22,7 +22,7 @@
 /// 3rd-party
 #include <plog/Log.h>
 
-namespace tslib
+namespace mpeg2ts
 {
 TsDemuxer::TsDemuxer()
 : mParser { new TsParser() }

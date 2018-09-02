@@ -146,7 +146,7 @@ TEST(TsStatisticsTests, TestPcrHistogram)
  */
 TEST(TsStatisticsTests, TestTsPacketCounter)
 {
-    tslib::TsDemuxer demuxer;
+    mpeg2ts::TsDemuxer demuxer;
     TsStatistics statistics = demuxer.getTsStatistics();
     EXPECT_EQ(statistics.mTsPacketCounter, 0u);
 

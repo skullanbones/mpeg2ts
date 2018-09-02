@@ -4,9 +4,9 @@ international specification ISO/IEC 13818-1.
 
 Artifacts:
 ```
-Win32: mp2ts.dll mp2ts.lib
-Linux: libmp2ts.so libmp2ts.a
-Both: mp2ts.h
+Win32: mpeg2ts.dll mpeg2ts.lib
+Linux: libmpeg2ts.so libmpeg2ts.a
+Both: mpeg2ts.h
 ```
 Applications:
 ```

@@ -7,13 +7,13 @@
 #ifdef _WIN32
 
 #ifdef TSLIB_DLL_EXPORTS
-#define TSLIB_API __declspec(dllexport)
+#define MPEG2TS_API __declspec(dllexport)
 #else
-#define TSLIB_API __declspec(dllimport)
+#define MPEG2TS_API __declspec(dllimport)
 #endif
 
 #elif __linux__
-#define TSLIB_API
+#define MPEG2TS_API
 #endif
 
 
@@ -299,7 +299,7 @@ public:
 };
 
 
-namespace tslib
+namespace mpeg2ts
 {
 
 
@@ -312,15 +312,15 @@ typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, voi
 class TsDemuxer
 {
 public:
-    TSLIB_API explicit TsDemuxer();
+    MPEG2TS_API explicit TsDemuxer();
 
-    TSLIB_API ~TsDemuxer();
+    MPEG2TS_API ~TsDemuxer();
 
     /*!
      * Demuxes a transport stream packed based on its Packet ID.
      * @param tsPacket The TS packet to demux.
      */
-    TSLIB_API void demux(const uint8_t* tsPacket);
+    MPEG2TS_API void demux(const uint8_t* tsPacket);
 
     /*!
      * Outputs to callback function when found a PSI table with PID.
@@ -328,7 +328,7 @@ public:
      * @param cb Returns a complete PSI table to this callback function.
      * @param hdl Custom handler
      */
-    TSLIB_API void addPsiPid(int pid, PsiCallBackFnc cb, void* hdl);
+    MPEG2TS_API void addPsiPid(int pid, PsiCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete PES packet with PID.
@@ -336,7 +336,7 @@ public:
      * @param cb  Callback when found a complete PES packet.
      * @param hdl Custom handler
      */
-    TSLIB_API void addPesPid(int pid, PesCallBackFnc cb, void* hdl);
+    MPEG2TS_API void addPesPid(int pid, PesCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete TS packet filtered on PID.
@@ -344,13 +344,13 @@ public:
      * @param cb Callback when found a TS packet.
      * @param hdl Custom handler
      */
-    TSLIB_API void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
+    MPEG2TS_API void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
 
     /*!
      * Returns statistics on parsed transport stream packets.
      * @return TsStatistics containing collected statistics for all demuxed packets.
      */
-    TSLIB_API TsStatistics
+    MPEG2TS_API TsStatistics
 
     getTsStatistics() const;
 
