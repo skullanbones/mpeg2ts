@@ -148,23 +148,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\CommonTypes.h" />
     <ClInclude Include="..\..\..\..\include\EsParser.h" />
     <ClInclude Include="..\..\..\..\include\GetBits.h" />
     <ClInclude Include="..\..\..\..\include\Logging.h" />
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h" />
-    <ClInclude Include="..\..\..\..\include\PesPacket.h" />
-    <ClInclude Include="..\..\..\..\include\PsiTables.h" />
-    <ClInclude Include="..\..\..\..\include\TsDemuxer.h" />
-    <ClInclude Include="..\..\..\..\include\TsPacketInfo.h" />
+    <ClInclude Include="..\..\..\..\include\public\mpeg2ts.h" />
+    <ClInclude Include="..\..\..\..\include\public\Ts_IEC13818-1.h" />
     <ClInclude Include="..\..\..\..\include\TsParser.h" />
-    <ClInclude Include="..\..\..\..\include\TsStandards.h" />
-    <ClInclude Include="..\..\..\..\include\TsStatistics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\GetBits.cc" />
     <ClCompile Include="..\..\..\..\src\mpeg2vid\Mpeg2VideoParser.cc" />
+    <ClCompile Include="..\..\..\..\src\PesPacket.cc" />
+    <ClCompile Include="..\..\..\..\src\PsiTables.cc" />
     <ClCompile Include="..\..\..\..\src\TsDemuxer.cc" />
+    <ClCompile Include="..\..\..\..\src\TsPacketInfo.cc" />
     <ClCompile Include="..\..\..\..\src\TsParser.cc" />
     <ClCompile Include="..\..\..\..\src\TsStatistics.cc" />
   </ItemGroup>

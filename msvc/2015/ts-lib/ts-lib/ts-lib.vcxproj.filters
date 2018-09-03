@@ -19,13 +19,13 @@
     <Filter Include="Source Files\mpeg2vid">
       <UniqueIdentifier>{460593e5-8a8d-457d-b5ce-9f9a9cad20b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\public">
+      <UniqueIdentifier>{06081a1d-2584-41b1-a080-00e9ca99a6d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h">
       <Filter>Header Files\mpeg2vid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\CommonTypes.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\EsParser.h">
       <Filter>Header Files</Filter>
@@ -36,26 +36,14 @@
     <ClInclude Include="..\..\..\..\include\Logging.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\PesPacket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\PsiTables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\TsDemuxer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\TsPacketInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\include\TsParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\TsStandards.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\..\include\public\mpeg2ts.h">
+      <Filter>Header Files\public</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\TsStatistics.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\..\..\include\public\Ts_IEC13818-1.h">
+      <Filter>Header Files\public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\mpeg2vid\Mpeg2VideoParser.cc">
       <Filter>Source Files\mpeg2vid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\PesPacket.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\PsiTables.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\TsPacketInfo.cc">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
