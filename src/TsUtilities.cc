@@ -1,20 +1,39 @@
 #include "public/TsUtilities.h"
 #include <iostream>
 #include "public/Ts_IEC13818-1.h"
+#include "Logging.h"
 
 #include <fstream>
 
+/// 3rd-party
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
 namespace tsutil
 {
+const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
+const char LOGFILE_NAME[] = "mpeg2ts_log.csv";
+int LOGFILE_MAXSIZE = 100 * 1024;
+int LOGFILE_MAXNUMBEROF = 10;
+
 TsUtilities::TsUtilities()
     : mAddedPmts{ false }
 {
     
 }
 
+void TsUtilities::initLogging()
+{
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME, LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
+    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
+}
+
 
 void TsUtilities::initParse()
 {
+    initLogging();
     mPmtPids.clear();  // Restart
     mPrevPat = {};
     mPmts.clear();
@@ -46,7 +65,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
         return false;
     }
 
-    std::cout << "Parsing tsfile:" << file << std::endl;
+    LOGD << "Parsing tsfile:" << file << std::endl;
 
     while (!tsFile.eof())
     {
@@ -68,7 +87,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     // If empty data, just return
     if (data == NULL || data == nullptr)
     {
-        std::cerr << "No data to parse..." << std::endl;
+        LOGE << "No data to parse...";
         return false;
     }
 
@@ -79,7 +98,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 
     if ((data[0] != TS_PACKET_SYNC_BYTE) || (size <= 0)) // TODO support maxsize?
     {
-        std::cerr << "ERROR: 1'st byte not in sync!!!" << std::endl;
+        LOGE << "ERROR: 1'st byte not in sync!!!" << std::endl;
         return false;
     }
 
@@ -89,7 +108,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
         readIndex += TS_PACKET_SIZE;
         count++;
     }
-    std::cout << "Found " << count << " ts packets." << std::endl;
+    LOGD << "Found " << count << " ts packets." << std::endl;
 
     return true;
 }
@@ -98,7 +117,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 void TsUtilities::PATCallback(PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
-    //LOGV << "PATCallback pid:" << pid;
+    LOGV_(FileLog) << "PATCallback pid:" << pid;
     PatTable* pat;
     try
     {
@@ -106,20 +125,20 @@ void TsUtilities::PATCallback(PsiTable* table, uint16_t pid, void* hdl)
     }
     catch (std::exception& ex)
     {
-        //LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pat == NULL)
     {
-        //LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
     // Do nothing if same PAT
     if (instance->mPrevPat == *pat)
     {
-        //LOGV << "Got same PAT...";
+        LOGV << "Got same PAT...";
         return;
     }
     instance->mPrevPat = *pat;
@@ -129,19 +148,17 @@ void TsUtilities::PATCallback(PsiTable* table, uint16_t pid, void* hdl)
     int numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
-        //LOGD << "No programs found in PAT, exiting...";
+        LOGD_(FileLog) << "No programs found in PAT, exiting...";
         exit(EXIT_SUCCESS);
     }
     else if (numPrograms == 1) // SPTS
     {
-        //LOGD << "Found Single Program Transport Stream (SPTS).";
-        std::cout << "Found Single Program Transport Stream (SPTS)." << std::endl;
+        LOGD << "Found Single Program Transport Stream (SPTS).";
         instance->mPmtPids.push_back(pat->programs[0].program_map_PID);
     }
     else if (numPrograms >= 1) // MPTS
     {
-        //LOGD << "Found Multiple Program Transport Stream (MPTS).";
-        std::cout << "Found Multiple Program Transport Stream (MPTS)." << std::endl;
+        LOGD << "Found Multiple Program Transport Stream (MPTS).";
         for (auto program : pat->programs)
         {
             if (program.type == ProgramType::PMT)
@@ -170,7 +187,7 @@ void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
-    //LOGV << "PMTCallback... pid:" << pid;
+    LOGV_(FileLog) << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
 
     try
@@ -179,13 +196,13 @@ void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
     }
     catch (std::exception& ex)
     {
-        //LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
+        LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
     if (pmt == NULL)
     {
-        //LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
+        LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
 
@@ -193,16 +210,16 @@ void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
     // Do nothing if same PMT
     if (instance->mPmts.find(pid) != instance->mPmts.end())
     {
-        //LOGV << "Got same PMT...";
+        LOGV_(FileLog) << "Got same PMT...";
         return;
     }
 
-    std::cout << "Adding PMT to list..." << std::endl;
+    LOGD << "Adding PMT to list..." << std::endl;
     instance->mPmts[pid] = *pmt;
     
     for (auto& stream : pmt->streams)
     {
-            //LOGD << "Add ES PID: " << stream.elementary_PID << std::endl;
+        LOGD_(FileLog) << "Add ES PID: " << stream.elementary_PID << std::endl;
         instance->mEsPids.push_back(stream.elementary_PID);
     }
     /*

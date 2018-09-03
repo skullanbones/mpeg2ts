@@ -41,6 +41,7 @@ public:
     MPEG2TS_API std::map<uint16_t, PmtTable> getPmtTables() const;
 
 private:
+    void initLogging();
     void initParse();
     void registerPmtCallback();
 
