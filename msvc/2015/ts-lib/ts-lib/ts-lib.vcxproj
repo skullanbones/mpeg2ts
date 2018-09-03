@@ -99,6 +99,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDir)$(Configuration)" "$(SolutionDir)..\..\TestTsLib\TestTsLib" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -153,6 +156,7 @@
     <ClInclude Include="..\..\..\..\include\Logging.h" />
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h" />
     <ClInclude Include="..\..\..\..\include\public\mpeg2ts.h" />
+    <ClInclude Include="..\..\..\..\include\public\TsUtilities.h" />
     <ClInclude Include="..\..\..\..\include\public\Ts_IEC13818-1.h" />
     <ClInclude Include="..\..\..\..\include\TsParser.h" />
   </ItemGroup>
@@ -165,6 +169,7 @@
     <ClCompile Include="..\..\..\..\src\TsPacketInfo.cc" />
     <ClCompile Include="..\..\..\..\src\TsParser.cc" />
     <ClCompile Include="..\..\..\..\src\TsStatistics.cc" />
+    <ClCompile Include="..\..\..\..\src\TsUtilities.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
