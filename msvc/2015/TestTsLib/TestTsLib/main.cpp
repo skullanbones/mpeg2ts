@@ -97,10 +97,7 @@ int main()
         std::cout << "Size of PES packets: " << pes.second.size() << std::endl;
     }
 
-    /*for (auto& kv : pmtTables) {
-        std::cout << "PMT PID: " << kv.first << " has PMT " << kv.second << std::endl;
-    }
-
+    /* Demonstrates non-orthogonality between APIs...
     try
     {
         std::cout << "Size of pmtTables: " << pmtTables.size() << std::endl;

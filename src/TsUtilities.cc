@@ -10,22 +10,47 @@
 
 namespace tsutil
 {
-const plog::Severity TsUtilities::DEFAULT_LOG_LEVEL = plog::debug;
-const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
-int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
-int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 
 TsUtilities::TsUtilities()
     : mAddedPmts{ false }
 {
 }
 
-void TsUtilities::initLogging()
+void TsUtilities::initLogging() const
 {
+    plog::Severity logLevel;
+    switch (DEFAULT_LOG_LEVEL)
+    {
+    case LogLevel::VERBOSE:
+        logLevel = plog::Severity::verbose;
+        break;
+    case LogLevel::DEBUG:
+        logLevel = plog::Severity::debug;
+        break;
+    case LogLevel::INFO:
+        logLevel = plog::Severity::info;
+        break;
+    case LogLevel::WARNING:
+        logLevel = plog::Severity::warning;
+        break;
+    case LogLevel::ERROR:
+        logLevel = plog::Severity::error;
+        break;
+    case LogLevel::FATAL:
+        logLevel = plog::Severity::fatal;
+        break;
+    case LogLevel::NONE:
+        logLevel = plog::Severity::none;
+        break;
+    default:
+        logLevel = plog::Severity::debug;
+        break;
+    }
+
     static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME.c_str(), LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
-    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
-    plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
+    plog::init(logLevel, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(logLevel, &fileAppender); // Initialize the 2nd logger instance.
 }
 
 

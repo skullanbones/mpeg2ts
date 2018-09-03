@@ -7,8 +7,6 @@
 
 #include "public/mpeg2ts.h"
 
-/// 3rd-party
-#include <plog/Log.h>
 
 /*
  * High level API on mpeg2ts library
@@ -35,6 +33,17 @@ public:
     std::string GetPort() const { return mPort; }
 private:
     std::string mPort;
+};
+
+enum class LogLevel
+{
+    VERBOSE,
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR,
+    FATAL,
+    NONE
 };
 
 class TsUtilities
@@ -99,13 +108,13 @@ public:
     MPEG2TS_API std::map<uint16_t, std::vector<PesPacket>> getPesPackets() const;
 
 private:
-    void initLogging();
+    void initLogging() const;
     void initParse();
     void registerPmtCallback();
     void registerPesCallback();
 
     // constants
-    static const plog::Severity DEFAULT_LOG_LEVEL;
+    static const LogLevel DEFAULT_LOG_LEVEL;
     static const std::string LOGFILE_NAME;
     static int LOGFILE_MAXSIZE;
     static int LOGFILE_MAXNUMBEROF;
@@ -118,6 +127,14 @@ private:
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
     std::map<uint16_t, std::vector<PesPacket>> mPesPackets;
+    LogLevel mLogLevel;
 };
+
+//* Settings *//
+//* TODO READ FROM JSON FILE *//
+const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
+const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
+int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
+int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 
 } // namespace tsutil
