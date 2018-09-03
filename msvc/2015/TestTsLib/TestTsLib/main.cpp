@@ -36,7 +36,7 @@ void PATCallback(PsiTable* table, uint16_t pid, void* hdl) {
     }
     catch (std::exception& ex)
     {
-        //LOGE_(FileLog) << "ERROR: dynamic_cast ex: " << ex.what();
+        std::cerr << "ERROR: dynamic_cast ex: " << ex.what();
         return;
     }
 
@@ -45,24 +45,65 @@ void PATCallback(PsiTable* table, uint16_t pid, void* hdl) {
 
 int main()
 {
+    // TsUtilities High level API
     tsutil::TsUtilities util;
-    util.parseTransportStreamData(pat_packet_1, 188);
-    PatTable pat = util.getPatTable();
+    //util.parseTransportStreamData(pat_packet_1, 188);
+    
+    bool success = util.parseTransportFile("../../../../assets/bbc_one.ts");
+    if (!success)
+    {
+        std::cerr << "Could not open file" << std::endl;
+        system("PAUSE");
+        return EXIT_FAILURE;
+    }
 
     //std::cout << "Got PAT: " << pat << std::endl;
-
-    std::cout << "Got PAT with PMT PIDd: " << pat.programs.at(0).program_map_PID << std::endl;
+    PatTable pat = util.getPatTable();
+    try
+    {   
+        std::cout << "Got PAT with PMT PIDd: " << pat.programs.at(0).program_map_PID << std::endl;
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << "Got exception..." << e.what() << std::endl;
+    }
     std::vector<uint16_t> pmtPids = util.getPmtPids();
     for (auto pid : pmtPids)
     {
         std::cout << "Got PMT pid: " << pid << std::endl;
     }
+    std::map<uint16_t, PmtTable> pmtTables = util.getPmtTables();
 
+
+    for (auto pid : pmtPids)
+    {
+        for (auto stream : pmtTables[pid].streams)
+        {
+            std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << std::endl;
+        }
+    }
+
+    /*for (auto& kv : pmtTables) {
+        std::cout << "PMT PID: " << kv.first << " has PMT " << kv.second << std::endl;
+    }
+
+    try
+    {
+        std::cout << "Size of pmtTables: " << pmtTables.size() << std::endl;
+        std::cout << "Got PMT with first stream PID: " << pmtTables[pmtPids.at(0)].streams.at(0).elementary_PID << std::endl;
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << "Got exception..." << e.what() << std::endl;
+    }*/
+
+    // Low level API
+    /*
 	mpeg2ts::TsDemuxer demuxer;
 
 	demuxer.addPsiPid(0, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
 
-	demuxer.demux(pat_packet_1);
+	demuxer.demux(pat_packet_1);*/
 
 	system("PAUSE");
     return 0;

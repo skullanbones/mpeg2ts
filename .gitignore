@@ -6,6 +6,7 @@
 *.lo
 *.o
 *.obj
+*.a
 
 # Precompiled Headers
 *.gch
@@ -15,6 +16,9 @@
 *.so
 *.dylib
 *.dll
+*.exp
+*.ilk
+*.pdb
 
 # Fortran module files
 *.mod
@@ -50,3 +54,4 @@ Release/
 .vs/
 *.VC.db
 *.VC.opendb
+
