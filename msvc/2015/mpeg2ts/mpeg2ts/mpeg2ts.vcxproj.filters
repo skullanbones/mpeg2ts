@@ -51,6 +51,9 @@
     <ClInclude Include="..\..\..\..\include\public\TsUtilities.h">
       <Filter>Header Files\public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\include\JsonSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\GetBits.cc">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\TsUtilities.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\JsonSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

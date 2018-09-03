@@ -1,6 +1,7 @@
 #include "public/TsUtilities.h"
 #include "public/Ts_IEC13818-1.h"
 #include "Logging.h"
+#include "JsonSettings.h"
 
 #include <fstream>
 
@@ -18,36 +19,34 @@ TsUtilities::TsUtilities()
 
 void TsUtilities::initLogging() const
 {
-    plog::Severity logLevel;
-    switch (DEFAULT_LOG_LEVEL)
-    {
-    case LogLevel::VERBOSE:
-        logLevel = plog::Severity::verbose;
-        break;
-    case LogLevel::DEBUG:
-        logLevel = plog::Severity::debug;
-        break;
-    case LogLevel::INFO:
-        logLevel = plog::Severity::info;
-        break;
-    case LogLevel::WARNING:
-        logLevel = plog::Severity::warning;
-        break;
-    case LogLevel::ERROR:
-        logLevel = plog::Severity::error;
-        break;
-    case LogLevel::FATAL:
-        logLevel = plog::Severity::fatal;
-        break;
-    case LogLevel::NONE:
-        logLevel = plog::Severity::none;
-        break;
-    default:
-        logLevel = plog::Severity::debug;
-        break;
-    }
+    Settings settings;
+    settings.loadFile("settings.json"); // Must be at same location as dll/so
 
-    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME.c_str(), LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
+    const std::string strLogLevel = settings.getLogLevel();
+    plog::Severity logLevel;
+
+    if (strLogLevel == "VERBOSE")
+        logLevel = plog::Severity::verbose;
+    else if (strLogLevel == "DEBUG")
+        logLevel = plog::Severity::debug;
+    else if (strLogLevel == "INFO")
+        logLevel = plog::Severity::info;
+    else if (strLogLevel == "WARNING")
+        logLevel = plog::Severity::warning;
+    else if (strLogLevel == "ERROR")
+        logLevel = plog::Severity::error;
+    else if (strLogLevel == "FATAL")
+        logLevel = plog::Severity::fatal;
+    else if (strLogLevel == "NONE")
+        logLevel = plog::Severity::none;
+    else // Default
+        logLevel = plog::Severity::debug;
+
+    const int maxSize = settings.getLogFileMaxSize();
+    const int maxNumberOf = settings.getLogFileMaxNumberOf();
+    std::string logFileName = settings.getLogFileName();
+
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(logFileName.c_str(), maxSize, maxNumberOf); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
     plog::init(logLevel, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
     plog::init<FileLog>(logLevel, &fileAppender); // Initialize the 2nd logger instance.

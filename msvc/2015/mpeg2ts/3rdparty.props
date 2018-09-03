@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_PropertySheetDisplayName>3rdparty_x86</_PropertySheetDisplayName>
-    <IncludePath>$(ProjectDir)..\..\..\..\3rd-party\plog-1.1.4\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\3rd-party\nlohmann\include;$(ProjectDir)..\..\..\..\3rd-party\plog-1.1.4\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />
