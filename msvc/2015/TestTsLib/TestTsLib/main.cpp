@@ -59,8 +59,8 @@ int main()
         return EXIT_FAILURE;
     }
 
-    //std::cout << "Got PAT: " << pat << std::endl;
     PatTable pat = util.getPatTable();
+    std::cout << "Got PAT: " << pat << std::endl;
 
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
@@ -73,6 +73,12 @@ int main()
         {
             std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << std::endl;
         }
+    }
+
+    for (auto table : pmtTables)
+    {
+        std::cout << "PMT PID: " << table.first << std::endl;
+        std::cout << table.second << std::endl;
     }
 
     std::vector<uint16_t> mEsPids = util.getEsPids();

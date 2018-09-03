@@ -77,7 +77,7 @@ struct PesPacket
 
     ByteVector mPesBuffer;
 
-    friend std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs);
+    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs);
 };
 
 
@@ -112,12 +112,12 @@ public:
     uint8_t last_section_number;
     uint32_t CRC_32;
 
-    friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs);
+    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PsiTables
-    bool operator==(const PsiTable& rhs) const;
+    MPEG2TS_API bool operator==(const PsiTable& rhs) const;
 
-    bool operator!=(const PsiTable& rhs) const;
+    MPEG2TS_API bool operator!=(const PsiTable& rhs) const;
 };
 
 /*!
@@ -128,12 +128,12 @@ class PatTable : public PsiTable
 public:
     std::vector<Program> programs;
 
-    friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs);
+    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PatTables
-    bool operator==(const PatTable& rhs) const;
+    MPEG2TS_API bool operator==(const PatTable& rhs) const;
 
-    bool operator!=(const PatTable& rhs) const;
+    MPEG2TS_API bool operator!=(const PatTable& rhs) const;
 };
 
 struct StreamTypeHeader
@@ -161,12 +161,12 @@ public:
     std::vector<StreamTypeHeader> streams;
 
 
-    friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs);
+    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PmtTables
-    bool operator==(const PmtTable& rhs) const;
+    MPEG2TS_API bool operator==(const PmtTable& rhs) const;
 
-    bool operator!=(const PmtTable& rhs) const;
+    MPEG2TS_API bool operator!=(const PmtTable& rhs) const;
 };
 
 struct CatDescriptor
@@ -216,7 +216,7 @@ public:
     bool isError; // If a parser error or TS not following standards.
 
 
-    friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
+    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
 };
 
 // TODO check these
@@ -305,8 +305,6 @@ public:
     uint64_t mTsPacketNullPacketCounter;
     uint64_t mTsPacketErrorIndicator;
 };
-
-
 
 
 
