@@ -35,6 +35,17 @@ private:
     std::string mPort;
 };
 
+enum class LogLevel
+{
+    VERBOSE,
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR,
+    FATAL,
+    NONE
+};
+
 class TsUtilities
 {
 public:
@@ -102,6 +113,12 @@ private:
     void registerPmtCallback();
     void registerPesCallback();
 
+    // Default constants
+    static const LogLevel DEFAULT_LOG_LEVEL;
+    static const std::string LOGFILE_NAME;
+    static int LOGFILE_MAXSIZE;
+    static int LOGFILE_MAXNUMBEROF;
+
     // members
     TsDemuxer mDemuxer;
     PatTable mPrevPat;
@@ -112,6 +129,11 @@ private:
     std::map<uint16_t, std::vector<PesPacket>> mPesPackets;
 };
 
-
+//* Default Settings *//
+//* If NO JSON file found *//
+const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
+const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
+int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
+int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 
 } // namespace tsutil

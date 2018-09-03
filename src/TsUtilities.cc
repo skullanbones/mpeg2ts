@@ -20,31 +20,45 @@ TsUtilities::TsUtilities()
 void TsUtilities::initLogging() const
 {
     Settings settings;
-    settings.loadFile("settings.json"); // Must be at same location as dll/so
+    bool success = settings.loadFile("settings.json"); // Must be at same location as dll/so
 
-    const std::string strLogLevel = settings.getLogLevel();
     plog::Severity logLevel;
+    std::string logFileName;
+    int maxSize;
+    int maxNumberOf;
 
-    if (strLogLevel == "VERBOSE")
-        logLevel = plog::Severity::verbose;
-    else if (strLogLevel == "DEBUG")
-        logLevel = plog::Severity::debug;
-    else if (strLogLevel == "INFO")
-        logLevel = plog::Severity::info;
-    else if (strLogLevel == "WARNING")
-        logLevel = plog::Severity::warning;
-    else if (strLogLevel == "ERROR")
-        logLevel = plog::Severity::error;
-    else if (strLogLevel == "FATAL")
-        logLevel = plog::Severity::fatal;
-    else if (strLogLevel == "NONE")
-        logLevel = plog::Severity::none;
-    else // Default
-        logLevel = plog::Severity::debug;
+    if (success)
+    {
+        const std::string strLogLevel = settings.getLogLevel();
+        
+        if (strLogLevel == "VERBOSE")
+            logLevel = plog::Severity::verbose;
+        else if (strLogLevel == "DEBUG")
+            logLevel = plog::Severity::debug;
+        else if (strLogLevel == "INFO")
+            logLevel = plog::Severity::info;
+        else if (strLogLevel == "WARNING")
+            logLevel = plog::Severity::warning;
+        else if (strLogLevel == "ERROR")
+            logLevel = plog::Severity::error;
+        else if (strLogLevel == "FATAL")
+            logLevel = plog::Severity::fatal;
+        else if (strLogLevel == "NONE")
+            logLevel = plog::Severity::none;
+        else // Default
+            logLevel = plog::Severity::debug;
 
-    const int maxSize = settings.getLogFileMaxSize();
-    const int maxNumberOf = settings.getLogFileMaxNumberOf();
-    std::string logFileName = settings.getLogFileName();
+        maxSize = settings.getLogFileMaxSize();
+        maxNumberOf = settings.getLogFileMaxNumberOf();
+        logFileName = settings.getLogFileName();
+    }
+    else
+    {
+        logLevel = plog::Severity::debug; // TODO ugly fix, convert from LogLevel...
+        logFileName = LOGFILE_NAME;
+        maxSize = LOGFILE_MAXSIZE;
+        maxNumberOf = LOGFILE_MAXNUMBEROF;
+    }
 
     static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(logFileName.c_str(), maxSize, maxNumberOf); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.

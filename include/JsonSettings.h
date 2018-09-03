@@ -17,7 +17,7 @@ public:
     explicit Settings() = default;
     ~Settings() = default;
 
-    void loadFile(std::string);
+    bool loadFile(std::string);
     void loadJson(json js);
     std::string getLogLevel() const;
     std::string getLogFileName() const;

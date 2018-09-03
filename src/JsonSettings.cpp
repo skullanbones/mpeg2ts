@@ -9,16 +9,18 @@
 
 using json = nlohmann::json;
 
-void Settings::loadFile(std::string file)
+bool Settings::loadFile(std::string file)
 {
     try
     {
         std::ifstream ifs(file);
         ifs >> mJ;
+        return true;
     }
     catch (std::exception& e)
     {
         std::cerr << "Could not load asset file: " << file << ", with exception: " << e.what() << std::endl;
+        return false;
     }
 }
 
