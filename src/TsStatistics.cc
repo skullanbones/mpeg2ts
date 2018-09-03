@@ -20,8 +20,12 @@
 #include <public/mpeg2ts.h>
 #include "Logging.h"
 
+namespace mpeg2ts
+{
+
+
 TsStatistics::TsStatistics()
-: mTsPacketCounter{ 0 }
+    : mTsPacketCounter{ 0 }
 {
 }
 
@@ -37,7 +41,7 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
         {
             ++mPidStatistics[pid].numberOfCCErrors;
             LOGD_(FileLog) << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
-                      << pid << "\n";
+                << pid << "\n";
         }
         mPidStatistics[pid].lastCC = cc;
     }
@@ -49,7 +53,7 @@ void TsStatistics::checkTsDiscontinuity(int pid, bool isDiscontinuous)
     {
         ++mPidStatistics[pid].numberOfTsDiscontinuities;
         LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mTsPacketCounter
-                  << " on pid " << pid << "\n";
+            << " on pid " << pid << "\n";
     }
 }
 
@@ -70,7 +74,7 @@ void TsStatistics::buildPtsHistogram(int pid, int64_t pts)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
         LOGD_(FileLog) << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
-                  << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff << "\n";
+            << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff << "\n";
     }
     mPidStatistics[pid].lastPts = pts;
 }
@@ -92,7 +96,7 @@ void TsStatistics::buildDtsHistogram(int pid, int64_t dts)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
         LOGD_(FileLog) << "DTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " dts-1 "
-                  << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
+            << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
     }
 
     mPidStatistics[pid].lastDts = dts;
@@ -114,8 +118,10 @@ void TsStatistics::buildPcrHistogram(int pid, int64_t pcr)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
     {
         LOGD_(FileLog) << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
-                  << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
+            << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
     }
 
     mPidStatistics[pid].lastPcr = pcr;
 }
+
+} // namespace mpeg2ts

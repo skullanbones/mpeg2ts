@@ -14,6 +14,7 @@
 
 namespace tsutil
 {
+using namespace mpeg2ts;
 
 class TsUtilities
 {

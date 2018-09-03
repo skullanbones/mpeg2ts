@@ -9,6 +9,8 @@
 /// Project files
 #include <public/mpeg2ts.h>
 
+using namespace mpeg2ts;
+
 TEST(PsiTablesTests, PsiTableTestComparisonOperator)
 {
     PsiTable psi1;

@@ -10,6 +10,8 @@
 #include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
 
+using namespace mpeg2ts;
+
 TEST(TsStatisticsTests, TwoPlusTwoEqualsFour)
 {
     EXPECT_EQ(2 + 2, 4);

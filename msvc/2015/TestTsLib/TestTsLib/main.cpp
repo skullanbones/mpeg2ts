@@ -5,6 +5,8 @@
 #include "public/TsUtilities.h"
 #include <iostream>
 
+using namespace mpeg2ts;
+
 /*!
 * PID: 0
 * PAT packet

@@ -26,18 +26,23 @@
 /// project files
 #include <public/Ts_IEC13818-1.h> // For TsHeader  Program
 
-// forward declarations
-class TsParser;
 
+namespace mpeg2ts
+{
+// Common types
 typedef std::vector<uint8_t> ByteVector;
 typedef std::shared_ptr<ByteVector> ByteVectorPtr;
 
-
+// Internal types // TODO remove to internal h-file
 /// Window types
 #ifdef WIN32
 #define ssize_t size_t
 typedef char TCHAR;
 #endif
+
+
+// forward declarations
+class TsParser;
 
 /*!
  * @class PES-Packet prototype containing buffer
@@ -218,6 +223,7 @@ public:
 const int64_t CLOCK_90_KHZ = 90000;
 const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
 
+
 struct PidStatistic
 {
     static const uint8_t INVALID_CC = 16;
@@ -251,6 +257,8 @@ struct PidStatistic
 
     uint64_t numberOfMissingDts;
 };
+
+
 
 class TsStatistics
 {
@@ -299,8 +307,7 @@ public:
 };
 
 
-namespace mpeg2ts
-{
+
 
 
 
@@ -368,4 +375,5 @@ private:
 
     TsParser* mParser;
 };
-}
+
+} // namespace mpeg2ts

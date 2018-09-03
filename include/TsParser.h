@@ -21,6 +21,8 @@
 #include <public/Ts_IEC13818-1.h>
 #include "GetBits.h"
 
+namespace mpeg2ts
+{
 
 class TsParser : GetBits
 {
@@ -138,3 +140,5 @@ private:
     std::map<uint16_t, int> mReadSectionLength;
     std::map<uint16_t, PesPacket> mPesPacket;
 };
+
+} // namespace mpeg2ts

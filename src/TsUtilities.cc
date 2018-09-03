@@ -1,5 +1,4 @@
 #include "public/TsUtilities.h"
-#include <iostream>
 #include "public/Ts_IEC13818-1.h"
 #include "Logging.h"
 

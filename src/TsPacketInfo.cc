@@ -1,5 +1,8 @@
 #include <public/mpeg2ts.h>
 
+namespace mpeg2ts
+{
+
 std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
 {
     ss << "-------------TsPacketInfo------------- " << std::endl;
@@ -28,3 +31,5 @@ std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
     ss << "isError: " << rhs.isError << std::endl;
     return ss;
 }
+
+} // namespace mpeg2ts

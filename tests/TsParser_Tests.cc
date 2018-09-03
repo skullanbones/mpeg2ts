@@ -11,6 +11,8 @@
 #include "TsPacketTestData.h"
 #include "TsParser.h"
 
+using namespace mpeg2ts;
+
 TEST(TsParserConstants, CheckConstants)
 {
     EXPECT_EQ(TS_PACKET_HEADER_SIZE, 4);

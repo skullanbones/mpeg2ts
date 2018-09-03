@@ -1,6 +1,7 @@
 #include <public/mpeg2ts.h>
 
-
+namespace mpeg2ts
+{
 
 std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs)
 {
@@ -27,4 +28,6 @@ std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs)
 
     ss << "PES_header_data_length: " << (int)rhs.PES_header_data_length << std::endl;
     return ss;
+}
+
 }

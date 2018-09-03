@@ -27,6 +27,8 @@
 #include "mpeg2vid/Mpeg2VideoParser.h"
 #include "h264/H264Parser.h"
 
+using namespace mpeg2ts;
+
 static const std::string VERSION = "0.0.2.rc1";
 
 uint64_t count = 0;
@@ -102,7 +104,7 @@ void display_usage()
               << std::endl;
 }
 
-void display_statistics(TsStatistics statistics)
+void display_statistics(mpeg2ts::TsStatistics statistics)
 {
     for (auto& pidStat : statistics.mPidStatistics)
     {
