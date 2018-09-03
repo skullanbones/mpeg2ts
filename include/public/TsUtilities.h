@@ -130,7 +130,11 @@ private:
 };
 
 //* Default Settings *//
-//* If NO JSON file found *//
+/* 
+ * Used ONLY If NO JSON file found. 
+ * NOTE! Change has no effect here. If you need change these 
+ * please make sure you have settings.json file next to the library.
+ */
 const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
 const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
 int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
