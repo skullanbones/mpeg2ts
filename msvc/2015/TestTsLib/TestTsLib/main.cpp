@@ -61,24 +61,14 @@ int main()
 
     //std::cout << "Got PAT: " << pat << std::endl;
     PatTable pat = util.getPatTable();
-    try
-    {   
-        std::cout << "Got PAT with PMT PIDd: " << pat.programs.at(0).program_map_PID << std::endl;
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "Got exception..." << e.what() << std::endl;
-    }
+
     std::vector<uint16_t> pmtPids = util.getPmtPids();
+
+    std::map<uint16_t, PmtTable> pmtTables = util.getPmtTables();
+    
     for (auto pid : pmtPids)
     {
         std::cout << "Got PMT pid: " << pid << std::endl;
-    }
-    std::map<uint16_t, PmtTable> pmtTables = util.getPmtTables();
-
-
-    for (auto pid : pmtPids)
-    {
         for (auto stream : pmtTables[pid].streams)
         {
             std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << std::endl;

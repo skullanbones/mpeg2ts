@@ -22,6 +22,9 @@
     <Filter Include="Header Files\public">
       <UniqueIdentifier>{06081a1d-2584-41b1-a080-00e9ca99a6d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{090a03cc-66bf-4011-95b9-956fb784406d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h">

@@ -7,6 +7,9 @@
 
 #include "public/mpeg2ts.h"
 
+/// 3rd-party
+#include <plog/Log.h>
+
 /*
  * High level API on mpeg2ts library
  * Utilities functionality to simplify usage of mpeg2ts library
@@ -41,11 +44,20 @@ public:
     // PMT
     MPEG2TS_API std::map<uint16_t, PmtTable> getPmtTables() const;
 
+    // ES / PES
+
 private:
     void initLogging();
     void initParse();
     void registerPmtCallback();
 
+    // constants
+    static const plog::Severity DEFAULT_LOG_LEVEL;
+    static const std::string LOGFILE_NAME;
+    static int LOGFILE_MAXSIZE;
+    static int LOGFILE_MAXNUMBEROF;
+
+    // members
     mpeg2ts::TsDemuxer mDemuxer;
     PatTable mPrevPat;
     std::vector<uint16_t> mPmtPids;
