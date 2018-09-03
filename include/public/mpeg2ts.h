@@ -6,7 +6,7 @@
 #pragma once
 #ifdef _WIN32
 
-#ifdef TSLIB_DLL_EXPORTS
+#ifdef MPEG2TS_DLL_EXPORTS
 #define MPEG2TS_API __declspec(dllexport)
 #else
 #define MPEG2TS_API __declspec(dllimport)
