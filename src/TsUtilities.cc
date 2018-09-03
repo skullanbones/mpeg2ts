@@ -8,10 +8,10 @@ namespace tsutil
 bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size)
 {
     //_addedPmts = false;
-    //_pmtPids.clear();
+    mPmtPids.clear();  // Restart
 
     // If empty data, just return
-    if (data == NULL | data == nullptr)
+    if (data == NULL || data == nullptr)
     {
         std::cerr << "No data to parse..." << std::endl;
         return false;
