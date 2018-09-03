@@ -75,6 +75,22 @@ int main()
         }
     }
 
+    std::vector<uint16_t> mEsPids = util.getEsPids();
+    for (auto esPid : mEsPids)
+    {
+        std::cout << "Found elementary stream with Pid: " << esPid << std::endl;
+    }
+
+    std::map<uint16_t, std::vector<PesPacket>> pesPackets = util.getPesPackets();
+
+    std::cout << "Got number of PES packets: " << pesPackets.size() << std::endl;
+
+    for (auto & pes : pesPackets)
+    {
+        std::cout << "Got PES with PID: " << pes.first << std::endl;
+        std::cout << "Size of PES packets: " << pes.second.size() << std::endl;
+    }
+
     /*for (auto& kv : pmtTables) {
         std::cout << "PMT PID: " << kv.first << " has PMT " << kv.second << std::endl;
     }

@@ -323,6 +323,10 @@ public:
 
     MPEG2TS_API ~TsDemuxer();
 
+    // Make this object be non copyable because it holds a pointer
+    TsDemuxer(const TsDemuxer&) = delete;
+    const TsDemuxer& operator=(const TsDemuxer&) = delete;
+
     /*!
      * Demuxes a transport stream packed based on its Packet ID.
      * @param tsPacket The TS packet to demux.
@@ -368,12 +372,7 @@ protected:
     std::map<int, void*> mHandlers;
 
 private:
-    // Make this object be non copyable because it holds a pointer
-    TsDemuxer(const TsDemuxer&);
-
-    const TsDemuxer& operator=(const TsDemuxer&);
-
-    TsParser* mParser;
+     TsParser* mParser;
 };
 
 } // namespace mpeg2ts

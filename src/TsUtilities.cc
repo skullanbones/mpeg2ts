@@ -18,7 +18,6 @@ int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 TsUtilities::TsUtilities()
     : mAddedPmts{ false }
 {
-    
 }
 
 void TsUtilities::initLogging()
@@ -36,6 +35,8 @@ void TsUtilities::initParse()
     mPmtPids.clear();  // Restart
     mPrevPat = {};
     mPmts.clear();
+    mEsPids.clear();
+    mAddedPmts = false;
     // Register PAT callback
     mDemuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
 }
@@ -50,6 +51,15 @@ void TsUtilities::registerPmtCallback()
             mDemuxer.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
         }
         mAddedPmts = true;
+    }
+}
+
+void TsUtilities::registerPesCallback()
+{
+    for (auto pid : mEsPids)
+    {
+        LOGD << "Adding PES PID for parsing: " << pid;
+        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
     }
 }
 
@@ -74,6 +84,11 @@ bool TsUtilities::parseTransportFile(const std::string& file)
     }
     tsFile.close();
 
+    return true;
+}
+
+bool TsUtilities::parseTransportUdpStream(const IpAddress &ip, const Port &p)
+{
     return true;
 }
 
@@ -231,12 +246,64 @@ void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
             instance->mEsPids.push_back(pmt->PCR_PID);
         }
     }*/
+
+    instance->registerPesCallback();
 }
 
 std::map<uint16_t, PmtTable> TsUtilities::getPmtTables() const
 {
     return mPmts;
 }
+
+std::vector<uint16_t> TsUtilities::getEsPids() const
+{
+    return mEsPids;
+}
+
+void TsUtilities::PESCallback(const PesPacket& pes, uint16_t pid, void* hdl)
+{
+    auto instance = reinterpret_cast<TsUtilities*>(hdl);
+
+    //LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
+    //     << " (" << pid << ")\n";
+    //LOGV << pes << std::endl;
+
+    LOGV << "Adding PES to list..." << std::endl;
+    instance->mPesPackets[pid].push_back(pes);
+    /*
+    // @TODO add "if parse pid" option to cmd line
+    {
+        for (auto& pmtPid : instance->mPmtPids)
+        {
+            if (instance->mPmts.find(pmtPid) != instance->mPmts.end())
+            {
+                auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(), instance->mPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream) {return stream.elementary_PID == pid; });
+                if (it != instance->mPmts[pmtPid].streams.end())
+                {
+                    try
+                    {
+                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                    }
+                    catch (const std::out_of_range&) {
+                        LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
+                    }
+                }
+            }
+        }
+    }*/
+
+
+//    LOGD << "Write " << "PES" << ": " << pes.mPesBuffer.size() - writeOffset
+  //       << " bytes, pid: " << pid << std::endl;
+    
+}
+
+
+std::map<uint16_t, std::vector<PesPacket>> TsUtilities::getPesPackets() const
+{
+    return mPesPackets;
+}
+
 
 
 } // namespace tsutil
