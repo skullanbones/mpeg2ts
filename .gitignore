@@ -54,4 +54,5 @@ Release/
 .vs/
 *.VC.db
 *.VC.opendb
+*.csv
 

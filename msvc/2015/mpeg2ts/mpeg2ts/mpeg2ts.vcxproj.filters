@@ -83,7 +83,7 @@
     <ClCompile Include="..\..\..\..\src\TsUtilities.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\JsonSettings.cpp">
+    <ClCompile Include="..\..\..\..\src\JsonSettings.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
