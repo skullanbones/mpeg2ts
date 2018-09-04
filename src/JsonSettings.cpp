@@ -1,5 +1,8 @@
 #include "JsonSettings.h"
 
+// Dont allow json.hpp throw exceptions
+#define JSON_THROW_USER
+
 #include "json.hpp"
 
 #include <fstream>
