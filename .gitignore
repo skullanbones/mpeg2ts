@@ -56,3 +56,6 @@ Release/
 *.VC.opendb
 *.csv
 
+# 3rd-party
+3rd-party/nlohmann/*
+3rd-party/plog-1.1.4/*
