@@ -19,7 +19,8 @@ TOOLSDIR = $(PROJ_ROOT)/tools
 PLOG_VERSION=1.1.4
 
 INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include
+				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
+				-I$(3RDPARTYDIR)/nlohmann/include
 
 export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
@@ -61,7 +62,8 @@ SRCS = 	TsParser.cc \
         h264/H264Parser.cc \
         PesPacket.cc \
         PsiTables.cc \
-        TsPacketInfo.cc
+        TsPacketInfo.cc \
+        JsonSettings.cc
 
 HDRS = 	include/public/mpeg2ts.h \
 		include/public/Ts_IEC13818-1.h \
@@ -69,7 +71,7 @@ HDRS = 	include/public/mpeg2ts.h \
 		include/TsParser.h \
 		include/mpeg2vid/Mpeg2VideoParser.h \
 		include/h264/H264Parser.h \
-		include/mpeg2vid/Mpeg2VideoParser.h
+		include/JsonSettings.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
@@ -218,9 +220,16 @@ $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
 	touch $@
 
-3rd-party: plog
+$(3RDPARTYDIR)/.json_extracted: $(3RDPARTYDIR)/nlohmann.tar.gz
+	cd $(3RDPARTYDIR)
+	tar xvf $(3RDPARTYDIR)/nlohmann.tar.gz -C $(3RDPARTYDIR)
+	touch $@
+
+3rd-party: plog json
 
 plog: $(3RDPARTYDIR)/.plog_extracted
+
+json: $(3RDPARTYDIR)/.json_extracted
 
 clean:
 	rm -f $(OBJS)
