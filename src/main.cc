@@ -25,6 +25,7 @@
 #include "TsStandards.h"
 #include "Logging.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
+#include "h264/H264Parser.h"
 
 static const std::string VERSION = "0.0.2.rc1";
 
@@ -36,7 +37,14 @@ tslib::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
-std::map<StreamType, std::shared_ptr<EsParser> > g_EsParsers = {{STREAMTYPE_VIDEO_MPEG2, std::make_shared<Mpeg2VideoEsParser>()}};
+
+std::map<StreamType, std::unique_ptr<EsParser> > g_EsParsers = [](std::map<StreamType, std::unique_ptr<EsParser> >&)
+{
+    std::map<StreamType, std::unique_ptr<EsParser> > map;
+    map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<Mpeg2VideoEsParser>(new Mpeg2VideoEsParser()));
+    map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<H264EsParser>(new H264EsParser()));
+    return map;
+}(g_EsParsers);
 
 const char LOGFILE_NAME[] = "tsparser.csv";
 int LOGFILE_MAXSIZE = 100 * 1024;
