@@ -130,10 +130,10 @@ $(BUILDDIR):
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l$(COMPONENT_NAME)
 
-$(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
+$(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
-$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc plog
+$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc 3rd-party
 	@echo [Compile] $<
 	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
 
