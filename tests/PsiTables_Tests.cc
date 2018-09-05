@@ -7,7 +7,9 @@
 #include <iostream>
 
 /// Project files
-#include "PsiTables.h"
+#include <public/mpeg2ts.h>
+
+using namespace mpeg2ts;
 
 TEST(PsiTablesTests, PsiTableTestComparisonOperator)
 {

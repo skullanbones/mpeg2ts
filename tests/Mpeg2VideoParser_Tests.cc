@@ -5,6 +5,8 @@
 /// Project files CUT (Class Under Test)
 #include "mpeg2vid/Mpeg2VideoParser.h"
 
+using namespace mpeg2ts;
+
 TEST(Mpeg2VideoTests, Parse1)
 {
     std::vector<uint8_t> testVec = {0,0,0,1};

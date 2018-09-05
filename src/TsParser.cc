@@ -8,10 +8,11 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "CommonTypes.h"
 #include "TsParser.h"
 #include "Logging.h"
 
+namespace mpeg2ts
+{
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
@@ -74,14 +75,14 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 bool TsParser::checkHasAdaptationField(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
@@ -119,7 +120,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     }
 
     auto ofsAfterAF =
-    getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
+        getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
 
     if (adaptHdr.PCR_flag)
     {
@@ -273,7 +274,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
         pid = tsPacketInfo.pid;
 
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
     }
@@ -287,7 +288,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
         // TODO: check if we have boud PES and return it if it is coplete
     }
 
@@ -475,3 +476,5 @@ void TsParser::parsePesPacket(int16_t pid)
         }
     }
 }
+
+} // namespace mpeg2ts

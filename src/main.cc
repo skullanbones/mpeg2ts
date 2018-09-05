@@ -20,12 +20,14 @@
 #include <plog/Appenders/ConsoleAppender.h>
 
 /// Project files
-#include "TsDemuxer.h"
-#include "TsPacketInfo.h"
-#include "TsStandards.h"
+#include <public/mpeg2ts.h>
+#include <public/Ts_IEC13818-1.h>
+#include "TsParser.h"
 #include "Logging.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
 #include "h264/H264Parser.h"
+
+using namespace mpeg2ts;
 
 static const std::string VERSION = "0.0.2.rc1";
 
@@ -33,7 +35,7 @@ uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
-tslib::TsDemuxer g_tsDemux;
+mpeg2ts::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
@@ -102,7 +104,7 @@ void display_usage()
               << std::endl;
 }
 
-void display_statistics(TsStatistics statistics)
+void display_statistics(mpeg2ts::TsStatistics statistics)
 {
     for (auto& pidStat : statistics.mPidStatistics)
     {

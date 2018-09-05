@@ -1,9 +1,12 @@
-# tslib
+# MPEG-2 Transport Stream utility library
+A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
+international specification ISO/IEC 13818-1.
+
 Artifacts:
 ```
-Win32: tslib.dll tslib.lib
-Linux: tslib.so tslib.a
-Both: tslib.h
+Win32: mpeg2ts.dll mpeg2ts.lib
+Linux: libmpeg2ts.so libmpeg2ts.a
+Both: mpeg2ts.h
 ```
 Applications:
 ```
@@ -12,8 +15,8 @@ Linux: tsparser
 ```
 
 ## SW Architecture
-There is currently only 1 set of API under the namespace tslib and its exported
-currently under TsDemuxer.h Soon there will only be 1 h-file: tslib.h
+There is currently only 1 set of API under the namespace mp2ts and its exported
+currently under TsDemuxer.h Soon there will only be 1 h-file: mp2ts.h
 ![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
 
 ## Releases
@@ -104,7 +107,13 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 | Abbreviation  | Meaning                             |
 |---------------|-------------------------------------|
 | VCS           | Version Control System              |
-| DVCS          | Distributed Version Control System  |
-| SW            | Software                            |
-| MC            | Multicast                           |
 | CI            | Continuous Integration              |
+| DVCS          | Distributed Version Control System  |
+| IEC           | International Electrotechnical Commission  |
+| ISO           | International Organization for Standardization  |
+| MC            | Multicast                           |
+| MPEG          | Moving Picture Experts Group        |
+| PS            | Program Stream                      |
+| SDK           | Software Development Kit            |
+| SW            | Software                            |
+| TS            | Transport Stream                    |

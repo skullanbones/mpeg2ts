@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CommonTypes.h"
+#include <public/mpeg2ts.h> // For ssize_t
 
 #include <cstdint>
 #include <algorithm>

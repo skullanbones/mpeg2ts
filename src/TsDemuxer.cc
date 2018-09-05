@@ -12,12 +12,17 @@
 * Strictly Confidential - Do not duplicate or distribute without written
 * permission from authors
 */
-#include "TsDemuxer.h"
+#include <public/mpeg2ts.h>
+#include "TsParser.h"
+#include "Logging.h"
 #include "TsParser.h"
 
 #include <cstdint>
 
-namespace tslib
+/// 3rd-party
+#include <plog/Log.h>
+
+namespace mpeg2ts
 {
 TsDemuxer::TsDemuxer()
 : mParser { new TsParser() }
@@ -106,6 +111,11 @@ void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
 {
     mTsCallbackMap[pid] = cb;
     mHandlers[pid] = hdl;
+}
+
+TsStatistics TsDemuxer::getTsStatistics() const
+{
+    return mParser->mStatistics;
 }
 
 }
