@@ -248,4 +248,5 @@ clean-all: clean
 	rm -f $(3RDPARTYDIR)/.plog_extracted
 	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
 	rm -rf $(BUILDDIR)
+	rm -rf $(PROJ_ROOT)/component_tests/downloaded_files
 

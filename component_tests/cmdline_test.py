@@ -27,7 +27,7 @@ def test_asset_list(asset_list):
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset_list[0]
     assert "GoT-HBO.ts" in asset_list[1]
     assert "RuBeatles_h265_aac_short.ts" in asset_list[2]
-    assert "Safari_ Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.m2ts" in asset_list[3]
+    assert "Safari_Dolby_Digital_Plus_h264_aac3LCRLRLFE_192B.m2ts" in asset_list[3]
     assert "avsync_mpeg2_ac3LR.ts" in asset_list[4]
     assert "eurosport.ts" in asset_list[5]
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset_list[6]

@@ -13,4 +13,4 @@ jobs:
           command: make gtests && make run-gtests
       - run:
           name: Component Tests
-          command: make component_tests
+          command: make component-tests
