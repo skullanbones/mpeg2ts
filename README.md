@@ -10,13 +10,14 @@ Both: mpeg2ts.h
 ```
 Applications:
 ```
-Win32: None, TBD
+Win32: TestTsLib located under msvs/2015
 Linux: tsparser
 ```
 
 ## SW Architecture
-There is currently only 1 set of API under the namespace mp2ts and its exported
-currently under TsDemuxer.h Soon there will only be 1 h-file: mp2ts.h
+There are 2 sets of API, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage. These are the APIs:
+* mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
+* TsUtilities.h High level API to simplify usage
 ![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
 
 ## Releases
@@ -106,7 +107,7 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 ## Acronyms
 | Abbreviation  | Meaning                             |
 |---------------|-------------------------------------|
-| VCS           | Version Control System              |
+| API           | Application Program Interface       |
 | CI            | Continuous Integration              |
 | DVCS          | Distributed Version Control System  |
 | IEC           | International Electrotechnical Commission  |
@@ -117,3 +118,4 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 | SDK           | Software Development Kit            |
 | SW            | Software                            |
 | TS            | Transport Stream                    |
+| VCS           | Version Control System              |
