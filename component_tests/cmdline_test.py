@@ -60,6 +60,17 @@ def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
     assert "network_PID: 31" in out[1]
     assert "program_map_PID: 256" in out[1]
 
+def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
+    """Test we can parse the first asset with short option"""
+    asset = asset_h264_dolby_atmos.get_asset()
+    assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
+    out = parser.start(extra_args=['-i', asset, '-p', 0])
+    log.debug(out[0])
+    log.debug(out[1])
+    assert "programs.size(): 2" in out[1]
+    assert "network_PID: 31" in out[1]
+    assert "program_map_PID: 256" in out[1]
+
 
 def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
