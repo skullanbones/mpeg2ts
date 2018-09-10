@@ -65,13 +65,6 @@ std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
 
-static const char* optString = "m:w:i:l:p:h?v";
-
-struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
-                             { "pid", 1, nullptr, 'p' },   { "log-level", 1, nullptr, 'l' },
-                             { "input", 1, nullptr, 'i' }, { "help", 0, nullptr, 'h' },
-                             { "version", 0, nullptr, 'v' }, { nullptr, 0, nullptr, 0 } };
-
 bool hasPid(std::string param, uint32_t pid)
 {
     return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
@@ -358,6 +351,17 @@ extern void printTsPacket(const uint8_t* packet)
     printf ("\n");
 }
 
+static const char* optString = "m:w:i:l:p:h?v";
+
+struct option longOpts[] = { { "write", 1, nullptr, 'w' },
+                             { "wrmode", 1, nullptr, 'm' },
+                             { "input", 1, nullptr, 'i' },
+                             { "log-level", 1, nullptr, 'l' },
+                             { "pid", 1, nullptr, 'p' },
+                             { "help", 0, nullptr, 'h' },
+                             { "version", 0, nullptr, 'v' },
+                             { nullptr, 0, nullptr, 0 } };
+
 int main(int argc, char** argv)
 {
     // Initialize the logger
@@ -377,11 +381,30 @@ int main(int argc, char** argv)
 
     LOGD << "Starting parser of file";
 
-    int longIndex;
-
-    int opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
-    while (opt != -1)
+    for(;;)
     {
+        int opt;
+        int optInd = -1;
+        opt = getopt_long(argc, argv, optString, longOpts, &optInd);
+        if (optInd == -1)
+        {
+            for (optInd = 0; longOpts[optInd].name; ++optInd)
+            {
+                if (longOpts[optInd].val == opt)
+                {
+                    LOGD << "optInd: " << optInd;
+                    break;
+                }
+            }
+            if (longOpts[optInd].name == NULL)
+            {
+                // the short option was not found; do something
+                LOGE << "the short option was not found; do something"; // TODO
+            }
+        }
+
+        if(opt < 0)
+            break;
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
@@ -389,7 +412,6 @@ int main(int argc, char** argv)
         {
             display_usage();
             exit(EXIT_SUCCESS);
-            break;
         }
         case 'v':
         {
@@ -400,7 +422,7 @@ int main(int argc, char** argv)
         case 'w':
         case 'p':
             LOGD << "Got pid listener pid:" << std::atoi(optarg);
-            g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
+            g_Options[longOpts[optInd].name].push_back(std::atoi(optarg));
             break;
         case 'l':
         {
@@ -435,8 +457,8 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
             g_WriteMode.push_back(writeMode);
+            break;
         }
-        break;
         case 'i':
         {
             LOGD << "Got file input: " << std::string(optarg);
@@ -447,9 +469,8 @@ int main(int argc, char** argv)
             /* You won't actually get here. */
             break;
         }
+    } // for
 
-        opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
-    }
     if (g_WriteMode.empty())
     {
         g_WriteMode.push_back(OptionWriteMode::PES);
@@ -466,7 +487,7 @@ int main(int argc, char** argv)
     uint64_t count;
 
     // FILE
-    FILE* fptr;
+    FILE* fptr = NULL;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
     if (fptr == NULL)
