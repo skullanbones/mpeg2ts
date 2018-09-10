@@ -381,10 +381,9 @@ int main(int argc, char** argv)
 
     LOGD << "Starting parser of file";
 
-    int opt;
-
     for(;;)
     {
+        int opt;
         int optInd = -1;
         opt = getopt_long(argc, argv, optString, longOpts, &optInd);
         if (optInd == -1)
@@ -403,7 +402,7 @@ int main(int argc, char** argv)
                 LOGE << "the short option was not found; do something"; // TODO
             }
         }
-        
+
         if(opt < 0)
             break;
         switch (opt)
@@ -413,7 +412,6 @@ int main(int argc, char** argv)
         {
             display_usage();
             exit(EXIT_SUCCESS);
-            break;
         }
         case 'v':
         {
@@ -489,7 +487,7 @@ int main(int argc, char** argv)
     uint64_t count;
 
     // FILE
-    FILE* fptr;
+    FILE* fptr = NULL;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
     if (fptr == NULL)
