@@ -128,7 +128,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)/h264
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l$(COMPONENT_NAME)
+	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l:$(STATIC)
 
 $(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
