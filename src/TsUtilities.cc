@@ -12,6 +12,12 @@
 namespace tsutil
 {
 
+// Constants
+const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
+const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
+int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
+int TsUtilities::LOGFILE_MAXNUMBEROF = 10;   
+
 TsUtilities::TsUtilities()
     : mAddedPmts{ false }
 {
@@ -20,7 +26,22 @@ TsUtilities::TsUtilities()
 void TsUtilities::initLogging() const
 {
     Settings settings;
-    bool success = settings.loadFile("settings.json"); // Must be at same location as dll/so
+    std::string logFile = "settings.json";
+    bool success = false;
+    LoadException openException;
+    try {
+        success = settings.loadFile(logFile); // Must be at same location as dll/so
+    }
+    catch(LoadException& e) {
+        openException = e;   
+    }
+    catch(std::exception& e) {
+        openException = LoadException(e);
+    }
+    catch(...) {
+        std::string errorMsg = "Got unknown exception when loading file: " + logFile;
+        openException = LoadException(errorMsg);
+    }
 
     plog::Severity logLevel;
     std::string logFileName;
@@ -64,6 +85,10 @@ void TsUtilities::initLogging() const
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
     plog::init(logLevel, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
     plog::init<FileLog>(logLevel, &fileAppender); // Initialize the 2nd logger instance.
+
+    if (strlen(openException.what()) > 0) {
+        LOGE << "Got exception when opening file: " << logFile << ", with exception: " << openException.what();
+    }
 }
 
 
@@ -112,7 +137,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
         return false;
     }
 
-    LOGD << "Parsing tsfile:" << file << std::endl;
+    LOGD << "Parsing tsfile:" << file;
 
     while (!tsFile.eof())
     {
@@ -133,7 +158,6 @@ bool TsUtilities::parseTransportUdpStream(const IpAddress &ip, const Port &p)
 
 bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size)
 {
-    //_addedPmts = false;
     initParse();
 
     // If empty data, just return
@@ -150,7 +174,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 
     if ((data[0] != TS_PACKET_SYNC_BYTE) || (size <= 0)) // TODO support maxsize?
     {
-        LOGE << "ERROR: 1'st byte not in sync!!!" << std::endl;
+        LOGE << "ERROR: 1'st byte not in sync!!!";
         return false;
     }
 
@@ -160,7 +184,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
         readIndex += TS_PACKET_SIZE;
         count++;
     }
-    LOGD << "Found " << count << " ts packets." << std::endl;
+    LOGD << "Found " << count << " ts packets.";
 
     return true;
 }
@@ -266,12 +290,12 @@ void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
         return;
     }
 
-    LOGD << "Adding PMT to list..." << std::endl;
+    LOGD << "Adding PMT to list...";
     instance->mPmts[pid] = *pmt;
     
     for (auto& stream : pmt->streams)
     {
-        LOGD_(FileLog) << "Add ES PID: " << stream.elementary_PID << std::endl;
+        LOGD_(FileLog) << "Add ES PID: " << stream.elementary_PID;
         instance->mEsPids.push_back(stream.elementary_PID);
     }
     /*
@@ -306,7 +330,7 @@ void TsUtilities::PESCallback(const PesPacket& pes, uint16_t pid, void* hdl)
     //     << " (" << pid << ")\n";
     //LOGV << pes << std::endl;
 
-    LOGV << "Adding PES to list..." << std::endl;
+    LOGV << "Adding PES to list...";
     instance->mPesPackets[pid].push_back(pes);
     /*
     // @TODO add "if parse pid" option to cmd line

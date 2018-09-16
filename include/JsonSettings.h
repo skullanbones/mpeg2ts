@@ -27,3 +27,16 @@ public:
 private:
     json mJ;
 };
+
+class LoadException: public std::exception 
+{
+private:
+    std::string message_;
+public:
+    explicit LoadException() = default;
+    explicit LoadException(const std::string& message);
+    explicit LoadException(const std::exception e);
+    virtual const char* what() const throw() {
+        return message_.c_str();
+    }
+};
