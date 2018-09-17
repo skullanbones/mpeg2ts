@@ -29,7 +29,7 @@
 
 using namespace mpeg2ts;
 
-static const std::string VERSION = "0.0.2.rc1";
+static const std::string VERSION = "0.1";
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
