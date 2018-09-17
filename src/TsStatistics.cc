@@ -74,7 +74,7 @@ void TsStatistics::buildPtsHistogram(int pid, int64_t pts)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
         LOGD_(FileLog) << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
-            << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff << "\n";
+            << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff;
     }
     mPidStatistics[pid].lastPts = pts;
 }
