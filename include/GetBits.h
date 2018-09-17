@@ -41,7 +41,7 @@ public:
     /*!
      * Return offset to current byte
      */
-    size_t getByteInx();
+    size_t getByteInx() const;
 
     /*!
      * Skips entire bytes instead of bits. Good to use when skip large block of data.
@@ -52,7 +52,7 @@ public:
     /*!
      * For debugging the data in store up to current parsed index.
      */
-    void printSrcBytes();
+    void printSrcBytes() const;
 
 protected:
     uint8_t mNumStoredBits;

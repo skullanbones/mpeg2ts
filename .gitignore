@@ -6,6 +6,7 @@
 *.lo
 *.o
 *.obj
+*.a
 
 # Precompiled Headers
 *.gch
@@ -15,6 +16,9 @@
 *.so
 *.dylib
 *.dll
+*.exp
+*.ilk
+*.pdb
 
 # Fortran module files
 *.mod
@@ -40,3 +44,18 @@ tests/gtests
 downloaded_files/
 cmdline_test.log
 *~
+
+
+# MSVC
+*.TMP
+*.suo
+Debug/
+Release/
+.vs/
+*.VC.db
+*.VC.opendb
+*.csv
+
+# 3rd-party
+3rd-party/nlohmann/*
+3rd-party/plog-1.1.4/*

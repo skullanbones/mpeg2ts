@@ -1,35 +1,53 @@
 /**
- * @class TsDemuxer
- *
- * @brief Demux transport stream packet
- *
- * @author skullanbones
- *
- * @version $Revision: 0.1 $
- *
- * @date $Date: 2018/02/23 00:16:20 $
- *
- * Strictly Confidential - Do not duplicate or distribute without written
- * permission from authors
- */
-#include "TsDemuxer.h"
-#include "GetBits.h"
+* @class TsDemuxer
+*
+* @brief Demux transport stream packet
+*
+* @author skullanbones
+*
+* @version $Revision: 0.1 $
+*
+* @date $Date: 2018/02/23 00:16:20 $
+*
+* Strictly Confidential - Do not duplicate or distribute without written
+* permission from authors
+*/
+#include <public/mpeg2ts.h>
+#include "TsParser.h"
+#include "Logging.h"
+#include "TsParser.h"
+
 #include <cstdint>
+
+/// 3rd-party
+#include <plog/Log.h>
+
+namespace mpeg2ts
+{
+TsDemuxer::TsDemuxer()
+: mParser { new TsParser() }
+{
+}
+
+TsDemuxer::~TsDemuxer()
+{
+    delete mParser;
+}
 
 
 void TsDemuxer::demux(const uint8_t* tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
-    mParser.parseTsPacketInfo(tsPacket, tsPacketInfo);
+    mParser->parseTsPacketInfo(tsPacket, tsPacketInfo);
 
     if (tsPacketInfo.errorIndicator)
     {
-        ++mParser.mTsPacketErrorIndicator;
+        ++mParser->mStatistics.mTsPacketErrorIndicator;
     }
 
     if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
     {
-        ++mParser.mTsPacketNullPacketCounter;
+        ++mParser->mStatistics.mTsPacketNullPacketCounter;
         return; // Skip null packets, they contain no info
     }
 
@@ -42,7 +60,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     {
         // Check what table
         uint8_t table_id;
-        mParser.collectTable(tsPacket, tsPacketInfo, table_id);
+        mParser->collectTable(tsPacket, tsPacketInfo, table_id);
 
         if (table_id == PSI_TABLE_ID_PAT)
         {
@@ -53,14 +71,14 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             }
             else
             {
-                PatTable pat = mParser.parsePatPacket(tsPacketInfo.pid);
+                PatTable pat = mParser->parsePatPacket(tsPacketInfo.pid);
                 mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
             }
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
 
-            PmtTable pmt = mParser.parsePmtPacket(tsPacketInfo.pid);
+            PmtTable pmt = mParser->parsePmtPacket(tsPacketInfo.pid);
             mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
@@ -68,13 +86,13 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     if (mPesCallbackMap.find(tsPacketInfo.pid) != mPesCallbackMap.end())
     {
         PesPacket pes;
-        if (mParser.collectPes(tsPacket, tsPacketInfo, pes))
+        if (mParser->collectPes(tsPacket, tsPacketInfo, pes))
         {
             mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 
-    ++mParser.mTsPacketCounter;
+    ++mParser->mStatistics.mTsPacketCounter;
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb, void* hdl)
@@ -93,4 +111,11 @@ void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
 {
     mTsCallbackMap[pid] = cb;
     mHandlers[pid] = hdl;
+}
+
+TsStatistics TsDemuxer::getTsStatistics() const
+{
+    return mParser->mStatistics;
+}
+
 }

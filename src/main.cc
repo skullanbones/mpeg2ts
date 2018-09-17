@@ -20,24 +20,39 @@
 #include <plog/Appenders/ConsoleAppender.h>
 
 /// Project files
-#include "TsDemuxer.h"
-#include "TsPacketInfo.h"
-#include "TsStandards.h"
+#include <public/mpeg2ts.h>
+#include <public/Ts_IEC13818-1.h>
+#include "TsParser.h"
 #include "Logging.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "h264/H264Parser.h"
 
-static const std::string VERSION = "0.0.2.rc1";
+using namespace mpeg2ts;
+
+static const std::string VERSION = "0.1";
 
 uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
-TsDemuxer g_tsDemux;
+mpeg2ts::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
+std::map<StreamType, std::unique_ptr<EsParser> > g_EsParsers = [](std::map<StreamType, std::unique_ptr<EsParser> >&)
+{
+    std::map<StreamType, std::unique_ptr<EsParser> > map;
+    map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<Mpeg2VideoEsParser>(new Mpeg2VideoEsParser()));
+    map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<H264EsParser>(new H264EsParser()));
+    return map;
+}(g_EsParsers);
+
+const char LOGFILE_NAME[] = "tsparser.csv";
 int LOGFILE_MAXSIZE = 100 * 1024;
 int LOGFILE_MAXNUMBEROF = 10;
+
+const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
 
 enum class OptionWriteMode
 {
@@ -49,13 +64,6 @@ enum class OptionWriteMode
 std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
-
-static const char* optString = "m:w:i:l:h?";
-
-struct option longOpts[] = { { "write", 1, nullptr, 'w' }, { "wrmode", 1, nullptr, 'm' },
-                             { "pid", 1, nullptr, 'p' },   { "level", 1, nullptr, 'l' },
-                             { "input", 1, nullptr, 'i' }, { "help", 0, nullptr, 'h' },
-                             { "version", 0, nullptr, 'v' }, { nullptr, 0, nullptr, 0 } };
 
 bool hasPid(std::string param, uint32_t pid)
 {
@@ -76,21 +84,22 @@ void display_usage()
 {
     std::cout << "Ts-lib simple command-line:" << std::endl;
 
-    std::cout << "USAGE: ./tsparser [-h] [-w PID] [-p PID] [-l log-level] [-i file]" << std::endl;
+    std::cout << "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" << std::endl;
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
+                 "        -v [ --version ]     Print library version\n"
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-                 "        -i [ --input FILE]   Use input file for parsing\n"
-                 "        -v [ --version ]     Print library version"
+                 "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose what logs are filtered, both file and stdout, default:" << plog::severityToString(DEFAULT_LOG_LEVEL) << "\n"
+                 "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
 
-void display_statistics(TsDemuxer demuxer)
+void display_statistics(mpeg2ts::TsStatistics statistics)
 {
-    for (auto& pidStat : demuxer.getTsStatistics().mPidStatistics)
+    for (auto& pidStat : statistics.mPidStatistics)
     {
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pidStat.first) == 0)
         {
@@ -277,7 +286,27 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                   << " (" << pid << ")\n";
         LOGN << pes << std::endl;
     }
-
+    
+    // @TODO add "if parse pid" option to cmd line
+    {
+        for (auto& pmtPid : g_PMTPIDS)
+        {
+            if (g_prevPmts.find(pmtPid) != g_prevPmts.end())
+            {
+                auto it = std::find_if(g_prevPmts[pmtPid].streams.begin(), g_prevPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream){return stream.elementary_PID == pid;});
+                if (it != g_prevPmts[pmtPid].streams.end())
+                {
+                    try
+                    {
+                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                    }catch(const std::out_of_range&){
+                        LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
+                    }
+                }
+            }
+        }
+    }
+    
     if (hasPid("write", pid))
     {
         auto writeOffset = 0;
@@ -322,6 +351,17 @@ extern void printTsPacket(const uint8_t* packet)
     printf ("\n");
 }
 
+static const char* optString = "m:w:i:l:p:h?v";
+
+struct option longOpts[] = { { "write", 1, nullptr, 'w' },
+                             { "wrmode", 1, nullptr, 'm' },
+                             { "input", 1, nullptr, 'i' },
+                             { "log-level", 1, nullptr, 'l' },
+                             { "pid", 1, nullptr, 'p' },
+                             { "help", 0, nullptr, 'h' },
+                             { "version", 0, nullptr, 'v' },
+                             { nullptr, 0, nullptr, 0 } };
+
 int main(int argc, char** argv)
 {
     // Initialize the logger
@@ -333,21 +373,38 @@ int main(int argc, char** argv)
     ///LOGE << "error";
     ///LOGF << "fatal";
     ///LOGN << "none";
-    //plog::init(plog::debug, "tsparser.csv");
 
-
-    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("tsparser.csv", LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME, LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
-    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
-    plog::init<FileLog>(plog::debug, &fileAppender); // Initialize the 2nd logger instance.
+    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
 
     LOGD << "Starting parser of file";
 
-    int longIndex;
-
-    int opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
-    while (opt != -1)
+    for(;;)
     {
+        int opt;
+        int optInd = -1;
+        opt = getopt_long(argc, argv, optString, longOpts, &optInd);
+        if (optInd == -1)
+        {
+            for (optInd = 0; longOpts[optInd].name; ++optInd)
+            {
+                if (longOpts[optInd].val == opt)
+                {
+                    LOGD << "optInd: " << optInd;
+                    break;
+                }
+            }
+            if (longOpts[optInd].name == NULL)
+            {
+                // the short option was not found; do something
+                LOGE << "the short option was not found; do something"; // TODO
+            }
+        }
+
+        if(opt < 0)
+            break;
         switch (opt)
         {
         case 'h': /* fall-through is intentional */
@@ -355,7 +412,6 @@ int main(int argc, char** argv)
         {
             display_usage();
             exit(EXIT_SUCCESS);
-            break;
         }
         case 'v':
         {
@@ -365,10 +421,20 @@ int main(int argc, char** argv)
         }
         case 'w':
         case 'p':
-        case 'l':
             LOGD << "Got pid listener pid:" << std::atoi(optarg);
-            g_Options[longOpts[longIndex].name].push_back(std::atoi(optarg));
+            g_Options[longOpts[optInd].name].push_back(std::atoi(optarg));
             break;
+        case 'l':
+        {
+            LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
+            std::string logLevel = std::string(optarg);
+            LOGD << "Got input log-level setting: " << logLevel;
+            for (auto & c: logLevel) c = toupper(c);
+            plog::Severity severity = plog::severityFromString(logLevel.c_str());
+            plog::get()->setMaxSeverity(severity);
+            LOGD << "Use log-level: " << plog::severityToString(severity) << ", (" << severity << ")";
+            break;
+        }
         case 'm':
         {
             OptionWriteMode writeMode = OptionWriteMode::PES;
@@ -391,8 +457,8 @@ int main(int argc, char** argv)
                 exit(EXIT_FAILURE);
             }
             g_WriteMode.push_back(writeMode);
+            break;
         }
-        break;
         case 'i':
         {
             LOGD << "Got file input: " << std::string(optarg);
@@ -403,9 +469,8 @@ int main(int argc, char** argv)
             /* You won't actually get here. */
             break;
         }
+    } // for
 
-        opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
-    }
     if (g_WriteMode.empty())
     {
         g_WriteMode.push_back(OptionWriteMode::PES);
@@ -422,7 +487,7 @@ int main(int argc, char** argv)
     uint64_t count;
 
     // FILE
-    FILE* fptr;
+    FILE* fptr = NULL;
     fptr = fopen(g_InputFile.c_str(), "rb");
 
     if (fptr == NULL)
@@ -454,7 +519,7 @@ int main(int argc, char** argv)
                 LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
                 LOGD << "Statistics\n";
-                display_statistics(g_tsDemux);
+                display_statistics(g_tsDemux.getTsStatistics());
                 fclose(fptr);
                 return EXIT_SUCCESS;
             }

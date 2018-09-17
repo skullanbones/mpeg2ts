@@ -8,10 +8,11 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "CommonTypes.h"
 #include "TsParser.h"
 #include "Logging.h"
 
+namespace mpeg2ts
+{
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
@@ -74,20 +75,20 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 bool TsParser::checkHasAdaptationField(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 {
-    TsAdaptationFieldHeader hdr;
+    TsAdaptationFieldHeader hdr = {}; // zero initialization
     hdr.adaptation_field_length = getBits(8);
     if (hdr.adaptation_field_length == 0)
     {
@@ -109,7 +110,7 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
 void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
+    const TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
     outInfo.pcr = -1;
     outInfo.opcr = -1;
@@ -119,7 +120,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     }
 
     auto ofsAfterAF =
-    getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
+        getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
 
     if (adaptHdr.PCR_flag)
     {
@@ -155,7 +156,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.adaptation_field_extension_flag)
     {
-        uint8_t adaptation_field_extension_length = getBits(8);
+        const uint8_t adaptation_field_extension_length = getBits(8);
 
         // Check if data size is within boundary of a TS Packet
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
@@ -202,8 +203,8 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
     int PID = tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
-    checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
-    checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
 
     if (tsPacketInfo.hdr.payload_unit_start_indicator)
     {
@@ -237,14 +238,14 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket)
 {
     bool ret = false;
-    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    const uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
     auto pid = tsPacketInfo.pid;
 
-    checkCCError(pid, tsPacketInfo.continuityCounter);
-    checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkCCError(pid, tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
     if (tsPacketInfo.hasAdaptationField)
     {
-        buildPcrHistogram(pid, tsPacketInfo.pcr);
+        mStatistics.buildPcrHistogram(pid, tsPacketInfo.pcr);
     }
 
     if (tsPacketInfo.isPayloadStart)
@@ -261,8 +262,8 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             {
                 pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
 
-                buildPtsHistogram(pid, pesPacket.pts);
-                buildDtsHistogram(pid, pesPacket.dts);
+                mStatistics.buildPtsHistogram(pid, pesPacket.pts);
+                mStatistics.buildDtsHistogram(pid, pesPacket.dts);
 
                 ret = true;
             }
@@ -273,7 +274,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
         pid = tsPacketInfo.pid;
 
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
     }
@@ -287,7 +288,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
         // TODO: check if we have boud PES and return it if it is coplete
     }
 
@@ -316,7 +317,7 @@ PatTable TsParser::parsePatPacket(int pid)
     resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
     parsePsiTable(mSectionBuffer[pid], pat);
 
-    int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    const int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {
@@ -367,7 +368,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
     while (readSize < streamsSize)
     {
         StreamTypeHeader hdr;
-        hdr.stream_type = getBits(8);
+        hdr.stream_type = (StreamType)getBits(8);
         getBits(3); // reserved
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved
@@ -475,3 +476,5 @@ void TsParser::parsePesPacket(int16_t pid)
         }
     }
 }
+
+} // namespace mpeg2ts

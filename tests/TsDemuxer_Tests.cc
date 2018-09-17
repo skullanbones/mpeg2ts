@@ -5,10 +5,10 @@
 #include <iostream>
 
 /// Project files
-#include "TsPacketInfo.h"
+#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
-#include "TsDemuxer.h"
 
+using namespace mpeg2ts;
 
 using ::testing::StrictMock;
 

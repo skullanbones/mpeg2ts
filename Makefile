@@ -7,7 +7,7 @@
 # permission from skullanbones™ and authors
 
 ## Project
-COMPONENT_NAME ?= ts-lib
+COMPONENT_NAME ?= mpeg2ts
 export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
@@ -19,7 +19,8 @@ TOOLSDIR = $(PROJ_ROOT)/tools
 PLOG_VERSION=1.1.4
 
 INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include
+				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
+				-I$(3RDPARTYDIR)/nlohmann/include
 
 export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
@@ -36,8 +37,9 @@ DOCKER_USER_ID ?= $(USER)
 
 ## Compiler
 CXX = g++
-STATIC = libts.a
-DYNAMIC = libts.so
+STATIC = lib$(COMPONENT_NAME).a
+DYNAMIC = lib$(COMPONENT_NAME).so
+
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
 ifeq ($(BUILD_TYPE),DEBUG)
 	CXXFLAGS += -g -O0
@@ -55,18 +57,26 @@ PYTHON_VERSION ?= 3
 SRCS = 	TsParser.cc \
 		GetBits.cc \
 		TsDemuxer.cc \
-		TsStatistics.cc
+		TsStatistics.cc \
+        mpeg2vid/Mpeg2VideoParser.cc \
+        h264/H264Parser.cc \
+        PesPacket.cc \
+        PsiTables.cc \
+        TsPacketInfo.cc \
+        JsonSettings.cc \
+		TsUtilities.cc
 
-HDRS = 	include/GetBits.h \
-		include/TsDemuxer.h \
-		include/TsPacketInfo.h \
+HDRS = 	include/public/mpeg2ts.h \
+		include/public/Ts_IEC13818-1.h \
+		include/GetBits.h \
 		include/TsParser.h \
-		include/TsStandards.h \
-		include/TsStatistics.h
+		include/mpeg2vid/Mpeg2VideoParser.h \
+		include/h264/H264Parser.h \
+		include/JsonSettings.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
-$(info $$OBJS is $(OBJS))
+$(info OBJS is: $(OBJS))
 
 ## Commands
 docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
@@ -102,7 +112,9 @@ help:
 	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component-tests       - run all component tests.'
-	@echo '  so                    - make shared object as dynamic linkage library.'
+	@echo '  libs                  - make both static and dynamic libs.'
+	@echo '  shared                - make static object as static linkage library.'
+	@echo '  static                - make shared object as dynamic linkage library.'
 	@echo '  3rd-party             - install 3rd-party dependencies.'
 	@echo '  plog                  - install 3rd-party plog logging library.'
 	@echo '  clean                 - deletes build content.'
@@ -113,22 +125,28 @@ all: $(BUILDDIR) $(BUILDDIR)/tsparser
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/mpeg2vid
+	mkdir -p $(BUILDDIR)/h264
 
-$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o $(BUILDDIR)/$(STATIC) $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -lts
+$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
+	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l:$(STATIC)
 
-$(BUILDDIR)/main.o: plog $(SRCDIR)/main.cc $(HDRS)
+$(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
 
-$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc plog
+$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc 3rd-party
 	@echo [Compile] $<
 	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
+
+libs: $(BUILDDIR) static shared
+
+static: $(BUILDDIR)/$(STATIC)
 
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
-so: $(BUILDDIR)/$(DYNAMIC)
+shared: $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
@@ -170,7 +188,7 @@ tests: unit-tests component-tests
 
 ### unit tests
 
-build-unit-tests: $(BUILDDIR)/$(STATIC)
+build-unit-tests: static
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
 	$(call docker_command, gtests)
 
@@ -201,11 +219,18 @@ $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
 $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	cd $(3RDPARTYDIR)
 	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
-	touch $(3RDPARTYDIR)/.plog_extracted
+	touch $@
 
-3rd-party: plog
+$(3RDPARTYDIR)/.json_extracted: $(3RDPARTYDIR)/nlohmann.tar.gz
+	cd $(3RDPARTYDIR)
+	tar xvf $(3RDPARTYDIR)/nlohmann.tar.gz -C $(3RDPARTYDIR)
+	touch $@
+
+3rd-party: plog json
 
 plog: $(3RDPARTYDIR)/.plog_extracted
+
+json: $(3RDPARTYDIR)/.json_extracted
 
 clean:
 	rm -f $(OBJS)
@@ -218,9 +243,11 @@ clean:
 		$(MAKE) -C $$dir clean; \
 	done
 
-### Will force clean download cache
+### Will force clean download cache & build directory
 clean-all: clean
 	rm -f $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	rm -f $(3RDPARTYDIR)/.plog_extracted
 	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
+	rm -rf $(BUILDDIR)
+	rm -rf $(PROJ_ROOT)/component_tests/downloaded_files
 

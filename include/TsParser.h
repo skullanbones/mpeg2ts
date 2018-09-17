@@ -17,15 +17,14 @@
 #include <cstdint>
 
 // Project files
+#include <public/mpeg2ts.h>
+#include <public/Ts_IEC13818-1.h>
 #include "GetBits.h"
-#include "PesPacket.h"
-#include "PsiTables.h"
-#include "TsPacketInfo.h"
-#include "TsStandards.h"
-#include "TsStatistics.h"
 
+namespace mpeg2ts
+{
 
-class TsParser : GetBits, public TsStatistics
+class TsParser : GetBits
 {
 public:
     /*!
@@ -132,6 +131,7 @@ public:
      */
     void parsePesPacket(int16_t pid);
 
+    TsStatistics mStatistics;
 private:
     // TODO maybe 1 parser per pid?
     std::map<uint16_t, ByteVector> mSectionBuffer;
@@ -140,3 +140,5 @@ private:
     std::map<uint16_t, int> mReadSectionLength;
     std::map<uint16_t, PesPacket> mPesPacket;
 };
+
+} // namespace mpeg2ts

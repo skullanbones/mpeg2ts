@@ -7,9 +7,11 @@
 #include <iostream>
 
 /// Project files
-#include "TsPacketInfo.h"
+#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
 #include "TsParser.h"
+
+using namespace mpeg2ts;
 
 TEST(TsParserConstants, CheckConstants)
 {

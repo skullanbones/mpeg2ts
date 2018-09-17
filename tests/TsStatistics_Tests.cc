@@ -7,9 +7,10 @@
 #include <iostream>
 
 /// Project files
-#include "TsDemuxer.h"
+#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
-#include "TsStatistics.h"
+
+using namespace mpeg2ts;
 
 TEST(TsStatisticsTests, TwoPlusTwoEqualsFour)
 {
@@ -147,7 +148,7 @@ TEST(TsStatisticsTests, TestPcrHistogram)
  */
 TEST(TsStatisticsTests, TestTsPacketCounter)
 {
-    TsDemuxer demuxer;
+    mpeg2ts::TsDemuxer demuxer;
     TsStatistics statistics = demuxer.getTsStatistics();
     EXPECT_EQ(statistics.mTsPacketCounter, 0u);
 
