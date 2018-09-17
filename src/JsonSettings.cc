@@ -11,17 +11,29 @@
 
 using json = nlohmann::json;
 
+
 bool Settings::loadFile(std::string file)
 {
-    try
+    // 1. Open file
+    std::ifstream ifs(file);
+    if (ifs.fail())
     {
-        std::ifstream ifs(file);
+        std::string errMsg = "Could not find settings file: " + file;
+        throw LoadException(errMsg);
+        return false;
+    }
+    
+    // 2. Load and read file
+    try 
+    {
         ifs >> mJ;
         return true;
     }
     catch (std::exception& e)
     {
         std::cerr << "Could not load asset file: " << file << ", with exception: " << e.what() << std::endl;
+        std::string errMsg = "Could not load asset file: " + file + ", with exception: " + e.what();
+        throw LoadException(errMsg);
         return false;
     }
 }
@@ -52,3 +64,13 @@ int Settings::getLogFileMaxNumberOf() const
 {
     return mJ["settings"]["logFileMaxNumberOf"];
 };
+
+///////////////// LoadException /////////////////////////
+
+LoadException::LoadException(const std::string& message) : message_(message) 
+{
+}
+
+LoadException::LoadException(const std::exception e) : message_(e.what())
+{
+}
