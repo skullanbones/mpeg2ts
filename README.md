@@ -21,6 +21,16 @@ There are 2 sets of API, the core API called mpeg2ts under the same namespace an
 ![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
 
 ## Releases
+*V0.1*
+
+* Added first version of API (mpeg2ts.h)
+* Added Windows support and build artifacts (mpeg2ts.lib/dll)
+* Added Linux build artifacts (libmpeg2ts.so/a)
+* Added high-level TsUtilities.h API for convinience
+* Added first version H.264 support
+* Added support for short version CLI for tsparser (Linux only)
+* Fixed bug not finding and printing out error for settings.json
+
 *V0.0.2.rc1*
 
 * Add logging libary: Plog
