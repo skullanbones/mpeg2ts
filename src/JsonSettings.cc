@@ -14,9 +14,18 @@ using json = nlohmann::json;
 
 bool Settings::loadFile(std::string file)
 {
-    try
+    // 1. Open file
+    std::ifstream ifs(file);
+    if (ifs.fail())
     {
-        std::ifstream ifs(file);
+        std::string errMsg = "Could not find settings file: " + file;
+        throw LoadException(errMsg);
+        return false;
+    }
+    
+    // 2. Load and read file
+    try 
+    {
         ifs >> mJ;
         return true;
     }
