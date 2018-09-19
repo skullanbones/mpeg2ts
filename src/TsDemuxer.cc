@@ -12,10 +12,9 @@
 * Strictly Confidential - Do not duplicate or distribute without written
 * permission from authors
 */
-#include <public/mpeg2ts.h>
+#include "public/mpeg2ts.h"
 #include "TsParser.h"
 #include "Logging.h"
-#include "TsParser.h"
 
 #include <cstdint>
 
@@ -113,9 +112,9 @@ void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
     mHandlers[pid] = hdl;
 }
 
-TsStatistics TsDemuxer::getTsStatistics() const
+PidStatisticsType TsDemuxer::getPidStatistics() const
 {
-    return mParser->mStatistics;
+    return mParser->mStatistics.mPidStatistics;
 }
 
-}
+} // mpeg2ts

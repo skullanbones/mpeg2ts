@@ -107,6 +107,8 @@ public:
     //! \return Map containing PES packets ordered by their respective PID as keys
     MPEG2TS_API std::map<uint16_t, std::vector<PesPacket>> getPesPackets() const;
 
+    MPEG2TS_API PidStatisticsType getPidStatistics() const;
+
 private:
     void initLogging() const;
     void initParse();

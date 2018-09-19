@@ -97,6 +97,18 @@ int main()
         std::cout << "Size of PES packets: " << pes.second.size() << std::endl;
     }
 
+    // typedef std::map<int, PidStatistic> PidStatisticsType;
+    PidStatisticsType stat = util.getPidStatistics();
+    
+    for (auto pid : stat) {
+        std::cout << "PID: " << pid.first << std::endl;
+        std::cout << "numberOfCCErrors: " << pid.second.numberOfCCErrors << std::endl;
+        std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << std::endl;
+        std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << std::endl;
+    }
+
+
+
     /* Demonstrates non-orthogonality between APIs...
     try
     {

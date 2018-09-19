@@ -29,20 +29,16 @@
 
 namespace mpeg2ts
 {
+// Forward declarations
+class TsParser;
+struct PidStatistic;
+    
 // Common types
 typedef std::vector<uint8_t> ByteVector;
 typedef std::shared_ptr<ByteVector> ByteVectorPtr;
-
-// Internal types // TODO remove to internal h-file
-/// Window types
-#ifdef WIN32
-#define ssize_t size_t
-typedef char TCHAR;
-#endif
+typedef std::map<int, PidStatistic> PidStatisticsType;
 
 
-// forward declarations
-class TsParser;
 
 /*!
  * @class PES-Packet prototype containing buffer
@@ -219,10 +215,6 @@ public:
     MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
 };
 
-// TODO check these
-const int64_t CLOCK_90_KHZ = 90000;
-const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
-
 
 struct PidStatistic
 {
@@ -257,55 +249,6 @@ struct PidStatistic
 
     uint64_t numberOfMissingDts;
 };
-
-
-
-class TsStatistics
-{
-public:
-    explicit TsStatistics();
-
-    /*!
-     * Calculates Continuity errors.
-     * @param pid Filtered PID.
-     * @param cc Current TS packets Continuity Counter.
-     */
-    void checkCCError(int pid, uint8_t cc);
-
-    /*!
-     * Book keep flagged TS packets discontinuities.
-     * @param pid Filtered PID.
-     * @param isDiscontinuous Whether or not this is a discontinuity.
-     */
-    void checkTsDiscontinuity(int pid, bool isDiscontinuous);
-
-    /*!
-     * Build a histogram of PTS differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Program Time Stamp value.
-     */
-    void buildPtsHistogram(int pid, int64_t pts);
-
-    /*!
-     * Build a histogram of DTS differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Display Time Stamp value.
-     */
-    void buildDtsHistogram(int pid, int64_t dts);
-
-    /*!
-     * Build a histogram of PCR differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Program Clock Reference value.
-     */
-    void buildPcrHistogram(int pid, int64_t pcr);
-
-    std::map<int, PidStatistic> mPidStatistics;
-    uint64_t mTsPacketCounter;
-    uint64_t mTsPacketNullPacketCounter;
-    uint64_t mTsPacketErrorIndicator;
-};
-
 
 
 
@@ -359,9 +302,7 @@ public:
      * Returns statistics on parsed transport stream packets.
      * @return TsStatistics containing collected statistics for all demuxed packets.
      */
-    MPEG2TS_API TsStatistics
-
-    getTsStatistics() const;
+    MPEG2TS_API PidStatisticsType getPidStatistics() const;
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
