@@ -97,9 +97,9 @@ void display_usage()
               << std::endl;
 }
 
-void display_statistics(mpeg2ts::TsStatistics statistics)
+void display_statistics(mpeg2ts::PidStatisticsMap statistics)
 {
-    for (auto& pidStat : statistics.mPidStatistics)
+    for (auto& pidStat : statistics)
     {
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pidStat.first) == 0)
         {
@@ -188,7 +188,7 @@ void PATCallback(PsiTable* table, uint16_t pid)
 
     if (hasPid("pid", TS_PACKET_PID_PAT))
     {
-        LOGN << "PAT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter << "\n";
+        LOGN << "PAT at Ts packet: " << g_tsDemux.getTsCounters().mTsPacketCounter << "\n";
         LOGN << *pat << std::endl;
     }
 
@@ -253,7 +253,7 @@ void PMTCallback(PsiTable* table, uint16_t pid)
 
     if (hasPids("pid", g_PMTPIDS))
     {
-        LOGN << "PMT at Ts packet: " << g_tsDemux.getTsStatistics().mTsPacketCounter;
+        LOGN << "PMT at Ts packet: " << g_tsDemux.getTsCounters().mTsPacketCounter;
         LOGN << *pmt;
     }
 
@@ -282,8 +282,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
 
     if (hasPid("pid", pid))
     {
-        LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsStatistics().mTsPacketCounter
-                  << " (" << pid << ")\n";
+        LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
         LOGN << pes << std::endl;
     }
     
@@ -519,7 +518,7 @@ int main(int argc, char** argv)
                 LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
 
                 LOGD << "Statistics\n";
-                display_statistics(g_tsDemux.getTsStatistics());
+                display_statistics(g_tsDemux.getPidStatistics());
                 fclose(fptr);
                 return EXIT_SUCCESS;
             }

@@ -36,7 +36,7 @@ struct PidStatistic;
 // Common types
 typedef std::vector<uint8_t> ByteVector;
 typedef std::shared_ptr<ByteVector> ByteVectorPtr;
-typedef std::map<int, PidStatistic> PidStatisticsType;
+typedef std::map<int, PidStatistic> PidStatisticsMap;
 
 
 
@@ -250,6 +250,12 @@ struct PidStatistic
     uint64_t numberOfMissingDts;
 };
 
+struct TsCounters {
+    uint64_t mTsPacketCounter{0};
+    uint64_t mTsPacketNullPacketCounter{0};
+    uint64_t mTsPacketErrorIndicator{0};
+};
+
 
 
 typedef std::function<void(PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
@@ -300,9 +306,15 @@ public:
 
     /*!
      * Returns statistics on parsed transport stream packets.
-     * @return TsStatistics containing collected statistics for all demuxed packets.
+     * @return PidStatisticsType containing collected statistics for each pid on all demuxed packets.
      */
-    MPEG2TS_API PidStatisticsType getPidStatistics() const;
+    MPEG2TS_API PidStatisticsMap getPidStatistics() const;
+
+    /*!
+    * Returns counter statistics on parsed transport stream packets.
+    * @return TsCounters
+    */
+    MPEG2TS_API TsCounters getTsCounters() const;
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
@@ -313,5 +325,7 @@ protected:
 private:
      TsParser* mParser;
 };
+
+
 
 } // namespace mpeg2ts

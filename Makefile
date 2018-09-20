@@ -72,7 +72,9 @@ HDRS = 	include/public/mpeg2ts.h \
 		include/TsParser.h \
 		include/mpeg2vid/Mpeg2VideoParser.h \
 		include/h264/H264Parser.h \
-		include/JsonSettings.h
+		include/JsonSettings.h \
+		include/TsStatistics.h \
+		include/Types.h
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 

@@ -5,7 +5,6 @@
 
 namespace mpeg2ts
 {
-
 class TsStatistics
 {
 public:
@@ -50,11 +49,41 @@ public:
     */
     void buildPcrHistogram(int pid, int64_t pcr);
 
-    PidStatisticsType mPidStatistics;
-    uint64_t mTsPacketCounter;
-    uint64_t mTsPacketNullPacketCounter;
-    uint64_t mTsPacketErrorIndicator;
+    PidStatisticsMap getPidStatistics() const;
+    TsCounters getTsCounters() const;
+
+    void addTsPacketErrorIndicator();
+    void addTsPacketNullPacketCounter();
+    void addTsPacketCounter();
+
+private:
+    PidStatisticsMap mPidStatistics;
+    TsCounters mCounters;
 };
 
+inline PidStatisticsMap TsStatistics::getPidStatistics() const
+{
+    return mPidStatistics;
+}
+
+inline TsCounters TsStatistics::getTsCounters() const
+{
+    return mCounters;
+}
+
+inline void TsStatistics::addTsPacketErrorIndicator()
+{
+    ++mCounters.mTsPacketErrorIndicator;
+}
+
+inline void TsStatistics::addTsPacketNullPacketCounter()
+{
+    ++mCounters.mTsPacketNullPacketCounter;
+}
+
+inline void TsStatistics::addTsPacketCounter()
+{
+    ++mCounters.mTsPacketCounter;
+}
 
 } // namespace mpeg2ts

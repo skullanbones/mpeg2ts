@@ -366,7 +366,7 @@ std::map<uint16_t, std::vector<PesPacket>> TsUtilities::getPesPackets() const
     return mPesPackets;
 }
 
-PidStatisticsType TsUtilities::getPidStatistics() const
+PidStatisticsMap TsUtilities::getPidStatistics() const
 {
     return mDemuxer.getPidStatistics();
 }

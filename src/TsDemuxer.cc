@@ -41,12 +41,12 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
     if (tsPacketInfo.errorIndicator)
     {
-        ++mParser->mStatistics.mTsPacketErrorIndicator;
+        mParser->mStatistics.addTsPacketErrorIndicator();
     }
 
     if (tsPacketInfo.pid == TS_PACKET_PID_NULL)
     {
-        ++mParser->mStatistics.mTsPacketNullPacketCounter;
+        mParser->mStatistics.addTsPacketNullPacketCounter();
         return; // Skip null packets, they contain no info
     }
 
@@ -91,7 +91,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         }
     }
 
-    ++mParser->mStatistics.mTsPacketCounter;
+    mParser->mStatistics.addTsPacketCounter();
 }
 
 void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb, void* hdl)
@@ -112,9 +112,14 @@ void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
     mHandlers[pid] = hdl;
 }
 
-PidStatisticsType TsDemuxer::getPidStatistics() const
+PidStatisticsMap TsDemuxer::getPidStatistics() const
 {
-    return mParser->mStatistics.mPidStatistics;
+    return mParser->mStatistics.getPidStatistics();
+}
+
+TsCounters TsDemuxer::getTsCounters() const
+{
+    return mParser->mStatistics.getTsCounters();
 }
 
 } // mpeg2ts
