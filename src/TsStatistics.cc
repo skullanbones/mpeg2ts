@@ -24,6 +24,9 @@
 namespace mpeg2ts
 {
 
+// constants
+const int64_t TsStatistics::CLOCK_90_KHZ = 90000;
+const int64_t TsStatistics::TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ;
 
 TsStatistics::TsStatistics()
 {

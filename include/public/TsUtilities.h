@@ -118,8 +118,8 @@ private:
     // Default constants
     static const LogLevel DEFAULT_LOG_LEVEL; // = LogLevel::DEBUG;
     static const std::string LOGFILE_NAME; // = "mpeg2ts_log.csv";
-    static int LOGFILE_MAXSIZE; // = 100 * 1024;
-    static int LOGFILE_MAXNUMBEROF; // = 10;
+    static const int LOGFILE_MAXSIZE; // = 100 * 1024;
+    static const int LOGFILE_MAXNUMBEROF; // = 10;
 
     // members
     TsDemuxer mDemuxer;

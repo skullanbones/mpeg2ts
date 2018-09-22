@@ -9,8 +9,8 @@ class TsStatistics
 {
 public:
     // Constants
-    const int64_t CLOCK_90_KHZ = 90000;
-    const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
+    static const int64_t CLOCK_90_KHZ;
+    static const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL; // 3s
 
     explicit TsStatistics();
 
