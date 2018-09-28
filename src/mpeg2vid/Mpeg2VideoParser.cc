@@ -5,7 +5,7 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include <mpeg2vid/Mpeg2VideoParser.h>
 #include "Types.h"
 
 bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)

@@ -358,10 +358,3 @@ TEST(TsParserTests, TestParsePcr)
     EXPECT_EQ(0x30, info.pid);
     EXPECT_EQ(31571712, info.pcr);
 }
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();
-}
