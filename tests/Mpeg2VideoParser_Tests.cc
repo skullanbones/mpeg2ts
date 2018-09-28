@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 /// Project files CUT (Class Under Test)
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include <mpeg2vid/Mpeg2VideoParser.h>
 
 
 TEST(Mpeg2VideoTests, Parse1)

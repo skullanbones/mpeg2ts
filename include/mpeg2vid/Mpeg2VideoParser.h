@@ -17,14 +17,13 @@ public:
 
     Mpeg2VideoEsParser()
         : foundStartCodes{0}
-
     {
     }
-    virtual ~Mpeg2VideoEsParser()
-    {
-    }
+    
+    virtual ~Mpeg2VideoEsParser() = default;
+   
 
-    virtual bool operator()(const uint8_t* from, ssize_t length);
+    bool operator()(const uint8_t* from, std::size_t length) override;
     virtual bool analyze();
 
     std::vector<uint8_t> last;

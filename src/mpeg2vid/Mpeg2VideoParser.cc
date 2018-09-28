@@ -8,9 +8,9 @@
 #include <mpeg2vid/Mpeg2VideoParser.h>
 #include "Types.h"
 
-bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
+bool Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
-    auto tmpLast = std::vector<uint8_t>(from + length - std::min(length, (ssize_t)3), from + length);
+    auto tmpLast = std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
     auto copyFrom = from;
     auto end = from + length;
     while (length > 0)
@@ -23,19 +23,22 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             {
                 startCodeFound = true;
             }
-        }else if (onePosition == from + 1)
+        }
+        else if (onePosition == from + 1)
         {
             if (last.size() >= 2 && last[1] == 0 && last[0] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
-        }else if (onePosition == from + 2)
+        }
+        else if (onePosition == from + 2)
         {
             if (last.size() >= 1 && last[0] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
             {
                 startCodeFound = true;
             }
-        }else
+        }
+        else
         {
             if ((onePosition != from + length) && *(onePosition - 1) == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
             {
@@ -53,9 +56,9 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             }
             mPicture.clear();
             copyFrom = onePosition + 1;
-
         }
-        length -= (onePosition - from) + 1;
+        int diff = (onePosition - from);
+        length -= diff;
         from = onePosition + 1;
     }
     
