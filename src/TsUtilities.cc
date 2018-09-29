@@ -15,8 +15,8 @@ namespace tsutil
 // Constants
 const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
 const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
-int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
-int TsUtilities::LOGFILE_MAXNUMBEROF = 10;   
+const int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
+const int TsUtilities::LOGFILE_MAXNUMBEROF = 10;   
 
 TsUtilities::TsUtilities()
     : mAddedPmts{ false }
@@ -365,6 +365,12 @@ std::map<uint16_t, std::vector<PesPacket>> TsUtilities::getPesPackets() const
 {
     return mPesPackets;
 }
+
+PidStatisticsMap TsUtilities::getPidStatistics() const
+{
+    return mDemuxer.getPidStatistics();
+}
+
 
 
 

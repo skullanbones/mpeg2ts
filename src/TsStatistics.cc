@@ -18,14 +18,17 @@
 
 /// project files
 #include <public/mpeg2ts.h>
+#include "TsStatistics.h"
 #include "Logging.h"
 
 namespace mpeg2ts
 {
 
+// constants
+const int64_t TsStatistics::CLOCK_90_KHZ = 90000;
+const int64_t TsStatistics::TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ;
 
 TsStatistics::TsStatistics()
-    : mTsPacketCounter{ 0 }
 {
 }
 
@@ -40,7 +43,7 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
         if (((mPidStatistics[pid].lastCC + 1) & 0x0f) != cc)
         {
             ++mPidStatistics[pid].numberOfCCErrors;
-            LOGD_(FileLog) << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
+            LOGD_(FileLog) << "Continuity counter error at ts packet " << mCounters.mTsPacketCounter << " on pid "
                 << pid << "\n";
         }
         mPidStatistics[pid].lastCC = cc;
@@ -52,7 +55,7 @@ void TsStatistics::checkTsDiscontinuity(int pid, bool isDiscontinuous)
     if (isDiscontinuous)
     {
         ++mPidStatistics[pid].numberOfTsDiscontinuities;
-        LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mTsPacketCounter
+        LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mCounters.mTsPacketCounter
             << " on pid " << pid << "\n";
     }
 }
@@ -73,7 +76,7 @@ void TsStatistics::buildPtsHistogram(int pid, int64_t pts)
     mPidStatistics[pid].ptsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        LOGD_(FileLog) << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
+        LOGD_(FileLog) << "PTS discontinuity at ts packet " << mCounters.mTsPacketCounter << " on pid " << pid << " pts-1 "
             << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff;
     }
     mPidStatistics[pid].lastPts = pts;
@@ -95,7 +98,7 @@ void TsStatistics::buildDtsHistogram(int pid, int64_t dts)
     mPidStatistics[pid].dtsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        LOGD_(FileLog) << "DTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " dts-1 "
+        LOGD_(FileLog) << "DTS discontinuity at ts packet " << mCounters.mTsPacketCounter << " on pid " << pid << " dts-1 "
             << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
     }
 
@@ -117,7 +120,7 @@ void TsStatistics::buildPcrHistogram(int pid, int64_t pcr)
     mPidStatistics[pid].pcrHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
     {
-        LOGD_(FileLog) << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
+        LOGD_(FileLog) << "PCR discontinuity at ts packet " << mCounters.mTsPacketCounter << " on pid " << pid << " pcr-1 "
             << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
     }
 

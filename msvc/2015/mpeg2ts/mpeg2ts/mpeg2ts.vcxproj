@@ -162,6 +162,8 @@
     <ClInclude Include="..\..\..\..\include\public\TsUtilities.h" />
     <ClInclude Include="..\..\..\..\include\public\Ts_IEC13818-1.h" />
     <ClInclude Include="..\..\..\..\include\TsParser.h" />
+    <ClInclude Include="..\..\..\..\include\TsStatistics.h" />
+    <ClInclude Include="..\..\..\..\include\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\GetBits.cc" />

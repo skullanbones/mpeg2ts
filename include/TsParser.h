@@ -17,9 +17,9 @@
 #include <cstdint>
 
 // Project files
-#include <public/mpeg2ts.h>
 #include <public/Ts_IEC13818-1.h>
 #include "GetBits.h"
+#include "TsStatistics.h"
 
 namespace mpeg2ts
 {

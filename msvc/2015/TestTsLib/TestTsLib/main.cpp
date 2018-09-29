@@ -1,8 +1,9 @@
 // TestTsLib.cpp : Defines the entry point for the console application.
 //
 
-#include "public/mpeg2ts.h"
-#include "public/TsUtilities.h"
+#include <public/mpeg2ts.h>
+#include <public/TsUtilities.h>
+
 #include <iostream>
 
 using namespace mpeg2ts;
@@ -96,6 +97,18 @@ int main()
         std::cout << "Got PES with PID: " << pes.first << std::endl;
         std::cout << "Size of PES packets: " << pes.second.size() << std::endl;
     }
+
+    // typedef std::map<int, PidStatistic> PidStatisticsType;
+    PidStatisticsType stat = util.getPidStatistics();
+    
+    for (auto pid : stat) {
+        std::cout << "PID: " << pid.first << std::endl;
+        std::cout << "numberOfCCErrors: " << pid.second.numberOfCCErrors << std::endl;
+        std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << std::endl;
+        std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << std::endl;
+    }
+
+
 
     /* Demonstrates non-orthogonality between APIs...
     try
