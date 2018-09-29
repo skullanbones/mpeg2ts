@@ -152,7 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\tests\GetBits_Tests.cc" />
-    <ClCompile Include="..\..\..\..\tests\main.cpp" />
+    <ClCompile Include="..\..\..\..\tests\main.cc" />
     <ClCompile Include="..\..\..\..\tests\Mpeg2VideoParser_Tests.cc" />
     <ClCompile Include="..\..\..\..\tests\PsiTables_Tests.cc" />
     <ClCompile Include="..\..\..\..\tests\TsDemuxer_Tests.cc" />

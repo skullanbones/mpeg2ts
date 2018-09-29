@@ -38,7 +38,7 @@
     <ClCompile Include="..\..\..\..\tests\TsStatistics_Tests.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\tests\main.cpp">
+    <ClCompile Include="..\..\..\..\tests\main.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
