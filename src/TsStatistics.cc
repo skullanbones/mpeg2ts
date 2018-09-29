@@ -17,7 +17,7 @@
 #include <plog/Log.h>
 
 /// project files
-#include "public/mpeg2ts.h"
+#include <public/mpeg2ts.h>
 #include "TsStatistics.h"
 #include "Logging.h"
 

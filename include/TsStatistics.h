@@ -1,7 +1,8 @@
 #pragma once
 
+#include <public/mpeg2ts.h>
+
 #include <cstdint>
-#include "public/mpeg2ts.h"
 
 namespace mpeg2ts
 {
