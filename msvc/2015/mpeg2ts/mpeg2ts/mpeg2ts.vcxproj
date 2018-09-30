@@ -102,8 +102,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>XCOPY "$(SolutionDir)$(Configuration)" "$(SolutionDir)..\TestTsLib\TestTsLib" /S /Y
-XCOPY "$(SolutionDir)$(Configuration)" "$(SolutionDir)googletests" /S /Y</Command>
+      <Command>XCOPY "$(SolutionDir)$(Configuration)" "$(SolutionDir)..\TestTsLib\TestTsLib" /S /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
