@@ -5,12 +5,11 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "mpeg2vid/Mpeg2VideoParser.h"
-#include "Types.h"
+#include <mpeg2vid/Mpeg2VideoParser.h>
 
-bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
+bool Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
-    auto tmpLast = std::vector<uint8_t>(from + length - std::min(length, (ssize_t)3), from + length);
+    auto tmpLast = std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
     auto copyFrom = from;
     auto end = from + length;
     while (length > 0)
@@ -23,19 +22,22 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             {
                 startCodeFound = true;
             }
-        }else if (onePosition == from + 1)
+        }
+        else if (onePosition == from + 1)
         {
             if (last.size() >= 2 && last[1] == 0 && last[0] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
-        }else if (onePosition == from + 2)
+        }
+        else if (onePosition == from + 2)
         {
             if (last.size() >= 1 && last[0] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
             {
                 startCodeFound = true;
             }
-        }else
+        }
+        else
         {
             if ((onePosition != from + length) && *(onePosition - 1) == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
             {
@@ -53,9 +55,9 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, ssize_t length)
             }
             mPicture.clear();
             copyFrom = onePosition + 1;
-
         }
-        length -= (onePosition - from) + 1;
+        int diff = (onePosition - from);
+        length -= diff;
         from = onePosition + 1;
     }
     
@@ -91,16 +93,20 @@ bool Mpeg2VideoEsParser::analyze()
 
                 };
                 LOGD << msg.str();
-            }else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
+            }
+            else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
             {
                 LOGD << "slice_start_code";
-            }else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
+            }
+            else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
             {
                 LOGD << "reserved";
-            }else if (mPicture[0] == 0xb2)
+            }
+            else if (mPicture[0] == 0xb2)
             {
                 LOGD << "user_data_start_code";
-            }else if (mPicture[0] == 0xb3)
+            }
+            else if (mPicture[0] == 0xb3)
             {
                 msg << "sequence_header_code ";
                 skipBits(8);
@@ -112,19 +118,24 @@ bool Mpeg2VideoEsParser::analyze()
                 msg << ", aspect " << AspectToString[aspect_ratio_information];
                 msg << ", frame rate " << FrameRateToString[frame_rate_code];
                 LOGD << msg.str();
-            }else if (mPicture[0] == 0xb4)
+            }
+            else if (mPicture[0] == 0xb4)
             {
                 LOGD << "sequence_error_code";
-            }else if (mPicture[0] == 0xb5)
+            }
+            else if (mPicture[0] == 0xb5)
             {
                 LOGD << "extension_start_code";
-            }else if (mPicture[0] == 0xb7)
+            }
+            else if (mPicture[0] == 0xb7)
             {
                 LOGD << "sequence_end_code";
-            }else if (mPicture[0] == 0xb8)
+            }
+            else if (mPicture[0] == 0xb8)
             {
                 LOGD << "group_start_code";
-            }else
+            }
+            else
             {
                 LOGD << "system start code";
             }

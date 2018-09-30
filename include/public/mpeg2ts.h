@@ -39,7 +39,6 @@ typedef std::shared_ptr<ByteVector> ByteVectorPtr;
 typedef std::map<int, PidStatistic> PidStatisticsMap;
 
 
-
 /*!
  * @class PES-Packet prototype containing buffer
  *

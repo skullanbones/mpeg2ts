@@ -99,7 +99,7 @@ int main()
     }
 
     // typedef std::map<int, PidStatistic> PidStatisticsType;
-    PidStatisticsType stat = util.getPidStatistics();
+    PidStatisticsMap stat = util.getPidStatistics();
     
     for (auto pid : stat) {
         std::cout << "PID: " << pid.first << std::endl;

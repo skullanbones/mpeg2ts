@@ -1,5 +1,5 @@
-#include "public/TsUtilities.h"
-#include "public/Ts_IEC13818-1.h"
+#include <public/TsUtilities.h>
+#include <public/Ts_IEC13818-1.h>
 #include "Logging.h"
 #include "JsonSettings.h"
 

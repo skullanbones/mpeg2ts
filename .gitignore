@@ -68,3 +68,11 @@ Release/
 *.PES
 component_tests/__pycache__/
 env/
+
+# TestTsLib
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.pdb
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.ilk
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.dll
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.lib
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.exp
+msvc/2015/TestTsLib/TestTsLib/settings.json
