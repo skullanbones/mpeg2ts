@@ -149,6 +149,25 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 }
 
 /*!
+* Test we can demux a PMT packet over 2 ts-packets
+*/
+TEST_F(TsDemuxerTest, TestDemux2PmtPackets)
+{
+    ExpectNoException([&]
+    {
+        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
+
+        demuxer.addPsiPid(32, 
+                          std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
+                          std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
+        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        demuxer.demux(pmt_packet_2_1);
+        demuxer.demux(pmt_packet_2_2);
+    });
+}
+
+/*!
  * Test we can demux a big PMT packet
  */
 TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)

@@ -377,25 +377,32 @@ PmtTable TsParser::parsePmtPacket(int pid)
         << "Stream not following ISO/IEC 13818-1 in program_info_length control bits != 0.";
     }
     int program_info_length = pmt.program_info_length & 0x3FF;
-    Descriptor desc;
-    desc.descriptor_tag = getBits(8);
-    desc.descriptor_length = getBits(8);
-    
-    LOGD << "descriptor_tag: " << (int)desc.descriptor_tag << ", descriptor_length: " << (int)desc.descriptor_length;
-    if (desc.descriptor_tag == 14)
-    {
-        MaximumBitrateDescriptor maxDesc;
-        maxDesc.descriptor_tag = desc.descriptor_tag;
-        maxDesc.descriptor_length = desc.descriptor_length;
 
-        maxDesc.reserved = getBits(2);
-        maxDesc.maximum_bitrate = getBits(22);
-        LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
-        skipBytes(program_info_length - 2 - 3);
+    Descriptor desc;
+
+    if (program_info_length != 0)
+    {
+        desc.descriptor_tag = getBits(8);
+        desc.descriptor_length = getBits(8);
+
+        LOGD << "descriptor_tag: " << (int)desc.descriptor_tag << ", descriptor_length: " << (int)desc.descriptor_length;
+        if (desc.descriptor_tag == 14) // TODO switch/CASE for all the rest of descriptors...
+        {
+            MaximumBitrateDescriptor maxDesc;
+            maxDesc.descriptor_tag = desc.descriptor_tag;
+            maxDesc.descriptor_length = desc.descriptor_length;
+
+            maxDesc.reserved = getBits(2);
+            maxDesc.maximum_bitrate = getBits(22);
+            LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
+            skipBytes(program_info_length - 2 - 3);
+        }
+        else {
+            LOGD << "skipping descriptor.." << std::endl;
+            skipBytes(program_info_length - 2); // skip descriptors for now
+        }
     }
-    else {
-        skipBytes(program_info_length - 2); // skip descriptors for now
-    }
+      
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
     int readSize = 0;
