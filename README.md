@@ -103,8 +103,10 @@ This will spin up a docker container with gtest/gmock and execute all tests.
 Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
 There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
 mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
-called TestTsLib that tests the dynamic mpeg2ts.dll library. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
-change to dynamic project. 
+called TestTsLib that uses the dynamic mpeg2ts.dll library. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
+change to dynamic project. These are the VS2015 solution files:
+* mpeg2ts.sln
+* TestTsLib.sln
 
 ## Continuous integration (CI)
 For CI we use CircleCI which will automatically run all unit tests after a commit either
