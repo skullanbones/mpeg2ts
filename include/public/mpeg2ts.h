@@ -170,10 +170,6 @@ public:
     MPEG2TS_API bool operator!=(const PmtTable& rhs) const;
 };
 
-struct CatDescriptor
-{
-};
-
 class CatTable : public PsiTable
 {
 public:

@@ -259,3 +259,83 @@ enum StreamId
     STREAM_ID_ITU_T_Rec_H222_1_type_E_stream = 0xF8,
     STREAM_ID_program_stream_directory = 0xFF
 };
+
+/*! @brief Descriptor tags Table 2-45
+*/
+
+enum class DescriptorTag : uint32_t
+{
+    Reserved = 0,
+    Forbidden = 1,
+    video_stream_descriptor = 2,
+    audio_stream_descriptor = 3,
+    hierarchy_descriptor = 4,
+    registration_descriptor = 5,
+    data_stream_alignment_descriptor = 6,
+    target_background_grid_descriptor = 7,
+    video_window_descriptor = 8,
+    CA_descriptor = 9,
+    ISO_639_language_descriptor = 10,
+    system_clock_descriptor = 11,
+    multiplex_buffer_utilization_descriptor = 12,
+    copyright_descriptor = 13,
+    maximum_bitrate_descriptor = 14,
+    private_data_indicator_descriptor,
+    smoothing_buffer_descriptor,
+    STD_descriptor,
+    IBP_descriptor,
+    MPEG4_video_descriptor,
+    MPEG4_audio_descriptor,
+    IOD_descriptor,
+    SL_descriptor,
+    FMC_descriptor,
+    external_ES_ID_descriptor,
+    MuxCode_descriptor,
+    FmxBufferSize_descriptor,
+    multiplexBuffer_descriptor,
+    content_labeling_descriptor,
+    metadata_pointer_descriptor,
+    metadata_descriptor,
+    metadata_STD_descriptor,
+    AVC_video_descriptor,
+    IPMP_descriptor,
+    AVC_timing_HRD_descriptor,
+    MPEG2_AAC_audio_descriptor,
+    FlexMuxTiming_descriptor,
+    MPEG4_text_descriptor,
+    MPEG4_audio_extension_descriptor,
+    Auxiliary_video_stream_descriptor,
+    SVC_extension_descriptor,
+    MVC_extension_descriptor,
+    J2K_video_descriptor,
+    MVC_operation_point_descriptor,
+    MPEG2_stereoscopic_video_format_descriptor,
+    Stereoscopic_program_info_descriptor,
+    Stereoscopic_video_info_descriptor,
+    Transport_profile_descriptor,
+    HEVC_video_descriptor,
+    Reserved2,
+    Extension_descriptor
+};
+
+/*! From 2.6.1 */
+struct Descriptor
+{
+    uint8_t descriptor_tag;
+    uint8_t descriptor_length;
+};
+
+/*! Table 2-59 – Conditional access descriptor */
+struct CatDescriptor : public Descriptor
+{
+    uint16_t CA_system_ID;
+    uint8_t reserved;
+    uint16_t CA_PID;
+};
+
+/*! Table 2-65 – Maximum bitrate descriptor */
+struct MaximumBitrateDescriptor : public Descriptor 
+{
+    uint8_t reserved;
+    uint32_t maximum_bitrate;
+};
