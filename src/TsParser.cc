@@ -346,19 +346,6 @@ PatTable TsParser::parsePatPacket(int pid)
     return pat;
 }
 
-// TODO move to Ts_IEC13818-1.h
-struct Descriptor
-{
-    uint8_t descriptor_tag;
-    uint8_t descriptor_length;
-};
-
-struct MaximumBitrateDescriptor : public Descriptor 
-{
-    uint8_t reserved;
-    uint32_t maximum_bitrate;
-};
-
 
 PmtTable TsParser::parsePmtPacket(int pid)
 {
@@ -378,19 +365,18 @@ PmtTable TsParser::parsePmtPacket(int pid)
     }
     int program_info_length = pmt.program_info_length & 0x3FF;
 
-    Descriptor desc;
 
     if (program_info_length != 0)
     {
-        desc.descriptor_tag = getBits(8);
-        desc.descriptor_length = getBits(8);
+        // TODO function parseDescriptors...
+        uint8_t descriptorTag = getBits(8);
 
-        LOGD << "descriptor_tag: " << (int)desc.descriptor_tag << ", descriptor_length: " << (int)desc.descriptor_length;
-        if (desc.descriptor_tag == 14) // TODO switch/CASE for all the rest of descriptors...
+        LOGD << "descriptor_tag: " << (int)descriptorTag;
+        if (descriptorTag == static_cast<uint32_t>(DescriptorTag::maximum_bitrate_descriptor)) // TODO switch/CASE for all the rest of descriptors...
         {
             MaximumBitrateDescriptor maxDesc;
-            maxDesc.descriptor_tag = desc.descriptor_tag;
-            maxDesc.descriptor_length = desc.descriptor_length;
+            maxDesc.descriptor_tag = descriptorTag;
+            maxDesc.descriptor_length = getBits(8);
 
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
