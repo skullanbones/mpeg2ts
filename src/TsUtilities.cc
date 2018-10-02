@@ -122,7 +122,7 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
+        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
     }
 }
 
@@ -322,7 +322,7 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 

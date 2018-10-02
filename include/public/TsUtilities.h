@@ -80,7 +80,7 @@ public:
     //* callbacks *//
     static void PATCallback(PsiTable* table, uint16_t pid, void* hdl);
     static void PMTCallback(PsiTable* table, uint16_t pid, void* hdl);
-    static void PESCallback(const PesPacket& pes, uint16_t pid, void* hdl);
+    static void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl);
 
     //* PAT *//
     //! \brief Returns the PAT table found in stream

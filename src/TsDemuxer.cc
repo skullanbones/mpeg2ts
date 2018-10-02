@@ -87,7 +87,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         PesPacket pes;
         if (mParser->collectPes(tsPacket, tsPacketInfo, pes))
         {
-            mPesCallbackMap[tsPacketInfo.pid](pes, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            mPesCallbackMap[tsPacketInfo.pid](pes.mPesBuffer, pes, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 
