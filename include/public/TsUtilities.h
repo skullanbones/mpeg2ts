@@ -78,8 +78,8 @@ public:
     MPEG2TS_API bool parseTransportStreamData(const uint8_t* data, std::size_t size);
 
     //* callbacks *//
-    static void PATCallback(PsiTable* table, uint16_t pid, void* hdl);
-    static void PMTCallback(PsiTable* table, uint16_t pid, void* hdl);
+    static void PATCallback(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl);
+    static void PMTCallback(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl);
     static void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl);
 
     //* PAT *//

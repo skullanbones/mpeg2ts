@@ -158,7 +158,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(PsiTable* table, uint16_t pid)
+void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
 {
     LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
@@ -220,7 +220,7 @@ void PATCallback(PsiTable* table, uint16_t pid)
     // TODO: add writing of table
 }
 
-void PMTCallback(PsiTable* table, uint16_t pid)
+void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
 {
     LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
@@ -497,7 +497,7 @@ int main(int argc, char** argv)
     }
 
     // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
 
     for (count = 0;; ++count)
     {
@@ -566,7 +566,7 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
             }
             addedPmts = true;
         }

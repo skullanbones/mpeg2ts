@@ -131,6 +131,10 @@ public:
      */
     void parsePesPacket(int16_t pid);
 
+    /*!
+     * Return raw bytes of table at pid
+     */
+    ByteVector& getRawTable(int16_t pid);
     TsStatistics mStatistics;
 private:
     // TODO maybe 1 parser per pid?

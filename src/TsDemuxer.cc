@@ -71,14 +71,14 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             else
             {
                 PatTable pat = mParser->parsePatPacket(tsPacketInfo.pid);
-                mPsiCallbackMap[tsPacketInfo.pid](&pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+                mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
             }
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
 
             PmtTable pmt = mParser->parsePmtPacket(tsPacketInfo.pid);
-            mPsiCallbackMap[tsPacketInfo.pid](&pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 
