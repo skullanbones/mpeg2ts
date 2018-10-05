@@ -23,8 +23,8 @@ std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs)
     ss << "PES_CRC_flag: " << (int)rhs.PES_CRC_flag << std::endl;
     ss << "PES_extension_flag: " << (int)rhs.PES_extension_flag << std::endl;
 
-    ss << "pts: " << (int)rhs.pts << std::endl;
-    ss << "dts: " << (int)rhs.dts << std::endl;
+    ss << "pts: " << rhs.pts << std::endl;
+    ss << "dts: " << rhs.dts << std::endl;
 
     ss << "PES_header_data_length: " << (int)rhs.PES_header_data_length << std::endl;
     return ss;
