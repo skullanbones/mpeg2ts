@@ -41,6 +41,7 @@ RUN apt-get install --yes --no-install-recommends python3-pip
 RUN apt-get install --yes --no-install-recommends python3-dev
 RUN apt-get install --yes --no-install-recommends python3-virtualenv
 RUN apt-get install --yes --no-install-recommends wget
+RUN apt-get install --yes --no-install-recommends lcov
 
 # Install gtest/gmock
 RUN git clone -q https://github.com/google/googletest.git /googletest \
