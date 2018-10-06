@@ -1,7 +1,7 @@
 CXX = g++
 INC := -I$(CURDIR) $(INCLUDE_DIRS)
 COMPONENT_NAME := gtests
-CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11
+CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -O0 --coverage
 BUILDDIR = $(PROJ_ROOT)/build
 
 ## Tests
@@ -26,6 +26,18 @@ gtests:
 unit-tests:
 	$(BUILDDIR)/$(COMPONENT_NAME)
 
+coverage:
+	lcov -t "result" -o $(COMPONENT_NAME).info -c -d .
+	genhtml -o html $(COMPONENT_NAME).info
+#	cp $(PROJ_ROOT)/tests/*.gcno $(BUILDDIR)
+#	lcov -c -i -d $(PROJ_ROOT)/tests -o $(COMPONENT_NAME).coverage.base
+#	lcov -c -d $(PROJ_ROOT)/tests -o $(COMPONENT_NAME).coverage.run
+#	lcov -d $(PROJ_ROOT)/tests -a $(COMPONENT_NAME).coverage.base -a .coverage.run -o .coverage.total
+#	genhtml --no-branch-coverage -o $(BUILDDIR) $(COMPONENT_NAME).coverage.total
 
 clean:
 	rm -f $(BUILDDIR)/$(COMPONENT_NAME)
+	rm -f $(PROJ_ROOT)/tests/*.gcno
+	rm -f $(PROJ_ROOT)/tests/*.gcda
+	rm -f $(PROJ_ROOT)/tests/*.info
+	rm -rf $(PROJ_ROOT)/tests/html

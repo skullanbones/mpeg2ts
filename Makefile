@@ -119,6 +119,7 @@ help:
 	@echo '  static                - make shared object as dynamic linkage library.'
 	@echo '  3rd-party             - install 3rd-party dependencies.'
 	@echo '  plog                  - install 3rd-party plog logging library.'
+	@echo '  coverage              - run code coverage on unit-tests.'
 	@echo '  clean                 - deletes build content.'
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
@@ -203,6 +204,13 @@ gtests:
 
 run-gtests:
 	$(MAKE) -C tests unit-tests
+
+coverage: unit-tests
+	$(info running make target coverage...)
+	$(call docker_command, gtest-coverage)
+
+gtest-coverage:	
+	$(MAKE) -C tests coverage	
 
 ### component tests
 
