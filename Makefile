@@ -41,12 +41,15 @@ STATIC = lib$(COMPONENT_NAME).a
 DYNAMIC = lib$(COMPONENT_NAME).so
 
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
+LDFLAGS =
 ifeq ($(BUILD_TYPE),DEBUG)
-	CXXFLAGS += -g -O0
+	CXXFLAGS += -g -O0 --coverage
+	LDFLAGS += -lgcov
 else ifeq ($(BUILD_TYPE),RELEASE)
 	CXXFLAGS += -O3
+	LDFLAGS +=
 endif
-LDFLAGS = -shared
+
 # Only needed if linkage to libts.so
 #export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
 
@@ -124,15 +127,19 @@ help:
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
-all: $(BUILDDIR) $(BUILDDIR)/tsparser
+all: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264 $(BUILDDIR)/tsparser
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
+	
+$(BUILDDIR)/mpeg2vid:	
 	mkdir -p $(BUILDDIR)/mpeg2vid
+	
+$(BUILDDIR)/h264:	
 	mkdir -p $(BUILDDIR)/h264
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l:$(STATIC)
+	$(CXX) -o $@ $(BUILDDIR)/main.o $(LDFLAGS) -L$(BUILDDIR) -l:$(STATIC)
 
 $(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
@@ -153,7 +160,7 @@ shared: $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
-	$(CXX) ${LDFLAGS} -o $@ $^
+	$(CXX) -shared -o $@ $^
 
 lint: flake clang-format
 
@@ -205,12 +212,24 @@ gtests:
 run-gtests:
 	$(MAKE) -C tests unit-tests
 
-coverage: unit-tests
-	$(info running make target coverage...)
-	$(call docker_command, gtest-coverage)
+docker-coverage:
+	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
+	$(call docker_command, coverage)
 
-gtest-coverage:	
-	$(MAKE) -C tests coverage	
+coverage: $(BUILDDIR)/coverage.info
+	lcov --remove $(BUILDDIR)/coverage.info "/usr*" -o $(BUILDDIR)/coverage.info
+	genhtml $(BUILDDIR)/coverage.info -o $(BUILDDIR)/coverage
+
+$(BUILDDIR)/coverage.info: all $(BUILDDIR)/tsparser
+	$(BUILDDIR)/tsparser -h
+	lcov -c -d ./ -o $(BUILDDIR)/coverage.info
+
+#coverage: unit-tests
+#	$(info running make target coverage...)
+#	$(call docker_command, gtest-coverage)
+
+#gtest-coverage:	
+#	$(MAKE) -C tests coverage	
 
 ### component tests
 
@@ -252,6 +271,12 @@ clean:
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
+	rm -f $(BUILDDIR)/*.gcno
+	rm -f $(BUILDDIR)/*.gcda
+	rm -rf $(BUILDDIR)/coverage
+	rm -rf $(BUILDDIR)/h264
+	rm -rf $(BUILDDIR)/mpeg2vid
+	rm -f $(BUILDDIR)/coverage.info
 
 ### Will force clean download cache & build directory
 clean-all: clean
