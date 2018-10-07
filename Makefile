@@ -127,16 +127,18 @@ help:
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
-all: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264 $(BUILDDIR)/tsparser
+all: folders $(BUILDDIR)/tsparser
+
+folders: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264
 
 $(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+	mkdir -p $@
 	
 $(BUILDDIR)/mpeg2vid:	
-	mkdir -p $(BUILDDIR)/mpeg2vid
+	mkdir -p $@
 	
 $(BUILDDIR)/h264:	
-	mkdir -p $(BUILDDIR)/h264
+	mkdir -p $@
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
 	$(CXX) -o $@ $(BUILDDIR)/main.o $(LDFLAGS) -L$(BUILDDIR) -l:$(STATIC)
@@ -150,13 +152,13 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc 3rd-party
 
 libs: $(BUILDDIR) static shared
 
-static: $(BUILDDIR)/$(STATIC)
+static: folders $(BUILDDIR)/$(STATIC)
 
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
-shared: $(BUILDDIR)/$(DYNAMIC)
+shared: folders $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
@@ -198,38 +200,26 @@ tests: unit-tests component-tests
 
 ### unit tests
 
-build-unit-tests: static
+build-unit-tests:
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
+	$(call docker_command, static)
 	$(call docker_command, gtests)
 
 unit-tests: build-unit-tests
+	$(call docker_command, gtests)
 	@echo "[Running unit tests..]"
-	$(MAKE) -C tests unit-tests
+	$(MAKE) -C tests run-unit-tests
 
 gtests:
 	$(MAKE) -C tests gtests
 
-run-gtests:
-	$(MAKE) -C tests unit-tests
+### coverage	
 
-docker-coverage:
-	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
-	$(call docker_command, coverage)
+coverage: build-unit-tests
+	$(call docker_command, gtest-coverage)
 
-coverage: $(BUILDDIR)/coverage.info
-	lcov --remove $(BUILDDIR)/coverage.info "/usr*" -o $(BUILDDIR)/coverage.info
-	genhtml $(BUILDDIR)/coverage.info -o $(BUILDDIR)/coverage
-
-$(BUILDDIR)/coverage.info: all $(BUILDDIR)/tsparser
-	$(BUILDDIR)/tsparser -h
-	lcov -c -d ./ -o $(BUILDDIR)/coverage.info
-
-#coverage: unit-tests
-#	$(info running make target coverage...)
-#	$(call docker_command, gtest-coverage)
-
-#gtest-coverage:	
-#	$(MAKE) -C tests coverage	
+gtest-coverage:	
+	$(MAKE) -C tests coverage
 
 ### component tests
 
