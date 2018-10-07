@@ -210,6 +210,10 @@ unit-tests: build-unit-tests
 	@echo "[Running unit tests..]"
 	$(MAKE) -C tests run-unit-tests
 
+# DONT DELETE!!! Used by CircleCI
+run-gtests:
+	$(MAKE) -C tests run-unit-tests
+
 gtests:
 	$(MAKE) -C tests gtests
 
