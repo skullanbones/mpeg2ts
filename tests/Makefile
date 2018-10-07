@@ -41,9 +41,12 @@ coverage: $(BUILDDIR)/coverage.info
 	lcov --remove $(BUILDDIR)/coverage.info "plog/*" -o $(BUILDDIR)/coverage.info
 	genhtml $(BUILDDIR)/coverage.info -o $(BUILDDIR)/coverage
 
-$(BUILDDIR)/coverage.info: gtests
+$(BUILDDIR)/coverage.info: $(BUILDDIR)/coverage-all.info
+	lcov --remove $< "/usr*" -o $@
+
+$(BUILDDIR)/coverage-all.info: gtests
 	$(BUILDDIR)/$(COMPONENT_NAME)
-	lcov -c -d $(BUILDDIR) -o $(BUILDDIR)/coverage.info	
+	lcov -c -d $(BUILDDIR) -o $@
 
 clean:
 	rm -f $(OBJS)
