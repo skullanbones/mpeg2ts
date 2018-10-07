@@ -385,7 +385,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
         }
         else {
             LOGD << "skipping descriptor.." << std::endl;
-            skipBytes(program_info_length - 2); // skip descriptors for now
+            skipBytes(program_info_length - 1); // skip descriptors for now
         }
     }
       
