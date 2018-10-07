@@ -31,7 +31,7 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Docker
-DOCKER_IMAGE_VER ?= v4
+DOCKER_IMAGE_VER ?= v5
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
 DOCKER_USER_ID ?= $(USER)
 
@@ -41,12 +41,15 @@ STATIC = lib$(COMPONENT_NAME).a
 DYNAMIC = lib$(COMPONENT_NAME).so
 
 CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC
+LDFLAGS =
 ifeq ($(BUILD_TYPE),DEBUG)
-	CXXFLAGS += -g -O0
+	CXXFLAGS += -g -O0 --coverage
+	LDFLAGS += -lgcov
 else ifeq ($(BUILD_TYPE),RELEASE)
 	CXXFLAGS += -O3
+	LDFLAGS +=
 endif
-LDFLAGS = -shared
+
 # Only needed if linkage to libts.so
 #export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
 
@@ -119,19 +122,26 @@ help:
 	@echo '  static                - make shared object as dynamic linkage library.'
 	@echo '  3rd-party             - install 3rd-party dependencies.'
 	@echo '  plog                  - install 3rd-party plog logging library.'
+	@echo '  coverage              - run code coverage on unit-tests.'
 	@echo '  clean                 - deletes build content.'
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
-all: $(BUILDDIR) $(BUILDDIR)/tsparser
+all: folders $(BUILDDIR)/tsparser
+
+folders: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264
 
 $(BUILDDIR):
-	mkdir -p $(BUILDDIR)
-	mkdir -p $(BUILDDIR)/mpeg2vid
-	mkdir -p $(BUILDDIR)/h264
+	mkdir -p $@
+	
+$(BUILDDIR)/mpeg2vid:	
+	mkdir -p $@
+	
+$(BUILDDIR)/h264:	
+	mkdir -p $@
 
 $(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o -L$(BUILDDIR) -l:$(STATIC)
+	$(CXX) -o $@ $(BUILDDIR)/main.o $(LDFLAGS) -L$(BUILDDIR) -l:$(STATIC)
 
 $(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
@@ -142,17 +152,17 @@ $(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc 3rd-party
 
 libs: $(BUILDDIR) static shared
 
-static: $(BUILDDIR)/$(STATIC)
+static: folders $(BUILDDIR)/$(STATIC)
 
 $(BUILDDIR)/$(STATIC): $(OBJS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
-shared: $(BUILDDIR)/$(DYNAMIC)
+shared: folders $(BUILDDIR)/$(DYNAMIC)
 
 $(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
-	$(CXX) ${LDFLAGS} -o $@ $^
+	$(CXX) -shared -o $@ $^
 
 lint: flake clang-format
 
@@ -190,19 +200,30 @@ tests: unit-tests component-tests
 
 ### unit tests
 
-build-unit-tests: static
+build-unit-tests:
 	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
+	$(call docker_command, static)
 	$(call docker_command, gtests)
 
 unit-tests: build-unit-tests
+	$(call docker_command, gtests)
 	@echo "[Running unit tests..]"
-	$(MAKE) -C tests unit-tests
+	$(MAKE) -C tests run-unit-tests
+
+# DONT DELETE!!! Used by CircleCI
+run-gtests:
+	$(MAKE) -C tests run-unit-tests
 
 gtests:
 	$(MAKE) -C tests gtests
 
-run-gtests:
-	$(MAKE) -C tests unit-tests
+### coverage	
+
+coverage: build-unit-tests
+	$(call docker_command, gtest-coverage)
+
+gtest-coverage:	
+	$(MAKE) -C tests coverage
 
 ### component tests
 
@@ -244,6 +265,12 @@ clean:
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
+	rm -f $(BUILDDIR)/*.gcno
+	rm -f $(BUILDDIR)/*.gcda
+	rm -rf $(BUILDDIR)/coverage
+	rm -rf $(BUILDDIR)/h264
+	rm -rf $(BUILDDIR)/mpeg2vid
+	rm -f $(BUILDDIR)/coverage.info
 
 ### Will force clean download cache & build directory
 clean-all: clean
