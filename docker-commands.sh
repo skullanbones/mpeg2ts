@@ -9,7 +9,7 @@ docker_run() {
 
     echo "Got command: " "$*"
 
-    docker run  --env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
+    docker run  --env LOCAL_USER_ID=`id -u $USER` \
                 --rm -v "$(pwd)":/tmp/workspace \
 				--workdir /tmp/workspace \
                 --env "TERM=xterm-256color" \
