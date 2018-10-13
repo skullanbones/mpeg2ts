@@ -477,4 +477,9 @@ void TsParser::parsePesPacket(int16_t pid)
     }
 }
 
+ByteVector& TsParser::getRawTable(int16_t pid)
+{
+    return mSectionBuffer[pid];
+}
+
 } // namespace mpeg2ts

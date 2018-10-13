@@ -101,7 +101,7 @@ void TsUtilities::initParse()
     mEsPids.clear();
     mAddedPmts = false;
     // Register PAT callback
-    mDemuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
+    mDemuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
 }
 
 void TsUtilities::registerPmtCallback()
@@ -111,7 +111,7 @@ void TsUtilities::registerPmtCallback()
         for (auto pid : mPmtPids)
         {
             //LOGD << "Adding PSI PID for parsing: " << pid;
-            mDemuxer.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
+            mDemuxer.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
         }
         mAddedPmts = true;
     }
@@ -122,7 +122,7 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), (void*) this);
+        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
     }
 }
 
@@ -190,7 +190,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 }
 
 
-void TsUtilities::PATCallback(PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
     LOGV_(FileLog) << "PATCallback pid:" << pid;
@@ -259,7 +259,7 @@ std::vector<uint16_t> TsUtilities::getPmtPids() const
     return mPmtPids;
 }
 
-void TsUtilities::PMTCallback(PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -322,7 +322,7 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 

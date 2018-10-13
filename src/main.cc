@@ -158,7 +158,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(PsiTable* table, uint16_t pid)
+void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
 {
     LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
@@ -220,7 +220,7 @@ void PATCallback(PsiTable* table, uint16_t pid)
     // TODO: add writing of table
 }
 
-void PMTCallback(PsiTable* table, uint16_t pid)
+void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
 {
     LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
@@ -277,9 +277,10 @@ void PMTCallback(PsiTable* table, uint16_t pid)
     }
 }
 
-void PESCallback(const PesPacket& pes, uint16_t pid)
+void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
 {
 
+    
     if (hasPid("pid", pid))
     {
         LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
@@ -297,7 +298,7 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                 {
                     try
                     {
-                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                        (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset], rawPes.size() - pes.elementary_data_offset);
                     }catch(const std::out_of_range&){
                         LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
                     }
@@ -333,10 +334,10 @@ void PESCallback(const PesPacket& pes, uint16_t pid)
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(pes.mPesBuffer.begin() + writeOffset, pes.mPesBuffer.end(),
+        std::copy(rawPes.begin() + writeOffset, rawPes.end(),
                   std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        LOGD << "Write " << writeModeString << ": " << pes.mPesBuffer.size() - writeOffset
+        LOGD << "Write " << writeModeString << ": " << rawPes.size() - writeOffset
                   << " bytes, pid: " << pid << std::endl;
     }
 }
@@ -496,7 +497,7 @@ int main(int argc, char** argv)
     }
 
     // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
 
     for (count = 0;; ++count)
     {
@@ -565,7 +566,7 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
             }
             addedPmts = true;
         }
@@ -573,7 +574,7 @@ int main(int argc, char** argv)
         for (auto pid : g_ESPIDS)
         {
             LOGD << "Adding PES PID for parsing: " << pid;
-            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
         }
         g_ESPIDS.clear();
 
