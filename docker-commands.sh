@@ -2,9 +2,7 @@
 
 # Run commands inside docker container
 docker_run() {
-    # TODO read from other env file?
-    DOCKER_IMAGE_NAME="heliconwave/circleci"
-    DOCKER_IMAGE_VER="v5"
+    source Makefile.variables
     echo "Starting container: " "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VER"
 
     echo "Got command: " "$*"

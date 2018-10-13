@@ -6,6 +6,9 @@
 # Strictly Confidential - Do not duplicate or distribute without written
 # permission from skullanbones™ and authors
 
+# Get variables
+include Makefile.variables
+
 ## Project
 COMPONENT_NAME ?= mpeg2ts
 export PROJ_ROOT := $(CURDIR)
@@ -29,11 +32,6 @@ BUILD_TYPE ?= DEBUG
 CORES ?= $(shell nproc)
 MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
-
-## Docker
-DOCKER_IMAGE_VER ?= v6
-DOCKER_IMAGE_NAME ?= heliconwave/circleci
-DOCKER_USER_ID ?= $(USER)
 
 ## Compiler
 CXX = g++
@@ -176,7 +174,7 @@ docker-bash:
 		--interactive \
 		--tty=true \
 		--volume=$$(pwd):/tmp/workspace \
-		--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
+		--env LOCAL_USER_ID=`id -u ${USER}` \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
 
 ### all tests
