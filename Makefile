@@ -31,7 +31,7 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Docker
-DOCKER_IMAGE_VER ?= v5
+DOCKER_IMAGE_VER ?= v6
 DOCKER_IMAGE_NAME ?= heliconwave/circleci
 DOCKER_USER_ID ?= $(USER)
 
@@ -82,23 +82,6 @@ HDRS = 	include/public/mpeg2ts.h \
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
 $(info OBJS is: $(OBJS))
-
-## Commands
-docker_command = docker run --env CXX="$(CXX)" --env CXXFLAGS="$(CXXFLAGS)" \
-					--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
- 					--rm -v $$(pwd):/tmp/workspace \
- 					--workdir /tmp/workspace \
- 					$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
- 					make $1
-
-docker_run = docker run \
-				--rm \
-				--interactive \
-				--tty=true \
-				--volume=$$(pwd):/tmp/workspace \
-				--workdir /tmp/workspace \
-				--env LOCAL_USER_ID=`id -u ${DOCKER_USER_ID}` \
-				$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash -c $1
 
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests
 
@@ -180,11 +163,13 @@ run: $(BUILDDIR)/tsparser
 
 ### docker stuff
 
+# Build docker image
 docker-image:
 	docker build \
 		--file=$(TOOLSDIR)/Dockerfile \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) .
 
+# start tty session inside docker container
 docker-bash:
 	docker run \
 		--rm \
@@ -200,29 +185,16 @@ tests: unit-tests component-tests
 
 ### unit tests
 
-build-unit-tests:
-	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER)
-	$(call docker_command, static)
-	$(call docker_command, gtests)
+build-unit-tests: static
+	$(MAKE) -C tests gtests
 
 unit-tests: build-unit-tests
-	$(call docker_command, gtests)
 	@echo "[Running unit tests..]"
 	$(MAKE) -C tests run-unit-tests
-
-# DONT DELETE!!! Used by CircleCI
-run-gtests:
-	$(MAKE) -C tests run-unit-tests
-
-gtests:
-	$(MAKE) -C tests gtests
 
 ### coverage	
 
 coverage: build-unit-tests
-	$(call docker_command, gtest-coverage)
-
-gtest-coverage:	
 	$(MAKE) -C tests coverage
 
 ### component tests
