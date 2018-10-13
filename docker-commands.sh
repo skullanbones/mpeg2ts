@@ -8,8 +8,10 @@ docker_run() {
     echo "Starting container: " "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VER"
 
     echo "Got command: " "$*"
+    USER_ID=$(id -u $USER)
+    echo "Using USER_ID:" $USER_ID
 
-    docker run  --env LOCAL_USER_ID=`id -u $USER` \
+    docker run  --env LOCAL_USER_ID=$USER_ID \
                 --rm -v "$(pwd)":/tmp/workspace \
 				--workdir /tmp/workspace \
                 --env "TERM=xterm-256color" \

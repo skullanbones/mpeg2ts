@@ -75,6 +75,24 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ./tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
+### Docker
+Some targets requires docker in order to run since you most likely will not have
+all build dependencies in your native environment. To virtualize the Application
+build time dependencies they have been collected inside a docker image following
+docker best practises. You only need to remember to source the 
+```
+source docker-commands.sh
+```
+and you will be ready to run commands inside the docker container by:
+```
+docker-make unit-tests
+```
+for example.
+If you want to run a custom bash command you can do it by:
+```
+docker-bash make help
+```
+for instance.
 
 ### Docker image
 To just use the latest image just pull from our private registry/repository @ DockerHub:
