@@ -45,7 +45,7 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
     }
 
     return ret;
-};
+}
 
 void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
 {
@@ -88,7 +88,8 @@ void GetBits::skipBytes(uint16_t skipBytes)
     {
         throw GetBitsException("getBits: Out of bound read mSrcInx: " + std::to_string(mSrcInx));
     }
-    else {
+    else
+    {
         mNumStoredBits = 0;
         mBitStore = 0;
         mSrcInx += skipBytes;
@@ -101,14 +102,15 @@ size_t GetBits::getByteInx() const
 }
 
 GetBitsException::GetBitsException(const std::string msg)
-        : std::runtime_error(msg)
-{}
+: std::runtime_error(msg)
+{
+}
 
 void GetBits::printSrcBytes() const
 {
     for (size_t i = mSrcInx; i < mSize; i++)
     {
-        printf ("%02X", mSrcBytes[i]);
+        printf("%02X", mSrcBytes[i]);
     }
-    printf ("\n");
+    printf("\n");
 }

@@ -1,13 +1,13 @@
+#include "JsonSettings.h"
+#include "Logging.h"
 #include <public/TsUtilities.h>
 #include <public/Ts_IEC13818-1.h>
-#include "Logging.h"
-#include "JsonSettings.h"
 
 #include <fstream>
 
 /// 3rd-party
-#include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <plog/Log.h>
 
 namespace tsutil
 {
@@ -16,10 +16,10 @@ namespace tsutil
 const LogLevel TsUtilities::DEFAULT_LOG_LEVEL = LogLevel::DEBUG;
 const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
 const int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
-const int TsUtilities::LOGFILE_MAXNUMBEROF = 10;   
+const int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 
 TsUtilities::TsUtilities()
-    : mAddedPmts{ false }
+: mAddedPmts{ false }
 {
 }
 
@@ -29,16 +29,20 @@ void TsUtilities::initLogging() const
     std::string logFile = "settings.json";
     bool success = false;
     LoadException openException;
-    try {
+    try
+    {
         success = settings.loadFile(logFile); // Must be at same location as dll/so
     }
-    catch(LoadException& e) {
-        openException = e;   
+    catch (LoadException& e)
+    {
+        openException = e;
     }
-    catch(std::exception& e) {
+    catch (std::exception& e)
+    {
         openException = LoadException(e);
     }
-    catch(...) {
+    catch (...)
+    {
         std::string errorMsg = "Got unknown exception when loading file: " + logFile;
         openException = LoadException(errorMsg);
     }
@@ -51,7 +55,7 @@ void TsUtilities::initLogging() const
     if (success)
     {
         const std::string strLogLevel = settings.getLogLevel();
-        
+
         if (strLogLevel == "VERBOSE")
             logLevel = plog::Severity::verbose;
         else if (strLogLevel == "DEBUG")
@@ -82,12 +86,15 @@ void TsUtilities::initLogging() const
     }
 
     static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(logFileName.c_str(), maxSize, maxNumberOf); // Create the 1st appender.
-    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
-    plog::init(logLevel, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;  // Create the 2nd appender.
+    plog::init(logLevel, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with
+                                                                       // the both appenders.
     plog::init<FileLog>(logLevel, &fileAppender); // Initialize the 2nd logger instance.
 
-    if (strlen(openException.what()) > 0) {
-        LOGE << "Got exception when opening file: " << logFile << ", with exception: " << openException.what();
+    if (strlen(openException.what()) > 0)
+    {
+        LOGE << "Got exception when opening file: " << logFile
+             << ", with exception: " << openException.what();
     }
 }
 
@@ -95,13 +102,16 @@ void TsUtilities::initLogging() const
 void TsUtilities::initParse()
 {
     initLogging();
-    mPmtPids.clear();  // Restart
+    mPmtPids.clear(); // Restart
     mPrevPat = {};
     mPmts.clear();
     mEsPids.clear();
     mAddedPmts = false;
     // Register PAT callback
-    mDemuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
+    mDemuxer.addPsiPid(TS_PACKET_PID_PAT,
+                       std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
+                                 std::placeholders::_3, std::placeholders::_4),
+                       (void*)this);
 }
 
 void TsUtilities::registerPmtCallback()
@@ -110,8 +120,11 @@ void TsUtilities::registerPmtCallback()
     {
         for (auto pid : mPmtPids)
         {
-            //LOGD << "Adding PSI PID for parsing: " << pid;
-            mDemuxer.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
+            // LOGD << "Adding PSI PID for parsing: " << pid;
+            mDemuxer.addPsiPid(pid,
+                               std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
+                                         std::placeholders::_3, std::placeholders::_4),
+                               (void*)this);
         }
         mAddedPmts = true;
     }
@@ -122,7 +135,10 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        mDemuxer.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), (void*) this);
+        mDemuxer.addPesPid(pid,
+                           std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
+                                     std::placeholders::_3, std::placeholders::_4),
+                           (void*)this);
     }
 }
 
@@ -133,7 +149,8 @@ bool TsUtilities::parseTransportFile(const std::string& file)
     std::string line;
     std::ifstream tsFile(file, std::ifstream::binary);
 
-    if (!tsFile) {
+    if (!tsFile)
+    {
         return false;
     }
 
@@ -150,7 +167,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
     return true;
 }
 
-bool TsUtilities::parseTransportUdpStream(const IpAddress &ip, const Port &p)
+bool TsUtilities::parseTransportUdpStream(const IpAddress& /* ip*/, const Port& /* p*/)
 {
     return true;
 }
@@ -171,7 +188,6 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     uint64_t readIndex = 0;
 
 
-
     if ((data[0] != TS_PACKET_SYNC_BYTE) || (size <= 0)) // TODO support maxsize?
     {
         LOGE << "ERROR: 1'st byte not in sync!!!";
@@ -190,7 +206,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 }
 
 
-void TsUtilities::PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
     LOGV_(FileLog) << "PATCallback pid:" << pid;
@@ -259,7 +275,7 @@ std::vector<uint16_t> TsUtilities::getPmtPids() const
     return mPmtPids;
 }
 
-void TsUtilities::PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -292,7 +308,7 @@ void TsUtilities::PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_
 
     LOGD << "Adding PMT to list...";
     instance->mPmts[pid] = *pmt;
-    
+
     for (auto& stream : pmt->streams)
     {
         LOGD_(FileLog) << "Add ES PID: " << stream.elementary_PID;
@@ -322,13 +338,13 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const ByteVector& /* rawPes*/, const PesPacket& pes, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
-    //LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
+    // LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
     //     << " (" << pid << ")\n";
-    //LOGV << pes << std::endl;
+    // LOGV << pes << std::endl;
 
     LOGV << "Adding PES to list...";
     instance->mPesPackets[pid].push_back(pes);
@@ -339,12 +355,14 @@ void TsUtilities::PESCallback(const ByteVector& rawPes, const PesPacket& pes, ui
         {
             if (instance->mPmts.find(pmtPid) != instance->mPmts.end())
             {
-                auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(), instance->mPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream) {return stream.elementary_PID == pid; });
-                if (it != instance->mPmts[pmtPid].streams.end())
+                auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(),
+    instance->mPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream) {return
+    stream.elementary_PID == pid; }); if (it != instance->mPmts[pmtPid].streams.end())
                 {
                     try
                     {
-                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset], pes.mPesBuffer.size() - pes.elementary_data_offset);
+                        (*g_EsParsers.at(it->stream_type))(&pes.mPesBuffer[pes.elementary_data_offset],
+    pes.mPesBuffer.size() - pes.elementary_data_offset);
                     }
                     catch (const std::out_of_range&) {
                         LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
@@ -355,9 +373,8 @@ void TsUtilities::PESCallback(const ByteVector& rawPes, const PesPacket& pes, ui
     }*/
 
 
-//    LOGD << "Write " << "PES" << ": " << pes.mPesBuffer.size() - writeOffset
-  //       << " bytes, pid: " << pid << std::endl;
-    
+    //    LOGD << "Write " << "PES" << ": " << pes.mPesBuffer.size() - writeOffset
+    //       << " bytes, pid: " << pid << std::endl;
 }
 
 
@@ -370,8 +387,6 @@ PidStatisticsMap TsUtilities::getPidStatistics() const
 {
     return mDemuxer.getPidStatistics();
 }
-
-
 
 
 } // namespace tsutil

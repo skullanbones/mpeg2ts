@@ -22,9 +22,9 @@ bool Settings::loadFile(std::string file)
         throw LoadException(errMsg);
         return false;
     }
-    
+
     // 2. Load and read file
-    try 
+    try
     {
         ifs >> mJ;
         return true;
@@ -53,24 +53,26 @@ std::string Settings::getLogFileName() const
 {
     std::string str = mJ["settings"]["logFileName"];
     return str;
-};
+}
 
 int Settings::getLogFileMaxSize() const
 {
     return mJ["settings"]["logFileMaxSize"];
-};
+}
 
 int Settings::getLogFileMaxNumberOf() const
 {
     return mJ["settings"]["logFileMaxNumberOf"];
-};
+}
 
 ///////////////// LoadException /////////////////////////
 
-LoadException::LoadException(const std::string& message) : message_(message) 
+LoadException::LoadException(const std::string& message)
+: message_(message)
 {
 }
 
-LoadException::LoadException(const std::exception e) : message_(e.what())
+LoadException::LoadException(const std::exception e)
+: message_(e.what())
 {
 }

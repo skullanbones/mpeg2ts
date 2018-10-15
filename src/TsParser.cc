@@ -8,15 +8,15 @@
 #include <plog/Log.h>
 
 /// Project files
-#include "TsParser.h"
 #include "Logging.h"
+#include "TsParser.h"
 
 namespace mpeg2ts
 {
 
 void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
 {
-    TsPacketInfo zero = { 0 };
+    TsPacketInfo zero;
     outInfo = zero;
 
     TsHeader hdr = parseTsHeader(packet);
@@ -75,14 +75,14 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 bool TsParser::checkHasAdaptationField(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
-        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
 bool TsParser::checkHasPayload(TsHeader hdr)
 {
     return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
-        hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
@@ -120,7 +120,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
     }
 
     auto ofsAfterAF =
-        getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
+    getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
 
     if (adaptHdr.PCR_flag)
     {
@@ -198,13 +198,16 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
 {
     // NOTE!! this is not as easy as one might think. There maybe be alternating PSI long tables and
     // it has been confirmed by assets that some long PMT can be mixed with PAT tables in between.
-    // Therefore we need be able collect different types of tables on their PID to handle this. If we don't do it,
-    // the alternating table will reset the previous collected table since it start over all from the beginning.
-    int PID = tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
+    // Therefore we need be able collect different types of tables on their PID to handle this. If
+    // we don't do it, the alternating table will reset the previous collected table since it start
+    // over all from the beginning.
+    int PID =
+    tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
     mStatistics.checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
-    mStatistics.checkTsDiscontinuity(tsPacketInfo.pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkTsDiscontinuity(tsPacketInfo.pid,
+                                     tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
 
     if (tsPacketInfo.hdr.payload_unit_start_indicator)
     {
@@ -274,7 +277,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
         pid = tsPacketInfo.pid;
 
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
     }
@@ -288,14 +291,14 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-            &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
         // TODO: check if we have boud PES and return it if it is coplete
     }
 
     return ret;
 }
 
-void TsParser::parsePsiTable(const ByteVector& table, PsiTable& tableInfo)
+void TsParser::parsePsiTable(const ByteVector& /* table*/, PsiTable& tableInfo)
 {
     tableInfo.table_id = getBits(8);
     tableInfo.section_syntax_indicator = getBits(1);
@@ -317,7 +320,8 @@ PatTable TsParser::parsePatPacket(int pid)
     resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
     parsePsiTable(mSectionBuffer[pid], pat);
 
-    const int numberOfPrograms = (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
+    const int numberOfPrograms =
+    (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
     for (int i = 0; i < numberOfPrograms; i++)
     {
@@ -357,7 +361,8 @@ PmtTable TsParser::parsePmtPacket(int pid)
     int control_bits = pmt.program_info_length & 0xC00;
     if ((control_bits >> 10) != 0)
     {
-        LOGE_(FileLog) << "Stream not following ISO/IEC 13818-1 in program_info_length control bits != 0.";
+        LOGE_(FileLog)
+        << "Stream not following ISO/IEC 13818-1 in program_info_length control bits != 0.";
     }
     int program_info_length = pmt.program_info_length & 0x3FF;
     skipBytes(program_info_length); // skip descriptors for now
@@ -376,7 +381,8 @@ PmtTable TsParser::parsePmtPacket(int pid)
         int control_bits = hdr.ES_info_length & 0xC00;
         if ((control_bits >> 10) != 0)
         {
-            LOGE_(FileLog) << "Stream not following ISO/IEC 13818-1 in ES_info_length control bits != 0.";
+            LOGE_(FileLog)
+            << "Stream not following ISO/IEC 13818-1 in ES_info_length control bits != 0.";
         }
         int ES_info_length = hdr.ES_info_length & 0x3FF;
         skipBytes(ES_info_length);

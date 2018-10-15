@@ -1,12 +1,12 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 /// Project files
-#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
+#include <public/mpeg2ts.h>
 
 using namespace mpeg2ts;
 
@@ -15,7 +15,7 @@ using ::testing::StrictMock;
 class IDemuxerCallbacks
 {
 public:
-/* This callback is called when Demuxer demuxes any of the registered TS-packets on a PID */
+    /* This callback is called when Demuxer demuxes any of the registered TS-packets on a PID */
 
     virtual void onPatCallback() = 0;
     virtual void onPmtCallback() = 0;
@@ -28,13 +28,15 @@ public:
     MOCK_METHOD0(onPmtCallback, void());
 };
 
-void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl) {
+void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
+{
     std::cout << "came here PATCallback" << std::endl;
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPatCallback();
 }
 
-void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl) {
+void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
+{
     std::cout << "came here PMTCallback" << std::endl;
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPmtCallback();
@@ -50,11 +52,14 @@ TEST(TsDemuxerTests, TestDemuxPatPacket)
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
-        demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+        demuxer.addPsiPid(TS_PACKET_PID_PAT,
+                          std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
@@ -70,12 +75,15 @@ TEST(TsDemuxerTests, TestDemux2PatPacket)
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
-        demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+        demuxer.addPsiPid(TS_PACKET_PID_PAT,
+                          std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(2);
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
@@ -91,11 +99,14 @@ TEST(TsDemuxerTests, TestDemuxPmtPacket)
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
-        demuxer.addPsiPid(1010, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+        demuxer.addPsiPid(1010,
+                          std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_1);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
@@ -111,13 +122,16 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
-        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+        demuxer.addPsiPid(50,
+                          std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1);
         demuxer.demux(large_pmt_ts_packet_2);
         demuxer.demux(large_pmt_ts_packet_3);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
@@ -133,7 +147,10 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
-        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+        demuxer.addPsiPid(50,
+                          std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1); // This is the start of the PMT
         demuxer.demux(pat_packet_1);
@@ -145,9 +162,8 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
         demuxer.demux(large_pmt_ts_packet_3); // last PMT packet
         demuxer.demux(packet_2);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
 }
-

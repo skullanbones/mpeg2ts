@@ -7,9 +7,9 @@
 #include <iostream>
 
 /// Project files
-#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
 #include "TsParser.h"
+#include <public/mpeg2ts.h>
 
 using namespace mpeg2ts;
 
@@ -305,7 +305,7 @@ TEST(TsParserTests, CheckParseLargePmtTable)
         EXPECT_EQ(1310, pmt.streams[4].elementary_PID);
         EXPECT_EQ(20, pmt.streams[4].ES_info_length);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
         std::cout << "Got exception: " << e.what() << std::endl;
     }
