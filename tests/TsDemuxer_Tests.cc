@@ -155,8 +155,6 @@ TEST_F(TsDemuxerTest, TestDemux2PmtPackets)
 {
     ExpectNoException([&]
     {
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(32, 
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                           std::placeholders::_3, std::placeholders::_4),
