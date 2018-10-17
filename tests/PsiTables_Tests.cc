@@ -37,16 +37,16 @@ TEST(PsiTablesTests, PsiTableTestComparisonOperator)
     psi2.last_section_number = 9;
     psi2.CRC_32 = 0;
 
-    EXPECT_TRUE(psi1 == psi2);
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
 
     psi2.table_id = 2;
 
-    EXPECT_FALSE(psi1 == psi2);
+    EXPECT_FALSE(psi1 == psi2) << "table_id not equal hence should not be equal.";
 
     psi2.table_id = 1;
     psi2.CRC_32 = 1;
 
-    EXPECT_FALSE(psi1 == psi2);
+    EXPECT_FALSE(psi1 == psi2) << "table_id and CRC_32 not equal hence should not be equal.";
 
     psi2.CRC_32 = 0;
     psi2.section_syntax_indicator = false;

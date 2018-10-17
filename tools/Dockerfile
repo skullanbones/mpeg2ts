@@ -46,7 +46,7 @@ RUN apt-get install --yes --no-install-recommends lcov
 # Install gtest/gmock
 RUN git clone -q https://github.com/google/googletest.git /googletest \
   && cd googletest \
-  && git checkout tags/release-1.8.0 \
+  && git checkout tags/release-1.8.1 \
   && mkdir -p /googletest/build \
   && cd /googletest/build \
   && cmake .. && make && make install \
@@ -55,7 +55,7 @@ RUN git clone -q https://github.com/google/googletest.git /googletest \
 # Install benchmark
 RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cd benchmark \
-  && git checkout tags/v1.3.0 \
+  && git checkout tags/v1.4.0 \
   && mkdir -p /benchmark/build \
   && cd /benchmark/build \
   && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
