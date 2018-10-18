@@ -11,134 +11,225 @@
 
 using namespace mpeg2ts;
 
-TEST(PsiTablesTests, PsiTableTestComparisonOperator)
+class PsiTableTest : public ::testing::Test
 {
+public:
+    void SetUp() override
+    {
+        psi1.table_id = 1;
+        psi1.section_syntax_indicator = true;
+        psi1.section_length = 10;
+        psi1.transport_stream_id = 11;
+        psi1.version_number = 1;
+        psi1.current_next_indicator = false;
+        psi1.section_number = 14;
+        psi1.last_section_number = 9;
+        psi1.CRC_32 = 0;
+
+        // Create identical PsiTable 2
+        psi2.table_id = 1;
+        psi2.section_syntax_indicator = true;
+        psi2.section_length = 10;
+        psi2.transport_stream_id = 11;
+        psi2.version_number = 1;
+        psi2.current_next_indicator = false;
+        psi2.section_number = 14;
+        psi2.last_section_number = 9;
+        psi2.CRC_32 = 0;
+    }
+
+    void TearDown() override
+    {
+    }
+
     PsiTable psi1;
     PsiTable psi2;
+};
 
-    psi1.table_id = 1;
-    psi1.section_syntax_indicator = true;
-    psi1.section_length = 10;
-    psi1.transport_stream_id = 11;
-    psi1.version_number = 1;
-    psi1.current_next_indicator = false;
-    psi1.section_number = 14;
-    psi1.last_section_number = 9;
-    psi1.CRC_32 = 0;
+class PatTableTest : public ::testing::Test
+{
+public:
+    void SetUp() override
+    {
+        // SPTS
+        Program prg;
+        prg.program_number = 1;
+        prg.program_map_PID = 258;
 
-    // Create identical PsiTable 2
-    psi2.table_id = 1;
-    psi2.section_syntax_indicator = true;
-    psi2.section_length = 10;
-    psi2.transport_stream_id = 11;
-    psi2.version_number = 1;
-    psi2.current_next_indicator = false;
-    psi2.section_number = 14;
-    psi2.last_section_number = 9;
-    psi2.CRC_32 = 0;
+        pat1.programs.push_back(prg);
+        pat2.programs.push_back(prg);
 
+        pat1.CRC_32 = 0;
+        pat2.CRC_32 = 0;
+    }
+
+    void TearDown() override
+    {
+    }
+
+    PatTable pat1;
+    PatTable pat2;
+};
+
+
+class PmtTableTest : public ::testing::Test
+{
+public:
+    void SetUp() override
+    {
+        stream.stream_type = STREAMTYPE_VIDEO_MPEG1;
+        stream.elementary_PID = 258;
+        stream.ES_info_length = 0;
+
+        pmt1.streams.push_back(stream);
+        pmt2.streams.push_back(stream);
+
+        pmt1.PCR_PID = 0;
+        pmt2.PCR_PID = 0;
+        pmt1.program_info_length = 0;
+        pmt2.program_info_length = 0;
+
+        ///
+        pmt3.streams.push_back(stream);
+        pmt4.streams.push_back(stream);
+
+        pmt3.PCR_PID = 0;
+        pmt4.PCR_PID = 0;
+        pmt3.program_info_length = 0;
+        pmt4.program_info_length = 0;
+    }
+
+    void TearDown() override
+    {
+    }
+
+    PmtTable pmt1;
+    PmtTable pmt2;
+    PmtTable pmt3;
+    PmtTable pmt4;
+    StreamTypeHeader stream;
+};
+
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_tableid)
+{
     EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
 
     psi2.table_id = 2;
 
     EXPECT_FALSE(psi1 == psi2) << "table_id not equal hence should not be equal.";
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.table_id = 1;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_crc32)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.CRC_32 = 1;
 
     EXPECT_FALSE(psi1 == psi2) << "table_id and CRC_32 not equal hence should not be equal.";
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.CRC_32 = 0;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_section_syntax_indicator)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.section_syntax_indicator = false;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.section_syntax_indicator = true;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_section_length)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.section_length = 9;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.section_length = 10;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_transport_stream_id)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.transport_stream_id = 0;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.transport_stream_id = 11;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_version_number)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.version_number = 2;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
+}
 
-    psi2.version_number = 1;
+TEST_F(PsiTableTest, PsiTableTestComparisonOperator_current_next_indicator)
+{
+    EXPECT_TRUE(psi1 == psi2) << "2 identical PSI tables should be equal.";
+    EXPECT_FALSE(psi1 != psi2);
+
     psi2.current_next_indicator = true;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
 
     psi2.current_next_indicator = false;
     psi2.section_number = 7;
 
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
 
     psi2.section_number = 14;
     psi2.last_section_number = 2;
     EXPECT_FALSE(psi1 == psi2);
+    EXPECT_TRUE(psi1 != psi2);
 
     psi2.last_section_number = 9;
     EXPECT_TRUE(psi1 == psi2);
+    EXPECT_FALSE(psi1 != psi2);
 }
 
-TEST(PsiTablesTests, PatTableTestComparisonOperatorCRC32)
+TEST_F(PatTableTest, test_comparison_operator_CRC32)
 {
-    PatTable pat1;
-    PatTable pat2;
-
-    // SPTS
-    Program prg;
-    prg.program_number = 1;
-    prg.program_map_PID = 258;
-
-    pat1.programs.push_back(prg);
-    pat2.programs.push_back(prg);
-
-    pat1.CRC_32 = 0;
-    pat2.CRC_32 = 0;
-
     EXPECT_TRUE(pat1 == pat2);
+    EXPECT_FALSE(pat1 != pat2);
 
     pat1.CRC_32 = 1;
     pat2.CRC_32 = 0;
 
     EXPECT_FALSE(pat1 == pat2);
+    EXPECT_TRUE(pat1 != pat2);
 }
 
-
-TEST(PsiTablesTests, PatTableTestComparisonOperatorNumPrograms)
+TEST_F(PatTableTest, test_comparison_operator_num_programs)
 {
-    PatTable pat1;
-    PatTable pat2;
-
-    // SPTS
-    Program prg;
-    prg.program_number = 1;
-    prg.program_map_PID = 258;
+    EXPECT_TRUE(pat1 == pat2);
+    EXPECT_FALSE(pat1 != pat2);
 
     Program prg2;
     prg2.program_number = 2;
     prg2.program_map_PID = 4432;
 
-    pat1.programs.push_back(prg);
-    pat2.programs.push_back(prg);
-
-    pat1.CRC_32 = 0;
-    pat2.CRC_32 = 0;
-
-    EXPECT_TRUE(pat1 == pat2);
-
     pat2.programs.push_back(prg2);
 
     EXPECT_FALSE(pat1 == pat2);
+    EXPECT_TRUE(pat1 != pat2);
 }
 
-TEST(PsiTablesTests, PatTableTestComparisonOperatorPrograms)
+TEST(PsiTablesTests, test_comparison_operator_programs)
 {
     PatTable pat1;
     PatTable pat2;
@@ -164,63 +255,42 @@ TEST(PsiTablesTests, PatTableTestComparisonOperatorPrograms)
     pat2.CRC_32 = 0;
 
     EXPECT_TRUE(pat1 == pat2);
+    EXPECT_FALSE(pat1 != pat2);
 
     pat1.programs.push_back(prg2);
     pat2.programs.push_back(prg3);
 
-
     EXPECT_FALSE(pat1 == pat2);
+    EXPECT_TRUE(pat1 != pat2);
 }
 
-TEST(PsiTablesTests, PmtTableTestComparisonOperatorPCR_PID)
+TEST_F(PmtTableTest, PmtTableTestComparisonOperatorPCR_PID)
 {
-    PmtTable pmt1;
-    PmtTable pmt2;
-
-    StreamTypeHeader stream;
-    stream.stream_type = STREAMTYPE_VIDEO_MPEG1;
-    stream.elementary_PID = 258;
-    stream.ES_info_length = 0;
-
-    pmt1.streams.push_back(stream);
-    pmt2.streams.push_back(stream);
-
-    pmt1.PCR_PID = 0;
-    pmt1.program_info_length = 0;
-    pmt2.PCR_PID = 0;
-    pmt2.program_info_length = 0;
-
     EXPECT_TRUE(pmt1 == pmt2);
+    EXPECT_FALSE(pmt1 != pmt2);
 
     pmt1.PCR_PID = 1;
     pmt2.PCR_PID = 0;
 
     EXPECT_FALSE(pmt1 == pmt2);
+    EXPECT_TRUE(pmt1 != pmt2);
+
+    pmt1.CRC_32 = 3;
+    pmt2.CRC_32 = 1;
+
+    EXPECT_FALSE(pmt1 == pmt2);
+    EXPECT_TRUE(pmt1 != pmt2);
 
     pmt1.PCR_PID = 0;
     pmt2.program_info_length = 1;
     EXPECT_FALSE(pmt1 == pmt2);
+    EXPECT_TRUE(pmt1 != pmt2);
 }
 
-TEST(PsiTablesTests, PmtTableTestComparisonOperatorNumStreams)
+TEST_F(PmtTableTest, PmtTableTestComparisonOperatorNumStreams)
 {
-    PmtTable pmt1;
-    PmtTable pmt2;
-
-    pmt1.PCR_PID = 0;
-    pmt1.program_info_length = 0;
-    pmt2.PCR_PID = 0;
-    pmt2.program_info_length = 0;
-
-    StreamTypeHeader stream;
-    stream.stream_type = STREAMTYPE_VIDEO_MPEG1;
-    stream.elementary_PID = 258;
-    stream.ES_info_length = 0;
-
-    pmt1.streams.push_back(stream);
-    pmt2.streams.push_back(stream);
-
     EXPECT_TRUE(pmt1 == pmt2);
+    EXPECT_FALSE(pmt1 != pmt2);
 
     StreamTypeHeader stream2;
     stream.stream_type = STREAMTYPE_VIDEO_MPEG2;
@@ -230,6 +300,7 @@ TEST(PsiTablesTests, PmtTableTestComparisonOperatorNumStreams)
     pmt2.streams.push_back(stream2);
 
     EXPECT_FALSE(pmt1 == pmt2);
+    EXPECT_TRUE(pmt1 != pmt2);
 }
 
 TEST(PsiTablesTests, StreamTypeHeaderComparisonOperator)

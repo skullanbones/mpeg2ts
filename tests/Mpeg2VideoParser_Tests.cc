@@ -57,7 +57,7 @@ TEST(Mpeg2VideoTests, Parse5)
     parser(testVec1.data(), testVec1.size());
     parser(testVec2.data(), testVec2.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes);
+    EXPECT_EQ(1, parser.foundStartCodes); // TODO seem its flaky...
 }
 
 TEST(Mpeg2VideoTests, Parse6)
