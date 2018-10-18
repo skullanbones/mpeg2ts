@@ -42,20 +42,33 @@ void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* 
     instance->onPmtCallback();
 }
 
+class TsDemuxerTest : public ::testing::Test
+{
+public:
+    void SetUp() override
+    {
+        mcallback = std::unique_ptr<MockCallback>(new StrictMock<MockCallback>);
+    }
+
+    void TearDown() override
+    {
+    }
+
+    TsDemuxer demuxer;
+    std::unique_ptr<MockCallback> mcallback;
+};
+
 /*!
  * Test we can demux a PAT packet
  */
-TEST(TsDemuxerTests, TestDemuxPatPacket)
+TEST_F(TsDemuxerTest, TestDemuxPatPacket)
 {
     try
     {
-        TsDemuxer demuxer;
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
-                          std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
-                                    std::placeholders::_3, std::placeholders::_4),
-                          mcallback.get());
+                            std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
+                            std::placeholders::_3, std::placeholders::_4),
+                            mcallback.get());
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
     }
@@ -68,10 +81,11 @@ TEST(TsDemuxerTests, TestDemuxPatPacket)
 /*!
  * Test we can demux 2 PAT packets
  */
-TEST(TsDemuxerTests, TestDemux2PatPacket)
+TEST_F(TsDemuxerTest, TestDemux2PatPacket)
 {
     try
     {
+<<<<<<< HEAD
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
@@ -79,6 +93,9 @@ TEST(TsDemuxerTests, TestDemux2PatPacket)
                           std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
+=======
+        demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+>>>>>>> Add fixture to TsDemuxer tests
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(2);
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
@@ -92,10 +109,11 @@ TEST(TsDemuxerTests, TestDemux2PatPacket)
 /*!
  * Test we can demux a PMT packet
  */
-TEST(TsDemuxerTests, TestDemuxPmtPacket)
+TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 {
     try
     {
+<<<<<<< HEAD
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
@@ -103,6 +121,9 @@ TEST(TsDemuxerTests, TestDemuxPmtPacket)
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
+=======
+        demuxer.addPsiPid(1010, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+>>>>>>> Add fixture to TsDemuxer tests
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_1);
     }
@@ -115,10 +136,11 @@ TEST(TsDemuxerTests, TestDemuxPmtPacket)
 /*!
  * Test we can demux a big PMT packet
  */
-TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
+TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
 {
     try
     {
+<<<<<<< HEAD
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
@@ -126,6 +148,9 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
+=======
+        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+>>>>>>> Add fixture to TsDemuxer tests
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1);
         demuxer.demux(large_pmt_ts_packet_2);
@@ -140,10 +165,11 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPackets)
 /*!
  * Test we can demux a big PMT packet with alternating of other PAT tables
  */
-TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
+TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
 {
     try
     {
+<<<<<<< HEAD
         TsDemuxer demuxer;
         std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
 
@@ -151,6 +177,9 @@ TEST(TsDemuxerTests, TestDemuxServeralPmtPacketsAlternatingOtherPat)
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
+=======
+        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
+>>>>>>> Add fixture to TsDemuxer tests
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1); // This is the start of the PMT
         demuxer.demux(pat_packet_1);
