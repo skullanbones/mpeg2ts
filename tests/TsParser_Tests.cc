@@ -4,7 +4,6 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <iostream>
 
 /// Project files
 #include "TsPacketTestData.h"
@@ -307,7 +306,7 @@ TEST(TsParserTests, CheckParseLargePmtTable)
     }
     catch (std::exception& e)
     {
-        std::cout << "Got exception: " << e.what() << std::endl;
+        FAIL() << "Should not catch exception";
     }
 }
 

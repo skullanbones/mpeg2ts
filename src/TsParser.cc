@@ -2,7 +2,6 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
-#include <iostream>
 
 /// 3rd-party
 #include <plog/Log.h>
