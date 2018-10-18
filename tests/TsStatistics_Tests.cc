@@ -6,8 +6,8 @@
 #include "TsStatistics.h"
 
 /// Project files
-#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
+#include <public/mpeg2ts.h>
 
 using namespace mpeg2ts;
 

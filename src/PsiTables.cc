@@ -1,5 +1,5 @@
-#include <public/mpeg2ts.h>
 #include "Logging.h"
+#include <public/mpeg2ts.h>
 
 /// 3rd-party
 #include <plog/Log.h>
@@ -24,10 +24,10 @@ std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
 bool PsiTable::operator==(const PsiTable& rhs) const
 {
     return CRC_32 == rhs.CRC_32 && table_id == rhs.table_id &&
-        section_syntax_indicator == rhs.section_syntax_indicator &&
-        section_length == rhs.section_length && transport_stream_id == rhs.transport_stream_id &&
-        version_number == rhs.version_number && current_next_indicator == rhs.current_next_indicator &&
-        section_number == rhs.section_number && last_section_number == rhs.last_section_number;
+           section_syntax_indicator == rhs.section_syntax_indicator &&
+           section_length == rhs.section_length && transport_stream_id == rhs.transport_stream_id &&
+           version_number == rhs.version_number && current_next_indicator == rhs.current_next_indicator &&
+           section_number == rhs.section_number && last_section_number == rhs.last_section_number;
 }
 
 bool PsiTable::operator!=(const PsiTable& rhs) const
@@ -78,8 +78,8 @@ bool PatTable::operator==(const PatTable& rhs) const
     {
         if (prg != rhs.programs.at(i))
         {
-            LOGD_(FileLog) << "PatTable programs content unequal for program: " << prg.program_number
-                << std::endl;
+            LOGD_(FileLog)
+            << "PatTable programs content unequal for program: " << prg.program_number << std::endl;
             return false;
         }
         i++;
@@ -104,7 +104,7 @@ std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
 bool StreamTypeHeader::operator==(const StreamTypeHeader& rhs) const
 {
     return stream_type == rhs.stream_type && elementary_PID == rhs.elementary_PID &&
-        ES_info_length == rhs.ES_info_length;
+           ES_info_length == rhs.ES_info_length;
 }
 
 bool StreamTypeHeader::operator!=(const StreamTypeHeader& rhs) const
@@ -124,7 +124,7 @@ std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
     {
         ss << "-------------stream " << i << "--------------" << std::endl;
         ss << "stream_type: " << StreamTypeToString[(int)rhs.streams[i].stream_type] << ",  ("
-            << (int)rhs.streams[i].stream_type << ")" << std::endl;
+           << (int)rhs.streams[i].stream_type << ")" << std::endl;
         ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
         ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
     }
@@ -170,8 +170,8 @@ bool PmtTable::operator==(const PmtTable& rhs) const
     {
         if (stream != rhs.streams.at(i))
         {
-            LOGD_(FileLog) << "PmtTable stream content unequal for stream_type: " << stream.stream_type
-                << std::endl;
+            LOGD_(FileLog)
+            << "PmtTable stream content unequal for stream_type: " << stream.stream_type << std::endl;
             return false;
         }
         i++;

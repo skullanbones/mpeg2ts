@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include "public/mpeg2ts.h"
@@ -20,8 +20,15 @@ using namespace mpeg2ts;
 class IpAddress
 {
 public:
-    explicit IpAddress(const std::string& ip) : mIpAddress(ip) {}
-    std::string GetIpAddress() const { return mIpAddress; }
+    explicit IpAddress(const std::string& ip)
+    : mIpAddress(ip)
+    {
+    }
+    std::string GetIpAddress() const
+    {
+        return mIpAddress;
+    }
+
 private:
     std::string mIpAddress;
 };
@@ -29,8 +36,15 @@ private:
 class Port
 {
 public:
-    explicit Port(const std::string& port) : mPort(port) {}
-    std::string GetPort() const { return mPort; }
+    explicit Port(const std::string& port)
+    : mPort(port)
+    {
+    }
+    std::string GetPort() const
+    {
+        return mPort;
+    }
+
 private:
     std::string mPort;
 };
@@ -65,11 +79,10 @@ public:
     //! \return True if parse was successful, false in all other cases
     MPEG2TS_API bool parseTransportFile(const std::string& file);
 
-    //! \brief Parses data over a network transmitting UDP packets containing Transport Stream packets.
-    //! \return True if parse was successful, false in all other cases
-    //! \note NOT IMPLEMENTED!!!!!!!!!!!!!
-    //! \note this API will stream data to callbacks... TODO TBD
-    MPEG2TS_API bool parseTransportUdpStream(const IpAddress &ip, const Port &p);
+    //! \brief Parses data over a network transmitting UDP packets containing Transport Stream
+    //! packets. \return True if parse was successful, false in all other cases \note NOT
+    //! IMPLEMENTED!!!!!!!!!!!!! \note this API will stream data to callbacks... TODO TBD
+    MPEG2TS_API bool parseTransportUdpStream(const IpAddress& ip, const Port& p);
 
     //! \brief Parses a raw data buffer of Transport Stream packets.
     //! \param data Raw pointer to data buffer to parse. Must be binary.
@@ -117,9 +130,9 @@ private:
 
     // Default constants
     static const LogLevel DEFAULT_LOG_LEVEL; // = LogLevel::DEBUG;
-    static const std::string LOGFILE_NAME; // = "mpeg2ts_log.csv";
-    static const int LOGFILE_MAXSIZE; // = 100 * 1024;
-    static const int LOGFILE_MAXNUMBEROF; // = 10;
+    static const std::string LOGFILE_NAME;   // = "mpeg2ts_log.csv";
+    static const int LOGFILE_MAXSIZE;        // = 100 * 1024;
+    static const int LOGFILE_MAXNUMBEROF;    // = 10;
 
     // members
     TsDemuxer mDemuxer;

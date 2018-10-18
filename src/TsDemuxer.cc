@@ -1,20 +1,20 @@
 /**
-* @class TsDemuxer
-*
-* @brief Demux transport stream packet
-*
-* @author skullanbones
-*
-* @version $Revision: 0.1 $
-*
-* @date $Date: 2018/02/23 00:16:20 $
-*
-* Strictly Confidential - Do not duplicate or distribute without written
-* permission from authors
-*/
-#include <public/mpeg2ts.h>
-#include "TsParser.h"
+ * @class TsDemuxer
+ *
+ * @brief Demux transport stream packet
+ *
+ * @author skullanbones
+ *
+ * @version $Revision: 0.1 $
+ *
+ * @date $Date: 2018/02/23 00:16:20 $
+ *
+ * Strictly Confidential - Do not duplicate or distribute without written
+ * permission from authors
+ */
 #include "Logging.h"
+#include "TsParser.h"
+#include <public/mpeg2ts.h>
 
 #include <cstdint>
 
@@ -24,7 +24,7 @@
 namespace mpeg2ts
 {
 TsDemuxer::TsDemuxer()
-: mParser { new TsParser() }
+: mParser{ new TsParser() }
 {
 }
 
@@ -71,14 +71,16 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
             else
             {
                 PatTable pat = mParser->parsePatPacket(tsPacketInfo.pid);
-                mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pat, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+                mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pat,
+                                                  tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
             }
         }
         else if (table_id == PSI_TABLE_ID_PMT)
         {
 
             PmtTable pmt = mParser->parsePmtPacket(tsPacketInfo.pid);
-            mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pmt, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            mPsiCallbackMap[tsPacketInfo.pid](mParser->getRawTable(tsPacketInfo.pid), &pmt,
+                                              tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
         }
     }
 
@@ -87,7 +89,8 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
         PesPacket pes;
         if (mParser->collectPes(tsPacket, tsPacketInfo, pes))
         {
-            mPesCallbackMap[tsPacketInfo.pid](pes.mPesBuffer, pes, tsPacketInfo.pid, mHandlers[tsPacketInfo.pid]);
+            mPesCallbackMap[tsPacketInfo.pid](pes.mPesBuffer, pes, tsPacketInfo.pid,
+                                              mHandlers[tsPacketInfo.pid]);
         }
     }
 

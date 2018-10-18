@@ -16,16 +16,16 @@
 #include <unistd.h>
 
 /// 3rd-party
-#include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <plog/Log.h>
 
 /// Project files
-#include <public/mpeg2ts.h>
-#include <public/Ts_IEC13818-1.h>
-#include "TsParser.h"
 #include "Logging.h"
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "TsParser.h"
 #include "h264/H264Parser.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
+#include <public/Ts_IEC13818-1.h>
+#include <public/mpeg2ts.h>
 
 using namespace mpeg2ts;
 
@@ -40,9 +40,9 @@ PatTable g_prevPat;
 std::map<uint16_t, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
-std::map<StreamType, std::unique_ptr<EsParser> > g_EsParsers = [](std::map<StreamType, std::unique_ptr<EsParser> >&)
-{
-    std::map<StreamType, std::unique_ptr<EsParser> > map;
+std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
+[](std::map<StreamType, std::unique_ptr<EsParser>>&) {
+    std::map<StreamType, std::unique_ptr<EsParser>> map;
     map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<Mpeg2VideoEsParser>(new Mpeg2VideoEsParser()));
     map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<H264EsParser>(new H264EsParser()));
     return map;
@@ -65,7 +65,7 @@ std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
 
-bool hasPid(std::string param, uint32_t pid)
+bool hasPid(std::string param, uint16_t pid)
 {
     return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
 }
@@ -84,7 +84,8 @@ void display_usage()
 {
     std::cout << "Ts-lib simple command-line:" << std::endl;
 
-    std::cout << "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" << std::endl;
+    std::cout
+    << "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" << std::endl;
 
     std::cout << "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
@@ -92,7 +93,10 @@ void display_usage()
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-                 "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose what logs are filtered, both file and stdout, default:" << plog::severityToString(DEFAULT_LOG_LEVEL) << "\n"
+                 "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose "
+                 "what logs are filtered, both file and stdout, default:"
+              << plog::severityToString(DEFAULT_LOG_LEVEL)
+              << "\n"
                  "        -i [ --input FILE]   Use input file for parsing"
               << std::endl;
 }
@@ -158,7 +162,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
+void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
 {
     LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
@@ -220,7 +224,7 @@ void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
     // TODO: add writing of table
 }
 
-void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
+void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
 {
     LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
@@ -280,33 +284,38 @@ void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid)
 void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
 {
 
-    
+
     if (hasPid("pid", pid))
     {
         LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
         LOGN << pes << std::endl;
     }
-    
+
     // @TODO add "if parse pid" option to cmd line
     {
         for (auto& pmtPid : g_PMTPIDS)
         {
             if (g_prevPmts.find(pmtPid) != g_prevPmts.end())
             {
-                auto it = std::find_if(g_prevPmts[pmtPid].streams.begin(), g_prevPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream){return stream.elementary_PID == pid;});
+                auto it =
+                std::find_if(g_prevPmts[pmtPid].streams.begin(), g_prevPmts[pmtPid].streams.end(),
+                             [&](StreamTypeHeader& stream) { return stream.elementary_PID == pid; });
                 if (it != g_prevPmts[pmtPid].streams.end())
                 {
                     try
                     {
-                        (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset], rawPes.size() - pes.elementary_data_offset);
-                    }catch(const std::out_of_range&){
+                        (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset],
+                                                           rawPes.size() - pes.elementary_data_offset);
+                    }
+                    catch (const std::out_of_range&)
+                    {
                         LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
                     }
                 }
             }
         }
     }
-    
+
     if (hasPid("write", pid))
     {
         auto writeOffset = 0;
@@ -334,11 +343,10 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
                                           std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
         }
 
-        std::copy(rawPes.begin() + writeOffset, rawPes.end(),
-                  std::ostreambuf_iterator<char>(outFiles[pid]));
+        std::copy(rawPes.begin() + writeOffset, rawPes.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
 
         LOGD << "Write " << writeModeString << ": " << rawPes.size() - writeOffset
-                  << " bytes, pid: " << pid << std::endl;
+             << " bytes, pid: " << pid << std::endl;
     }
 }
 
@@ -346,42 +354,40 @@ extern void printTsPacket(const uint8_t* packet)
 {
     for (int i = 0; i < 188; i++)
     {
-        printf ("0x%02x\n", packet[i]);
+        printf("0x%02x\n", packet[i]);
     }
-    printf ("\n");
+    printf("\n");
 }
 
 static const char* optString = "m:w:i:l:p:h?v";
 
-struct option longOpts[] = { { "write", 1, nullptr, 'w' },
-                             { "wrmode", 1, nullptr, 'm' },
-                             { "input", 1, nullptr, 'i' },
-                             { "log-level", 1, nullptr, 'l' },
-                             { "pid", 1, nullptr, 'p' },
-                             { "help", 0, nullptr, 'h' },
-                             { "version", 0, nullptr, 'v' },
-                             { nullptr, 0, nullptr, 0 } };
+struct option longOpts[] = { { "write", 1, nullptr, 'w' },   { "wrmode", 1, nullptr, 'm' },
+                             { "input", 1, nullptr, 'i' },   { "log-level", 1, nullptr, 'l' },
+                             { "pid", 1, nullptr, 'p' },     { "help", 0, nullptr, 'h' },
+                             { "version", 0, nullptr, 'v' }, { nullptr, 0, nullptr, 0 } };
 
 int main(int argc, char** argv)
 {
     // Initialize the logger
     /// Short macros list
-    ///LOGV << "verbose";
-    ///LOGD << "debug";
-    ///LOGI << "info";
-    ///LOGW << "warning";
-    ///LOGE << "error";
-    ///LOGF << "fatal";
-    ///LOGN << "none";
+    /// LOGV << "verbose";
+    /// LOGD << "debug";
+    /// LOGI << "info";
+    /// LOGW << "warning";
+    /// LOGE << "error";
+    /// LOGF << "fatal";
+    /// LOGN << "none";
 
     static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME, LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
-    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the logger with the both appenders.
+    plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the
+                                                                                // logger with the
+                                                                                // both appenders.
     plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
 
     LOGD << "Starting parser of file";
 
-    for(;;)
+    for (;;)
     {
         int opt;
         int optInd = -1;
@@ -403,7 +409,7 @@ int main(int argc, char** argv)
             }
         }
 
-        if(opt < 0)
+        if (opt < 0)
             break;
         switch (opt)
         {
@@ -429,7 +435,8 @@ int main(int argc, char** argv)
             LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
             std::string logLevel = std::string(optarg);
             LOGD << "Got input log-level setting: " << logLevel;
-            for (auto & c: logLevel) c = toupper(c);
+            for (auto& c : logLevel)
+                c = toupper(c);
             plog::Severity severity = plog::severityFromString(logLevel.c_str());
             plog::get()->setMaxSeverity(severity);
             LOGD << "Use log-level: " << plog::severityToString(severity) << ", (" << severity << ")";
@@ -497,7 +504,9 @@ int main(int argc, char** argv)
     }
 
     // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT,
+                        std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                        nullptr);
 
     for (count = 0;; ++count)
     {
@@ -533,9 +542,10 @@ int main(int argc, char** argv)
         fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
         if (res != TS_PACKET_SIZE)
         {
-            LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: " << res; // May be last packet end of file.
+            LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: "
+                           << res; // May be last packet end of file.
         }
-        //printTsPacket(packet);
+        // printTsPacket(packet);
         // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
         // packets...
         if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
@@ -566,7 +576,10 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
+                g_tsDemux.addPsiPid(pid,
+                                    std::bind(&PMTCallback, std::placeholders::_1,
+                                              std::placeholders::_2, std::placeholders::_3),
+                                    nullptr);
             }
             addedPmts = true;
         }
@@ -574,7 +587,10 @@ int main(int argc, char** argv)
         for (auto pid : g_ESPIDS)
         {
             LOGD << "Adding PES PID for parsing: " << pid;
-            g_tsDemux.addPesPid(pid, std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), nullptr);
+            g_tsDemux.addPesPid(pid,
+                                std::bind(&PESCallback, std::placeholders::_1,
+                                          std::placeholders::_2, std::placeholders::_3),
+                                nullptr);
         }
         g_ESPIDS.clear();
 

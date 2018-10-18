@@ -17,9 +17,9 @@
 #include <cstdint>
 
 // Project files
-#include <public/Ts_IEC13818-1.h>
 #include "GetBits.h"
 #include "TsStatistics.h"
+#include <public/Ts_IEC13818-1.h>
 
 namespace mpeg2ts
 {
@@ -136,6 +136,7 @@ public:
      */
     ByteVector& getRawTable(int16_t pid);
     TsStatistics mStatistics;
+
 private:
     // TODO maybe 1 parser per pid?
     std::map<uint16_t, ByteVector> mSectionBuffer;

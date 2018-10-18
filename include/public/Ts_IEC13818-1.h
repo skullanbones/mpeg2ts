@@ -46,6 +46,18 @@ const int PMT_STREAM_TYPE_LENGTH = 5;
  */
 struct TsHeader
 {
+    TsHeader()
+    : sync_byte{ 0 }
+    , transport_error_indicator{ false }
+    , payload_unit_start_indicator{ false }
+    , transport_priority{ false }
+    , PID{ 0x1fff }
+    , transport_scrambling_control{ 0 }
+    , adaptation_field_control{ 0 }
+    , continuity_counter{ 0 }
+    {
+    }
+
     uint8_t sync_byte;
     bool transport_error_indicator;
     bool payload_unit_start_indicator;

@@ -17,11 +17,11 @@
 #endif
 
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
 #include <vector>
-#include <cstdint>
 
 /// project files
 #include <public/Ts_IEC13818-1.h> // For TsHeader  Program
@@ -32,7 +32,7 @@ namespace mpeg2ts
 // Forward declarations
 class TsParser;
 struct PidStatistic;
-    
+
 // Common types
 typedef std::vector<uint8_t> ByteVector;
 typedef std::shared_ptr<ByteVector> ByteVectorPtr;
@@ -178,6 +178,29 @@ public:
 class TsPacketInfo
 {
 public:
+    TsPacketInfo()
+    : pid{ 0x1fff }
+    , errorIndicator{ false }
+    , isPayloadStart{ false }
+    , hasAdaptationField{ false }
+    , hasPayload{ false }
+    , hasPrivateData{ false }
+    , hasRandomAccess{ false }
+    , isScrambled{ false }
+    , isDiscontinuity{ false }
+    , continuityCounter{ 0 }
+    , pcr{ -1 }
+    , opcr{ -1 }
+    , pts{ -1 }
+    , dts{ -1 }
+    , privateDataSize{ 0 }
+    , privateDataOffset{ 0 }
+    , payloadSize{ 0 }
+    , payloadStartOffset{ 0 }
+    , isError{ false }
+    {
+    }
+
     uint16_t pid; // This Packet Identifier.
     TsHeader hdr; // This packet Ts Header
 
@@ -193,12 +216,12 @@ public:
     uint8_t continuityCounter : 4; // 4-bit continuity counter
 
     // Adaptation field data:
-    uint64_t pcr; // PCR clock...
-    uint64_t opcr;
+    int64_t pcr; // PCR clock...
+    int64_t opcr;
 
     // For elementary-streams
-    uint64_t pts;
-    uint64_t dts;
+    int64_t pts;
+    int64_t dts;
 
     // Private data:
     uint32_t privateDataSize;
@@ -219,14 +242,14 @@ struct PidStatistic
 {
     static const uint8_t INVALID_CC = 16;
     PidStatistic()
-            : lastCC{ INVALID_CC }
-            , numberOfCCErrors{ 0 }
-            , numberOfTsDiscontinuities{ 0 }
-            , lastPts{ -1 }
-            , lastDts{ -1 }
-            , lastPcr{ -1 }
-            , numberOfMissingPts{ 0 }
-            , numberOfMissingDts{ 0 }
+    : lastCC{ INVALID_CC }
+    , numberOfCCErrors{ 0 }
+    , numberOfTsDiscontinuities{ 0 }
+    , lastPts{ -1 }
+    , lastDts{ -1 }
+    , lastPcr{ -1 }
+    , numberOfMissingPts{ 0 }
+    , numberOfMissingDts{ 0 }
     {
     }
 
@@ -249,12 +272,12 @@ struct PidStatistic
     uint64_t numberOfMissingDts;
 };
 
-struct TsCounters {
-    uint64_t mTsPacketCounter{0};
-    uint64_t mTsPacketNullPacketCounter{0};
-    uint64_t mTsPacketErrorIndicator{0};
+struct TsCounters
+{
+    uint64_t mTsPacketCounter{ 0 };
+    uint64_t mTsPacketNullPacketCounter{ 0 };
+    uint64_t mTsPacketErrorIndicator{ 0 };
 };
-
 
 
 typedef std::function<void(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
@@ -305,14 +328,15 @@ public:
 
     /*!
      * Returns statistics on parsed transport stream packets.
-     * @return PidStatisticsType containing collected statistics for each pid on all demuxed packets.
+     * @return PidStatisticsType containing collected statistics for each pid on all demuxed
+     * packets.
      */
     MPEG2TS_API PidStatisticsMap getPidStatistics() const;
 
     /*!
-    * Returns counter statistics on parsed transport stream packets.
-    * @return TsCounters
-    */
+     * Returns counter statistics on parsed transport stream packets.
+     * @return TsCounters
+     */
     MPEG2TS_API TsCounters getTsCounters() const;
 
 protected:
@@ -322,9 +346,8 @@ protected:
     std::map<int, void*> mHandlers;
 
 private:
-     TsParser* mParser;
+    TsParser* mParser;
 };
-
 
 
 } // namespace mpeg2ts

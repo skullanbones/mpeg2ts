@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
 /// Project files
 #include "EsParser.h"
@@ -26,7 +26,7 @@ public:
     void seq_parameter_set_rbsp();
     void pic_parameter_set_rbsp();
     void slice_header(bool IdrPicFlag);
-    //sps data
+    // sps data
     uint64_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;
     uint64_t frame_mbs_only_flag;
