@@ -69,6 +69,7 @@ TEST_F(TsDemuxerTest, TestDemuxPatPacket)
                             std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                             std::placeholders::_3, std::placeholders::_4),
                             mcallback.get());
+        
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
     }
@@ -85,17 +86,11 @@ TEST_F(TsDemuxerTest, TestDemux2PatPacket)
 {
     try
     {
-<<<<<<< HEAD
-        TsDemuxer demuxer;
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
                           std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
-=======
-        demuxer.addPsiPid(TS_PACKET_PID_PAT, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
->>>>>>> Add fixture to TsDemuxer tests
+
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(2);
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
@@ -113,17 +108,11 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 {
     try
     {
-<<<<<<< HEAD
-        TsDemuxer demuxer;
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(1010,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
-=======
-        demuxer.addPsiPid(1010, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
->>>>>>> Add fixture to TsDemuxer tests
+
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_1);
     }
@@ -140,17 +129,11 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
 {
     try
     {
-<<<<<<< HEAD
-        TsDemuxer demuxer;
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
-=======
-        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
->>>>>>> Add fixture to TsDemuxer tests
+
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1);
         demuxer.demux(large_pmt_ts_packet_2);
@@ -169,17 +152,11 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
 {
     try
     {
-<<<<<<< HEAD
-        TsDemuxer demuxer;
-        std::shared_ptr<MockCallback> mcallback(new StrictMock<MockCallback>);
-
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
-=======
-        demuxer.addPsiPid(50, std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), mcallback.get());
->>>>>>> Add fixture to TsDemuxer tests
+
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1); // This is the start of the PMT
         demuxer.demux(pat_packet_1);
