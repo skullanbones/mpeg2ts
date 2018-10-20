@@ -38,6 +38,7 @@ run-unit-tests:
 
 coverage: $(BUILDDIR)/coverage.info
 	lcov --remove $(BUILDDIR)/coverage.info "/usr*" -o $(BUILDDIR)/coverage.info
+	lcov --remove $(BUILDDIR)/coverage.info "plog/*" -o $(BUILDDIR)/coverage.info
 	genhtml $(BUILDDIR)/coverage.info -o $(BUILDDIR)/coverage
 
 $(BUILDDIR)/coverage.info: gtests
