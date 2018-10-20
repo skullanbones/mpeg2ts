@@ -23,6 +23,10 @@ uint8_t testData[] = { 0x47, 0x40, 0x63, 0x15, 0x00, 0x02, 0xb0, 0x5b, 0x00, 0x0
                        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                        0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
+
+/// size 10
+uint8_t limitedData[] = { 0x47, 0x40, 0x63, 0x15, 0x00, 0x02, 0xb0, 0x5b, 0x00, 0x01 };
+
 /// Test fixture
 struct GetBitsTest : public ::testing::Test
 {
@@ -92,8 +96,9 @@ TEST_F(GetBitsTest, TestSkipBytesLessThan64Bits)
 
 /*!
  * Tests that we can skip bits greater than 64 bits
+ * and less than 64 bits
  */
-TEST_F(GetBitsTest, TestSkipBytesGreaterThan64Bits)
+TEST_F(GetBitsTest, test_skip_bits)
 {
     EXPECT_EQ(sizeof(testData), 188);
 
@@ -119,6 +124,12 @@ TEST_F(GetBitsTest, TestSkipBytesGreaterThan64Bits)
     parser.skipBits(128);
     EXPECT_EQ(0x1c, parser.getBits(8));
     EXPECT_EQ(0x01, parser.getBits(8));
+
+    parser.skipBits(8);
+    EXPECT_EQ(0xe7, parser.getBits(8));
+
+    parser.skipBits(16);
+    EXPECT_EQ(0xea, parser.getBits(8));
 }
 
 TEST_F(GetBitsTest, TestGetBitsMoreThan64)
@@ -170,4 +181,117 @@ TEST_F(GetBitsTest, test_with_overlimit_data_expect_failure)
     {
         FAIL() << "Expected GetBitsException";
     }
+}
+
+/// Testing we can only request maximum data
+TEST_F(GetBitsTest, test_with_out_of_bound_read_expect_failure)
+{
+    try
+    {
+        parser.resetBits(limitedData, sizeof(limitedData));
+
+        EXPECT_EQ(0x47, parser.getBits(8));
+        EXPECT_EQ(0x40, parser.getBits(8));
+        EXPECT_EQ(0x63, parser.getBits(8));
+        EXPECT_EQ(0x15, parser.getBits(8));
+        EXPECT_EQ(0x00, parser.getBits(8));
+        EXPECT_EQ(0x02, parser.getBits(8));
+        EXPECT_EQ(0xb0, parser.getBits(8));
+        EXPECT_EQ(0x5b, parser.getBits(8));
+        EXPECT_EQ(0x00, parser.getBits(8));
+        EXPECT_EQ(0x01, parser.getBits(8));
+        parser.getBits(8); /// This doesnt exist in limitedData
+
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read"));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
+    }
+}
+
+/// Testing we can only skip maximum data
+TEST_F(GetBitsTest, test_skip_bits_expect_failure)
+{
+    try
+    {
+        parser.resetBits(limitedData, sizeof(limitedData));
+
+        parser.skipBits(65);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8);
+        parser.skipBits(8); /// This doesnt exist in limitedData
+
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read"));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
+    }
+}
+
+/// Testing we can only skip maximum data
+TEST_F(GetBitsTest, test_skip_more_than_64_bits_expect_failure)
+{
+    try
+    {
+        parser.resetBits(limitedData, sizeof(limitedData));
+
+        parser.skipBits(80);
+        parser.skipBits(65); /// This doesnt exist in limitedData
+
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("skipBits: Out of bound read"));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
+    }
+}
+
+/// Testing we can only skip maximum data
+TEST_F(GetBitsTest, test_skip_bytes_beyond_data_expect_failure)
+{
+    try
+    {
+        parser.resetBits(limitedData, sizeof(limitedData));
+
+        parser.skipBytes(9);
+        parser.skipBytes(1); // TODO Is this correct?
+        //parser.skipBytes(65); /// This doesnt exist in limitedData
+
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read mSrcInx: 9"));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
+    }
+}
+
+/// Make coverage happy...
+TEST_F(GetBitsTest, test_print_src_bytes)
+{
+    parser.printSrcBytes();
 }

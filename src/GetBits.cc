@@ -101,10 +101,6 @@ size_t GetBits::getByteInx() const
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
 }
 
-GetBitsException::GetBitsException(const std::string msg)
-: std::runtime_error(msg)
-{
-}
 
 void GetBits::printSrcBytes() const
 {
