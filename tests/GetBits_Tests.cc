@@ -1,8 +1,7 @@
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-/// Project files CUT (Class Under Test)
+/// Project files CUT (Code Under Test)
 #include "GetBits.h"
 
 /*!
@@ -24,13 +23,25 @@ uint8_t testData[] = { 0x47, 0x40, 0x63, 0x15, 0x00, 0x02, 0xb0, 0x5b, 0x00, 0x0
                        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                        0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
+/// Test fixture
+struct GetBitsTest : public ::testing::Test
+{
+    void SetUp() override
+    {
+        parser.resetBits(testData, sizeof(testData));
+        empty_parser.resetBits({0}, 0);
+    }
+
+    GetBits parser;
+    GetBits empty_parser;
+};
+
+
 /*!
  * Test basic bit parser functionality
  */
-TEST(GetBitsTests, TestGetBits)
+TEST_F(GetBitsTest, TestGetBits)
 {
-    GetBits parser;
-    parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
     EXPECT_EQ(0x47, parser.getBits(8));
@@ -46,10 +57,8 @@ TEST(GetBitsTests, TestGetBits)
 /*!
  * Tests that we can alternate between reading and skipping bits
  */
-TEST(GetBitsTests, TestSkipBytesAlternating)
+TEST_F(GetBitsTest, TestSkipBytesAlternating)
 {
-    GetBits parser;
-    parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
     // Alternate skip and read data
@@ -66,10 +75,8 @@ TEST(GetBitsTests, TestSkipBytesAlternating)
 /*!
  * Tests that we can skip bits less than 64 bits
  */
-TEST(GetBitsTests, TestSkipBytesLessThan64Bits)
+TEST_F(GetBitsTest, TestSkipBytesLessThan64Bits)
 {
-    GetBits parser;
-    parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
     // Alternate skip and read data
@@ -86,10 +93,8 @@ TEST(GetBitsTests, TestSkipBytesLessThan64Bits)
 /*!
  * Tests that we can skip bits greater than 64 bits
  */
-TEST(GetBitsTests, TestSkipBytesGreaterThan64Bits)
+TEST_F(GetBitsTest, TestSkipBytesGreaterThan64Bits)
 {
-    GetBits parser;
-    parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
     // Alternate skip and read data
@@ -116,10 +121,8 @@ TEST(GetBitsTests, TestSkipBytesGreaterThan64Bits)
     EXPECT_EQ(0x01, parser.getBits(8));
 }
 
-TEST(GetBitsTests, TestGetBitsMoreThan64)
+TEST_F(GetBitsTest, TestGetBitsMoreThan64)
 {
-    GetBits parser;
-    parser.resetBits(testData, sizeof(testData));
     EXPECT_EQ(sizeof(testData), 188);
 
     try
@@ -130,5 +133,41 @@ TEST(GetBitsTests, TestGetBitsMoreThan64)
     catch (GetBitsException& err)
     {
         EXPECT_EQ(err.what(), std::string("Cannot parse more than 64 individual bits at a time."));
+    }
+}
+
+/// Testing we throw exception when no data available
+TEST_F(GetBitsTest, test_with_no_data_expect_failure)
+{
+    try
+    {
+        empty_parser.getBits(8);
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("null input data"));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
+    }
+}
+
+/// Testing we can only request maximum data size 64 bits
+TEST_F(GetBitsTest, test_with_overlimit_data_expect_failure)
+{
+    try
+    {
+        parser.getBits(65);
+        FAIL() << "Expected GetBitsException";
+    }
+    catch(GetBitsException const & e)
+    {
+        EXPECT_EQ(e.what(), std::string("Cannot parse more than 64 individual bits at a time."));
+    }
+    catch(...)
+    {
+        FAIL() << "Expected GetBitsException";
     }
 }
