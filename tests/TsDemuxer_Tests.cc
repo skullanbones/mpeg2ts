@@ -54,16 +54,35 @@ public:
     {
     }
 
+    
+    template<typename Callable>
+    void ExpectNoException(Callable f)
+    {
+        try 
+        {
+            f();
+        }
+        catch (std::exception& e)
+        {
+            FAIL() << "Expected no exception but got exception: " << e.what();
+        }
+        catch (...)
+        {
+            FAIL() << "Expected no exception.";
+        }
+    }
+
     TsDemuxer demuxer;
     std::unique_ptr<MockCallback> mcallback;
 };
+
 
 /*!
  * Test we can demux a PAT packet
  */
 TEST_F(TsDemuxerTest, TestDemuxPatPacket)
 {
-    try
+    ExpectNoException([&]
     {
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
                             std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
@@ -72,11 +91,7 @@ TEST_F(TsDemuxerTest, TestDemuxPatPacket)
         
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Got exception: " << e.what() << std::endl;
-    }
+    });
 }
 
 /*!
@@ -84,7 +99,7 @@ TEST_F(TsDemuxerTest, TestDemuxPatPacket)
  */
 TEST_F(TsDemuxerTest, TestDemux2PatPacket)
 {
-    try
+    ExpectNoException([&]
     {
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
                           std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
@@ -94,11 +109,7 @@ TEST_F(TsDemuxerTest, TestDemux2PatPacket)
         EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(2);
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Got exception: " << e.what() << std::endl;
-    }
+    });
 }
 
 /*!
@@ -106,7 +117,7 @@ TEST_F(TsDemuxerTest, TestDemux2PatPacket)
  */
 TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 {
-    try
+    ExpectNoException([&]
     {
         demuxer.addPsiPid(1010,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
@@ -115,11 +126,7 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 
         EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_1);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Got exception: " << e.what() << std::endl;
-    }
+    });
 }
 
 /*!
@@ -127,7 +134,7 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
  */
 TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
 {
-    try
+    ExpectNoException([&]
     {
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
@@ -138,11 +145,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
         demuxer.demux(large_pmt_ts_packet_1);
         demuxer.demux(large_pmt_ts_packet_2);
         demuxer.demux(large_pmt_ts_packet_3);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Got exception: " << e.what() << std::endl;
-    }
+    });
 }
 
 /*!
@@ -150,7 +153,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
  */
 TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
 {
-    try
+    ExpectNoException([&]
     {
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
@@ -167,9 +170,5 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
         demuxer.demux(packet_1);
         demuxer.demux(large_pmt_ts_packet_3); // last PMT packet
         demuxer.demux(packet_2);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Got exception: " << e.what() << std::endl;
-    }
+    });
 }
