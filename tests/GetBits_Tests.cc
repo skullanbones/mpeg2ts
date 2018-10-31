@@ -36,6 +36,24 @@ struct GetBitsTest : public ::testing::Test
         empty_parser.resetBits({0}, 0);
     }
 
+    template <typename Callable>
+    void ExpectCorrectException(const Callable& f, const GetBitsException& expected)
+    {
+        try 
+        {
+            f();
+            FAIL() << "Expected GetBitsException";
+        }
+        catch(GetBitsException const & e)
+        {
+            ASSERT_STREQ(e.what(), expected.what()) << "Wrong exception message, expected: " << expected.what();
+        }
+        catch(...)
+        {
+            FAIL() << "Expected GetBitsException";
+        }
+    }
+
     GetBits parser;
     GetBits empty_parser;
 };
@@ -150,37 +168,19 @@ TEST_F(GetBitsTest, TestGetBitsMoreThan64)
 /// Testing we throw exception when no data available
 TEST_F(GetBitsTest, test_with_no_data_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
-        empty_parser.getBits(8);
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("null input data"));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+        empty_parser.getBits(8);    
+    }, GetBitsException("null input data"));
 }
 
 /// Testing we can only request maximum data size 64 bits
 TEST_F(GetBitsTest, test_with_overlimit_data_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
         parser.getBits(65);
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("Cannot parse more than 64 individual bits at a time."));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+    }, GetBitsException("Cannot parse more than 64 individual bits at a time."));
 }
 
 /// Testing we can only request maximum data
