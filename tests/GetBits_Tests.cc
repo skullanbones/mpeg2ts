@@ -186,7 +186,7 @@ TEST_F(GetBitsTest, test_with_overlimit_data_expect_failure)
 /// Testing we can only request maximum data
 TEST_F(GetBitsTest, test_with_out_of_bound_read_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
         parser.resetBits(limitedData, sizeof(limitedData));
 
@@ -201,23 +201,13 @@ TEST_F(GetBitsTest, test_with_out_of_bound_read_expect_failure)
         EXPECT_EQ(0x00, parser.getBits(8));
         EXPECT_EQ(0x01, parser.getBits(8));
         parser.getBits(8); /// This doesnt exist in limitedData
-
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read"));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+    }, GetBitsException("getBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_bits_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
         parser.resetBits(limitedData, sizeof(limitedData));
 
@@ -232,62 +222,32 @@ TEST_F(GetBitsTest, test_skip_bits_expect_failure)
         parser.skipBits(8);
         parser.skipBits(8);
         parser.skipBits(8); /// This doesnt exist in limitedData
-
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read"));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+    }, GetBitsException("getBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_more_than_64_bits_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         parser.skipBits(80);
         parser.skipBits(65); /// This doesnt exist in limitedData
-
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("skipBits: Out of bound read"));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+    }, GetBitsException("skipBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_bytes_beyond_data_expect_failure)
 {
-    try
+    ExpectCorrectException([&]
     {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         parser.skipBytes(9);
         parser.skipBytes(1); // TODO Is this correct?
         //parser.skipBytes(65); /// This doesnt exist in limitedData
-
-        FAIL() << "Expected GetBitsException";
-    }
-    catch(GetBitsException const & e)
-    {
-        EXPECT_EQ(e.what(), std::string("getBits: Out of bound read mSrcInx: 9"));
-    }
-    catch(...)
-    {
-        FAIL() << "Expected GetBitsException";
-    }
+    }, GetBitsException("getBits: Out of bound read mSrcInx: 9"));
 }
 
 /// Make coverage happy...
