@@ -24,8 +24,8 @@ public:
     virtual ~Mpeg2VideoEsParser() = default;
 
 
-    bool operator()(const uint8_t* from, std::size_t length) override;
-    virtual bool analyze();
+    std::list<std::shared_ptr<EsInfo>> operator()(const uint8_t* from, std::size_t length) override;
+    virtual std::list<std::shared_ptr<EsInfo>> analyze();
 
     std::vector<uint8_t> last;
     int foundStartCodes;

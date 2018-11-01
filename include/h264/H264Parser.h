@@ -20,7 +20,7 @@ public:
     {
     }
 
-    bool analyze() override;
+    std::list<std::shared_ptr<EsInfo>> analyze() override;
     uint64_t getBitsDecodeUGolomb();
     void scaling_list(uint8_t* scalingList, size_t sizeOfScalingList);
     void seq_parameter_set_rbsp();

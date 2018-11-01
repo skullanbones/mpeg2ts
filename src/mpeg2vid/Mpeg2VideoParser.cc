@@ -7,7 +7,7 @@
 /// Project files
 #include <mpeg2vid/Mpeg2VideoParser.h>
 
-bool Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
+std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
     auto tmpLast =
     std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
@@ -69,11 +69,11 @@ bool Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
     {
         mPicture.insert(mPicture.end(), copyFrom, end);
     }
-
-    return true;
+ 
+    return std::list<std::shared_ptr<EsInfo>>();
 }
 
-bool Mpeg2VideoEsParser::analyze()
+std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
@@ -143,7 +143,7 @@ bool Mpeg2VideoEsParser::analyze()
     {
         LOGD << "system start code";
     }
-    return true;
+    return std::list<std::shared_ptr<EsInfo>>();
 }
 
 std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString =

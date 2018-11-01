@@ -6,7 +6,7 @@
 /// Project files
 #include "h264/H264Parser.h"
 
-bool H264EsParser::analyze()
+std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
 
@@ -14,7 +14,7 @@ bool H264EsParser::analyze()
     if (forbidden_zero_bit != 0)
     {
         LOGD << "Syntax error";
-        return false;
+        return std::list<std::shared_ptr<EsInfo>>();
     }
     skipBits(2);
     auto nal_unit_type = getBits(5);
@@ -74,7 +74,7 @@ bool H264EsParser::analyze()
         }
     }
 
-    return true;
+    return std::list<std::shared_ptr<EsInfo>>();
 }
 
 void H264EsParser::slice_header(bool /* IdrPicFlag*/)
