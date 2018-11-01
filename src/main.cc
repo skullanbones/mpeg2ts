@@ -300,8 +300,16 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
                 {
                     try
                     {
-                        (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset],
+                        auto ret = (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset],
                                                            rawPes.size() - pes.elementary_data_offset);
+                        for (auto& esinfo: ret)
+                        {
+                            if (std::dynamic_pointer_cast<EsInfoMpeg2>(esinfo))
+                            {
+                                auto i = std::dynamic_pointer_cast<EsInfoMpeg2>(esinfo);
+                                LOGD << "mpeg2 picture: " << i->picture << " " << i->msg;
+                            }
+                        }
                     }
                     catch (const std::out_of_range&)
                     {

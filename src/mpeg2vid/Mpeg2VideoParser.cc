@@ -13,6 +13,7 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
     std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
     auto copyFrom = from;
     auto end = from + length;
+    std::list<std::shared_ptr<EsInfo>> ret;
     while (length > 0)
     {
         auto onePosition = getFirstOne(from, length);
@@ -53,7 +54,11 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
             mPicture.insert(mPicture.end(), copyFrom, r);
             if (!mPicture.empty())
             {
-                analyze();
+                auto list = analyze();
+                for (auto& l: list)
+                {
+                    ret.push_back(l);
+                }
             }
             mPicture.clear();
             copyFrom = onePosition + 1;
@@ -69,20 +74,22 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
     {
         mPicture.insert(mPicture.end(), copyFrom, end);
     }
- 
-    return std::list<std::shared_ptr<EsInfo>>();
+    return ret; 
 }
 
 std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
+    std::list<std::shared_ptr<EsInfo>> ret;
     if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
     {
+        auto rete = std::make_shared<EsInfoMpeg2PictureSliceCode>();
         msg << "picture_start_code ";
+        rete->picture = mPicture[0];
         skipBits(10 + 8);
-        auto picType = getBits(3);
-        switch (picType)
+        rete->picType = getBits(3);
+        switch (rete->picType)
         {
         case 1:
             msg << "I";
@@ -96,7 +103,8 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         default:
             msg << "forbiden/reserved";
         };
-        LOGD << msg.str();
+        rete->msg = msg.str();
+        ret.push_back(rete);
     }
     else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
     {
@@ -143,7 +151,7 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     {
         LOGD << "system start code";
     }
-    return std::list<std::shared_ptr<EsInfo>>();
+    return ret;
 }
 
 std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString =

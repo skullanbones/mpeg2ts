@@ -7,9 +7,9 @@
 #include <list>
 #include <memory>
 
-class EsInfo
+struct EsInfo
 {
-
+    virtual ~EsInfo(){};
 };
 
 class EsParser

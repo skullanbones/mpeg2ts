@@ -7,6 +7,19 @@
 #include "EsParser.h"
 #include "GetBits.h"
 
+struct EsInfoMpeg2 : public EsInfo
+{
+//    EsInfoMpeg2(int picture, const std::string& msg)
+//        : picture{picture}, msg{msg} {}
+    int picture;
+    std::string msg;
+};
+
+struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
+{
+    int picType; 
+};
+
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
     static std::map<uint8_t, std::string> AspectToString;
