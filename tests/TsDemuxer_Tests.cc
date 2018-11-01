@@ -19,6 +19,7 @@ public:
 
     virtual void onPatCallback() = 0;
     virtual void onPmtCallback() = 0;
+    virtual void onPesCallback() = 0;
 };
 
 class MockCallback : public IDemuxerCallbacks
@@ -26,6 +27,7 @@ class MockCallback : public IDemuxerCallbacks
 public:
     MOCK_METHOD0(onPatCallback, void());
     MOCK_METHOD0(onPmtCallback, void());
+    MOCK_METHOD0(onPesCallback, void());
 };
 
 void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
@@ -42,9 +44,18 @@ void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* 
     instance->onPmtCallback();
 }
 
+void PESCallback(const ByteVector& rawPes, const PesPacket& pes,  uint16_t pid, void* hdl)
+{
+    std::cout << "came here PESCallback" << std::endl;
+    IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
+    instance->onPesCallback();
+}
+
 class TsDemuxerTest : public ::testing::Test
 {
 public:
+    const uint8_t PES_PID = 50;
+
     void SetUp() override
     {
         mcallback = std::unique_ptr<MockCallback>(new StrictMock<MockCallback>);
@@ -172,3 +183,30 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
         demuxer.demux(packet_2);
     });
 }
+
+/*!
+ * Test we can demux a complete PES packet
+ */
+TEST_F(TsDemuxerTest, TestDemuxOnePesPacket)
+{
+    ExpectNoException([&]
+    {
+        demuxer.addPesPid(50,
+                          std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
+
+        EXPECT_CALL((*mcallback.get()), onPesCallback()).Times(1);
+        demuxer.demux(ts_pes_1);
+        demuxer.demux(ts_pes_2);
+        demuxer.demux(ts_pes_3);
+        demuxer.demux(ts_pes_4);
+        demuxer.demux(ts_pes_5);
+        demuxer.demux(ts_pes_6);
+        demuxer.demux(ts_pes_7);
+        demuxer.demux(ts_pes_8);
+        demuxer.demux(ts_pes_9);
+        demuxer.demux(ts_pes_10);
+    });
+}
+
