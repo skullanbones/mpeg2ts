@@ -20,6 +20,7 @@ public:
     virtual void onPatCallback() = 0;
     virtual void onPmtCallback() = 0;
     virtual void onPesCallback() = 0;
+    virtual void onTsCallback() = 0;
 };
 
 class MockCallback : public IDemuxerCallbacks
@@ -28,6 +29,7 @@ public:
     MOCK_METHOD0(onPatCallback, void());
     MOCK_METHOD0(onPmtCallback, void());
     MOCK_METHOD0(onPesCallback, void());
+    MOCK_METHOD0(onTsCallback, void());
 };
 
 void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
@@ -49,6 +51,13 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes,  uint16_t pid, 
     std::cout << "came here PESCallback" << std::endl;
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPesCallback();
+}
+
+void TSCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)
+{
+    std::cout << "came here TSCallback" << std::endl;
+    IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
+    instance->onTsCallback();
 }
 
 class TsDemuxerTest : public ::testing::Test
@@ -207,6 +216,23 @@ TEST_F(TsDemuxerTest, TestDemuxOnePesPacket)
         demuxer.demux(ts_pes_8);
         demuxer.demux(ts_pes_9);
         demuxer.demux(ts_pes_10);
+    });
+}
+
+/*!
+* Test we can parse 1 TS-packet
+*/
+TEST_F(TsDemuxerTest, TestDemuxOneTsPacket)
+{
+    ExpectNoException([&]
+    {
+        demuxer.addTsPid(50,
+                          std::bind(&TSCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3),
+                          mcallback.get());
+
+        EXPECT_CALL((*mcallback.get()), onTsCallback()).Times(1);
+        demuxer.demux(ts_pes_1);
     });
 }
 
