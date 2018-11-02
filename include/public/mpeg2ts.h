@@ -346,7 +346,7 @@ protected:
     std::map<int, void*> mHandlers;
 
 private:
-    TsParser* mParser;
+    std::unique_ptr<TsParser> mParser;
 };
 
 
