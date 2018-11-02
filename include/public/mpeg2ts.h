@@ -150,6 +150,12 @@ struct StreamTypeHeader
 class PmtTable : public PsiTable
 {
 public:
+    PmtTable() 
+    : PCR_PID(0)
+    , program_info_length(0)
+    {
+    }
+
     uint16_t PCR_PID;
     uint16_t program_info_length;
     //    std::vector<Descriptor> descriptors; // TODO
