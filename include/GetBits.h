@@ -65,6 +65,10 @@ protected:
 class GetBitsException : public std::runtime_error
 {
 public:
-    GetBitsException(const std::string msg);
+    GetBitsException(const std::string msg)
+            : std::runtime_error(msg)
+    {
+    }
+
     virtual ~GetBitsException() = default;
 };

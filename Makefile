@@ -135,13 +135,13 @@ libs: $(BUILDDIR) static shared
 
 static: folders $(BUILDDIR)/$(STATIC)
 
-$(BUILDDIR)/$(STATIC): $(OBJS)
+$(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 	@echo "[Link (Static)]"
 	@ar rcs $@ $^
 
 shared: folders $(BUILDDIR)/$(DYNAMIC)
 
-$(BUILDDIR)/$(DYNAMIC): $(OBJS)
+$(BUILDDIR)/$(DYNAMIC): $(OBJS) $(HDRS)
 	@echo "[Link (Dynamic)]"
 	$(CXX) -shared -o $@ $^
 

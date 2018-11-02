@@ -9,7 +9,7 @@ namespace mpeg2ts
 
 std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
 {
-    ss << std::endl << "-------------PsiTable------------- " << std::endl;
+    ss << std::endl << "-------------PsiTable-------------" << std::endl;
     ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
     ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
     ss << "section_length: " << (int)rhs.section_length << std::endl;
@@ -37,7 +37,7 @@ bool PsiTable::operator!=(const PsiTable& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
 {
-    ss << std::endl << "-------------PatTable------------- " << std::endl;
+    ss << std::endl << "-------------PatTable-------------" << std::endl;
     // ss << static_cast<const PsiTable&>(rhs) << std::endl;
     // ss << PsiTable::operator<<(rhs) << std::endl;
     ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
@@ -94,8 +94,9 @@ bool PatTable::operator!=(const PatTable& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
 {
-    ss << std::endl << "-------------StreamTypeHeader------------- " << std::endl;
-    ss << "stream_type: " << (int)rhs.stream_type << std::endl;
+    ss << std::endl << "-------------StreamTypeHeader-------------" << std::endl;
+    ss << "stream_type: " << StreamTypeToString[(int)rhs.stream_type] << ",  ("
+           << (int)rhs.stream_type << ")" << std::endl;
     ss << "elementary_PID: " << rhs.elementary_PID << std::endl;
     ss << "ES_info_length: " << rhs.ES_info_length << std::endl;
     return ss;
@@ -116,7 +117,7 @@ bool StreamTypeHeader::operator!=(const StreamTypeHeader& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
 {
-    ss << std::endl << "-------------PmtTable------------- " << std::endl;
+    ss << std::endl << "-------------PmtTable-------------" << std::endl;
     ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
     ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
     ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;

@@ -10,7 +10,8 @@ docker_run() {
     echo "Using USER_ID:" $USER_ID
 
     docker run  --env LOCAL_USER_ID=$USER_ID \
-                --rm -v "$(pwd)":/tmp/workspace \
+                --rm \
+                --volume "$(pwd)":/tmp/workspace \
 				--workdir /tmp/workspace \
                 --env "TERM=xterm-256color" \
                 --tty \
