@@ -372,6 +372,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
         uint8_t descriptorTag = getBits(8);
 
         LOGD << "descriptor_tag: " << (int)descriptorTag;
+        std::cout << "came here descriptor_tag: " << (int)descriptorTag << std::endl;
         if (descriptorTag == static_cast<uint32_t>(DescriptorTag::maximum_bitrate_descriptor)) // TODO switch/CASE for all the rest of descriptors...
         {
             MaximumBitrateDescriptor maxDesc;
@@ -381,7 +382,19 @@ PmtTable TsParser::parsePmtPacket(int pid)
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
             LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
+            pmt.descriptors.push_back(maxDesc);
             skipBytes(program_info_length - 2 - 3);
+        }
+        else if (descriptorTag == static_cast<uint32_t>(DescriptorTag::metadata_pointer_descriptor)) // TODO switch/CASE for all the rest of descriptors...
+        {
+            Metadata_pointer_descriptor pointer_desc;
+            pointer_desc.descriptor_tag = descriptorTag;
+            pointer_desc.descriptor_length = getBits(8);
+
+            pointer_desc.metadata_application_format = getBits(16);
+        
+            pmt.descriptors.push_back(pointer_desc);
+            skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
         }
         else {
             LOGD << "skipping descriptor.." << std::endl;

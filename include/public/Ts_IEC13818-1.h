@@ -280,21 +280,21 @@ enum class DescriptorTag : uint32_t
     multiplex_buffer_utilization_descriptor = 12,
     copyright_descriptor = 13,
     maximum_bitrate_descriptor = 14,
-    private_data_indicator_descriptor,
-    smoothing_buffer_descriptor,
-    STD_descriptor,
-    IBP_descriptor,
-    MPEG4_video_descriptor,
-    MPEG4_audio_descriptor,
-    IOD_descriptor,
-    SL_descriptor,
-    FMC_descriptor,
-    external_ES_ID_descriptor,
-    MuxCode_descriptor,
-    FmxBufferSize_descriptor,
-    multiplexBuffer_descriptor,
-    content_labeling_descriptor,
-    metadata_pointer_descriptor,
+    private_data_indicator_descriptor = 15,
+    smoothing_buffer_descriptor = 16,
+    STD_descriptor = 17,
+    IBP_descriptor = 18,
+    MPEG4_video_descriptor = 27,
+    MPEG4_audio_descriptor = 28,
+    IOD_descriptor = 29,
+    SL_descriptor = 30,
+    FMC_descriptor = 31,
+    external_ES_ID_descriptor = 32,
+    MuxCode_descriptor = 33,
+    FmxBufferSize_descriptor = 34,
+    multiplexBuffer_descriptor = 35,
+    content_labeling_descriptor = 36,
+    metadata_pointer_descriptor = 37,
     metadata_descriptor,
     metadata_STD_descriptor,
     AVC_video_descriptor,
@@ -338,4 +338,11 @@ struct MaximumBitrateDescriptor : public Descriptor
 {
     uint8_t reserved;
     uint32_t maximum_bitrate;
+};
+
+/*! Table 2-84 – Metadata pointer descriptor */
+struct Metadata_pointer_descriptor : public Descriptor 
+{
+    uint16_t metadata_application_format;
+    // TODO
 };

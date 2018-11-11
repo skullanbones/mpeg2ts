@@ -158,7 +158,7 @@ public:
 
     uint16_t PCR_PID;
     uint16_t program_info_length;
-    //    std::vector<Descriptor> descriptors; // TODO
+    std::vector<Descriptor> descriptors;
     std::vector<StreamTypeHeader> streams;
 
 

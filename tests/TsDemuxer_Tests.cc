@@ -108,7 +108,7 @@ TEST_F(TsDemuxerTest, TestDemuxPatPacket)
                             std::placeholders::_3, std::placeholders::_4),
                             mcallback.get());
         
-        EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
     });
 }
@@ -125,7 +125,7 @@ TEST_F(TsDemuxerTest, TestDemux2PatPacket)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onPatCallback()).Times(2);
+        EXPECT_CALL(*mcallback, onPatCallback()).Times(2);
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
     });
@@ -143,7 +143,7 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_1);
     });
 }
@@ -159,7 +159,7 @@ TEST_F(TsDemuxerTest, TestDemux2PmtPackets)
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                           std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
-        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_2_1);
         demuxer.demux(pmt_packet_2_2);
     });
@@ -177,7 +177,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1);
         demuxer.demux(large_pmt_ts_packet_2);
         demuxer.demux(large_pmt_ts_packet_3);
@@ -196,7 +196,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onPmtCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPmtCallback()).Times(1);
         demuxer.demux(large_pmt_ts_packet_1); // This is the start of the PMT
         demuxer.demux(pat_packet_1);
         demuxer.demux(pat_packet_2);
@@ -221,7 +221,7 @@ TEST_F(TsDemuxerTest, TestDemuxOnePesPacket)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onPesCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPesCallback()).Times(1);
         demuxer.demux(ts_pes_1);
         demuxer.demux(ts_pes_2);
         demuxer.demux(ts_pes_3);
@@ -247,7 +247,7 @@ TEST_F(TsDemuxerTest, TestDemuxOneTsPacket)
                                     std::placeholders::_3),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onTsCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onTsCallback()).Times(1);
         demuxer.demux(ts_pes_1);
     });
 }
@@ -264,7 +264,7 @@ TEST_F(TsDemuxerTest, test_get_ts_counters)
                                     std::placeholders::_3),
                           mcallback.get());
 
-        EXPECT_CALL((*mcallback.get()), onTsCallback()).Times(4);
+        EXPECT_CALL(*mcallback, onTsCallback()).Times(4);
         demuxer.demux(ts_pes_1);
         TsCounters count = demuxer.getTsCounters();
         EXPECT_EQ(count.mTsPacketCounter, 1);
@@ -290,7 +290,7 @@ TEST_F(TsDemuxerTest, test_get_pid_statistics)
                                     std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());                  
 
-        EXPECT_CALL((*mcallback.get()), onPesCallback()).Times(1);
+        EXPECT_CALL(*mcallback, onPesCallback()).Times(1);
         demuxer.demux(ts_pes_1);
         demuxer.demux(ts_pes_2);
         demuxer.demux(ts_pes_3);
