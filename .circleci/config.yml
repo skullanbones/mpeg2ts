@@ -19,4 +19,4 @@ jobs:
           command: rm -rf build/ && mkdir build && cd build/ && cmake .. && cmake --build . -- -j36
       - run:
           name: Run CTest
-          command: tests/run_gtests
+          command: build/tests/run_gtests
