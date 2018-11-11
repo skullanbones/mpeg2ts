@@ -9,11 +9,11 @@ jobs:
           name: Build
           command: make all
       - run:
-          name: Build CMake
-          command: mkdir build && cd build/ && cmake .. && cmake --build . -- -j36  
-      - run:
           name: Unit Test
           command: make gtests && make unit-tests
       - run:
           name: Component Tests
           command: make component-tests
+      - run:
+          name: Build CMake
+          command: rm -rf build/ && mkdir build && cd build/ && cmake .. && cmake --build . -- -j36
