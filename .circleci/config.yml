@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: heliconwave/circleci:v4
+      - image: heliconwave/circleci:v8
     steps:
       - checkout
       - run:
@@ -14,3 +14,9 @@ jobs:
       - run:
           name: Component Tests
           command: make component-tests
+      - run:
+          name: Build CMake
+          command: rm -rf build/ && mkdir build && cd build/ && cmake .. && cmake --build . -- -j36
+      - run:
+          name: Run CTest
+          command: build/tests/run_gtests

@@ -15,7 +15,7 @@ Linux: tsparser
 ```
 
 ## SW Architecture
-There are 2 sets of API, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage. These are the APIs:
+There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
 * TsUtilities.h High level API to simplify usage
 ![](Ts-lib_SW_Architecture.png)
@@ -54,7 +54,24 @@ There are 2 sets of API, the core API called mpeg2ts under the same namespace an
 * Added PAT parsing
 * Added Demuxer
 
-## Linux
+## CMake
+To simplify the crosscompile process we use CMake. Under Linux just do this:
+```
+mkdir build
+cd build/
+cmake ..
+make
+```
+You will get the following artifacts:
+```
+libmpeg2ts.so*
+libmpeg2ts_static.a
+tsparser*
+```
+If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
+
+## Linux Make
+This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
 
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
@@ -147,8 +164,22 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 | ISO           | International Organization for Standardization  |
 | MC            | Multicast                           |
 | MPEG          | Moving Picture Experts Group        |
+| OSS           | Open Source Software                |
 | PS            | Program Stream                      |
 | SDK           | Software Development Kit            |
 | SW            | Software                            |
 | TS            | Transport Stream                    |
 | VCS           | Version Control System              |
+
+
+## Technologies / Open Source Software (OSS)
+* C++
+* Docker
+* CMake
+* GNU Make
+* GCC
+* Python
+* Git
+* Google test
+
+![](ts_lib_oss.png)

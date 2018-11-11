@@ -34,7 +34,6 @@ RUN apt-get install --yes --no-install-recommends tstools
 RUN apt-get install --yes --no-install-recommends git
 RUN apt-get install --yes --no-install-recommends gdb
 RUN apt-get install --yes --no-install-recommends gdbserver
-RUN apt-get install --yes --no-install-recommends cmake
 RUN apt-get install --yes --no-install-recommends python3-setuptools
 RUN apt-get install --yes --no-install-recommends virtualenv
 RUN apt-get install --yes --no-install-recommends python3-pip
@@ -42,6 +41,13 @@ RUN apt-get install --yes --no-install-recommends python3-dev
 RUN apt-get install --yes --no-install-recommends python3-virtualenv
 RUN apt-get install --yes --no-install-recommends wget
 RUN apt-get install --yes --no-install-recommends lcov
+
+# Install latest cmake
+ADD https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.sh /cmake-3.12.4-Linux-x86_64.sh
+RUN mkdir /opt/cmake
+RUN sh /cmake-3.12.4-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+RUN cmake --version
 
 # Install gtest/gmock
 RUN git clone -q https://github.com/google/googletest.git /googletest \
@@ -60,7 +66,5 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cd /benchmark/build \
   && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
   && cd / && rm -rf /benchmark
-
-
 
 WORKDIR /tmp/workspace
