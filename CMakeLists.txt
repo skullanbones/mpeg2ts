@@ -10,10 +10,6 @@ endif()
 
 ## project
 include_directories(include)
-include_directories(include/h264)
-include_directories(include/mpeg2vid)
-include_directories(include/public)
-include_directories(tests)
 
 ## 3rd-party
 include_directories(3rd-party/nlohmann/include)
@@ -67,14 +63,9 @@ set(    3rdPartySources
         3rd-party/plog-1.1.4/include/plog/Util.h
         3rd-party/plog-1.1.4/include/plog/WinApi.h)
 
-# shared lib
-add_library(mpeg2ts SHARED
-        ${TsLibSourcesList})
-# shared libraries need PIC
-set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
-
 # static lib
 add_library(mpeg2ts_static STATIC
+        ${3rdPartySources}
         ${TsLibSourcesList})
 
 # tsparser executable
@@ -82,4 +73,11 @@ add_executable(tsparser
         src/main.cc
         ${3rdPartySources})
 
-target_link_libraries(tsparser mpeg2ts_static)
+target_link_libraries(tsparser mpeg2ts_static)        
+
+# shared lib
+add_library(mpeg2ts SHARED
+        ${TsLibSourcesList}
+        ${3rdPartySources})
+# shared libraries need PIC
+set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
