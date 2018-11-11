@@ -1,8 +1,22 @@
 #!/bin/bash
 
+# get git root
+get_repo_root(){
+    local REPO_ROOT="$(git rev-parse --show-toplevel)"
+    echo "$REPO_ROOT"
+}
+
 # Run commands inside docker container
 docker_run() {
-    source Makefile.variables
+    REPO_ROOT=$(get_repo_root)
+    echo "Using REPO_ROOT: " "$REPO_ROOT"
+    source $REPO_ROOT/Makefile.variables
+
+    CUR_DIR=$(pwd)
+    echo "CUR_DIR: " "$CUR_DIR"
+    SUB_DIR=$(echo "$CUR_DIR" | grep -oP "^$REPO_ROOT\K.*")
+    echo "SUB_DIR: " "$SUB_DIR"
+
     echo "Starting container: " "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VER"
 
     echo "Got command: " "$*"
@@ -11,8 +25,8 @@ docker_run() {
 
     docker run  --env LOCAL_USER_ID=$USER_ID \
                 --rm \
-                --volume "$(pwd)":/tmp/workspace \
-				--workdir /tmp/workspace \
+                --volume $REPO_ROOT:/tmp/workspace \
+		        --workdir /tmp/workspace$SUB_DIR \
                 --env "TERM=xterm-256color" \
                 --tty \
                 --entrypoint /tmp/workspace/tools/entrypoint.sh \
