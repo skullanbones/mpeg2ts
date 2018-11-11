@@ -59,6 +59,7 @@ To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```
 mkdir build
 cd build/
+cmake ..
 make
 ```
 You will get the following artifacts:
