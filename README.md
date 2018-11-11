@@ -68,6 +68,7 @@ libmpeg2ts.so*
 libmpeg2ts_static.a
 tsparser*
 ```
+If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
 ## Linux Make
 This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
@@ -179,5 +180,6 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 * GCC
 * Python
 * Git
+* Google test
 
 ![](ts_lib_oss.png)
