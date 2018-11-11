@@ -42,14 +42,14 @@ enable_testing()
 # includes & sources
 #-------------------
 set(TestSources
-    GetBits_Tests.cc
-    Mpeg2VideoParser_Tests.cc
-    PsiTables_Tests.cc
-    TsDemuxer_Tests.cc
-    TsPacketInfo_Tests.cc
-    TsPacketTestData.h
-    TsParser_Tests.cc
-    TsStatistics_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/GetBits_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/Mpeg2VideoParser_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/PsiTables_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/TsDemuxer_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/TsPacketInfo_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/TsPacketTestData.h
+    ${PROJECT_SOURCE_DIR}/tests/TsParser_Tests.cc
+    ${PROJECT_SOURCE_DIR}/tests/TsStatistics_Tests.cc
 )
 
 
