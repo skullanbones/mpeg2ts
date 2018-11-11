@@ -18,7 +18,7 @@ Linux: tsparser
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
 * TsUtilities.h High level API to simplify usage
-![](Ts-lib_SW_Architecture.png)
+![](images/Ts-lib_SW_Architecture.png)
 
 ## Releases
 *V0.1*
@@ -55,6 +55,8 @@ There are 2 sets of APIs, the core API called mpeg2ts under the same namespace a
 * Added Demuxer
 
 ## CMake
+![](images/cmake.png)
+
 To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```
 mkdir build
@@ -93,6 +95,8 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
 
 ### Docker
+![](images/docker.png)
+
 Some targets requires docker in order to run since you most likely will not have
 all build dependencies in your native environment. To virtualize the Application
 build time dependencies they have been collected inside a docker image following
@@ -144,12 +148,16 @@ change to dynamic project. These are the VS2015 solution files:
 * TestTsLib.sln
 
 ## Continuous integration (CI)
+![](images/circleci.png)
+
 For CI we use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
 
 ## Static code analysis
+![](images/codacy.png)
+
 For static and feedback in pull-requests we use a tool called Codacy which will run different
 tools to check for mistakes and coding quality/best practises. You can check that status here:
 [Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
@@ -182,4 +190,4 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 * Git
 * Google test
 
-![](ts_lib_oss.png)
+![](images/ts_lib_oss.png)
