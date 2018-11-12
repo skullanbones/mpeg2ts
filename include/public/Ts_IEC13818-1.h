@@ -14,6 +14,8 @@
 #include <iostream>
 #include <map>
 
+namespace mpeg2ts {
+
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
@@ -263,7 +265,7 @@ enum StreamId
 /*! @brief Descriptor tags Table 2-45
 */
 
-enum class DescriptorTag : uint32_t
+enum struct DescriptorTag : uint32_t
 {
     Reserved = 0,
     Forbidden = 1,
@@ -346,3 +348,5 @@ struct Metadata_pointer_descriptor : public Descriptor
     uint16_t metadata_application_format;
     // TODO
 };
+
+} // namespace mpeg2ts

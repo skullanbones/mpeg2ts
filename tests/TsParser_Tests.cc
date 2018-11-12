@@ -377,6 +377,9 @@ TEST(TsParserTests, parse_descriptor)
 
         auto pmt = parser.parsePmtPacket(info.pid);
         EXPECT_EQ(1, pmt.descriptors.size());
+        Descriptor d = pmt.descriptors.back();
+        EXPECT_TRUE(d.descriptor_tag == static_cast<uint8_t>(DescriptorTag::metadata_pointer_descriptor));
+        EXPECT_EQ(d.descriptor_length, 15); // TODO check this
     }
     catch (std::exception& e)
     {
