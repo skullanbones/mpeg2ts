@@ -372,8 +372,11 @@ PmtTable TsParser::parsePmtPacket(int pid)
         uint8_t descriptorTag = getBits(8);
 
         LOGD << "descriptor_tag: " << (int)descriptorTag;
+	DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
         std::cout << "came here descriptor_tag: " << (int)descriptorTag << std::endl;
-        if (descriptorTag == static_cast<uint32_t>(DescriptorTag::maximum_bitrate_descriptor)) // TODO switch/CASE for all the rest of descriptors...
+        switch(tag)
+	{
+	case DescriptorTag::maximum_bitrate_descriptor:
         {
             MaximumBitrateDescriptor maxDesc;
             maxDesc.descriptor_tag = descriptorTag;
@@ -384,24 +387,26 @@ PmtTable TsParser::parsePmtPacket(int pid)
             LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
             pmt.descriptors.push_back(maxDesc);
             skipBytes(program_info_length - 2 - 3);
+            break;
         }
-        else if (descriptorTag == static_cast<uint32_t>(DescriptorTag::metadata_pointer_descriptor)) // TODO switch/CASE for all the rest of descriptors...
+        case DescriptorTag::metadata_pointer_descriptor:
         {
             Metadata_pointer_descriptor pointer_desc;
             pointer_desc.descriptor_tag = descriptorTag;
             pointer_desc.descriptor_length = getBits(8);
 
             pointer_desc.metadata_application_format = getBits(16);
-        
+
             pmt.descriptors.push_back(pointer_desc);
             skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
+            break;
         }
-        else {
+        default:
             LOGD << "skipping descriptor.." << std::endl;
             skipBytes(program_info_length - 1); // skip descriptors for now
         }
     }
-      
+
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
     int readSize = 0;
