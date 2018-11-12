@@ -322,6 +322,39 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
                                          << ", frame rate: " << j->framerate;
                                 }
                             }
+                            if (std::dynamic_pointer_cast<EsInfoH264>(esinfo))
+                            {
+                                auto i = std::dynamic_pointer_cast<EsInfoH264>(esinfo);
+                                LOGD << "nal: " <<  i->nalUnitType << " " << i->msg;
+                                if (std::dynamic_pointer_cast<EsInfoH264SliceHeader>(i))
+                                {
+                                    auto j = std::dynamic_pointer_cast<EsInfoH264SliceHeader>(i);
+                                    LOGD << j->sliceTypeStr
+                                         << ", pps id: " << j->ppsId;
+                                    if (j->field)
+                                    {
+                                        LOGD << "field encoded: " << (j->top ? " top" : " bottom");
+                                    }
+                                    else
+                                    {
+                                        LOGD << "frame encoded";
+                                    }
+                                }else
+                                if (std::dynamic_pointer_cast<EsInfoH264SequenceParameterSet>(i))
+                                {
+                                    auto j = std::dynamic_pointer_cast<EsInfoH264SequenceParameterSet>(i);
+                                    LOGD << "sps id: " << j->spsId
+                                         << ", luma bits: " << j->lumaBits << ", chroma bits: " << j->chromaBits
+                                         << ", width: " << j->width << " x " << j->height
+                                         << ", ref pic: " << j->numRefPics;
+                                }else
+                                if (std::dynamic_pointer_cast<EsInfoH264PictureParameterSet>(i))
+                                {
+                                    auto j = std::dynamic_pointer_cast<EsInfoH264PictureParameterSet>(i);
+                                    LOGD << "sps id: " << j->spsId
+                                         << "pps id: " << j->ppsId;
+                                }
+                            }
                         }
                     }
                     catch (const std::out_of_range&)
