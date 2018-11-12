@@ -343,4 +343,5 @@ def test_parse_eurosport(parser, asset_eurosport):
     log.debug(out[0])
     log.debug(out[1])
     print(out[1])
-    assert "sequence_header_code size 704 x 576, aspect 3x4, frame rate 25" in out[1]
+    assert "sequence_header_code" in out[1]
+    assert "704 x 576, aspect: 3x4, frame rate: 25" in out[1]
