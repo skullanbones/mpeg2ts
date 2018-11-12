@@ -308,6 +308,19 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
                             {
                                 auto i = std::dynamic_pointer_cast<EsInfoMpeg2>(esinfo);
                                 LOGD << "mpeg2 picture: " << i->picture << " " << i->msg;
+                                if (std::dynamic_pointer_cast<EsInfoMpeg2PictureSliceCode>(i))
+                                {
+                                    auto j = std::dynamic_pointer_cast<EsInfoMpeg2PictureSliceCode>(i);
+                                    LOGD << "mpeg2 picture type: " << j->picType << " " << j->msg;
+                                }
+                                else
+                                if (std::dynamic_pointer_cast<EsInfoMpeg2SequenceHeader>(i))
+                                {
+                                    auto j = std::dynamic_pointer_cast<EsInfoMpeg2SequenceHeader>(i);
+                                    LOGD << j->width << " x " << j->height
+                                         << ", aspect: " << j->aspect
+                                         << ", frame rate: " << j->framerate;
+                                }
                             }
                         }
                     }

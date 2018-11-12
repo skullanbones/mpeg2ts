@@ -82,10 +82,11 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
     std::list<std::shared_ptr<EsInfo>> ret;
+    auto rete = std::make_shared<EsInfoMpeg2>();
+    rete->picture = mPicture[0];
     if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
     {
         auto rete = std::make_shared<EsInfoMpeg2PictureSliceCode>();
-        msg << "picture_start_code ";
         rete->picture = mPicture[0];
         skipBits(10 + 8);
         rete->picType = getBits(3);
@@ -108,48 +109,56 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     }
     else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
     {
-        LOGD << "slice_start_code";
+        rete->msg = "slice_start_code";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
     {
-        LOGD << "reserved";
+        rete->msg = "reserved";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb2)
     {
-        LOGD << "user_data_start_code";
+        rete->msg = "user_data_start_code";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb3)
     {
-        msg << "sequence_header_code ";
+        auto rete = std::make_shared<EsInfoMpeg2SequenceHeader>();
+        rete->msg = "sequence_header_code ";
         skipBits(8);
-        auto horizontal_size_value = getBits(12);
-        auto vertical_size_value = getBits(12);
+        rete->width = getBits(12);
+        rete->height = getBits(12);
         auto aspect_ratio_information = getBits(4);
         auto frame_rate_code = getBits(4);
-        msg << "size " << horizontal_size_value << " x " << vertical_size_value;
-        msg << ", aspect " << AspectToString[aspect_ratio_information];
-        msg << ", frame rate " << FrameRateToString[frame_rate_code];
-        LOGD << msg.str();
+        rete->aspect = AspectToString[aspect_ratio_information];
+        rete->framerate = FrameRateToString[frame_rate_code];
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb4)
     {
-        LOGD << "sequence_error_code";
+        rete->msg = "sequence_error_code";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb5)
     {
-        LOGD << "extension_start_code";
+        rete->msg = "extension_start_code";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb7)
     {
-        LOGD << "sequence_end_code";
+        rete->msg = "sequence_end_code";
+        ret.push_back(rete);
     }
     else if (mPicture[0] == 0xb8)
     {
-        LOGD << "group_start_code";
+        rete->msg = "group_start_code";
+        ret.push_back(rete);
     }
     else
     {
-        LOGD << "system start code";
+        rete->msg = "system start code";
+        ret.push_back(rete);
     }
     return ret;
 }

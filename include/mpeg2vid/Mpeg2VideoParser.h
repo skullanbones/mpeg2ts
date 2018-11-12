@@ -11,13 +11,20 @@ struct EsInfoMpeg2 : public EsInfo
 {
 //    EsInfoMpeg2(int picture, const std::string& msg)
 //        : picture{picture}, msg{msg} {}
-    int picture;
+    int picture; // slice
     std::string msg;
 };
 
 struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
 {
-    int picType; 
+    int picType; //I, B, P 
+};
+
+struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
+{
+    int width,height;
+    std::string aspect;
+    std::string framerate;
 };
 
 class Mpeg2VideoEsParser : public GetBits, public EsParser
