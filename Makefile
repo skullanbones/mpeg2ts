@@ -95,7 +95,6 @@ help:
 	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
 	@echo '  tests                 - run all tests unit & component.'
 	@echo '  unit-tests            - run all unit tests.'
-	@echo '  gtest                 - execute gtest executable with unit test suite.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component-tests       - run all component tests.'
 	@echo '  libs                  - make both static and dynamic libs.'

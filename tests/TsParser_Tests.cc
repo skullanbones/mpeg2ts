@@ -357,3 +357,62 @@ TEST(TsParserTests, TestParsePcr)
     EXPECT_EQ(0x30, info.pid);
     EXPECT_EQ(31571712, info.pcr);
 }
+
+TEST(TsParserTests, parse_descriptor)
+{
+    try
+    {
+        TsParser parser;
+        TsPacketInfo info;
+        uint8_t table_id;
+        parser.parseTsPacketInfo(pmt_packet_2_1, info);
+        EXPECT_EQ(32, info.pid);
+    
+        parser.collectTable(pmt_packet_2_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+     
+        parser.parseTsPacketInfo(pmt_packet_2_2, info);
+        parser.collectTable(pmt_packet_2_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(1, pmt.descriptors.size());
+        Descriptor d = pmt.descriptors.back();
+        EXPECT_TRUE(d.descriptor_tag == static_cast<uint8_t>(DescriptorTag::metadata_pointer_descriptor));
+        EXPECT_EQ(d.descriptor_length, 15); // TODO check this
+    }
+    catch (std::exception& e)
+    {
+        FAIL() << "Should not catch exception";
+    }
+}
+
+TEST(TsParserTests, parse_descriptor_large_pmt)
+{
+    try
+    {
+        TsParser parser;
+        TsPacketInfo info;
+        uint8_t table_id;
+        parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
+        EXPECT_EQ(50, info.pid);
+        
+        parser.collectTable(large_pmt_ts_packet_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_3, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(1, pmt.descriptors.size());
+    }
+    catch (std::exception& e)
+    {
+        FAIL() << "Should not catch exception";
+    }
+}

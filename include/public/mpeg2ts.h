@@ -158,7 +158,7 @@ public:
 
     uint16_t PCR_PID;
     uint16_t program_info_length;
-    //    std::vector<Descriptor> descriptors; // TODO
+    std::vector<Descriptor> descriptors;
     std::vector<StreamTypeHeader> streams;
 
 
@@ -168,10 +168,6 @@ public:
     MPEG2TS_API bool operator==(const PmtTable& rhs) const;
 
     MPEG2TS_API bool operator!=(const PmtTable& rhs) const;
-};
-
-struct CatDescriptor
-{
 };
 
 class CatTable : public PsiTable
