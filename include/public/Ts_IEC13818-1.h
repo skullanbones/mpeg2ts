@@ -317,7 +317,8 @@ enum struct DescriptorTag : uint32_t
     Transport_profile_descriptor,
     HEVC_video_descriptor,
     Reserved2,
-    Extension_descriptor
+    Extension_descriptor,
+    user_private_178 = 178
 };
 
 /*! From 2.6.1 */

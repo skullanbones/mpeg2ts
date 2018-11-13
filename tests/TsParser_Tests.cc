@@ -386,3 +386,33 @@ TEST(TsParserTests, parse_descriptor)
         FAIL() << "Should not catch exception";
     }
 }
+
+TEST(TsParserTests, parse_descriptor_large_pmt)
+{
+    try
+    {
+        TsParser parser;
+        TsPacketInfo info;
+        uint8_t table_id;
+        parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
+        EXPECT_EQ(50, info.pid);
+        
+        parser.collectTable(large_pmt_ts_packet_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_3, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(1, pmt.descriptors.size());
+    }
+    catch (std::exception& e)
+    {
+        FAIL() << "Should not catch exception";
+    }
+}

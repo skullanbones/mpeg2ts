@@ -401,6 +401,16 @@ PmtTable TsParser::parsePmtPacket(int pid)
             skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
+        case DescriptorTag::user_private_178:
+        {
+            Metadata_pointer_descriptor user_private;
+            user_private.descriptor_tag = descriptorTag;
+            user_private.descriptor_length = getBits(8);
+
+            pmt.descriptors.push_back(user_private);
+            skipBytes(program_info_length - 2); // TODO fix this, this is a much bigger descriptor...
+            break;
+        }
         default:
             LOGD << "skipping descriptor.." << std::endl;
             skipBytes(program_info_length - 1); // skip descriptors for now
