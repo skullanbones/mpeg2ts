@@ -82,23 +82,20 @@ bool hasPids(std::string param, std::vector<uint16_t> pids)
 
 void display_usage()
 {
-    std::cout << "Ts-lib simple command-line:" << std::endl;
+    printf("Ts-lib simple command-line:\n");
 
-    std::cout
-    << "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" << std::endl;
+    printf(
+    "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]\n");
 
-    std::cout << "Option Arguments:\n"
+    printf( "Option Arguments:\n"
                  "        -h [ --help ]        Print help messages\n"
                  "        -v [ --version ]     Print library version\n"
                  "        -p [ --pid PID]      Print PSI tables info with PID\n"
                  "        -w [ --write PID]    Writes PES packets with PID to file\n"
                  "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
                  "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose "
-                 "what logs are filtered, both file and stdout, default:"
-              << plog::severityToString(DEFAULT_LOG_LEVEL)
-              << "\n"
-                 "        -i [ --input FILE]   Use input file for parsing"
-              << std::endl;
+                 "what logs are filtered, both file and stdout, default: %s\n"
+                 "        -i [ --input FILE]   Use input file for parsing\n", plog::severityToString(DEFAULT_LOG_LEVEL));
 }
 
 void display_statistics(mpeg2ts::PidStatisticsMap statistics)
@@ -421,7 +418,7 @@ int main(int argc, char** argv)
         }
         case 'v':
         {
-            std::cout << "version: " << VERSION << std::endl;
+            printf("version: %s\n", VERSION.c_str());
             exit(EXIT_SUCCESS);
             break;
         }
@@ -518,7 +515,7 @@ int main(int argc, char** argv)
         b = fgetc(fptr);
         while (b != TS_PACKET_SYNC_BYTE)
         {
-            // std::cout << "ERROR: Sync error!!!" << std::endl;
+            // printf("ERROR: Sync error!!!\n");
             b = fgetc(fptr);
             int eof = feof(fptr);
             if (eof != 0)

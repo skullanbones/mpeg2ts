@@ -178,7 +178,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     initParse();
 
     // If empty data, just return
-    if (data == NULL || data == nullptr)
+    if ((data == NULL) | (data == nullptr))
     {
         LOGE << "No data to parse...";
         return false;

@@ -33,28 +33,28 @@ public:
 
 void PATCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
 {
-    std::cout << "came here PATCallback" << std::endl;
+    puts("came here PATCallback\n");
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPatCallback();
 }
 
 void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* hdl)
 {
-    std::cout << "came here PMTCallback" << std::endl;
+    puts("came here PMTCallback\n");
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPmtCallback();
 }
 
 void PESCallback(const ByteVector& rawPes, const PesPacket& pes,  uint16_t pid, void* hdl)
 {
-    std::cout << "came here PESCallback" << std::endl;
+    puts("came here PESCallback\n");
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onPesCallback();
 }
 
 void TSCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)
 {
-    std::cout << "came here TSCallback" << std::endl;
+    puts("came here TSCallback\n");
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
     instance->onTsCallback();
 }
