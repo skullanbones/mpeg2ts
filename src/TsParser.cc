@@ -327,17 +327,17 @@ PatTable TsParser::parsePatPacket(int pid)
         Program prg;
         prg.program_number = getBits(16);
         getBits(3); // reserved
-        uint16_t pid = getBits(13);
+        uint16_t PID = getBits(13);
 
         if (prg.program_number == 0)
         {
             prg.type = ProgramType::NIT;
-            prg.network_PID = pid;
+            prg.network_PID = PID;
         }
         else
         {
             prg.type = ProgramType::PMT;
-            prg.program_map_PID = pid;
+            prg.program_map_PID = PID;
         }
 
         pat.programs.push_back(prg);
@@ -429,7 +429,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved
         hdr.ES_info_length = getBits(12);
-        int control_bits = hdr.ES_info_length & 0xC00;
+        control_bits = hdr.ES_info_length & 0xC00;
         if ((control_bits >> 10) != 0)
         {
             LOGE_(FileLog)

@@ -31,7 +31,6 @@ using namespace mpeg2ts;
 
 static const std::string VERSION = "0.1";
 
-uint64_t count = 0;
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
