@@ -7,8 +7,8 @@ std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
 {
     ss << "-------------TsPacketInfo------------- " << std::endl;
     ss << "PID: " << rhs.pid << std::endl;
-    ss << "errorIndicator: " << (int)rhs.errorIndicator << std::endl;
-    ss << "isPayloadStart: " << (int)rhs.isPayloadStart << std::endl;
+    ss << "errorIndicator: " << static_cast<int>(rhs.errorIndicator) << std::endl;
+    ss << "isPayloadStart: " << static_cast<int>(rhs.isPayloadStart) << std::endl;
     ss << "hasAdaptationField: " << rhs.hasAdaptationField << std::endl;
     ss << "hasPayload: " << rhs.hasPayload << std::endl;
     ss << "hasPrivateData: " << rhs.hasPrivateData << std::endl;
@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
     if (rhs.hasPayload)
     {
         ss << "payloadSize: " << rhs.payloadSize << std::endl;
-        ss << "payloadStartOffset: " << (int)rhs.payloadStartOffset << std::endl;
+        ss << "payloadStartOffset: " << static_cast<int>(rhs.payloadStartOffset) << std::endl;
     }
     ss << "isError: " << rhs.isError << std::endl;
     return ss;

@@ -10,14 +10,14 @@ namespace mpeg2ts
 std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
 {
     ss << std::endl << "-------------PsiTable-------------" << std::endl;
-    ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
-    ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
-    ss << "section_length: " << (int)rhs.section_length << std::endl;
-    ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
-    ss << "version_number: " << (int)rhs.version_number << std::endl;
-    ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
-    ss << "section_number: " << (int)rhs.section_number << std::endl;
-    ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
+    ss << "table_id:" << std::hex << static_cast<int>(rhs.table_id) << std::dec << std::endl;
+    ss << "section_syntax_indicator: " << static_cast<int>(rhs.section_syntax_indicator) << std::endl;
+    ss << "section_length: " << static_cast<int>(rhs.section_length) << std::endl;
+    ss << "transport_stream_id: " << static_cast<int>(rhs.transport_stream_id) << std::endl;
+    ss << "version_number: " << static_cast<int>(rhs.version_number) << std::endl;
+    ss << "current_next_indicator: " << static_cast<int>(rhs.current_next_indicator) << std::endl;
+    ss << "section_number: " << static_cast<int>(rhs.section_number) << std::endl;
+    ss << "last_section_number: " << static_cast<int>(rhs.last_section_number) << std::endl;
     return ss;
 }
 
@@ -40,7 +40,7 @@ std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     ss << std::endl << "-------------PatTable-------------" << std::endl;
     // ss << static_cast<const PsiTable&>(rhs) << std::endl;
     // ss << PsiTable::operator<<(rhs) << std::endl;
-    ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
+    ss << "programs.size(): " << static_cast<int>(rhs.programs.size()) << std::endl;
     for (unsigned int i = 0; i < rhs.programs.size(); i++)
     {
         ss << "-------------program " << i << "--------------" << std::endl;
@@ -95,8 +95,8 @@ bool PatTable::operator!=(const PatTable& rhs) const
 std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
 {
     ss << std::endl << "-------------StreamTypeHeader-------------" << std::endl;
-    ss << "stream_type: " << StreamTypeToString[(int)rhs.stream_type] << ",  ("
-           << (int)rhs.stream_type << ")" << std::endl;
+    ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.stream_type)] << ",  ("
+           << static_cast<int>(rhs.stream_type) << ")" << std::endl;
     ss << "elementary_PID: " << rhs.elementary_PID << std::endl;
     ss << "ES_info_length: " << rhs.ES_info_length << std::endl;
     return ss;
@@ -118,16 +118,16 @@ bool StreamTypeHeader::operator!=(const StreamTypeHeader& rhs) const
 std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
 {
     ss << std::endl << "-------------PmtTable-------------" << std::endl;
-    ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
-    ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
-    ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;
+    ss << "PCR_PID: " << static_cast<int>(rhs.PCR_PID) << std::endl;
+    ss << "program_info_length: " << static_cast<int>(rhs.program_info_length) << std::endl;
+    ss << "streams.size(): " << static_cast<int>(rhs.streams.size()) << std::endl;
     for (unsigned int i = 0; i < rhs.streams.size(); i++)
     {
         ss << "-------------stream " << i << "--------------" << std::endl;
-        ss << "stream_type: " << StreamTypeToString[(int)rhs.streams[i].stream_type] << ",  ("
-           << (int)rhs.streams[i].stream_type << ")" << std::endl;
-        ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
-        ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
+        ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.streams[i].stream_type)] << ",  ("
+           << static_cast<int>(rhs.streams[i].stream_type) << ")" << std::endl;
+        ss << "elementary_PID: " << static_cast<int>(rhs.streams[i].elementary_PID) << std::endl;
+        ss << "ES_info_length: " << static_cast<int>(rhs.streams[i].ES_info_length) << std::endl;
     }
 
     return ss;

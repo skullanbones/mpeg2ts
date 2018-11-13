@@ -38,7 +38,7 @@ CXX = g++
 STATIC = lib$(COMPONENT_NAME).a
 DYNAMIC = lib$(COMPONENT_NAME).so
 
-CXXFLAGS = -Wall -Winline -Werror -pipe -std=c++11 -fPIC -Wextra -Wpedantic
+CXXFLAGS = -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Winline -Werror -Wold-style-cast -pipe -std=c++11 -fPIC -Wpedantic
 LDFLAGS =
 ifeq ($(BUILD_TYPE),DEBUG)
 	CXXFLAGS += -g -O0 --coverage
