@@ -34,11 +34,38 @@ MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
 ## Compiler
-CXX = g++
+CXX = c++
 STATIC = lib$(COMPONENT_NAME).a
 DYNAMIC = lib$(COMPONENT_NAME).so
 
-CXXFLAGS = -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Winline -Werror -Wold-style-cast -pipe -std=c++11 -fPIC -Wpedantic
+CXXFLAGS = 	-Wall \
+			-Wextra \
+			-Wshadow \
+			-Wnon-virtual-dtor \
+			-Wold-style-cast \
+			-Wcast-align \
+			-Wunused \
+			-Woverloaded-virtual \
+			-Wpedantic \
+			-Wuseless-cast \
+			-Wdouble-promotion \
+			-Wformat=2 \
+			-Winline \
+			-Werror \
+			-pipe \
+			-std=c++11 \
+			-fPIC \
+
+# These only works on newer compilers:
+# Docker has 16.04 compiler which is the least supported compiler
+#			-Wmisleading-indentation \			
+#			-Wduplicated-cond \
+#			-Wduplicated-branches \
+#			-Wnull-dereference \
+
+# Doesnt work with nlohmann 
+#			-Wlogical-op \
+			
 LDFLAGS =
 ifeq ($(BUILD_TYPE),DEBUG)
 	CXXFLAGS += -g -O0 --coverage
