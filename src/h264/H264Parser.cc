@@ -139,7 +139,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
     }
     auto frame_num = getBits(log2_max_frame_num_minus4 + 4);
     (void)frame_num;
-    if (!frame_mbs_only_flag)
+    if (!frame_mbs_only_flag)//field or frame
     {
         auto field_pic_flag = getBits(1);
         ret->field = field_pic_flag;
@@ -149,7 +149,10 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
             ret->top = !bottom_field_flag;
         }
     }
-
+    else
+    {
+        ret->field = 0;//only frames
+    }
     return ret;
 }
 
@@ -310,6 +313,19 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     frame_mbs_only_flag = getBits(1); // 0 - coded field or coded frame; 1 - coded frame
     ret->width = (pic_width_in_mbs_minus1s + 1) * 16;
     ret->height = (2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16;
+    if (!frame_mbs_only_flag)
+    {
+        //coded pictures of the coded video sequence may either be coded fields or coded frames
+        auto mb_adaptive_frame_field_flag = getBits(1);
+        LOGD << (mb_adaptive_frame_field_flag ? "interlaced MBAFF" : "interlaced PAFF");
+        //mb_adaptive_frame_field_flag is 1 -> possible mbaff (macroblocks fields and frames)
+        // else no switching between frame and field macroblocks within a picture
+    }
+    else
+    {
+        LOGD << "progressive";
+        //every coded picture of the coded video sequence is a coded frame containing only frame macroblocks
+    }
 
     return ret;
 }
