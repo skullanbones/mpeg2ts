@@ -21,6 +21,7 @@ struct EsInfoH264SliceHeader : public EsInfoH264
     int ppsId;
     bool field; //or frame
     bool top; // or bottom
+    int frame_num;
 };
 
 struct EsInfoH264SequenceParameterSet : public EsInfoH264

@@ -137,8 +137,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
         auto colour_plane_id = getBits(2);
         (void)colour_plane_id;
     }
-    auto frame_num = getBits(log2_max_frame_num_minus4 + 4);
-    (void)frame_num;
+    ret->frame_num = getBits(log2_max_frame_num_minus4 + 4);
     if (!frame_mbs_only_flag)//field or frame
     {
         auto field_pic_flag = getBits(1);
@@ -239,8 +238,11 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     }
     auto constraint_set012_flag = getBits(3);
     (void)constraint_set012_flag;
-    auto reserved_zero_5bits = getBits(5);
-    (void)reserved_zero_5bits;
+    //auto reserved_zero_5bits = getBits(5);
+    //(void)reserved_zero_5bits;
+    skipBits(1);
+    LOGD << "constraint_set4_flag " <<  getBits(1);
+    skipBits(3);
     auto level_idc = getBits(8);
     ret->levelIdc = level_idc;
     msg << " level: " << level_idc / 10 << "." << level_idc % 10;
