@@ -8,7 +8,7 @@
 
 std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 {
-    resetBits(mPicture.data(), mPicture.size());
+    resetBits(mPicture.data() + 4, mPicture.size() - 4);
     std::list<std::shared_ptr<EsInfo>> ret;
     auto forbidden_zero_bit = getBits(1);
     if (forbidden_zero_bit != 0)

@@ -618,8 +618,7 @@ int main(int argc, char** argv)
             LOGE_(FileLog) << "Got exception: " << e.what();
             LOGE_(FileLog) << "Got header: " << info.hdr;
             LOGE_(FileLog) << "Got packet: " << info;
-            fclose(fptr);
-            exit(EXIT_FAILURE);
+            LOGE << "Ignoring exception";
         }
         if (!addedPmts && (g_PMTPIDS.size() != 0u))
         {

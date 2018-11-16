@@ -9,50 +9,45 @@
 
 std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
-    auto tmpLast =
-    std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
-    auto copyFrom = from;
-    auto end = from + length;
     std::list<std::shared_ptr<EsInfo>> ret;
     while (length > 0)
     {
-        auto onePosition = getFirstOne(from, length);
+        uint8_t* onePosition = getFirstOne(from, length);
         auto startCodeFound = false;
         if (onePosition == from)
         {
-            if (last.size() >= 3 && last[2] == 0 && last[1] == 0 && last[0] == 0)
+            if (mPicture.size() >= 3 && mPicture[mPicture.size() - 3] == 0 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
             {
                 startCodeFound = true;
             }
         }
         else if (onePosition == from + 1)
         {
-            if (last.size() >= 2 && last[1] == 0 && last[0] == 0 && *(onePosition - 1) == 0)
+            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
         else if (onePosition == from + 2)
         {
-            if (last.size() >= 1 && last[0] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
+            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
             {
                 startCodeFound = true;
             }
         }
-        else
+        else if (onePosition != from + length)
         {
-            if ((onePosition != from + length) && *(onePosition - 1) == 0 &&
-                *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
+            if (*(onePosition - 1) == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
             {
                 startCodeFound = true;
             }
         }
+        const uint8_t* end = (onePosition != from + length) ? onePosition + 1 : onePosition;
+        std::copy(from, end, std::back_inserter(mPicture));
         if (startCodeFound)
         {
             ++foundStartCodes;
-            const uint8_t* r = onePosition + 1;
-            mPicture.insert(mPicture.end(), copyFrom, r);
-            if (!mPicture.empty())
+            if (mPicture.size() > 4)
             {
                 auto list = analyze();
                 for (auto& l: list)
@@ -60,26 +55,19 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
                     ret.push_back(l);
                 }
             }
-            mPicture.clear();
-            copyFrom = onePosition + 1;
+            mPicture = {0,0,0,1};
         }
-        int diff = (onePosition - from);
-        length -= diff;
+        size_t diff = (onePosition + 1 - from);
+        length = diff > length ? 0 : length-diff;
         from = onePosition + 1;
     }
-
-    last = tmpLast;
-
-    if (copyFrom < end)
-    {
-        mPicture.insert(mPicture.end(), copyFrom, end);
-    }
+    
     return ret; 
 }
 
 std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
-    resetBits(mPicture.data(), mPicture.size());
+    resetBits(mPicture.data() + 4, mPicture.size() - 4);
     std::ostringstream msg;
     std::list<std::shared_ptr<EsInfo>> ret;
     auto rete = std::make_shared<EsInfoMpeg2>();
