@@ -371,9 +371,9 @@ PmtTable TsParser::parsePmtPacket(int pid)
         // TODO function parseDescriptors...
         uint8_t descriptorTag = getBits(8);
 
-        LOGD << "descriptor_tag: " << (int)descriptorTag;
-	DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
-        std::cout << "came here descriptor_tag: " << (int)descriptorTag << std::endl;
+        LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
+	    DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
+        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << std::endl;
         switch(tag)
 	{
 	case DescriptorTag::maximum_bitrate_descriptor:
@@ -384,7 +384,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
-            LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
+            LOGD << "reserved: " << static_cast<int>(maxDesc.reserved) << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
             pmt.descriptors.push_back(maxDesc);
             skipBytes(program_info_length - 2 - 3);
             break;
