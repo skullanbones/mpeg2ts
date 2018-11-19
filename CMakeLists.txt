@@ -12,12 +12,12 @@ if (MSVC)
 else()    
     add_compile_options(-Wall
                         -Wextra # reasonable and standard
-#                        -Wshadow # warn the user if a variable declaration shadows one from a
+                        -Wshadow # warn the user if a variable declaration shadows one from a
                                  # parent context
                         -Wnon-virtual-dtor # warn the user if a class with virtual functions has a
                                            # non-virtual destructor. This helps catch hard to
                                            # track down memory errors
-#                        -Wold-style-cast # warn for c-style casts
+                        -Wold-style-cast # warn for c-style casts
                         -Wcast-align # warn for potential performance problem casts
                         -Wunused # warn on anything being unused
                         -Woverloaded-virtual # warn if you overload (not override) a virtual
@@ -29,13 +29,15 @@ else()
                                                   # do not exist
 #                        -Wduplicated-cond # warn if if / else chain has duplicated conditions
 #                        -Wduplicated-branches # warn if if / else branches have duplicated code
-                        -Wlogical-op # warn about logical operations being used where bitwise were
+#                        -Wlogical-op # warn about logical operations being used where bitwise were
                                      # probably wanted
 #                        -Wnull-dereference # warn if a null dereference is detected
                         -Wuseless-cast # warn if you perform a cast to the same type
                         -Wdouble-promotion # warn if float is implicit promoted to double
                         -Wformat=2 # warn on security issues around functions that format output
                                    # (ie printf)
+                        -Winline # Warn if a function that is declared as inline cannot be inlined.
+                        -Werror # Make the specified warning into an error.
         )
 endif()
 

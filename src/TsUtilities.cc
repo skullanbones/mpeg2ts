@@ -111,7 +111,7 @@ void TsUtilities::initParse()
     mDemuxer.addPsiPid(TS_PACKET_PID_PAT,
                        std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                                  std::placeholders::_3, std::placeholders::_4),
-                       (void*)this);
+                       reinterpret_cast<void*>(this));
 }
 
 void TsUtilities::registerPmtCallback()
@@ -124,7 +124,7 @@ void TsUtilities::registerPmtCallback()
             mDemuxer.addPsiPid(pid,
                                std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                          std::placeholders::_3, std::placeholders::_4),
-                               (void*)this);
+                               reinterpret_cast<void*>(this));
         }
         mAddedPmts = true;
     }
@@ -138,7 +138,7 @@ void TsUtilities::registerPesCallback()
         mDemuxer.addPesPid(pid,
                            std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
                                      std::placeholders::_3, std::placeholders::_4),
-                           (void*)this);
+                           reinterpret_cast<void*>(this));
     }
 }
 
@@ -159,7 +159,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
     while (!tsFile.eof())
     {
         uint8_t packet[188];
-        tsFile.read((char*)packet, 188); // TODO check sync byte
+        tsFile.read(reinterpret_cast<char*>(packet), 188); // TODO check sync byte
         mDemuxer.demux(packet);
     }
     tsFile.close();
@@ -178,7 +178,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     initParse();
 
     // If empty data, just return
-    if (data == NULL || data == nullptr)
+    if ((data == NULL) || (data == nullptr))
     {
         LOGE << "No data to parse...";
         return false;

@@ -327,17 +327,17 @@ PatTable TsParser::parsePatPacket(int pid)
         Program prg;
         prg.program_number = getBits(16);
         getBits(3); // reserved
-        uint16_t pid = getBits(13);
+        uint16_t PID = getBits(13);
 
         if (prg.program_number == 0)
         {
             prg.type = ProgramType::NIT;
-            prg.network_PID = pid;
+            prg.network_PID = PID;
         }
         else
         {
             prg.type = ProgramType::PMT;
-            prg.program_map_PID = pid;
+            prg.program_map_PID = PID;
         }
 
         pat.programs.push_back(prg);
@@ -371,9 +371,9 @@ PmtTable TsParser::parsePmtPacket(int pid)
         // TODO function parseDescriptors...
         uint8_t descriptorTag = getBits(8);
 
-        LOGD << "descriptor_tag: " << (int)descriptorTag;
-	DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
-        std::cout << "came here descriptor_tag: " << (int)descriptorTag << std::endl;
+        LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
+	    DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
+        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << std::endl;
         switch(tag)
 	{
 	case DescriptorTag::maximum_bitrate_descriptor:
@@ -384,7 +384,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
-            LOGD << "reserved: " << (int)maxDesc.reserved << ", maximum_bitrate: " << (int)maxDesc.maximum_bitrate;
+            LOGD << "reserved: " << static_cast<int>(maxDesc.reserved) << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
             pmt.descriptors.push_back(maxDesc);
             skipBytes(program_info_length - 2 - 3);
             break;
@@ -424,12 +424,12 @@ PmtTable TsParser::parsePmtPacket(int pid)
     while (readSize < streamsSize)
     {
         StreamTypeHeader hdr;
-        hdr.stream_type = (StreamType)getBits(8);
+        hdr.stream_type = static_cast<StreamType>(getBits(8));
         getBits(3); // reserved
         hdr.elementary_PID = getBits(13);
         getBits(4); // reserved
         hdr.ES_info_length = getBits(12);
-        int control_bits = hdr.ES_info_length & 0xC00;
+        control_bits = hdr.ES_info_length & 0xC00;
         if ((control_bits >> 10) != 0)
         {
             LOGE_(FileLog)
