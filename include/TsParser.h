@@ -24,7 +24,7 @@
 namespace mpeg2ts
 {
 
-class TsParser : public GetBits
+class TsParser : private GetBits
 {
 public:
     /*!
