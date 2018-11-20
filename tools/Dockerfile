@@ -19,10 +19,6 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
     && rm /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
 
-COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
 ### Builder image ###
 FROM user as build
 
@@ -66,5 +62,9 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cd /benchmark/build \
   && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
   && cd / && rm -rf /benchmark
+
+# entrypoint
+COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 WORKDIR /tmp/workspace

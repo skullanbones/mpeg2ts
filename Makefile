@@ -191,17 +191,8 @@ run: $(BUILDDIR)/tsparser
 docker-image:
 	docker build \
 		--file=$(TOOLSDIR)/Dockerfile \
-		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) .
-
-# start tty session inside docker container
-docker-bash:
-	docker run \
-		--rm \
-		--interactive \
-		--tty=true \
-		--volume=$$(pwd):/tmp/workspace \
-		--env LOCAL_USER_ID=`id -u ${USER}` \
-		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) /bin/bash
+		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
+		--tag=$(DOCKER_IMAGE_NAME):latest .
 
 ### all tests
 
