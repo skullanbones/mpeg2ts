@@ -39,7 +39,7 @@ RUN apt-get install --yes --no-install-recommends wget
 RUN apt-get install --yes --no-install-recommends lcov
 
 # Install latest cmake
-ADD https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.sh /cmake-3.12.4-Linux-x86_64.sh
+RUN curl -o /cmake-3.12.4-Linux-x86_64.sh -SL "https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.sh"
 RUN mkdir /opt/cmake
 RUN sh /cmake-3.12.4-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
 RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
