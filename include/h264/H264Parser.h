@@ -19,8 +19,8 @@ struct EsInfoH264SliceHeader : public EsInfoH264
     int sliceType;
     std::string sliceTypeStr;
     int ppsId;
-    bool field; //or frame
-    bool top; // or bottom
+    bool field; // or frame
+    bool top;   // or bottom
     int frame_num;
 };
 

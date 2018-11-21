@@ -9,20 +9,20 @@
 
 struct EsInfoMpeg2 : public EsInfo
 {
-//    EsInfoMpeg2(int picture, const std::string& msg)
-//        : picture{picture}, msg{msg} {}
+    //    EsInfoMpeg2(int picture, const std::string& msg)
+    //        : picture{picture}, msg{msg} {}
     int picture; // slice
     std::string msg;
 };
 
 struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
 {
-    int picType; //I, B, P 
+    int picType; // I, B, P
 };
 
 struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
 {
-    int width,height;
+    int width, height;
     std::string aspect;
     std::string framerate;
 };

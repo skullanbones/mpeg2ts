@@ -43,19 +43,19 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
             if (mPicture.size() > 4)
             {
                 auto list = analyze();
-                for (auto& l: list)
+                for (auto& l : list)
                 {
                     ret.push_back(l);
                 }
             }
-            mPicture = {0,0,0,1};
+            mPicture = { 0, 0, 0, 1 };
         }
         size_t diff = (onePosition + 1 - from);
-        length = diff > length ? 0 : length-diff;
+        length = diff > length ? 0 : length - diff;
         from = onePosition + 1;
     }
-    
-    return ret; 
+
+    return ret;
 }
 
 std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()

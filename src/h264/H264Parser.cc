@@ -5,7 +5,86 @@
 
 /// Project files
 #include "h264/H264Parser.h"
-
+static std::string seipayloadTypeToString(uint64_t payloadType)
+{
+    if (payloadType == 0)
+    {
+        return "buffering_period(payloadSize)";
+    }
+    else if (payloadType == 1)
+    {
+        return "pic_timing(payloadSize)";
+    }
+    else if (payloadType == 2)
+    {
+        return "pan_scan_rect(payloadSize)";
+    }
+    else if (payloadType == 3)
+    {
+        return "filler_payload(payloadSize)";
+    }
+    else if (payloadType == 4)
+    {
+        return "user_data_registered_itu_t_t35(payloadSize)";
+    }
+    else if (payloadType == 5)
+    {
+        return "user_data_unregistered(payloadSize)";
+    }
+    else if (payloadType == 6)
+    {
+        return "recovery_point(payloadSize)";
+    }
+    else if (payloadType == 7)
+    {
+        return "dec_ref_pic_marking_repetition(payloadSize)";
+    }
+    else if (payloadType == 8)
+    {
+        return "spare_pic(payloadSize)";
+    }
+    else if (payloadType == 9)
+    {
+        return "scene_info(payloadSize)";
+    }
+    else if (payloadType == 10)
+    {
+        return "sub_seq_info(payloadSize)";
+    }
+    else if (payloadType == 11)
+    {
+        return "sub_seq_layer_characteristics(payloadSize)";
+    }
+    else if (payloadType == 12)
+    {
+        return "sub_seq_characteristics(payloadSize)";
+    }
+    else if (payloadType == 13)
+    {
+        return "full_frame_freeze(payloadSize)";
+    }
+    else if (payloadType == 14)
+    {
+        return "full_frame_freeze_release(payloadSize)";
+    }
+    else if (payloadType == 15)
+    {
+        return "full_frame_snapshot(payloadSize)";
+    }
+    else if (payloadType == 16)
+    {
+        return "progressive_refinement_segment_start(payloadSize)";
+    }
+    else if (payloadType == 17)
+    {
+        return "progressive_refinement_segment_end(payloadSize)";
+    }
+    else if (payloadType == 18)
+    {
+        return "motion_constrained_slice_group_set(payloadSize)";
+    }
+    return "reserved_sei_message(payloadSize)";
+}
 std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 {
     resetBits(mPicture.data() + 4, mPicture.size() - 4);
@@ -23,30 +102,40 @@ std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
     switch (nal_unit_type)
     {
     case 0:
-         rete->msg = "Unspecified";
-         ret.push_back(rete);
+        rete->msg = "Unspecified";
+        ret.push_back(rete);
         break;
     case 1:
         ret.push_back(slice_header(nal_unit_type));
         break;
     case 2:
-         rete->msg = "Coded slice data partition A";
-         ret.push_back(rete);
+        rete->msg = "Coded slice data partition A";
+        ret.push_back(rete);
         break;
     case 3:
-         rete->msg = "Coded slice data partition B";
-         ret.push_back(rete);
+        rete->msg = "Coded slice data partition B";
+        ret.push_back(rete);
         break;
     case 4:
         rete->msg = "Coded slice data partition C";
-         ret.push_back(rete);
+        ret.push_back(rete);
         break;
     case 5:
         ret.push_back(slice_header(nal_unit_type));
         break;
     case 6:
-         rete->msg = "Supplemental enhancement information (SEI)";
-         ret.push_back(rete);
+    {
+        uint64_t payloadType = 0;
+        while (getBits(8) == 0xff)
+        {
+            payloadType += 255;
+        }
+        auto last_payload_type_byte = getBits(8);
+        payloadType += last_payload_type_byte;
+
+        rete->msg = "Supplemental enhancement information (SEI), type: " + seipayloadTypeToString(payloadType);
+    }
+        ret.push_back(rete);
         break;
     case 7:
         ret.push_back(seq_parameter_set_rbsp(nal_unit_type));
@@ -55,20 +144,20 @@ std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
         ret.push_back(pic_parameter_set_rbsp(nal_unit_type));
         break;
     case 9:
-         rete->msg = "Access unit delimiter";
-         ret.push_back(rete);
+        rete->msg = "Access unit delimiter";
+        ret.push_back(rete);
         break;
     case 10:
-         rete->msg = "End of sequence";
-         ret.push_back(rete);
+        rete->msg = "End of sequence";
+        ret.push_back(rete);
         break;
     case 11:
-         rete->msg = "End of stream";
-         ret.push_back(rete);
+        rete->msg = "End of stream";
+        ret.push_back(rete);
         break;
     case 12:
-         rete->msg = "Filler data";
-         ret.push_back(rete);
+        rete->msg = "Filler data";
+        ret.push_back(rete);
         break;
     default:
         if (nal_unit_type >= 13 && nal_unit_type <= 23)
@@ -89,10 +178,11 @@ std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_type)
 {
     auto ret = std::make_shared<EsInfoH264SliceHeader>();
-    ret->msg =  (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** pictur";
+    ret->msg = (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** pictur";
     ret->nalUnitType = nal_unit_type;
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
+    LOGD << "first_mb_in_slice " << first_mb_in_slice;
     auto slice_type = getBitsDecodeUGolomb();
     ret->sliceType = slice_type;
     switch (slice_type)
@@ -138,7 +228,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
         (void)colour_plane_id;
     }
     ret->frame_num = getBits(log2_max_frame_num_minus4 + 4);
-    if (!frame_mbs_only_flag)//field or frame
+    if (!frame_mbs_only_flag) // field or frame
     {
         auto field_pic_flag = getBits(1);
         ret->field = field_pic_flag;
@@ -150,7 +240,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
     }
     else
     {
-        ret->field = 0;//only frames
+        ret->field = 0; // only frames
     }
     return ret;
 }
@@ -238,10 +328,10 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     }
     auto constraint_set012_flag = getBits(3);
     (void)constraint_set012_flag;
-    //auto reserved_zero_5bits = getBits(5);
+    // auto reserved_zero_5bits = getBits(5);
     //(void)reserved_zero_5bits;
     skipBits(1);
-    LOGD << "constraint_set4_flag " <<  getBits(1);
+    LOGD << "constraint_set4_flag " << getBits(1);
     skipBits(3);
     auto level_idc = getBits(8);
     ret->levelIdc = level_idc;
@@ -317,18 +407,38 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     ret->height = (2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16;
     if (!frame_mbs_only_flag)
     {
-        //coded pictures of the coded video sequence may either be coded fields or coded frames
+        // coded pictures of the coded video sequence may either be coded fields or coded frames
         auto mb_adaptive_frame_field_flag = getBits(1);
         LOGD << (mb_adaptive_frame_field_flag ? "interlaced MBAFF" : "interlaced PAFF");
-        //mb_adaptive_frame_field_flag is 1 -> possible mbaff (macroblocks fields and frames)
+        // mb_adaptive_frame_field_flag is 1 -> possible mbaff (macroblocks fields and frames)
         // else no switching between frame and field macroblocks within a picture
     }
     else
     {
         LOGD << "progressive";
-        //every coded picture of the coded video sequence is a coded frame containing only frame macroblocks
+        // every coded picture of the coded video sequence is a coded frame containing only frame
+        // macroblocks
     }
 
+    auto direct_8x8_inference_flag = getBits(1);
+    (void)direct_8x8_inference_flag;
+    auto frame_cropping_flag = getBits(1);
+    if (frame_cropping_flag)
+    {
+        auto frame_crop_left_offset = getBitsDecodeUGolomb();
+        (void)frame_crop_left_offset;
+        auto frame_crop_right_offset = getBitsDecodeUGolomb();
+        (void)frame_crop_right_offset;
+        auto frame_crop_top_offset = getBitsDecodeUGolomb();
+        (void)frame_crop_top_offset;
+        auto frame_crop_bottom_offset = getBitsDecodeUGolomb();
+        (void)frame_crop_bottom_offset;
+    }
+    auto vui_parameters_present_flag = getBits(1);
+    if (vui_parameters_present_flag)
+    {
+        LOGD << "we have vui";
+    }
     return ret;
 }
 
