@@ -113,7 +113,10 @@ If you want to run a custom bash command you can do it by:
 ```
 docker-bash make help
 ```
-for instance.
+for instance. To get an interactive bash session type:
+```
+docker-interactive
+```
 
 ### Docker image
 To just use the latest image just pull from our private registry/repository @ DockerHub:
@@ -124,12 +127,6 @@ To build the image your self:
 ```
 make docker-image
 ```
-To spin-up a container:
-```
-make docker-bash
-```
-From here you can use the 3rd-party dependencies like
-tstools, clang-format-5.0 etc...
 
 ### How to test it
 In order to run all unit tests just type:

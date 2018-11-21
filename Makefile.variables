@@ -1,2 +1,2 @@
 DOCKER_IMAGE_NAME="heliconwave/circleci"
-DOCKER_IMAGE_VER="v8"
+DOCKER_IMAGE_VER="v9"
