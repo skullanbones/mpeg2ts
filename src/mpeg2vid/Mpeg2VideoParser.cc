@@ -16,28 +16,21 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
         auto startCodeFound = false;
         if (onePosition == from)
         {
-            if (mPicture.size() >= 3 && mPicture[mPicture.size() - 3] == 0 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
+            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
             {
                 startCodeFound = true;
             }
         }
         else if (onePosition == from + 1)
         {
-            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        else if (onePosition == from + 2)
-        {
-            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
+            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
         else if (onePosition != from + length)
         {
-            if (*(onePosition - 1) == 0 && *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
+            if (*(onePosition - 2) == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
