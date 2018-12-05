@@ -60,6 +60,7 @@ public:
     std::shared_ptr<EsInfoH264SequenceParameterSet> seq_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264PictureParameterSet> pic_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264SliceHeader> slice_header(int nal_unit_type);
+    void parse_vui();
     // sps data
     uint64_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;

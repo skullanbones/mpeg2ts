@@ -1,5 +1,6 @@
 ///
 #include <sstream>
+#include <iostream>
 /// 3rd-party
 #include <plog/Log.h>
 
@@ -420,8 +421,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         // macroblocks
     }
 
-    auto direct_8x8_inference_flag = getBits(1);
-    (void)direct_8x8_inference_flag;
+    auto direct_8x8_inference_flag = getBits(1);(void)direct_8x8_inference_flag;
     auto frame_cropping_flag = getBits(1);
     if (frame_cropping_flag)
     {
@@ -437,9 +437,98 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     auto vui_parameters_present_flag = getBits(1);
     if (vui_parameters_present_flag)
     {
-        LOGD << "we have vui";
+        parse_vui();
     }
     return ret;
+}
+
+void H264EsParser::parse_vui()
+{
+    auto aspect_ratio_info_present_flag = getBits(1);
+    if (aspect_ratio_info_present_flag)
+    {
+        auto aspect_ratio_idc = getBits(8);
+        LOGD << "aspect_ratio_info_present_flag: aspect_ratio_idc: " << aspect_ratio_idc;
+        if (aspect_ratio_idc == 255)
+        {
+            skipBits(16);
+            skipBits(16);
+        }
+    }
+        auto overscan_info_present_flag = getBits(1);
+        if (overscan_info_present_flag)
+        {
+            auto overscan_appropriate_flag = getBits(1);(void)overscan_appropriate_flag;
+        }
+        auto video_signal_type_present_flag = getBits(1);
+        if (video_signal_type_present_flag)
+        {
+            auto video_format = getBits(3);(void)video_format;
+            auto video_full_range_flag = getBits(1);(void)video_full_range_flag;
+            auto colour_description_present_flag = getBits(1);
+            LOGD << "video_signal_type_present_flag: video_format: " << video_format << ", video_full_range_flag:" << video_full_range_flag;
+            if (colour_description_present_flag)
+            {
+                auto colour_primaries = getBits(8);(void)colour_primaries;
+                auto transfer_characteristics = getBits(8);(void)transfer_characteristics;
+                auto matrix_coefficients = getBits(8);(void)matrix_coefficients;
+                LOGD << "colour_description_present_flag: colour_primaries: " << colour_primaries << ", transfer_characteristics:" << transfer_characteristics << ", matrix_coefficients:" << matrix_coefficients;
+            }
+        }
+        auto chroma_loc_info_present_flag = getBits(1);
+        if (chroma_loc_info_present_flag)
+        {
+            auto chroma_sample_loc_type_top_field = getBitsDecodeUGolomb();(void)chroma_sample_loc_type_top_field;
+            auto chroma_sample_loc_type_bottom_field = getBitsDecodeUGolomb();(void)chroma_sample_loc_type_bottom_field;
+            LOGD << "chroma_loc_info_present_flag: chroma_sample_loc_type_top_field: " << chroma_sample_loc_type_top_field << ", chroma_sample_loc_type_bottom_field:" << chroma_sample_loc_type_bottom_field;
+        }
+        auto timing_info_present_flag = getBits(1);
+        if (timing_info_present_flag)
+        {
+            //TODO: There is a bug here. I can not find it. It seems everything up to here is fine but we get wrong values in below code :(
+            auto num_units_in_tick = getBits(32);(void)num_units_in_tick;
+            auto time_scale = getBits(32);(void)time_scale;
+            auto fixed_frame_rate_flag = getBits(1);(void)fixed_frame_rate_flag;
+            LOGD << "timing_info_present_flag: num: " << num_units_in_tick << ", scale: " << time_scale << ", fixed frame rate: " << fixed_frame_rate_flag;
+            /*for (int i =0; i<32;++i)
+            {
+                std::cout << getBits(1) << " ";
+            }
+            std::cout << "\n";
+            for (int i =0; i<32;++i)
+            {
+                std::cout << getBits(1) << " ";
+            }
+            std::cout << "\n";
+            for (int i =0; i<1;++i)
+            {
+                std::cout << getBits(1) << " ";
+            }
+            std::cout << "\n";*/
+        }
+        auto nal_hrd_parameters_present_flag = getBits(1);
+        if (nal_hrd_parameters_present_flag)
+        {
+            LOGE << "Not supported can not parse any further";
+            //hrd_parameters();
+        }
+        auto vcl_hrd_parameters_present_flag = getBits(1);
+        if (vcl_hrd_parameters_present_flag)
+        {
+            LOGE << "Not supported can not parse any further";
+            //hrd_parameters();
+        }
+        if(nal_hrd_parameters_present_flag || vcl_hrd_parameters_present_flag)
+        {
+            auto low_delay_hrd_flag = getBits(1);(void)low_delay_hrd_flag;
+        }
+        auto pic_struct_present_flag = getBits(1);
+        LOGD << "pic_struct_present_flag " << (bool)pic_struct_present_flag;
+        auto bitstream_restriction_flag = getBits(1);
+        if (bitstream_restriction_flag)
+        {
+            LOGE << "bitstream_restriction_flag";
+        }
 }
 
 std::shared_ptr<EsInfoH264PictureParameterSet> H264EsParser::pic_parameter_set_rbsp(int nal_unit_type)

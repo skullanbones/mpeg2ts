@@ -44,7 +44,7 @@ void TsStatistics::checkCCError(int pid, uint8_t cc)
         {
             ++mPidStatistics[pid].numberOfCCErrors;
             LOGD_(FileLog) << "Continuity counter error at ts packet " << mCounters.mTsPacketCounter
-                           << " on pid " << pid << "\n";
+                           << " on pid " << pid << ", last: " << (int)mPidStatistics[pid].lastCC << ", cur: " << (int)cc << "\n";
         }
         mPidStatistics[pid].lastCC = cc;
     }
