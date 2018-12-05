@@ -7,6 +7,26 @@
 #include "EsParser.h"
 #include "GetBits.h"
 
+struct EsInfoMpeg2 : public EsInfo
+{
+    //    EsInfoMpeg2(int picture, const std::string& msg)
+    //        : picture{picture}, msg{msg} {}
+    int picture; // slice
+    std::string msg;
+};
+
+struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
+{
+    int picType; // I, B, P
+};
+
+struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
+{
+    int width, height;
+    std::string aspect;
+    std::string framerate;
+};
+
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
     static std::map<uint8_t, std::string> AspectToString;
@@ -24,10 +44,9 @@ public:
     virtual ~Mpeg2VideoEsParser() = default;
 
 
-    bool operator()(const uint8_t* from, std::size_t length) override;
-    virtual bool analyze();
+    std::vector<std::shared_ptr<EsInfo>> operator()(const uint8_t* from, std::size_t length) override;
+    virtual std::vector<std::shared_ptr<EsInfo>> analyze();
 
-    std::vector<uint8_t> last;
     int foundStartCodes;
     std::vector<uint8_t> mPicture;
 };

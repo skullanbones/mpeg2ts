@@ -4,7 +4,13 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <list>
+#include <memory>
 
+struct EsInfo
+{
+    virtual ~EsInfo(){};
+};
 
 class EsParser
 {
@@ -24,8 +30,8 @@ public:
         return std::find(from, from + length, 1);
     }
 
-    virtual bool operator()(const uint8_t* /*from*/, size_t /*length*/)
+    virtual std::vector<std::shared_ptr<EsInfo>> operator()(const uint8_t* /*from*/, size_t /*length*/)
     {
-        return true;
+        return std::vector<std::shared_ptr<EsInfo>>();
     }
 };

@@ -78,7 +78,7 @@ def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     pmt = asset_h264_dolby_atmos.get_pmt()
     log.debug(pmt)
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
-    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid'], '--pid', 4113])
     log.debug(out[0])
     log.debug(out[1])
     assert "PMT at Ts packet: 1" in out[1]
@@ -97,7 +97,10 @@ def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     assert "stream_type: STREAMTYPE_AUDIO_AC3_PLUS,  (132)" in out[1]
     assert "elementary_PID: 4353" in out[1]
     assert "ES_info_length: 12" in out[1]
-
+    assert "nal: 7 Sequence parameter set: profile: High level: 4.1" in out[1]
+    assert "sps id: 0, luma bits: 8, chroma bits: 8, width: 1920 x 1088, ref pic: 4" in out[1]
+    assert "nal: 8 Picture parameter set: entropy: CAVLC" in out[1]
+    assert "sps id: 0pps id: 0" in out[1]
 
 def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
     """
@@ -343,4 +346,5 @@ def test_parse_eurosport(parser, asset_eurosport):
     log.debug(out[0])
     log.debug(out[1])
     print(out[1])
-    assert "sequence_header_code size 704 x 576, aspect 3x4, frame rate 25" in out[1]
+    assert "sequence_header_code" in out[1]
+    assert "704 x 576, aspect: 3x4, frame rate: 25" in out[1]

@@ -7,82 +7,71 @@
 /// Project files
 #include <mpeg2vid/Mpeg2VideoParser.h>
 
-bool Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
+std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
-    auto tmpLast =
-    std::vector<uint8_t>(from + length - std::min(length, static_cast<std::size_t>(3)), from + length);
-    auto copyFrom = from;
-    auto end = from + length;
+    std::vector<std::shared_ptr<EsInfo>> ret;
     while (length > 0)
     {
-        auto onePosition = getFirstOne(from, length);
+        const uint8_t* onePosition = getFirstOne(from, length);
         auto startCodeFound = false;
         if (onePosition == from)
         {
-            if (last.size() >= 3 && last[2] == 0 && last[1] == 0 && last[0] == 0)
+            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
             {
                 startCodeFound = true;
             }
         }
         else if (onePosition == from + 1)
         {
-            if (last.size() >= 2 && last[1] == 0 && last[0] == 0 && *(onePosition - 1) == 0)
+            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
-        else if (onePosition == from + 2)
+        else if (onePosition != from + length)
         {
-            if (last.size() >= 1 && last[0] == 0 && *(onePosition - 1) == 0 && *(onePosition - 2) == 0)
+            if (*(onePosition - 2) == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
-        else
-        {
-            if ((onePosition != from + length) && *(onePosition - 1) == 0 &&
-                *(onePosition - 2) == 0 && *(onePosition - 3) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
+        const uint8_t* end = (onePosition != from + length) ? onePosition + 1 : onePosition;
+        std::copy(from, end, std::back_inserter(mPicture));
         if (startCodeFound)
         {
             ++foundStartCodes;
-            const uint8_t* r = onePosition + 1;
-            mPicture.insert(mPicture.end(), copyFrom, r);
-            if (!mPicture.empty())
+            if (mPicture.size() > 4)
             {
-                analyze();
+                auto vec = analyze();
+                for (auto& l : vec)
+                {
+                    ret.push_back(l);
+                }
             }
-            mPicture.clear();
-            copyFrom = onePosition + 1;
+            mPicture = { 0, 0, 0, 1 };
         }
-        int diff = (onePosition - from);
-        length -= diff;
+        size_t diff = (onePosition + 1 - from);
+        length = diff > length ? 0 : length - diff;
         from = onePosition + 1;
     }
 
-    last = tmpLast;
-
-    if (copyFrom < end)
-    {
-        mPicture.insert(mPicture.end(), copyFrom, end);
-    }
-
-    return true;
+    return ret;
 }
 
-bool Mpeg2VideoEsParser::analyze()
+std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
-    resetBits(mPicture.data(), mPicture.size());
+    resetBits(mPicture.data() + 4, mPicture.size() - 4);
     std::ostringstream msg;
-    if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
+    std::vector<std::shared_ptr<EsInfo>> ret;
+    auto rete = std::make_shared<EsInfoMpeg2>();
+    rete->picture = mPicture[4];
+    if (rete->picture == 0 && mPicture.size() > 4)
     {
-        msg << "picture_start_code ";
+        auto retel = std::make_shared<EsInfoMpeg2PictureSliceCode>();
+        retel->picture = rete->picture;
         skipBits(10 + 8);
-        auto picType = getBits(3);
-        switch (picType)
+        retel->picType = getBits(3);
+        switch (retel->picType)
         {
         case 1:
             msg << "I";
@@ -96,54 +85,63 @@ bool Mpeg2VideoEsParser::analyze()
         default:
             msg << "forbiden/reserved";
         };
-        LOGD << msg.str();
+        retel->msg = msg.str();
+        ret.push_back(retel);
     }
-    else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
+    else if (rete->picture >= 0x01 && rete->picture <= 0xaf)
     {
-        LOGD << "slice_start_code";
+        rete->msg = "slice_start_code";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
+    else if (rete->picture == 0xb0 && rete->picture == 0xb1 && rete->picture == 0xb6)
     {
-        LOGD << "reserved";
+        rete->msg = "reserved";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb2)
+    else if (rete->picture == 0xb2)
     {
-        LOGD << "user_data_start_code";
+        rete->msg = "user_data_start_code";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb3)
+    else if (rete->picture == 0xb3)
     {
-        msg << "sequence_header_code ";
+        auto retel = std::make_shared<EsInfoMpeg2SequenceHeader>();
+        retel->msg = "sequence_header_code ";
         skipBits(8);
-        auto horizontal_size_value = getBits(12);
-        auto vertical_size_value = getBits(12);
+        retel->width = getBits(12);
+        retel->height = getBits(12);
         auto aspect_ratio_information = getBits(4);
         auto frame_rate_code = getBits(4);
-        msg << "size " << horizontal_size_value << " x " << vertical_size_value;
-        msg << ", aspect " << AspectToString[aspect_ratio_information];
-        msg << ", frame rate " << FrameRateToString[frame_rate_code];
-        LOGD << msg.str();
+        retel->aspect = AspectToString[aspect_ratio_information];
+        retel->framerate = FrameRateToString[frame_rate_code];
+        ret.push_back(retel);
     }
-    else if (mPicture[0] == 0xb4)
+    else if (rete->picture == 0xb4)
     {
-        LOGD << "sequence_error_code";
+        rete->msg = "sequence_error_code";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb5)
+    else if (rete->picture == 0xb5)
     {
-        LOGD << "extension_start_code";
+        rete->msg = "extension_start_code";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb7)
+    else if (rete->picture == 0xb7)
     {
-        LOGD << "sequence_end_code";
+        rete->msg = "sequence_end_code";
+        ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb8)
+    else if (rete->picture == 0xb8)
     {
-        LOGD << "group_start_code";
+        rete->msg = "group_start_code";
+        ret.push_back(rete);
     }
     else
     {
-        LOGD << "system start code";
+        rete->msg = "system start code";
+        ret.push_back(rete);
     }
-    return true;
+    return ret;
 }
 
 std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString =
