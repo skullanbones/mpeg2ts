@@ -64,11 +64,11 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     std::ostringstream msg;
     std::vector<std::shared_ptr<EsInfo>> ret;
     auto rete = std::make_shared<EsInfoMpeg2>();
-    rete->picture = mPicture[0];
-    if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
+    rete->picture = mPicture[4];
+    if (rete->picture == 0 && mPicture.size() > 4)
     {
         auto retel = std::make_shared<EsInfoMpeg2PictureSliceCode>();
-        retel->picture = mPicture[0];
+        retel->picture = rete->picture;
         skipBits(10 + 8);
         retel->picType = getBits(3);
         switch (retel->picType)
@@ -88,22 +88,22 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         retel->msg = msg.str();
         ret.push_back(retel);
     }
-    else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
+    else if (rete->picture >= 0x01 && rete->picture <= 0xaf)
     {
         rete->msg = "slice_start_code";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb0 && mPicture[0] == 0xb1 && mPicture[0] == 0xb6)
+    else if (rete->picture == 0xb0 && rete->picture == 0xb1 && rete->picture == 0xb6)
     {
         rete->msg = "reserved";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb2)
+    else if (rete->picture == 0xb2)
     {
         rete->msg = "user_data_start_code";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb3)
+    else if (rete->picture == 0xb3)
     {
         auto retel = std::make_shared<EsInfoMpeg2SequenceHeader>();
         retel->msg = "sequence_header_code ";
@@ -116,22 +116,22 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         retel->framerate = FrameRateToString[frame_rate_code];
         ret.push_back(retel);
     }
-    else if (mPicture[0] == 0xb4)
+    else if (rete->picture == 0xb4)
     {
         rete->msg = "sequence_error_code";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb5)
+    else if (rete->picture == 0xb5)
     {
         rete->msg = "extension_start_code";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb7)
+    else if (rete->picture == 0xb7)
     {
         rete->msg = "sequence_end_code";
         ret.push_back(rete);
     }
-    else if (mPicture[0] == 0xb8)
+    else if (rete->picture == 0xb8)
     {
         rete->msg = "group_start_code";
         ret.push_back(rete);
