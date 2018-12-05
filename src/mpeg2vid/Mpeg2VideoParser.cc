@@ -12,7 +12,7 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
     std::list<std::shared_ptr<EsInfo>> ret;
     while (length > 0)
     {
-        uint8_t* onePosition = getFirstOne(from, length);
+        const uint8_t* onePosition = getFirstOne(from, length);
         auto startCodeFound = false;
         if (onePosition == from)
         {
@@ -67,11 +67,11 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     rete->picture = mPicture[0];
     if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
     {
-        auto rete = std::make_shared<EsInfoMpeg2PictureSliceCode>();
-        rete->picture = mPicture[0];
+        auto retel = std::make_shared<EsInfoMpeg2PictureSliceCode>();
+        retel->picture = mPicture[0];
         skipBits(10 + 8);
-        rete->picType = getBits(3);
-        switch (rete->picType)
+        retel->picType = getBits(3);
+        switch (retel->picType)
         {
         case 1:
             msg << "I";
@@ -85,8 +85,8 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         default:
             msg << "forbiden/reserved";
         };
-        rete->msg = msg.str();
-        ret.push_back(rete);
+        retel->msg = msg.str();
+        ret.push_back(retel);
     }
     else if (mPicture[0] >= 0x01 && mPicture[0] <= 0xaf)
     {
@@ -105,16 +105,16 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
     }
     else if (mPicture[0] == 0xb3)
     {
-        auto rete = std::make_shared<EsInfoMpeg2SequenceHeader>();
-        rete->msg = "sequence_header_code ";
+        auto retel = std::make_shared<EsInfoMpeg2SequenceHeader>();
+        retel->msg = "sequence_header_code ";
         skipBits(8);
-        rete->width = getBits(12);
-        rete->height = getBits(12);
+        retel->width = getBits(12);
+        retel->height = getBits(12);
         auto aspect_ratio_information = getBits(4);
         auto frame_rate_code = getBits(4);
-        rete->aspect = AspectToString[aspect_ratio_information];
-        rete->framerate = FrameRateToString[frame_rate_code];
-        ret.push_back(rete);
+        retel->aspect = AspectToString[aspect_ratio_information];
+        retel->framerate = FrameRateToString[frame_rate_code];
+        ret.push_back(retel);
     }
     else if (mPicture[0] == 0xb4)
     {

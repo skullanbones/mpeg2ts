@@ -523,7 +523,7 @@ void H264EsParser::parse_vui()
             auto low_delay_hrd_flag = getBits(1);(void)low_delay_hrd_flag;
         }
         auto pic_struct_present_flag = getBits(1);
-        LOGD << "pic_struct_present_flag " << (bool)pic_struct_present_flag;
+        LOGD << "pic_struct_present_flag " << static_cast<bool>(pic_struct_present_flag);
         auto bitstream_restriction_flag = getBits(1);
         if (bitstream_restriction_flag)
         {

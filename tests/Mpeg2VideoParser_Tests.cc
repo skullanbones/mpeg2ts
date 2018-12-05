@@ -18,7 +18,7 @@ TEST(Mpeg2VideoTests, Parse1)
 
 TEST(Mpeg2VideoTests, Parse2)
 {
-    std::vector<uint8_t> testVec = { 0, 0, 1 };
+    std::vector<uint8_t> testVec = { 0, 1 };
     Mpeg2VideoEsParser parser;
 
     parser(testVec.data(), testVec.size());
@@ -84,7 +84,7 @@ TEST(Mpeg2VideoTests, Parse7)
 
 TEST(Mpeg2VideoTests, Parse8)
 {
-    std::vector<uint8_t> testVec = { 1, 2, 3, 0, 0, 1, 0, 0, 0, 1 };
+    std::vector<uint8_t> testVec = { 1, 2, 3, 0, 1, 0, 0, 1 };
     Mpeg2VideoEsParser parser;
 
     parser(testVec.data(), testVec.size());
