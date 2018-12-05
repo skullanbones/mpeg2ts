@@ -30,8 +30,8 @@ public:
         return std::find(from, from + length, 1);
     }
 
-    virtual std::list<std::shared_ptr<EsInfo>> operator()(const uint8_t* /*from*/, size_t /*length*/)
+    virtual std::vector<std::shared_ptr<EsInfo>> operator()(const uint8_t* /*from*/, size_t /*length*/)
     {
-        return std::list<std::shared_ptr<EsInfo>>();
+        return std::vector<std::shared_ptr<EsInfo>>();
     }
 };

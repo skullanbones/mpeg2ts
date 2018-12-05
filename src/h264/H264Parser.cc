@@ -86,15 +86,15 @@ static std::string seipayloadTypeToString(uint64_t payloadType)
     }
     return "reserved_sei_message(payloadSize)";
 }
-std::list<std::shared_ptr<EsInfo>> H264EsParser::analyze()
+std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 {
     resetBits(mPicture.data() + 4, mPicture.size() - 4);
-    std::list<std::shared_ptr<EsInfo>> ret;
+    std::vector<std::shared_ptr<EsInfo>> ret;
     auto forbidden_zero_bit = getBits(1);
     if (forbidden_zero_bit != 0)
     {
         LOGD << "Syntax error";
-        return std::list<std::shared_ptr<EsInfo>>();
+        return std::vector<std::shared_ptr<EsInfo>>();
     }
     skipBits(2);
     auto nal_unit_type = getBits(5);

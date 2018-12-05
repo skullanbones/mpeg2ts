@@ -7,9 +7,9 @@
 /// Project files
 #include <mpeg2vid/Mpeg2VideoParser.h>
 
-std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
+std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
-    std::list<std::shared_ptr<EsInfo>> ret;
+    std::vector<std::shared_ptr<EsInfo>> ret;
     while (length > 0)
     {
         const uint8_t* onePosition = getFirstOne(from, length);
@@ -42,8 +42,8 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
             ++foundStartCodes;
             if (mPicture.size() > 4)
             {
-                auto list = analyze();
-                for (auto& l : list)
+                auto vec = analyze();
+                for (auto& l : vec)
                 {
                     ret.push_back(l);
                 }
@@ -58,11 +58,11 @@ std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t*
     return ret;
 }
 
-std::list<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
+std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
     resetBits(mPicture.data() + 4, mPicture.size() - 4);
     std::ostringstream msg;
-    std::list<std::shared_ptr<EsInfo>> ret;
+    std::vector<std::shared_ptr<EsInfo>> ret;
     auto rete = std::make_shared<EsInfoMpeg2>();
     rete->picture = mPicture[0];
     if (mPicture[0] == 0 && mPicture.size() > 4) // TODO: 4 ?
