@@ -68,11 +68,11 @@ int Settings::getLogFileMaxNumberOf() const
 ///////////////// LoadException /////////////////////////
 
 LoadException::LoadException(const std::string& message)
-: message_(message)
+    : message_(message)
 {
 }
 
 LoadException::LoadException(const std::exception e)
-: message_(e.what())
+    : message_(e.what())
 {
 }

@@ -367,10 +367,10 @@ TEST(TsParserTests, parse_descriptor)
         uint8_t table_id;
         parser.parseTsPacketInfo(pmt_packet_2_1, info);
         EXPECT_EQ(32, info.pid);
-    
+
         parser.collectTable(pmt_packet_2_1, info, table_id);
         EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
-     
+
         parser.parseTsPacketInfo(pmt_packet_2_2, info);
         parser.collectTable(pmt_packet_2_2, info, table_id);
         EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
@@ -396,7 +396,7 @@ TEST(TsParserTests, parse_descriptor_large_pmt)
         uint8_t table_id;
         parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
         EXPECT_EQ(50, info.pid);
-        
+
         parser.collectTable(large_pmt_ts_packet_1, info, table_id);
         EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
 

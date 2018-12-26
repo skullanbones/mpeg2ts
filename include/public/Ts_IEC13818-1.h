@@ -14,7 +14,8 @@
 #include <iostream>
 #include <map>
 
-namespace mpeg2ts {
+namespace mpeg2ts
+{
 
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
@@ -49,14 +50,14 @@ const int PMT_STREAM_TYPE_LENGTH = 5;
 struct TsHeader
 {
     TsHeader()
-    : sync_byte{ 0 }
-    , transport_error_indicator{ false }
-    , payload_unit_start_indicator{ false }
-    , transport_priority{ false }
-    , PID{ 0x1fff }
-    , transport_scrambling_control{ 0 }
-    , adaptation_field_control{ 0 }
-    , continuity_counter{ 0 }
+        : sync_byte{ 0 }
+        , transport_error_indicator{ false }
+        , payload_unit_start_indicator{ false }
+        , transport_priority{ false }
+        , PID{ 0x1fff }
+        , transport_scrambling_control{ 0 }
+        , adaptation_field_control{ 0 }
+        , continuity_counter{ 0 }
     {
     }
 
@@ -74,10 +75,12 @@ struct TsHeader
         ss << "-------------TsHeader------------- " << std::endl;
         ss << "sync_byte:  0x" << std::hex << static_cast<int>(rhs.sync_byte) << std::dec << std::endl;
         ss << "transport_error_indicator: " << static_cast<int>(rhs.transport_error_indicator) << std::endl;
-        ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator) << std::endl;
+        ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator)
+           << std::endl;
         ss << "transport_priority: " << static_cast<int>(rhs.transport_priority) << std::endl;
         ss << "PID: " << rhs.PID << std::endl;
-        ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control) << std::endl;
+        ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control)
+           << std::endl;
         ss << "adaptation_field_control: " << static_cast<int>(rhs.adaptation_field_control) << std::endl;
         ss << "continuity_counter: " << static_cast<int>(rhs.continuity_counter) << std::endl;
         return ss;
@@ -263,7 +266,7 @@ enum StreamId
 };
 
 /*! @brief Descriptor tags Table 2-45
-*/
+ */
 
 enum struct DescriptorTag : uint32_t
 {
@@ -337,14 +340,14 @@ struct CatDescriptor : public Descriptor
 };
 
 /*! Table 2-65 – Maximum bitrate descriptor */
-struct MaximumBitrateDescriptor : public Descriptor 
+struct MaximumBitrateDescriptor : public Descriptor
 {
     uint8_t reserved;
     uint32_t maximum_bitrate;
 };
 
 /*! Table 2-84 – Metadata pointer descriptor */
-struct Metadata_pointer_descriptor : public Descriptor 
+struct Metadata_pointer_descriptor : public Descriptor
 {
     uint16_t metadata_application_format;
     // TODO

@@ -335,15 +335,15 @@ TEST_F(PsiTableTest, test_psitable_stream_operator)
     std::stringstream out;
     out << d;
 
-    std::string correct_str = "\n-------------PsiTable-------------\n" 
-                            "table_id:0\n"
-                    "section_syntax_indicator: 0\n"
-                    "section_length: 0\n"
-                    "transport_stream_id: 0\n"
-                    "version_number: 0\n"
-                    "current_next_indicator: 0\n"
-                    "section_number: 0\n"
-                    "last_section_number: 0\n";
+    std::string correct_str = "\n-------------PsiTable-------------\n"
+                              "table_id:0\n"
+                              "section_syntax_indicator: 0\n"
+                              "section_length: 0\n"
+                              "transport_stream_id: 0\n"
+                              "version_number: 0\n"
+                              "current_next_indicator: 0\n"
+                              "section_number: 0\n"
+                              "last_section_number: 0\n";
 
 
     EXPECT_EQ(out.str(), correct_str) << "operator<< does not give correct output";
@@ -352,16 +352,16 @@ TEST_F(PsiTableTest, test_psitable_stream_operator)
 TEST_F(PsiTableTest, test_pattable_stream_operator)
 {
     PatTable d;
-    Program p = {1, 10, ProgramType::PMT};
+    Program p = { 1, 10, ProgramType::PMT };
     d.programs.push_back(p);
     std::stringstream out;
     out << d;
 
     std::string correct_str = "\n-------------PatTable-------------\n"
-                                "programs.size(): 1\n"
-                                "-------------program 0--------------\n"
-                                "program_number: 1\n"
-                                "program_map_PID: 10\n";
+                              "programs.size(): 1\n"
+                              "-------------program 0--------------\n"
+                              "program_number: 1\n"
+                              "program_map_PID: 10\n";
 
     EXPECT_EQ(out.str(), correct_str) << "operator<< does not give correct output";
 }
@@ -369,16 +369,16 @@ TEST_F(PsiTableTest, test_pattable_stream_operator)
 TEST_F(PsiTableTest, test_pattable_stream_operator_nit)
 {
     PatTable d;
-    Program p = {1, 10, ProgramType::NIT};
+    Program p = { 1, 10, ProgramType::NIT };
     d.programs.push_back(p);
     std::stringstream out;
     out << d;
 
     std::string correct_str = "\n-------------PatTable-------------\n"
-                                "programs.size(): 1\n"
-                                "-------------program 0--------------\n"
-                                "program_number: 1\n"
-                                "network_PID: 10\n";
+                              "programs.size(): 1\n"
+                              "-------------program 0--------------\n"
+                              "program_number: 1\n"
+                              "network_PID: 10\n";
 
     EXPECT_EQ(out.str(), correct_str) << "operator<< does not give correct output";
 }
@@ -386,33 +386,33 @@ TEST_F(PsiTableTest, test_pattable_stream_operator_nit)
 TEST_F(PmtTableTest, test_pmttable_stream_operator)
 {
     PmtTable d;
-    StreamTypeHeader hdr = {STREAMTYPE_RESERVED, 10, 1};
+    StreamTypeHeader hdr = { STREAMTYPE_RESERVED, 10, 1 };
     d.streams.push_back(hdr);
     std::stringstream out;
     out << d;
 
     std::string correct_str = "\n-------------PmtTable-------------\n"
-                                "PCR_PID: 0\n"
-                                "program_info_length: 0\n"
-                                "streams.size(): 1\n"
-                                "-------------stream 0--------------\n"
-                                "stream_type: STREAMTYPE_RESERVED,  (0)\n"
-                                "elementary_PID: 10\n"
-                                "ES_info_length: 1\n";
+                              "PCR_PID: 0\n"
+                              "program_info_length: 0\n"
+                              "streams.size(): 1\n"
+                              "-------------stream 0--------------\n"
+                              "stream_type: STREAMTYPE_RESERVED,  (0)\n"
+                              "elementary_PID: 10\n"
+                              "ES_info_length: 1\n";
 
     EXPECT_EQ(out.str(), correct_str) << "operator<< does not give correct output";
 }
 
 TEST(StreamTypeHeader, test_stream_type_hdr)
 {
-    StreamTypeHeader hdr = {STREAMTYPE_RESERVED, 10, 1};
+    StreamTypeHeader hdr = { STREAMTYPE_RESERVED, 10, 1 };
     std::stringstream out;
     out << hdr;
 
-    std::string correct_str =   "\n-------------StreamTypeHeader-------------\n"
-                                "stream_type: STREAMTYPE_RESERVED,  (0)\n"
-                                "elementary_PID: 10\n"
-                                "ES_info_length: 1\n";
+    std::string correct_str = "\n-------------StreamTypeHeader-------------\n"
+                              "stream_type: STREAMTYPE_RESERVED,  (0)\n"
+                              "elementary_PID: 10\n"
+                              "ES_info_length: 1\n";
 
     EXPECT_EQ(out.str(), correct_str) << "operator<< does not give correct output";
 }

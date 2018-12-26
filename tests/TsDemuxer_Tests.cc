@@ -45,7 +45,7 @@ void PMTCallback(const ByteVector& rawPes, PsiTable* table, uint16_t pid, void* 
     instance->onPmtCallback();
 }
 
-void PESCallback(const ByteVector& rawPes, const PesPacket& pes,  uint16_t pid, void* hdl)
+void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)
 {
     puts("came here PESCallback\n");
     IDemuxerCallbacks* instance = reinterpret_cast<IDemuxerCallbacks*>(hdl);
@@ -73,11 +73,10 @@ public:
     {
     }
 
-    
-    template<typename Callable>
-    void ExpectNoException(Callable f)
+
+    template <typename Callable> void ExpectNoException(Callable f)
     {
-        try 
+        try
         {
             f();
         }
@@ -101,13 +100,12 @@ public:
  */
 TEST_F(TsDemuxerTest, TestDemuxPatPacket)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
-                            std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
-                            std::placeholders::_3, std::placeholders::_4),
-                            mcallback.get());
-        
+                          std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
+                                    std::placeholders::_3, std::placeholders::_4),
+                          mcallback.get());
+
         EXPECT_CALL(*mcallback, onPatCallback()).Times(1);
         demuxer.demux(pat_packet_1);
     });
@@ -118,8 +116,7 @@ TEST_F(TsDemuxerTest, TestDemuxPatPacket)
  */
 TEST_F(TsDemuxerTest, TestDemux2PatPacket)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPsiPid(TS_PACKET_PID_PAT,
                           std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
@@ -136,8 +133,7 @@ TEST_F(TsDemuxerTest, TestDemux2PatPacket)
  */
 TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPsiPid(1010,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
@@ -149,15 +145,14 @@ TEST_F(TsDemuxerTest, TestDemuxPmtPacket)
 }
 
 /*!
-* Test we can demux a PMT packet over 2 ts-packets
-*/
+ * Test we can demux a PMT packet over 2 ts-packets
+ */
 TEST_F(TsDemuxerTest, TestDemux2PmtPackets)
 {
-    ExpectNoException([&]
-    {
-        demuxer.addPsiPid(32, 
+    ExpectNoException([&] {
+        demuxer.addPsiPid(32,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
-                          std::placeholders::_3, std::placeholders::_4),
+                                    std::placeholders::_3, std::placeholders::_4),
                           mcallback.get());
         EXPECT_CALL(*mcallback, onPmtCallback()).Times(1);
         demuxer.demux(pmt_packet_2_1);
@@ -170,8 +165,7 @@ TEST_F(TsDemuxerTest, TestDemux2PmtPackets)
  */
 TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
@@ -189,8 +183,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPackets)
  */
 TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPsiPid(50,
                           std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
@@ -214,8 +207,7 @@ TEST_F(TsDemuxerTest, TestDemuxServeralPmtPacketsAlternatingOtherPat)
  */
 TEST_F(TsDemuxerTest, TestDemuxOnePesPacket)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPesPid(50,
                           std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
@@ -236,33 +228,27 @@ TEST_F(TsDemuxerTest, TestDemuxOnePesPacket)
 }
 
 /*!
-* Test we can parse 1 TS-packet
-*/
+ * Test we can parse 1 TS-packet
+ */
 TEST_F(TsDemuxerTest, TestDemuxOneTsPacket)
 {
-    ExpectNoException([&]
-    {
-        demuxer.addTsPid(50,
-                          std::bind(&TSCallback, std::placeholders::_1, std::placeholders::_2,
-                                    std::placeholders::_3),
-                          mcallback.get());
+    ExpectNoException([&] {
+        demuxer.addTsPid(50, std::bind(&TSCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                         mcallback.get());
 
         EXPECT_CALL(*mcallback, onTsCallback()).Times(1);
         demuxer.demux(ts_pes_1);
     });
 }
 
-/*! 
-* Test we get correct Ts counter statistics
-*/
+/*!
+ * Test we get correct Ts counter statistics
+ */
 TEST_F(TsDemuxerTest, test_get_ts_counters)
 {
-    ExpectNoException([&]
-    {
-        demuxer.addTsPid(50,
-                          std::bind(&TSCallback, std::placeholders::_1, std::placeholders::_2,
-                                    std::placeholders::_3),
-                          mcallback.get());
+    ExpectNoException([&] {
+        demuxer.addTsPid(50, std::bind(&TSCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                         mcallback.get());
 
         EXPECT_CALL(*mcallback, onTsCallback()).Times(4);
         demuxer.demux(ts_pes_1);
@@ -278,17 +264,16 @@ TEST_F(TsDemuxerTest, test_get_ts_counters)
     });
 }
 
-/*! 
-* Test we get correct PID statistics
-*/
+/*!
+ * Test we get correct PID statistics
+ */
 TEST_F(TsDemuxerTest, test_get_pid_statistics)
 {
-    ExpectNoException([&]
-    {
+    ExpectNoException([&] {
         demuxer.addPesPid(50,
                           std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
                                     std::placeholders::_3, std::placeholders::_4),
-                          mcallback.get());                  
+                          mcallback.get());
 
         EXPECT_CALL(*mcallback, onPesCallback()).Times(1);
         demuxer.demux(ts_pes_1);
@@ -307,7 +292,8 @@ TEST_F(TsDemuxerTest, test_get_pid_statistics)
 
         // Test correct keys
         std::vector<int> keys;
-        for(auto & stat : map) {
+        for (auto& stat : map)
+        {
             keys.push_back(stat.first);
         }
         EXPECT_EQ(keys.size(), 1);
@@ -318,14 +304,14 @@ TEST_F(TsDemuxerTest, test_get_pid_statistics)
         EXPECT_EQ(stat.numberOfCCErrors, 0);
         EXPECT_EQ(stat.numberOfTsDiscontinuities, 0);
 
-        //EXPECT_EQ(stat.lastPts, 689094304); // Why does it not work?
+        // EXPECT_EQ(stat.lastPts, 689094304); // Why does it not work?
 
         EXPECT_EQ(stat.numberOfMissingPts, 0);
 
         // TODO check PID
         std::map<int64_t, uint64_t> dts_histogram = stat.dtsHistogram;
         std::map<int64_t, uint64_t> pts_histogram = stat.ptsHistogram;
-        EXPECT_EQ(dts_histogram.size(), 0); // Not Sure why this is correct. 
-        EXPECT_EQ(pts_histogram.size(), 0); // Not Sure why this is correct. 
+        EXPECT_EQ(dts_histogram.size(), 0); // Not Sure why this is correct.
+        EXPECT_EQ(pts_histogram.size(), 0); // Not Sure why this is correct.
     });
 }

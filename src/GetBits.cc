@@ -1,11 +1,11 @@
 #include "GetBits.h"
 
 GetBits::GetBits()
-: mNumStoredBits{ 0 }
-, mBitStore{ 0 }
-, mSrcInx{ 0 }
-, mSize{ 0 }
-, mSrcBytes{ nullptr }
+    : mNumStoredBits{ 0 }
+    , mBitStore{ 0 }
+    , mSrcInx{ 0 }
+    , mSize{ 0 }
+    , mSrcBytes{ nullptr }
 {
 }
 

@@ -86,15 +86,16 @@ void display_usage()
     printf(
     "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]\n");
 
-    printf( "Option Arguments:\n"
-                 "        -h [ --help ]        Print help messages\n"
-                 "        -v [ --version ]     Print library version\n"
-                 "        -p [ --pid PID]      Print PSI tables info with PID\n"
-                 "        -w [ --write PID]    Writes PES packets with PID to file\n"
-                 "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-                 "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose "
-                 "what logs are filtered, both file and stdout, default: %s\n"
-                 "        -i [ --input FILE]   Use input file for parsing\n", plog::severityToString(DEFAULT_LOG_LEVEL));
+    printf("Option Arguments:\n"
+           "        -h [ --help ]        Print help messages\n"
+           "        -v [ --version ]     Print library version\n"
+           "        -p [ --pid PID]      Print PSI tables info with PID\n"
+           "        -w [ --write PID]    Writes PES packets with PID to file\n"
+           "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
+           "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose "
+           "what logs are filtered, both file and stdout, default: %s\n"
+           "        -i [ --input FILE]   Use input file for parsing\n",
+           plog::severityToString(DEFAULT_LOG_LEVEL));
 }
 
 void display_statistics(mpeg2ts::PidStatisticsMap statistics)

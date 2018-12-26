@@ -33,22 +33,23 @@ struct GetBitsTest : public ::testing::Test
     void SetUp() override
     {
         parser.resetBits(testData, sizeof(testData));
-        empty_parser.resetBits({0}, 0);
+        empty_parser.resetBits({ 0 }, 0);
     }
 
     template <typename Callable>
     void ExpectCorrectException(const Callable& f, const GetBitsException& expected)
     {
-        try 
+        try
         {
             f();
             FAIL() << "Expected GetBitsException";
         }
-        catch(GetBitsException const & e)
+        catch (GetBitsException const& e)
         {
-            ASSERT_STREQ(e.what(), expected.what()) << "Wrong exception message, expected: " << expected.what();
+            ASSERT_STREQ(e.what(), expected.what())
+            << "Wrong exception message, expected: " << expected.what();
         }
-        catch(...)
+        catch (...)
         {
             FAIL() << "Expected GetBitsException";
         }
@@ -168,26 +169,22 @@ TEST_F(GetBitsTest, TestGetBitsMoreThan64)
 /// Testing we throw exception when no data available
 TEST_F(GetBitsTest, test_with_no_data_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
-        empty_parser.getBits(8);    
-    }, GetBitsException("null input data"));
+    ExpectCorrectException([&] { empty_parser.getBits(8); }, GetBitsException("null input data"));
 }
 
 /// Testing we can only request maximum data size 64 bits
 TEST_F(GetBitsTest, test_with_overlimit_data_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
-        parser.getBits(65);
-    }, GetBitsException("Cannot parse more than 64 individual bits at a time."));
+    ExpectCorrectException([&] { parser.getBits(65); },
+                           GetBitsException(
+                           "Cannot parse more than 64 individual bits at a time."));
 }
 
 /// Testing we can only request maximum data
 TEST_F(GetBitsTest, test_with_out_of_bound_read_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
+    ExpectCorrectException(
+    [&] {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         EXPECT_EQ(0x47, parser.getBits(8));
@@ -201,14 +198,15 @@ TEST_F(GetBitsTest, test_with_out_of_bound_read_expect_failure)
         EXPECT_EQ(0x00, parser.getBits(8));
         EXPECT_EQ(0x01, parser.getBits(8));
         parser.getBits(8); /// This doesnt exist in limitedData
-    }, GetBitsException("getBits: Out of bound read"));
+    },
+    GetBitsException("getBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_bits_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
+    ExpectCorrectException(
+    [&] {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         parser.skipBits(65);
@@ -222,32 +220,35 @@ TEST_F(GetBitsTest, test_skip_bits_expect_failure)
         parser.skipBits(8);
         parser.skipBits(8);
         parser.skipBits(8); /// This doesnt exist in limitedData
-    }, GetBitsException("getBits: Out of bound read"));
+    },
+    GetBitsException("getBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_more_than_64_bits_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
+    ExpectCorrectException(
+    [&] {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         parser.skipBits(80);
         parser.skipBits(65); /// This doesnt exist in limitedData
-    }, GetBitsException("skipBits: Out of bound read"));
+    },
+    GetBitsException("skipBits: Out of bound read"));
 }
 
 /// Testing we can only skip maximum data
 TEST_F(GetBitsTest, test_skip_bytes_beyond_data_expect_failure)
 {
-    ExpectCorrectException([&]
-    {
+    ExpectCorrectException(
+    [&] {
         parser.resetBits(limitedData, sizeof(limitedData));
 
         parser.skipBytes(9);
         parser.skipBytes(1); // TODO Is this correct?
-        //parser.skipBytes(65); /// This doesnt exist in limitedData
-    }, GetBitsException("getBits: Out of bound read mSrcInx: 9"));
+        // parser.skipBytes(65); /// This doesnt exist in limitedData
+    },
+    GetBitsException("getBits: Out of bound read mSrcInx: 9"));
 }
 
 /// Make coverage happy...

@@ -20,7 +20,7 @@ class IpAddress
 {
 public:
     explicit IpAddress(const std::string& ip)
-    : mIpAddress(ip)
+        : mIpAddress(ip)
     {
     }
     std::string GetIpAddress() const
@@ -36,7 +36,7 @@ class Port
 {
 public:
     explicit Port(const std::string& port)
-    : mPort(port)
+        : mPort(port)
     {
     }
     std::string GetPort() const
@@ -90,9 +90,12 @@ public:
     MPEG2TS_API bool parseTransportStreamData(const uint8_t* data, std::size_t size);
 
     //* callbacks *//
-    static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
-    static void PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
-    static void PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl);
+    static void
+    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    static void
+    PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    static void
+    PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl);
 
     //* PAT *//
     //! \brief Returns the PAT table found in stream

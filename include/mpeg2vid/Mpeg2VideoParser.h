@@ -37,7 +37,7 @@ public:
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
 
     Mpeg2VideoEsParser()
-    : foundStartCodes{ 0 }
+        : foundStartCodes{ 0 }
     {
     }
 
