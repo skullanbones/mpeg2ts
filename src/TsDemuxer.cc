@@ -24,7 +24,7 @@
 namespace mpeg2ts
 {
 TsDemuxer::TsDemuxer()
-: mParser{ std::unique_ptr<TsParser>(new TsParser()) }
+    : mParser{ std::unique_ptr<TsParser>(new TsParser()) }
 {
 }
 

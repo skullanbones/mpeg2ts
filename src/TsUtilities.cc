@@ -19,7 +19,7 @@ const int TsUtilities::LOGFILE_MAXSIZE = 100 * 1024;
 const int TsUtilities::LOGFILE_MAXNUMBEROF = 10;
 
 TsUtilities::TsUtilities()
-: mAddedPmts{ false }
+    : mAddedPmts{ false }
 {
 }
 

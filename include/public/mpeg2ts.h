@@ -150,9 +150,9 @@ struct StreamTypeHeader
 class PmtTable : public PsiTable
 {
 public:
-    PmtTable() 
-    : PCR_PID(0)
-    , program_info_length(0)
+    PmtTable()
+        : PCR_PID(0)
+        , program_info_length(0)
     {
     }
 
@@ -181,25 +181,25 @@ class TsPacketInfo
 {
 public:
     TsPacketInfo()
-    : pid{ 0x1fff }
-    , errorIndicator{ false }
-    , isPayloadStart{ false }
-    , hasAdaptationField{ false }
-    , hasPayload{ false }
-    , hasPrivateData{ false }
-    , hasRandomAccess{ false }
-    , isScrambled{ false }
-    , isDiscontinuity{ false }
-    , continuityCounter{ 0 }
-    , pcr{ -1 }
-    , opcr{ -1 }
-    , pts{ -1 }
-    , dts{ -1 }
-    , privateDataSize{ 0 }
-    , privateDataOffset{ 0 }
-    , payloadSize{ 0 }
-    , payloadStartOffset{ 0 }
-    , isError{ false }
+        : pid{ 0x1fff }
+        , errorIndicator{ false }
+        , isPayloadStart{ false }
+        , hasAdaptationField{ false }
+        , hasPayload{ false }
+        , hasPrivateData{ false }
+        , hasRandomAccess{ false }
+        , isScrambled{ false }
+        , isDiscontinuity{ false }
+        , continuityCounter{ 0 }
+        , pcr{ -1 }
+        , opcr{ -1 }
+        , pts{ -1 }
+        , dts{ -1 }
+        , privateDataSize{ 0 }
+        , privateDataOffset{ 0 }
+        , payloadSize{ 0 }
+        , payloadStartOffset{ 0 }
+        , isError{ false }
     {
     }
 
@@ -244,14 +244,14 @@ struct PidStatistic
 {
     static const uint8_t INVALID_CC = 16;
     PidStatistic()
-    : lastCC{ INVALID_CC }
-    , numberOfCCErrors{ 0 }
-    , numberOfTsDiscontinuities{ 0 }
-    , lastPts{ -1 }
-    , lastDts{ -1 }
-    , lastPcr{ -1 }
-    , numberOfMissingPts{ 0 }
-    , numberOfMissingDts{ 0 }
+        : lastCC{ INVALID_CC }
+        , numberOfCCErrors{ 0 }
+        , numberOfTsDiscontinuities{ 0 }
+        , lastPts{ -1 }
+        , lastDts{ -1 }
+        , lastPcr{ -1 }
+        , numberOfMissingPts{ 0 }
+        , numberOfMissingDts{ 0 }
     {
     }
 

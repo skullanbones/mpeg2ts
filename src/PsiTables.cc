@@ -96,7 +96,7 @@ std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
 {
     ss << std::endl << "-------------StreamTypeHeader-------------" << std::endl;
     ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.stream_type)] << ",  ("
-           << static_cast<int>(rhs.stream_type) << ")" << std::endl;
+       << static_cast<int>(rhs.stream_type) << ")" << std::endl;
     ss << "elementary_PID: " << rhs.elementary_PID << std::endl;
     ss << "ES_info_length: " << rhs.ES_info_length << std::endl;
     return ss;
@@ -124,8 +124,8 @@ std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
     for (unsigned int i = 0; i < rhs.streams.size(); i++)
     {
         ss << "-------------stream " << i << "--------------" << std::endl;
-        ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.streams[i].stream_type)] << ",  ("
-           << static_cast<int>(rhs.streams[i].stream_type) << ")" << std::endl;
+        ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.streams[i].stream_type)]
+           << ",  (" << static_cast<int>(rhs.streams[i].stream_type) << ")" << std::endl;
         ss << "elementary_PID: " << static_cast<int>(rhs.streams[i].elementary_PID) << std::endl;
         ss << "ES_info_length: " << static_cast<int>(rhs.streams[i].ES_info_length) << std::endl;
     }

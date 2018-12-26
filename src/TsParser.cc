@@ -372,11 +372,11 @@ PmtTable TsParser::parsePmtPacket(int pid)
         uint8_t descriptorTag = getBits(8);
 
         LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
-	    DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
+        DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
         std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << std::endl;
-        switch(tag)
-	{
-	case DescriptorTag::maximum_bitrate_descriptor:
+        switch (tag)
+        {
+        case DescriptorTag::maximum_bitrate_descriptor:
         {
             MaximumBitrateDescriptor maxDesc;
             maxDesc.descriptor_tag = descriptorTag;
@@ -384,7 +384,8 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
-            LOGD << "reserved: " << static_cast<int>(maxDesc.reserved) << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
+            LOGD << "reserved: " << static_cast<int>(maxDesc.reserved)
+                 << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
             pmt.descriptors.push_back(std::move(maxDesc));
             skipBytes(program_info_length - 2 - 3);
             break;
@@ -398,7 +399,8 @@ PmtTable TsParser::parsePmtPacket(int pid)
             pointer_desc.metadata_application_format = getBits(16);
 
             pmt.descriptors.push_back(std::move(pointer_desc));
-            skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
+            skipBytes(program_info_length - 2 -
+                      2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
         case DescriptorTag::user_private_178:
@@ -408,7 +410,8 @@ PmtTable TsParser::parsePmtPacket(int pid)
             user_private.descriptor_length = getBits(8);
 
             pmt.descriptors.push_back(std::move(user_private));
-            skipBytes(program_info_length - 2); // TODO fix this, this is a much bigger descriptor...
+            skipBytes(program_info_length -
+                      2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
         default:
