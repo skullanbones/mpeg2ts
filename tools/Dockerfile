@@ -39,9 +39,9 @@ RUN apt-get install --yes --no-install-recommends lcov=1.12-2
 RUN apt-get install --yes --no-install-recommends sudo=1.8.16-0ubuntu1.5
 
 # Install latest git
-RUN sudo apt-add-repository ppa:git-core/ppa \
-  && sudo apt-get update \
-  && sudo apt-get install --yes git
+RUN apt-add-repository ppa:git-core/ppa \
+  && apt-get update \
+  && apt-get install --yes git
 
 # Install latest cmake
 RUN curl -o /cmake-3.13.1-Linux-x86_64.sh -SL "https://cmake.org/files/v3.13/cmake-3.13.1-Linux-x86_64.sh"
