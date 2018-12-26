@@ -146,7 +146,6 @@ void TsUtilities::registerPesCallback()
 bool TsUtilities::parseTransportFile(const std::string& file)
 {
     initParse();
-    std::string line;
     std::ifstream tsFile(file, std::ifstream::binary);
 
     if (!tsFile)
