@@ -15,7 +15,6 @@
 
 namespace tsutil
 {
-using namespace mpeg2ts;
 
 class IpAddress
 {
@@ -91,14 +90,14 @@ public:
     MPEG2TS_API bool parseTransportStreamData(const uint8_t* data, std::size_t size);
 
     //* callbacks *//
-    static void PATCallback(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl);
-    static void PMTCallback(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl);
-    static void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl);
+    static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    static void PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    static void PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl);
 
     //* PAT *//
     //! \brief Returns the PAT table found in stream
     //! \return The PAT table
-    MPEG2TS_API PatTable getPatTable() const;
+    MPEG2TS_API mpeg2ts::PatTable getPatTable() const;
 
     //* PMT *//
     //! \brief Returns a vector with all PMT PIDs found in stream
@@ -108,7 +107,7 @@ public:
 
     //! \brief Returns a map with all PMT tables found in stream
     //! \return Map containing PMTs ordered by their respective PID as keys
-    MPEG2TS_API std::map<uint16_t, PmtTable> getPmtTables() const;
+    MPEG2TS_API std::map<uint16_t, mpeg2ts::PmtTable> getPmtTables() const;
 
     //* ES / PES *//
     //! \brief Returns a vector with all Elementary Stream PIDs found in stream
@@ -118,9 +117,9 @@ public:
 
     //! \brief Returns a map with all PES packets found in stream
     //! \return Map containing PES packets ordered by their respective PID as keys
-    MPEG2TS_API std::map<uint16_t, std::vector<PesPacket>> getPesPackets() const;
+    MPEG2TS_API std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> getPesPackets() const;
 
-    MPEG2TS_API PidStatisticsMap getPidStatistics() const;
+    MPEG2TS_API mpeg2ts::PidStatisticsMap getPidStatistics() const;
 
 private:
     void initLogging() const;
@@ -135,13 +134,13 @@ private:
     static const int LOGFILE_MAXNUMBEROF;    // = 10;
 
     // members
-    TsDemuxer mDemuxer;
-    PatTable mPrevPat;
+    mpeg2ts::TsDemuxer mDemuxer;
+    mpeg2ts::PatTable mPrevPat;
     std::vector<uint16_t> mPmtPids;
-    std::map<uint16_t, PmtTable> mPmts;
+    std::map<uint16_t, mpeg2ts::PmtTable> mPmts;
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
-    std::map<uint16_t, std::vector<PesPacket>> mPesPackets;
+    std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> mPesPackets;
 };
 
 } // namespace tsutil

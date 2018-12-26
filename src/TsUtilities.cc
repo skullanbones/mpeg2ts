@@ -108,7 +108,7 @@ void TsUtilities::initParse()
     mEsPids.clear();
     mAddedPmts = false;
     // Register PAT callback
-    mDemuxer.addPsiPid(TS_PACKET_PID_PAT,
+    mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT,
                        std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
                                  std::placeholders::_3, std::placeholders::_4),
                        reinterpret_cast<void*>(this));
@@ -146,7 +146,6 @@ void TsUtilities::registerPesCallback()
 bool TsUtilities::parseTransportFile(const std::string& file)
 {
     initParse();
-    std::string line;
     std::ifstream tsFile(file, std::ifstream::binary);
 
     if (!tsFile)
@@ -188,7 +187,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     uint64_t readIndex = 0;
 
 
-    if ((data[0] != TS_PACKET_SYNC_BYTE) || (size <= 0)) // TODO support maxsize?
+    if ((data[0] != mpeg2ts::TS_PACKET_SYNC_BYTE) || (size <= 0)) // TODO support maxsize?
     {
         LOGE << "ERROR: 1'st byte not in sync!!!";
         return false;
@@ -197,7 +196,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
     while (readIndex < size)
     {
         mDemuxer.demux(data + readIndex);
-        readIndex += TS_PACKET_SIZE;
+        readIndex += mpeg2ts::TS_PACKET_SIZE;
         count++;
     }
     LOGD << "Found " << count << " ts packets.";
@@ -206,14 +205,14 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 }
 
 
-void TsUtilities::PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
     LOGV_(FileLog) << "PATCallback pid:" << pid;
-    PatTable* pat;
+    mpeg2ts::PatTable* pat;
     try
     {
-        pat = dynamic_cast<PatTable*>(table);
+        pat = dynamic_cast<mpeg2ts::PatTable*>(table);
     }
     catch (std::exception& ex)
     {
@@ -253,7 +252,7 @@ void TsUtilities::PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, ui
         LOGD << "Found Multiple Program Transport Stream (MPTS).";
         for (auto program : pat->programs)
         {
-            if (program.type == ProgramType::PMT)
+            if (program.type == mpeg2ts::ProgramType::PMT)
             {
                 instance->mPmtPids.push_back(program.program_map_PID);
             }
@@ -265,7 +264,7 @@ void TsUtilities::PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, ui
     // TODO: add writing of table
 }
 
-PatTable TsUtilities::getPatTable() const
+mpeg2ts::PatTable TsUtilities::getPatTable() const
 {
     return mPrevPat;
 }
@@ -275,16 +274,16 @@ std::vector<uint16_t> TsUtilities::getPmtPids() const
     return mPmtPids;
 }
 
-void TsUtilities::PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
     LOGV_(FileLog) << "PMTCallback... pid:" << pid;
-    PmtTable* pmt;
+    mpeg2ts::PmtTable* pmt;
 
     try
     {
-        pmt = dynamic_cast<PmtTable*>(table);
+        pmt = dynamic_cast<mpeg2ts::PmtTable*>(table);
     }
     catch (std::exception& ex)
     {
@@ -328,7 +327,7 @@ void TsUtilities::PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, ui
     instance->registerPesCallback();
 }
 
-std::map<uint16_t, PmtTable> TsUtilities::getPmtTables() const
+std::map<uint16_t, mpeg2ts::PmtTable> TsUtilities::getPmtTables() const
 {
     return mPmts;
 }
@@ -338,7 +337,7 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const ByteVector& /* rawPes*/, const PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -378,12 +377,12 @@ void TsUtilities::PESCallback(const ByteVector& /* rawPes*/, const PesPacket& pe
 }
 
 
-std::map<uint16_t, std::vector<PesPacket>> TsUtilities::getPesPackets() const
+std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() const
 {
     return mPesPackets;
 }
 
-PidStatisticsMap TsUtilities::getPidStatistics() const
+mpeg2ts::PidStatisticsMap TsUtilities::getPidStatistics() const
 {
     return mDemuxer.getPidStatistics();
 }

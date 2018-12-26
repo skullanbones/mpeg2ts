@@ -340,7 +340,7 @@ PatTable TsParser::parsePatPacket(int pid)
             prg.program_map_PID = PID;
         }
 
-        pat.programs.push_back(prg);
+        pat.programs.push_back(std::move(prg));
     }
 
     return pat;
@@ -385,7 +385,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
             maxDesc.reserved = getBits(2);
             maxDesc.maximum_bitrate = getBits(22);
             LOGD << "reserved: " << static_cast<int>(maxDesc.reserved) << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
-            pmt.descriptors.push_back(maxDesc);
+            pmt.descriptors.push_back(std::move(maxDesc));
             skipBytes(program_info_length - 2 - 3);
             break;
         }
@@ -397,7 +397,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
             pointer_desc.metadata_application_format = getBits(16);
 
-            pmt.descriptors.push_back(pointer_desc);
+            pmt.descriptors.push_back(std::move(pointer_desc));
             skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
@@ -407,7 +407,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
             user_private.descriptor_tag = descriptorTag;
             user_private.descriptor_length = getBits(8);
 
-            pmt.descriptors.push_back(user_private);
+            pmt.descriptors.push_back(std::move(user_private));
             skipBytes(program_info_length - 2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
@@ -438,7 +438,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
         int ES_info_length = hdr.ES_info_length & 0x3FF;
         skipBytes(ES_info_length);
         readSize += (ES_info_length + PMT_STREAM_TYPE_LENGTH);
-        pmt.streams.push_back(hdr);
+        pmt.streams.push_back(std::move(hdr));
     }
 
     return pmt;

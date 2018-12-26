@@ -108,7 +108,7 @@ OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
 
 $(info OBJS is: $(OBJS))
 
-.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests
+.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests cppcheck
 
 help:
 	@echo
@@ -117,6 +117,7 @@ help:
 	@echo '  flake                 - run flake8 on python files.'
 	@echo '  clang-tidy            - run clang-tidy on c++ files.'
 	@echo '  clang-format          - run clang-format on c++ files following rules specified in tools dir.'
+	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
 	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
@@ -181,6 +182,9 @@ clang-format:
 
 clang-tidy:
 	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
+
+cppcheck:
+	cppcheck --enable=all $(SRCDIR)
 
 run: $(BUILDDIR)/tsparser
 	$(BUILDDIR)/tsparser --input $(PROJ_ROOT)/assets/bbc_one.ts --pid 258 --write 2304 --write 2305 --write 2306 --write 2342

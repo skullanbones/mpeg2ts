@@ -468,7 +468,6 @@ int main(int argc, char** argv)
         {
             printf("version: %s\n", VERSION.c_str());
             exit(EXIT_SUCCESS);
-            break;
         }
         case 'w':
         case 'p':
