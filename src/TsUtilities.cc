@@ -110,7 +110,7 @@ void TsUtilities::initParse()
     // Register PAT callback  
     auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
     {
-        PMTCallback(rawTable, table, aPid, hdl);
+        PATCallback(rawTable, table, aPid, hdl);
     };
     mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT, f, reinterpret_cast<void*>(this));
 }
@@ -208,7 +208,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 }
 
 
-void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
     LOGV_(FileLog) << "PATCallback pid:" << pid;
@@ -223,7 +223,7 @@ void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    if (pat == NULL)
+    if (pat == nullptr)
     {
         LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
@@ -294,7 +294,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    if (pmt == NULL)
+    if (pmt == nullptr)
     {
         LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;

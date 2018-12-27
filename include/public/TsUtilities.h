@@ -91,7 +91,7 @@ public:
 
     //* callbacks *//
     static void
-    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
     static void
     PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
     static void

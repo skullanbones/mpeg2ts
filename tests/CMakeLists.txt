@@ -49,6 +49,7 @@ set(TestSources
     TsPacketTestData.h
     TsParser_Tests.cc
     TsStatistics_Tests.cc
+    TsUtilities_Tests.cc
 )
 
 

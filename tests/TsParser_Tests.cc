@@ -69,16 +69,18 @@ TEST(TsParserTests, CheckParsePatTable)
     TsParser parser;
     // TsHeader hdr = parser.parseTsHeader(packet_1);
 
-    PsiTable pat;
+    PatTable pat;
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
     int table_id;
+    EXPECT_EQ(info.pid, 0);
     parser.collectTable(pat_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
     pat = parser.parsePatPacket(info.pid);
-    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
-    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
-    //    EXPECT_EQ(598, pat.network_PID);
+    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid) << "Wrong PID for PAT, should be 0!";
+    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id) << "Wrong Table id for PAT";
+    EXPECT_EQ(pat.programs.size(), 1) << "Got wrong numbers of PMTs in PAT!";
+    EXPECT_EQ(pat.programs.at(0).program_map_PID, 598) << "Got wrong PMT PID!";
 }
 
 TEST(TsParserTests, CheckParsePatTable2)

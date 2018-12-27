@@ -173,7 +173,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
         return;
     }
 
-    if (pat == NULL)
+    if (pat == nullptr)
     {
         LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
