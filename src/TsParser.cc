@@ -374,7 +374,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
         LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
         DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
-        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << std::endl;
+        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << "\n";
         switch (tag)
         {
         case DescriptorTag::maximum_bitrate_descriptor:
@@ -416,7 +416,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
             break;
         }
         default:
-            LOGD << "skipping descriptor.." << std::endl;
+            LOGD << "skipping descriptor.." << "\n";
             skipBytes(program_info_length - 1); // skip descriptors for now
         }
     }

@@ -155,7 +155,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
         }
         std::copy(packet, packet + TS_PACKET_SIZE, std::ostreambuf_iterator<char>(outFiles[pid]));
 
-        LOGD << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << std::endl;
+        LOGD << "Write TS: " << TS_PACKET_SIZE << " bytes, pid: " << pid << "\n";
     }
 }
 
@@ -190,7 +190,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
     if (hasPid("pid", TS_PACKET_PID_PAT))
     {
         LOGN << "PAT at Ts packet: " << g_tsDemux.getTsCounters().mTsPacketCounter << "\n";
-        LOGN << *pat << std::endl;
+        LOGN << *pat << "\n";
     }
 
     // Check if MPTS or SPTS
@@ -263,7 +263,7 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), stream.elementary_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), stream.elementary_PID))
         {
-            LOGD << "Add ES PID: " << stream.elementary_PID << std::endl;
+            LOGD << "Add ES PID: " << stream.elementary_PID << "\n";
             g_ESPIDS.push_back(stream.elementary_PID);
         }
     }
@@ -272,7 +272,7 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
-            LOGD << "Add PCR PID: " << pmt->PCR_PID << std::endl;
+            LOGD << "Add PCR PID: " << pmt->PCR_PID << "\n";
             g_ESPIDS.push_back(pmt->PCR_PID);
         }
     }
@@ -285,7 +285,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
     if (hasPid("pid", pid))
     {
         LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
-        LOGN << pes << std::endl;
+        LOGN << pes << "\n";
     }
     // @TODO add "if parse pid" option to cmd line
     {
@@ -392,7 +392,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
         std::copy(rawPes.begin() + writeOffset, rawPes.end(), std::ostreambuf_iterator<char>(outFiles[pid]));
 
         LOGD << "Write " << writeModeString << ": " << rawPes.size() - writeOffset
-             << " bytes, pid: " << pid << std::endl;
+             << " bytes, pid: " << pid << "\n";
     }
 }
 
@@ -569,9 +569,9 @@ int main(int argc, char** argv)
             int eof = feof(fptr);
             if (eof != 0)
             {
-                LOGD << "End Of File..." << std::endl;
-                LOGD << "Found " << count << " ts-packets." << std::endl;
-                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << std::endl;
+                LOGD << "End Of File..." << "\n";
+                LOGD << "Found " << count << " ts-packets." << "\n";
+                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << "\n";
 
                 LOGD << "Statistics\n";
                 display_statistics(g_tsDemux.getPidStatistics());
@@ -597,7 +597,7 @@ int main(int argc, char** argv)
         if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
         {
             LOGE << "ERROR: Ts-packet Sync error. Next packet sync: ";
-            // (int)packet[TS_PACKET_SIZE] << std::endl;  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
+            // (int)packet[TS_PACKET_SIZE] << "\n";  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
             // continue; // Skip this packet since it's not synced.
         }
         fseek(fptr, -1, SEEK_CUR); // reset file pointer and skip sync after packet
