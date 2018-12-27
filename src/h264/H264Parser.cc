@@ -512,17 +512,17 @@ void H264EsParser::parse_vui()
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";
+        std::cout << '\n';
         for (int i =0; i<32;++i)
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";
+        std::cout << '\n';
         for (int i =0; i<1;++i)
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";*/
+        std::cout << '\n';*/
     }
     auto nal_hrd_parameters_present_flag = getBits(1);
     if (nal_hrd_parameters_present_flag)

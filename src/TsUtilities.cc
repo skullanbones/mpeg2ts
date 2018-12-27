@@ -319,7 +319,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
-            //LOGD << "Add PCR PID: " << pmt->PCR_PID << "\n";
+            //LOGD << "Add PCR PID: " << pmt->PCR_PID << '\n';
             instance->mEsPids.push_back(pmt->PCR_PID);
         }
     }*/
@@ -343,7 +343,7 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg
 
     // LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
     //     << " (" << pid << ")\n";
-    // LOGV << pes << "\n";
+    // LOGV << pes << '\n';
 
     LOGV << "Adding PES to list...";
     instance->mPesPackets[pid].push_back(pes);
@@ -373,7 +373,7 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg
 
 
     //    LOGD << "Write " << "PES" << ": " << pes.mPesBuffer.size() - writeOffset
-    //       << " bytes, pid: " << pid << "\n";
+    //       << " bytes, pid: " << pid << '\n';
 }
 
 

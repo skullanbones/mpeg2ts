@@ -259,7 +259,7 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             if (mPesPacket[pid].PES_packet_length &&
                 mPesPacket[pid].mPesBuffer.size() < mPesPacket[pid].PES_packet_length)
             {
-                std::cerr << "Not returning incomplete PES packet on pid " << pid << "\n";
+                std::cerr << "Not returning incomplete PES packet on pid " << pid << '\n';
             }
             else
             {
@@ -374,7 +374,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
         LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
         DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
-        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << "\n";
+        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << '\n';
         switch (tag)
         {
         case DescriptorTag::maximum_bitrate_descriptor:
@@ -416,7 +416,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
             break;
         }
         default:
-            LOGD << "skipping descriptor.." << "\n";
+            LOGD << "skipping descriptor.." << '\n';
             skipBytes(program_info_length - 1); // skip descriptors for now
         }
     }
