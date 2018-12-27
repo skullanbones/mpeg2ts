@@ -65,7 +65,7 @@ struct TsHeader
     bool transport_error_indicator;
     bool payload_unit_start_indicator;
     bool transport_priority;
-    uint16_t PID;
+    int PID;
     uint8_t transport_scrambling_control;
     uint8_t adaptation_field_control;
     uint8_t continuity_counter;

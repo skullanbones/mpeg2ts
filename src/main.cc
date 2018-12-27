@@ -64,7 +64,7 @@ std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
 std::string g_InputFile;
 
-bool hasPid(std::string param, uint16_t pid)
+bool hasPid(std::string param, int pid)
 {
     return std::count(g_Options[param].begin(), g_Options[param].end(), pid);
 }
@@ -142,7 +142,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 
     if (hasPid("write", pid))
     {
-        static std::map<uint16_t, std::ofstream> outFiles;
+        static std::map<int, std::ofstream> outFiles;
         auto fit = outFiles.find(pid);
         if (fit == outFiles.end())
         {

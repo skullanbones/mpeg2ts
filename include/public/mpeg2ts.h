@@ -203,7 +203,7 @@ public:
     {
     }
 
-    uint16_t pid; // This Packet Identifier.
+    int pid; // This Packet Identifier.
     TsHeader hdr; // This packet Ts Header
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
@@ -282,8 +282,8 @@ struct TsCounters
 };
 
 
-typedef std::function<void(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
-typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)> PesCallBackFnc;
+typedef std::function<void(const ByteVector& rawTable, PsiTable* table, int pid, void* hdl)> PsiCallBackFnc;
+typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, int pid, void* hdl)> PesCallBackFnc;
 typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
 /// @brief Demux ts packets into PSI and PES (plus TS pass through)

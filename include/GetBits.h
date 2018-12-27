@@ -55,8 +55,8 @@ public:
     void printSrcBytes() const;
 
 protected:
-    int mNumStoredBits;
-    int mBitStore;
+    uint8_t mNumStoredBits;
+    uint8_t mBitStore;
     std::size_t mSrcInx;
     std::size_t mSize;
     const uint8_t* mSrcBytes;

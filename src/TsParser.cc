@@ -63,7 +63,7 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
     hdr.transport_error_indicator = getBits(1);
     hdr.payload_unit_start_indicator = getBits(1);
     hdr.transport_priority = getBits(1);
-    hdr.PID = static_cast<uint16_t>(getBits(13));
+    hdr.PID = static_cast<int>(getBits(13));
     hdr.transport_scrambling_control = static_cast<uint8_t>(getBits(2));
     hdr.adaptation_field_control = static_cast<uint8_t>(getBits(2));
     hdr.continuity_counter = static_cast<uint8_t>(getBits(4));
@@ -200,7 +200,7 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
     // Therefore we need be able collect different types of tables on their PID to handle this. If
     // we don't do it, the alternating table will reset the previous collected table since it start
     // over all from the beginning.
-    uint16_t PID =
+    int PID =
     tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint16_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
@@ -449,7 +449,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 }
 
 
-void TsParser::parsePesPacket(int16_t pid)
+void TsParser::parsePesPacket(int pid)
 {
     resetBits(mPesPacket[pid].mPesBuffer.data(), TS_PACKET_SIZE, 0);
 
@@ -538,7 +538,7 @@ void TsParser::parsePesPacket(int16_t pid)
     }
 }
 
-ByteVector& TsParser::getRawTable(int16_t pid)
+ByteVector& TsParser::getRawTable(int pid)
 {
     return mSectionBuffer[pid];
 }

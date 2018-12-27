@@ -40,8 +40,8 @@ uint64_t GetBits::getBits(int requestedBits)
         ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
 
         requestedBits -= bitsToFromStore;
-        mNumStoredBits -= bitsToFromStore;
-        mBitStore = mBitStore << bitsToFromStore;
+        mNumStoredBits = static_cast<uint8_t>(mNumStoredBits - bitsToFromStore);
+        mBitStore = static_cast<uint8_t>(mBitStore << bitsToFromStore);
     }
 
     return ret;
