@@ -11,7 +11,7 @@ GetBits::GetBits()
 
 uint64_t GetBits::getBits(int requestedBits)
 {
-    uint64_t ret = 0;
+    uint64_t ret { 0 };
 
     if (mSrcBytes == nullptr)
     {

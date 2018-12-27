@@ -423,7 +423,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
-    int readSize = 0;
+    int readSize { 0 };
 
     while (readSize < streamsSize)
     {

@@ -29,7 +29,7 @@
 
 using namespace mpeg2ts;
 
-static const std::string VERSION = "0.1";
+static const std::string VERSION { "0.1" };
 
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
@@ -37,7 +37,7 @@ std::vector<uint16_t> g_ESPIDS;
 mpeg2ts::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
-bool addedPmts = false;
+bool addedPmts { false };
 
 std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
 [](std::map<StreamType, std::unique_ptr<EsParser>>&) {
@@ -47,9 +47,9 @@ std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
     return map;
 }(g_EsParsers);
 
-const char LOGFILE_NAME[] = "tsparser.csv";
-int LOGFILE_MAXSIZE = 100 * 1024;
-int LOGFILE_MAXNUMBEROF = 10;
+const char LOGFILE_NAME[] { "tsparser.csv" };
+int LOGFILE_MAXSIZE { 100 * 1024 };
+int LOGFILE_MAXNUMBEROF { 10 };
 
 const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
 
@@ -71,7 +71,7 @@ bool hasPid(std::string param, int pid)
 
 bool hasPids(std::string param, std::vector<uint16_t> pids)
 {
-    bool ret = 0;
+    bool ret { 0 };
     for (auto pid : pids)
     {
         ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);
@@ -133,7 +133,7 @@ void display_statistics(mpeg2ts::PidStatisticsMap statistics)
 
 void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
-    auto pid = tsPacketInfo.pid;
+    auto pid { tsPacketInfo.pid };
     LOGD << "demuxed TS packet \n" << tsPacketInfo;
     if (hasPid("pid", pid))
     {
@@ -364,8 +364,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
     if (hasPid("write", pid))
     {
-        auto writeOffset = 0;
-        auto writeModeString = "";
+        auto writeOffset { 0 };
+        auto writeModeString { "" };
         if (g_WriteMode.front() == OptionWriteMode::TS)
         {
             return;
