@@ -147,7 +147,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
             return;
         }
 
-        for (uint32_t i = 0; i < outInfo.privateDataSize; i++) // skip it for now
+        for (uint32_t i = 0; i < outInfo.privateDataSize; ++i) // skip it for now
         {
             getBits(8);
         }
@@ -165,7 +165,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
             return;
         }
 
-        for (uint8_t i = 0; i < adaptation_field_extension_length; i++) // skip it for now
+        for (uint8_t i = 0; i < adaptation_field_extension_length; ++i) // skip it for now
         {
             getBits(8);
         }
@@ -323,7 +323,7 @@ PatTable TsParser::parsePatPacket(int pid)
     const int numberOfPrograms =
     (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
 
-    for (int i = 0; i < numberOfPrograms; i++)
+    for (int i = 0; i < numberOfPrograms; ++i)
     {
         Program prg;
         prg.program_number = static_cast<uint16_t>(getBits(16));

@@ -398,7 +398,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
 
 extern void printTsPacket(const uint8_t* packet)
 {
-    for (int i = 0; i < 188; i++)
+    for (int i = 0; i < 188; ++i)
     {
         printf("0x%02x\n", packet[i]);
     }

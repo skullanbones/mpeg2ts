@@ -67,7 +67,7 @@ void GetBits::skipBits(int skipBits)
     int n { skipBits / 64 };
     int rem { skipBits % 64 };
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
         mNumStoredBits = 0;
         mBitStore = 0;
@@ -104,7 +104,7 @@ std::size_t GetBits::getByteInx() const
 
 void GetBits::printSrcBytes() const
 {
-    for (std::size_t i = mSrcInx; i < mSize; i++)
+    for (std::size_t i = mSrcInx; i < mSize; ++i)
     {
         printf("%02X", mSrcBytes[i]);
     }

@@ -358,7 +358,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         auto seq_scaling_matrix_present_flag = getBits(1);
         if (seq_scaling_matrix_present_flag)
         {
-            for (auto i = 0; i < ((chroma_format_idc != 3) ? 8 : 12); i++)
+            for (auto i = 0; i < ((chroma_format_idc != 3) ? 8 : 12); ++i)
             {
                 auto seq_scaling_list_present_flag = getBits(1);
                 if (seq_scaling_list_present_flag)
@@ -392,7 +392,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         auto offset_for_top_to_bottom_field = getBitsDecodeUGolomb(); // TODO: it is se(v) !
         (void)offset_for_top_to_bottom_field;
         auto num_ref_frames_in_pic_order_cnt_cycle = getBitsDecodeUGolomb();
-        for (auto i = 0u; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
+        for (auto i = 0u; i < num_ref_frames_in_pic_order_cnt_cycle; ++i)
         {
             auto offset_for_ref_frame = getBitsDecodeUGolomb(); // TODO: it is se(v) !
             (void)offset_for_ref_frame;

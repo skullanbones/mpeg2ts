@@ -41,7 +41,7 @@ std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
     // ss << static_cast<const PsiTable&>(rhs) << "\n";
     // ss << PsiTable::operator<<(rhs) << "\n";
     ss << "programs.size(): " << static_cast<int>(rhs.programs.size()) << "\n";
-    for (unsigned int i = 0; i < rhs.programs.size(); i++)
+    for (unsigned int i = 0; i < rhs.programs.size(); ++i)
     {
         ss << "-------------program " << i << "--------------" << "\n";
         ss << "program_number: " << rhs.programs[i].program_number << "\n";
@@ -82,7 +82,7 @@ bool PatTable::operator==(const PatTable& rhs) const
             << "PatTable programs content unequal for program: " << prg.program_number << "\n";
             return false;
         }
-        i++;
+        ++i;
     }
     return true;
 }
@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
     ss << "PCR_PID: " << static_cast<int>(rhs.PCR_PID) << "\n";
     ss << "program_info_length: " << static_cast<int>(rhs.program_info_length) << "\n";
     ss << "streams.size(): " << static_cast<int>(rhs.streams.size()) << "\n";
-    for (unsigned int i = 0; i < rhs.streams.size(); i++)
+    for (std::size_t i = 0; i < rhs.streams.size(); ++i)
     {
         ss << "-------------stream " << i << "--------------" << "\n";
         ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.streams[i].stream_type)]
@@ -175,7 +175,7 @@ bool PmtTable::operator==(const PmtTable& rhs) const
             << "PmtTable stream content unequal for stream_type: " << stream.stream_type << "\n";
             return false;
         }
-        i++;
+        ++i;
     }
     return true;
 }
