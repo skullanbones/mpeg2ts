@@ -107,11 +107,12 @@ void TsUtilities::initParse()
     mPmts.clear();
     mEsPids.clear();
     mAddedPmts = false;
-    // Register PAT callback
-    mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT,
-                       std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
-                                 std::placeholders::_3, std::placeholders::_4),
-                       reinterpret_cast<void*>(this));
+    // Register PAT callback  
+    auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+    {
+        PMTCallback(rawTable, table, aPid, hdl);
+    };
+    mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT, f, reinterpret_cast<void*>(this));
 }
 
 void TsUtilities::registerPmtCallback()
@@ -120,11 +121,12 @@ void TsUtilities::registerPmtCallback()
     {
         for (auto pid : mPmtPids)
         {
-            // LOGD << "Adding PSI PID for parsing: " << pid;
-            mDemuxer.addPsiPid(pid,
-                               std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
-                                         std::placeholders::_3, std::placeholders::_4),
-                               reinterpret_cast<void*>(this));
+            LOGD << "Adding PSI PID for parsing: " << pid;
+            auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+            {
+                PMTCallback(rawTable, table, aPid, hdl);
+            };
+            mDemuxer.addPsiPid(pid, f, reinterpret_cast<void*>(this));
         }
         mAddedPmts = true;
     }
@@ -135,10 +137,11 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        mDemuxer.addPesPid(pid,
-                           std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
-                                     std::placeholders::_3, std::placeholders::_4),
-                           reinterpret_cast<void*>(this));
+        auto f = [](const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int aPid, void* hdl)
+        {
+            PESCallback(rawPes, pes, aPid, hdl);
+        };
+        mDemuxer.addPesPid(pid, f, reinterpret_cast<void*>(this));
     }
 }
 
@@ -274,7 +277,7 @@ std::vector<uint16_t> TsUtilities::getPmtPids() const
     return mPmtPids;
 }
 
-void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -327,7 +330,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
     instance->registerPesCallback();
 }
 
-std::map<uint16_t, mpeg2ts::PmtTable> TsUtilities::getPmtTables() const
+std::map<int, mpeg2ts::PmtTable> TsUtilities::getPmtTables() const
 {
     return mPmts;
 }
@@ -337,7 +340,7 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& pes, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -377,7 +380,7 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg
 }
 
 
-std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() const
+std::map<int, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() const
 {
     return mPesPackets;
 }

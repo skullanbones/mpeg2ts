@@ -36,7 +36,7 @@ std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
 mpeg2ts::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
-std::map<uint16_t, PmtTable> g_prevPmts;
+std::map<int, PmtTable> g_prevPmts;
 bool addedPmts = false;
 
 std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
@@ -159,7 +159,7 @@ void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
     }
 }
 
-void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
+void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
 {
     LOGV << "PATCallback pid:" << pid;
     PatTable* pat;
@@ -221,7 +221,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
     // TODO: add writing of table
 }
 
-void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
+void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
 {
     LOGV << "PMTCallback... pid:" << pid;
     PmtTable* pmt;
@@ -278,7 +278,7 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
     }
 }
 
-void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
+void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 {
 
 
@@ -381,7 +381,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid)
             writeModeString = "ES";
         }
 
-        static std::map<uint16_t, std::ofstream> outFiles;
+        static std::map<int, std::ofstream> outFiles;
         auto fit = outFiles.find(pid);
         if (fit == outFiles.end())
         {
@@ -532,8 +532,13 @@ int main(int argc, char** argv)
     if (g_WriteMode.front() == OptionWriteMode::TS)
     {
         for (auto pid : g_Options["write"])
-        {
-            g_tsDemux.addTsPid(pid, std::bind(&TsCallback, std::placeholders::_1, std::placeholders::_2), nullptr);
+        {      
+            auto f = [](const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)
+            {
+                (void)hdl;
+                TsCallback(packet, tsPacketInfo);
+            };
+            g_tsDemux.addTsPid(pid, f, nullptr);
         }
     }
 
@@ -549,10 +554,12 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    // Find PAT
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT,
-                        std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
-                        nullptr);
+    auto f1 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+    {
+        (void)hdl;
+        PATCallback(rawTable, table, aPid);
+    };
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, f1, nullptr);     // Find PAT
 
     for (count = 0;; ++count)
     {
@@ -621,10 +628,12 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                g_tsDemux.addPsiPid(pid,
-                                    std::bind(&PMTCallback, std::placeholders::_1,
-                                              std::placeholders::_2, std::placeholders::_3),
-                                    nullptr);
+                auto f2 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+                {
+                    (void)hdl;
+                    PMTCallback(rawTable, table, aPid);
+                };
+                g_tsDemux.addPsiPid(pid, f2, nullptr);
             }
             addedPmts = true;
         }
@@ -632,10 +641,13 @@ int main(int argc, char** argv)
         for (auto pid : g_ESPIDS)
         {
             LOGD << "Adding PES PID for parsing: " << pid;
-            g_tsDemux.addPesPid(pid,
-                                std::bind(&PESCallback, std::placeholders::_1,
-                                          std::placeholders::_2, std::placeholders::_3),
-                                nullptr);
+            auto f3 = [](const ByteVector& rawPes, const PesPacket& pes, int aPid, void* hdl)
+            {
+                (void)hdl;
+                PESCallback(rawPes, pes, aPid);
+            };
+            g_tsDemux.addPesPid(pid, f3, nullptr);
+
         }
         g_ESPIDS.clear();
 
