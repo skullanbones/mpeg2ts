@@ -230,7 +230,7 @@ public:
     uint32_t privateDataOffset;
 
     // Payload data:
-    size_t payloadSize;         // The size of the payload
+    std::size_t payloadSize;         // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
     bool isError; // If a parser error or TS not following standards.

@@ -19,7 +19,7 @@ public:
      * @param data Data to parse
      * @return Parsed bits
      */
-    uint64_t getBits(uint8_t requestedBits);
+    uint64_t getBits(int requestedBits);
 
     /*!
      * Resets bit reader to start over reading from a buffer with
@@ -36,7 +36,7 @@ public:
      * an out of bound exception.
      * @param skipBits Skip amount of bits.
      */
-    void skipBits(uint8_t skipBits);
+    void skipBits(int skipBits);
 
     /*!
      * Return offset to current byte
@@ -55,8 +55,8 @@ public:
     void printSrcBytes() const;
 
 protected:
-    uint8_t mNumStoredBits;
-    uint8_t mBitStore;
+    int mNumStoredBits;
+    int mBitStore;
     std::size_t mSrcInx;
     std::size_t mSize;
     const uint8_t* mSrcBytes;

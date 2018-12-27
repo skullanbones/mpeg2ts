@@ -50,7 +50,7 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_
             }
             mPicture = { 0, 0, 0, 1 };
         }
-        size_t diff = (onePosition + 1 - from);
+        std::size_t diff = (onePosition + 1 - from);
         length = diff > length ? 0 : length - diff;
         from = onePosition + 1;
     }

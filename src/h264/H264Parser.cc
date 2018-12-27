@@ -265,7 +265,7 @@ uint64_t H264EsParser::getBitsDecodeUGolomb()
     }
 }
 
-void H264EsParser::scaling_list(uint8_t* scalingList, size_t sizeOfScalingList)
+void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList)
 {
     uint8_t lastScale = 8;
     uint8_t nextScale = 8;

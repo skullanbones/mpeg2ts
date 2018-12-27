@@ -60,7 +60,7 @@ public:
 
     std::vector<std::shared_ptr<EsInfo>> analyze() override;
     uint64_t getBitsDecodeUGolomb();
-    void scaling_list(uint8_t* scalingList, size_t sizeOfScalingList);
+    void scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList);
     std::shared_ptr<EsInfoH264SequenceParameterSet> seq_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264PictureParameterSet> pic_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264SliceHeader> slice_header(int nal_unit_type);

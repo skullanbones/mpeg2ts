@@ -9,7 +9,7 @@ GetBits::GetBits()
 {
 }
 
-uint64_t GetBits::getBits(uint8_t requestedBits)
+uint64_t GetBits::getBits(int requestedBits)
 {
     uint64_t ret = 0;
 
@@ -23,9 +23,9 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         throw GetBitsException("Cannot parse more than 64 individual bits at a time.");
     }
 
-    while (requestedBits > 0u)
+    while (requestedBits > 0)
     {
-        if (mNumStoredBits == 0u)
+        if (mNumStoredBits == 0)
         {
             if (mSrcInx >= mSize)
             {
@@ -36,18 +36,18 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
             mBitStore = mSrcBytes[mSrcInx++];
         }
 
-        uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
+        int bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
         ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
 
-        requestedBits = static_cast<uint8_t>(requestedBits - bitsToFromStore);
-        mNumStoredBits = static_cast<uint8_t>(mNumStoredBits - bitsToFromStore);
-        mBitStore = static_cast<uint8_t>(mBitStore << bitsToFromStore);
+        requestedBits -= bitsToFromStore;
+        mNumStoredBits -= bitsToFromStore;
+        mBitStore = mBitStore << bitsToFromStore;
     }
 
     return ret;
 }
 
-void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
+void GetBits::resetBits(const uint8_t* srcBytes, std::size_t srcSize, size_t inx)
 {
     mNumStoredBits = 0;
     mBitStore = 0;
@@ -56,7 +56,7 @@ void GetBits::resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx)
     mSrcBytes = srcBytes;
 }
 
-void GetBits::skipBits(uint8_t skipBits)
+void GetBits::skipBits(int skipBits)
 {
     if (skipBits <= 64)
     {
@@ -64,8 +64,8 @@ void GetBits::skipBits(uint8_t skipBits)
         return;
     }
 
-    int n = skipBits / 64;
-    uint8_t rem = skipBits % 64;
+    int n { skipBits / 64 };
+    int rem { skipBits % 64 };
 
     for (int i = 0; i < n; i++)
     {
@@ -96,7 +96,7 @@ void GetBits::skipBytes(int skipBytes)
     }
 }
 
-size_t GetBits::getByteInx() const
+std::size_t GetBits::getByteInx() const
 {
     return mNumStoredBits == 0 ? mSrcInx : mSrcInx - 1;
 }
@@ -104,7 +104,7 @@ size_t GetBits::getByteInx() const
 
 void GetBits::printSrcBytes() const
 {
-    for (size_t i = mSrcInx; i < mSize; i++)
+    for (std::size_t i = mSrcInx; i < mSize; i++)
     {
         printf("%02X", mSrcBytes[i]);
     }

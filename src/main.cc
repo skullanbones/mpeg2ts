@@ -584,7 +584,7 @@ int main(int argc, char** argv)
         packet[0] = b;
 
         // Read TS Packet from file
-        size_t res =
+        std::size_t res =
         fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
         if (res != TS_PACKET_SIZE)
         {
