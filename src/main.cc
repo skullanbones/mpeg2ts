@@ -194,7 +194,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, uint16_t pid)
     }
 
     // Check if MPTS or SPTS
-    int numPrograms = pat->programs.size();
+    auto numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
         LOGD << "No programs found in PAT, exiting...";
@@ -480,8 +480,9 @@ int main(int argc, char** argv)
             LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
             std::string logLevel = std::string(optarg);
             LOGD << "Got input log-level setting: " << logLevel;
-            for (auto& c : logLevel)
-                c = toupper(c);
+            for (auto& c : logLevel) {
+                c = static_cast<char>(toupper(c));
+            }
             plog::Severity severity = plog::severityFromString(logLevel.c_str());
             plog::get()->setMaxSeverity(severity);
             LOGD << "Use log-level: " << plog::severityToString(severity) << ", (" << severity << ")";
@@ -560,11 +561,11 @@ int main(int argc, char** argv)
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
 
-        b = fgetc(fptr);
+        b = static_cast<char>(fgetc(fptr));
         while (b != TS_PACKET_SYNC_BYTE)
         {
             // printf("ERROR: Sync error!!!\n");
-            b = fgetc(fptr);
+            b = static_cast<char>(fgetc(fptr));
             int eof = feof(fptr);
             if (eof != 0)
             {

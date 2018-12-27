@@ -70,7 +70,7 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         auto retel = std::make_shared<EsInfoMpeg2PictureSliceCode>();
         retel->picture = rete->picture;
         skipBits(10 + 8);
-        retel->picType = getBits(3);
+        retel->picType = static_cast<int>(getBits(3));
         switch (retel->picType)
         {
         case 1:
@@ -108,10 +108,10 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         auto retel = std::make_shared<EsInfoMpeg2SequenceHeader>();
         retel->msg = "sequence_header_code ";
         skipBits(8);
-        retel->width = getBits(12);
-        retel->height = getBits(12);
-        auto aspect_ratio_information = getBits(4);
-        auto frame_rate_code = getBits(4);
+        retel->width = static_cast<int>(getBits(12));
+        retel->height = static_cast<int>(getBits(12));
+        uint8_t aspect_ratio_information = static_cast<uint8_t>(getBits(4));
+        uint8_t frame_rate_code = static_cast<uint8_t>(getBits(4));
         retel->aspect = AspectToString[aspect_ratio_information];
         retel->framerate = FrameRateToString[frame_rate_code];
         ret.push_back(retel);

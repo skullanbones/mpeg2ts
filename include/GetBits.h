@@ -28,7 +28,7 @@ public:
      * @param srcSize The buffer size to read from
      * @param inx The start byte offset to start read from
      */
-    void resetBits(const uint8_t* srcBytes, size_t srcSize, size_t inx = 0);
+    void resetBits(const uint8_t* srcBytes, std::size_t srcSize, std::size_t inx = 0);
 
     /*!
      * Skips amount of bits of any size. This function can skip any number
@@ -41,13 +41,13 @@ public:
     /*!
      * Return offset to current byte
      */
-    size_t getByteInx() const;
+    std::size_t getByteInx() const;
 
     /*!
      * Skips entire bytes instead of bits. Good to use when skip large block of data.
      * @param skipBytes Number of bytes to skip.
      */
-    void skipBytes(uint16_t skipBytes);
+    void skipBytes(int skipBytes);
 
     /*!
      * For debugging the data in store up to current parsed index.
@@ -57,8 +57,8 @@ public:
 protected:
     uint8_t mNumStoredBits;
     uint8_t mBitStore;
-    size_t mSrcInx;
-    size_t mSize;
+    std::size_t mSrcInx;
+    std::size_t mSize;
     const uint8_t* mSrcBytes;
 };
 

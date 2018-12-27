@@ -57,7 +57,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // Check what table
-        uint8_t table_id;
+        int table_id;
         mParser->collectTable(tsPacket, tsPacketInfo, table_id);
 
         if (table_id == PSI_TABLE_ID_PAT)

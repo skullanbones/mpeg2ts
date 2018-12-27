@@ -39,9 +39,9 @@ uint64_t GetBits::getBits(uint8_t requestedBits)
         uint8_t bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
         ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
 
-        requestedBits -= bitsToFromStore;
-        mNumStoredBits -= bitsToFromStore;
-        mBitStore = mBitStore << bitsToFromStore;
+        requestedBits = static_cast<uint8_t>(requestedBits - bitsToFromStore);
+        mNumStoredBits = static_cast<uint8_t>(mNumStoredBits - bitsToFromStore);
+        mBitStore = static_cast<uint8_t>(mBitStore << bitsToFromStore);
     }
 
     return ret;
@@ -65,7 +65,7 @@ void GetBits::skipBits(uint8_t skipBits)
     }
 
     int n = skipBits / 64;
-    int rem = skipBits % 64;
+    uint8_t rem = skipBits % 64;
 
     for (int i = 0; i < n; i++)
     {
@@ -82,7 +82,7 @@ void GetBits::skipBits(uint8_t skipBits)
     getBits(rem);
 }
 
-void GetBits::skipBytes(uint16_t skipBytes)
+void GetBits::skipBytes(int skipBytes)
 {
     if ((mSrcInx + skipBytes) >= mSize)
     {

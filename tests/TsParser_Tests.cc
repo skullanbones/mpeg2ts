@@ -72,7 +72,7 @@ TEST(TsParserTests, CheckParsePatTable)
     PsiTable pat;
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pat_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
     pat = parser.parsePatPacket(info.pid);
@@ -88,7 +88,7 @@ TEST(TsParserTests, CheckParsePatTable2)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pat_packet_2, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
     pat = parser.parsePatPacket(info.pid);
@@ -165,7 +165,7 @@ TEST(TsParserTests, CheckParsePmtTable)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pmt_packet_1, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pmt_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
     pmt = parser.parsePmtPacket(info.pid);
@@ -230,7 +230,7 @@ TEST(TsParserTests, CheckParsePmtTable2)
 
     TsPacketInfo info;
     parser.parseTsPacketInfo(pmt_packet_2_1, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pmt_packet_2_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
     parser.parseTsPacketInfo(pmt_packet_2_2, info);
@@ -262,7 +262,7 @@ TEST(TsParserTests, CheckParseLargePmtTable)
         TsParser parser;
 
         TsPacketInfo info;
-        uint8_t table_id;
+        int table_id;
         parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
         EXPECT_EQ(50, info.pid);
         parser.collectTable(large_pmt_ts_packet_1, info, table_id);
@@ -364,7 +364,7 @@ TEST(TsParserTests, parse_descriptor)
     {
         TsParser parser;
         TsPacketInfo info;
-        uint8_t table_id;
+        int table_id;
         parser.parseTsPacketInfo(pmt_packet_2_1, info);
         EXPECT_EQ(32, info.pid);
 
@@ -393,7 +393,7 @@ TEST(TsParserTests, parse_descriptor_large_pmt)
     {
         TsParser parser;
         TsPacketInfo info;
-        uint8_t table_id;
+        int table_id;
         parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
         EXPECT_EQ(50, info.pid);
 

@@ -10,7 +10,7 @@
 
 struct EsInfoH264 : public EsInfo
 {
-    int nalUnitType;
+    uint64_t nalUnitType;
     std::string msg;
 };
 
@@ -66,7 +66,7 @@ public:
     std::shared_ptr<EsInfoH264SliceHeader> slice_header(int nal_unit_type);
     void parse_vui();
     // sps data
-    uint64_t log2_max_frame_num_minus4;
+    uint8_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;
     uint64_t frame_mbs_only_flag;
 };

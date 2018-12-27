@@ -52,6 +52,7 @@ CXXFLAGS = 	-Wall \
 			-Wformat=2 \
 			-Winline \
 			-Werror \
+			-Wconversion \
 			-pipe \
 			-std=c++11 \
 			-fPIC \
@@ -62,6 +63,7 @@ CXXFLAGS = 	-Wall \
 #			-Wduplicated-cond \
 #			-Wduplicated-branches \
 #			-Wnull-dereference \
+#			-Wlifetime \
 
 # Doesnt work with nlohmann 
 #			-Wlogical-op \

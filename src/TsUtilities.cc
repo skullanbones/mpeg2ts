@@ -236,7 +236,7 @@ void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
 
 
     // Check if MPTS or SPTS
-    int numPrograms = pat->programs.size();
+    std::size_t numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
         LOGD_(FileLog) << "No programs found in PAT, exiting...";

@@ -43,7 +43,7 @@ void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
     if (outInfo.hasPayload)
     {
         outInfo.payloadSize = TS_PACKET_SIZE - getByteInx();
-        outInfo.payloadStartOffset = getByteInx();
+        outInfo.payloadStartOffset = static_cast<uint8_t>(getByteInx());
     }
 }
 
@@ -59,14 +59,14 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
     TsHeader hdr;
     resetBits(packet, TS_PACKET_SIZE);
 
-    hdr.sync_byte = getBits(8);
+    hdr.sync_byte = static_cast<uint8_t>(getBits(8));
     hdr.transport_error_indicator = getBits(1);
     hdr.payload_unit_start_indicator = getBits(1);
     hdr.transport_priority = getBits(1);
-    hdr.PID = getBits(13);
-    hdr.transport_scrambling_control = getBits(2);
-    hdr.adaptation_field_control = getBits(2);
-    hdr.continuity_counter = getBits(4);
+    hdr.PID = static_cast<uint16_t>(getBits(13));
+    hdr.transport_scrambling_control = static_cast<uint8_t>(getBits(2));
+    hdr.adaptation_field_control = static_cast<uint8_t>(getBits(2));
+    hdr.continuity_counter = static_cast<uint8_t>(getBits(4));
     return hdr;
 }
 
@@ -88,7 +88,7 @@ bool TsParser::checkHasPayload(TsHeader hdr)
 TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 {
     TsAdaptationFieldHeader hdr = {}; // zero initialization
-    hdr.adaptation_field_length = getBits(8);
+    hdr.adaptation_field_length = static_cast<uint8_t>(getBits(8));
     if (hdr.adaptation_field_length == 0)
     {
         return hdr;
@@ -136,8 +136,8 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.transport_private_data_flag)
     {
-        outInfo.privateDataSize = getBits(8);
-        outInfo.privateDataOffset = getByteInx();
+        outInfo.privateDataSize = static_cast<uint32_t>(getBits(8));
+        outInfo.privateDataOffset = static_cast<uint32_t>(getByteInx());
 
         // Check if data size is within boundary of a TS Packet
         if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset))
@@ -155,7 +155,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.adaptation_field_extension_flag)
     {
-        const uint8_t adaptation_field_extension_length = getBits(8);
+        const uint8_t adaptation_field_extension_length = static_cast<uint8_t>(getBits(8));
 
         // Check if data size is within boundary of a TS Packet
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
@@ -193,16 +193,16 @@ uint64_t TsParser::parsePcr()
 }
 
 
-void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id)
+void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, int& table_id)
 {
     // NOTE!! this is not as easy as one might think. There maybe be alternating PSI long tables and
     // it has been confirmed by assets that some long PMT can be mixed with PAT tables in between.
     // Therefore we need be able collect different types of tables on their PID to handle this. If
     // we don't do it, the alternating table will reset the previous collected table since it start
     // over all from the beginning.
-    int PID =
+    uint16_t PID =
     tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
-    uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    uint16_t pointerOffset = tsPacketInfo.payloadStartOffset;
 
     mStatistics.checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
     mStatistics.checkTsDiscontinuity(tsPacketInfo.pid,
@@ -213,10 +213,11 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
         mSectionBuffer[PID].clear();
         mReadSectionLength[PID] = 0;
 
-        const uint8_t pointer_field = tsPacket[pointerOffset];
-        pointerOffset += sizeof(pointer_field);
-        pointerOffset += pointer_field;
+        uint16_t pointer_field = tsPacket[pointerOffset];
 
+        pointerOffset++;  //pointerOffset += sizeof(pointer_field);
+        pointerOffset = static_cast<uint16_t>(pointerOffset + pointer_field);
+        //
         // It does only make sense to get PSI table info when start of a PSI.
         // Note the other payloads of PSI spans in more than 1 ts-packet will not contain
         // any PSI table info, just continuation of their content in the ts-packet payload...
@@ -232,7 +233,7 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
     }
 
     mSectionBuffer[PID].insert(mSectionBuffer[PID].end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
-    mReadSectionLength[PID] = mReadSectionLength[PID] + &tsPacket[TS_PACKET_SIZE] - &tsPacket[pointerOffset];
+    mReadSectionLength[PID] = mReadSectionLength[PID] + static_cast<int>(&tsPacket[TS_PACKET_SIZE] - &tsPacket[pointerOffset]);
     table_id = (mSectionLength[PID] > mReadSectionLength[PID]) ? PSI_TABLE_ID_INCOMPLETE : mTableId[PID];
 }
 
@@ -299,17 +300,17 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
 void TsParser::parsePsiTable(const ByteVector& /* table*/, PsiTable& tableInfo)
 {
-    tableInfo.table_id = getBits(8);
+    tableInfo.table_id = static_cast<uint8_t>(getBits(8));
     tableInfo.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    tableInfo.section_length = getBits(12);
-    tableInfo.transport_stream_id = getBits(16);
+    tableInfo.section_length = static_cast<uint16_t>(getBits(12));
+    tableInfo.transport_stream_id = static_cast<uint16_t>(getBits(16));
     getBits(2); // reserved
-    tableInfo.version_number = getBits(5);
+    tableInfo.version_number = static_cast<uint8_t>(getBits(5));
     tableInfo.current_next_indicator = getBits(1);
-    tableInfo.section_number = getBits(8);
-    tableInfo.last_section_number = getBits(8);
+    tableInfo.section_number = static_cast<uint8_t>(getBits(8));
+    tableInfo.last_section_number = static_cast<uint8_t>(getBits(8));
 }
 
 
@@ -325,9 +326,9 @@ PatTable TsParser::parsePatPacket(int pid)
     for (int i = 0; i < numberOfPrograms; i++)
     {
         Program prg;
-        prg.program_number = getBits(16);
+        prg.program_number = static_cast<uint16_t>(getBits(16));
         getBits(3); // reserved
-        uint16_t PID = getBits(13);
+        uint16_t PID = static_cast<uint16_t>(getBits(13));
 
         if (prg.program_number == 0)
         {
@@ -354,9 +355,9 @@ PmtTable TsParser::parsePmtPacket(int pid)
     parsePsiTable(mSectionBuffer[pid], pmt);
 
     getBits(3); // reserved
-    pmt.PCR_PID = getBits(13);
+    pmt.PCR_PID = static_cast<uint16_t>(getBits(13));
     getBits(4); // reserved
-    pmt.program_info_length = getBits(12);
+    pmt.program_info_length = static_cast<uint16_t>(getBits(12));
     int control_bits = pmt.program_info_length & 0xC00;
     if ((control_bits >> 10) != 0)
     {
@@ -369,7 +370,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
     if (program_info_length != 0)
     {
         // TODO function parseDescriptors...
-        uint8_t descriptorTag = getBits(8);
+        uint8_t descriptorTag = static_cast<uint8_t>(getBits(8));
 
         LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
         DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
@@ -380,10 +381,10 @@ PmtTable TsParser::parsePmtPacket(int pid)
         {
             MaximumBitrateDescriptor maxDesc;
             maxDesc.descriptor_tag = descriptorTag;
-            maxDesc.descriptor_length = getBits(8);
+            maxDesc.descriptor_length = static_cast<uint8_t>(getBits(8));
 
-            maxDesc.reserved = getBits(2);
-            maxDesc.maximum_bitrate = getBits(22);
+            maxDesc.reserved = static_cast<uint8_t>(getBits(2));
+            maxDesc.maximum_bitrate = static_cast<uint32_t>(getBits(22));
             LOGD << "reserved: " << static_cast<int>(maxDesc.reserved)
                  << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
             pmt.descriptors.push_back(std::move(maxDesc));
@@ -394,9 +395,9 @@ PmtTable TsParser::parsePmtPacket(int pid)
         {
             Metadata_pointer_descriptor pointer_desc;
             pointer_desc.descriptor_tag = descriptorTag;
-            pointer_desc.descriptor_length = getBits(8);
+            pointer_desc.descriptor_length = static_cast<uint8_t>(getBits(8));
 
-            pointer_desc.metadata_application_format = getBits(16);
+            pointer_desc.metadata_application_format = static_cast<uint16_t>(getBits(16));
 
             pmt.descriptors.push_back(std::move(pointer_desc));
             skipBytes(program_info_length - 2 -
@@ -407,7 +408,7 @@ PmtTable TsParser::parsePmtPacket(int pid)
         {
             Metadata_pointer_descriptor user_private;
             user_private.descriptor_tag = descriptorTag;
-            user_private.descriptor_length = getBits(8);
+            user_private.descriptor_length = static_cast<uint8_t>(getBits(8));
 
             pmt.descriptors.push_back(std::move(user_private));
             skipBytes(program_info_length -
@@ -429,9 +430,9 @@ PmtTable TsParser::parsePmtPacket(int pid)
         StreamTypeHeader hdr;
         hdr.stream_type = static_cast<StreamType>(getBits(8));
         getBits(3); // reserved
-        hdr.elementary_PID = getBits(13);
+        hdr.elementary_PID = static_cast<uint16_t>(getBits(13));
         getBits(4); // reserved
-        hdr.ES_info_length = getBits(12);
+        hdr.ES_info_length = static_cast<uint16_t>(getBits(12));
         control_bits = hdr.ES_info_length & 0xC00;
         if ((control_bits >> 10) != 0)
         {
@@ -452,9 +453,9 @@ void TsParser::parsePesPacket(int16_t pid)
 {
     resetBits(mPesPacket[pid].mPesBuffer.data(), TS_PACKET_SIZE, 0);
 
-    mPesPacket[pid].packet_start_code_prefix = getBits(24);
-    mPesPacket[pid].stream_id = getBits(8);
-    mPesPacket[pid].PES_packet_length = getBits(16);
+    mPesPacket[pid].packet_start_code_prefix = static_cast<uint32_t>(getBits(24));
+    mPesPacket[pid].stream_id = static_cast<uint8_t>(getBits(8));
+    mPesPacket[pid].PES_packet_length = static_cast<uint16_t>(getBits(16));
     mPesPacket[pid].elementary_data_offset = 0;
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
@@ -472,7 +473,7 @@ void TsParser::parsePesPacket(int16_t pid)
         mPesPacket[pid].data_alignment_indicator = getBits(1);
         mPesPacket[pid].copyright = getBits(1);
         mPesPacket[pid].original_or_copy = getBits(1);
-        mPesPacket[pid].PTS_DTS_flags = getBits(2);
+        mPesPacket[pid].PTS_DTS_flags = static_cast<uint8_t>(getBits(2));
         mPesPacket[pid].ESCR_flag = getBits(1);
         mPesPacket[pid].ES_rate_flag = getBits(1);
         mPesPacket[pid].DSM_trick_mode_flag = getBits(1);
@@ -480,8 +481,8 @@ void TsParser::parsePesPacket(int16_t pid)
         mPesPacket[pid].PES_CRC_flag = getBits(1);
         mPesPacket[pid].PES_extension_flag = getBits(1);
 
-        mPesPacket[pid].PES_header_data_length = getBits(8);
-        mPesPacket[pid].elementary_data_offset = mPesPacket[pid].PES_header_data_length + getByteInx();
+        mPesPacket[pid].PES_header_data_length = static_cast<uint8_t>(getBits(8));
+        mPesPacket[pid].elementary_data_offset = static_cast<uint16_t>(mPesPacket[pid].PES_header_data_length + getByteInx());
 
         mPesPacket[pid].pts = -1;
         mPesPacket[pid].dts = -1;

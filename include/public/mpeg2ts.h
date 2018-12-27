@@ -215,7 +215,7 @@ public:
     bool isScrambled;        // If this packet is scrambled
     bool isDiscontinuity;    // If this packet has discontinuity flag set
 
-    uint8_t continuityCounter : 4; // 4-bit continuity counter
+    uint8_t continuityCounter; // 4-bit continuity counter
 
     // Adaptation field data:
     int64_t pcr; // PCR clock...

@@ -17,7 +17,7 @@ struct EsInfoMpeg2 : public EsInfo
 
 struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
 {
-    int picType; // I, B, P
+    uint64_t picType; // I, B, P
 };
 
 struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
