@@ -172,7 +172,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
 
 bool TsUtilities::parseTransportUdpStream(const IpAddress& /* ip*/, const Port& /* p*/)
 {
-    return true;
+    return false;
 }
 
 

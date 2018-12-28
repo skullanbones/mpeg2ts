@@ -53,9 +53,9 @@ public:
     TsUtilities m_tsUtil;
 };
 
-TEST_F(TsUtilitiesTest, test_parseTransportStreamData_1)
+TEST_F(TsUtilitiesTest, test_parseTransportStreamData_1_success)
 {
-    m_tsUtil.parseTransportStreamData(pat_packet_1, sizeof(pat_packet_1));
+    EXPECT_TRUE(m_tsUtil.parseTransportStreamData(pat_packet_1, sizeof(pat_packet_1)));
     mpeg2ts::PatTable pat;
     pat =  m_tsUtil.getPatTable();
     std::vector<uint16_t> pmtPids;
@@ -64,9 +64,14 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_1)
     EXPECT_EQ(pmtPids.at(0), 598);
 }
 
-TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2)
+TEST_F(TsUtilitiesTest, test_parseTransportStreamData_1_fail)
 {
-    m_tsUtil.parseTransportStreamData(pat_packet_2, sizeof(pat_packet_2));
+    EXPECT_FALSE(m_tsUtil.parseTransportStreamData(NULL, 0));
+}
+
+TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2_success)
+{
+    EXPECT_TRUE(m_tsUtil.parseTransportStreamData(pat_packet_2, sizeof(pat_packet_2)));
     mpeg2ts::PatTable pat;
     pat =  m_tsUtil.getPatTable();
     const int kNumPmts = 17;
@@ -101,7 +106,7 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2)
     EXPECT_EQ(pmtPids.at(15), 3030);
 }
 
-TEST_F(TsUtilitiesTest, test_getPmtTables_1)
+TEST_F(TsUtilitiesTest, test_getPmtTables_1_success)
 {
     int totSize = sizeof(pat_packet_2) + sizeof(pmt_packet_1);
     printf("total size: %d\n", totSize);
@@ -109,7 +114,7 @@ TEST_F(TsUtilitiesTest, test_getPmtTables_1)
     memcpy(buf, pat_packet_2, sizeof(pat_packet_2));
     memcpy(buf + sizeof(pat_packet_2), pmt_packet_1, sizeof(pmt_packet_1));
     
-    m_tsUtil.parseTransportStreamData(buf, totSize);
+    EXPECT_TRUE(m_tsUtil.parseTransportStreamData(buf, totSize));
     mpeg2ts::PatTable pat;
     pat =  m_tsUtil.getPatTable();
     const int kNumPmts = 17;
@@ -142,9 +147,9 @@ TEST_F(TsUtilitiesTest, test_getPmtTables_1)
     EXPECT_EQ(esPids.at(3), 1019);
 }
 
-TEST_F(TsUtilitiesTest, test_parseTransportFile)
+TEST_F(TsUtilitiesTest, test_parseTransportFile_success)
 {
-    m_tsUtil.parseTransportFile("../assets/bbc_one.ts");
+    EXPECT_TRUE(m_tsUtil.parseTransportFile("../assets/bbc_one.ts"));
     mpeg2ts::PatTable pat;
     pat =  m_tsUtil.getPatTable();
     std::vector<uint16_t> pmtPids;
@@ -192,4 +197,16 @@ TEST_F(TsUtilitiesTest, test_parseTransportFile)
     EXPECT_EQ(esPids.at(9), 2312);
     EXPECT_EQ(esPids.at(10), 2313);
     EXPECT_EQ(esPids.at(11), 2314);
+}
+
+TEST_F(TsUtilitiesTest, test_parseTransportFile_fail)
+{
+    EXPECT_FALSE(m_tsUtil.parseTransportFile("../assets/does_not_exist.ts"));
+}
+
+TEST_F(TsUtilitiesTest, test_parseTransportUdpStream_fail)
+{
+    IpAddress ip {"192.168.1.1"};
+    Port port {"1234"};
+    EXPECT_FALSE(m_tsUtil.parseTransportUdpStream(ip, port));
 }
