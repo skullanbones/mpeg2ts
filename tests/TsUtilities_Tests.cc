@@ -101,7 +101,7 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2)
     EXPECT_EQ(pmtPids.at(15), 3030);
 }
 
-TEST_F(TsUtilitiesTest, test_getPmtTable_1)
+TEST_F(TsUtilitiesTest, test_getPmtTables_1)
 {
     int totSize = sizeof(pat_packet_2) + sizeof(pmt_packet_1);
     printf("total size: %d\n", totSize);
@@ -131,4 +131,13 @@ TEST_F(TsUtilitiesTest, test_getPmtTable_1)
     EXPECT_EQ(pmtTables[1010].streams.at(1).elementary_PID, 1018);
     EXPECT_EQ(pmtTables[1010].streams.at(2).elementary_PID, 1017);
     EXPECT_EQ(pmtTables[1010].streams.at(3).elementary_PID, 1019);
+
+    // Test getEsPids
+    std::vector<uint16_t> esPids;
+    esPids = m_tsUtil.getEsPids();
+    EXPECT_EQ(esPids.size(), 4);
+    EXPECT_EQ(esPids.at(0), 1004);
+    EXPECT_EQ(esPids.at(1), 1018);
+    EXPECT_EQ(esPids.at(2), 1017);
+    EXPECT_EQ(esPids.at(3), 1019);
 }
