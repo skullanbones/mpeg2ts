@@ -101,3 +101,34 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2)
     EXPECT_EQ(pmtPids.at(15), 3030);
 }
 
+TEST_F(TsUtilitiesTest, test_getPmtTable_1)
+{
+    int totSize = sizeof(pat_packet_2) + sizeof(pmt_packet_1);
+    printf("total size: %d\n", totSize);
+    uint8_t buf[totSize];
+    memcpy(buf, pat_packet_2, sizeof(pat_packet_2));
+    memcpy(buf + sizeof(pat_packet_2), pmt_packet_1, sizeof(pmt_packet_1));
+    
+    m_tsUtil.parseTransportStreamData(buf, totSize);
+    mpeg2ts::PatTable pat;
+    pat =  m_tsUtil.getPatTable();
+    const int kNumPmts = 17;
+    EXPECT_EQ(pat.programs.size(), kNumPmts);
+
+    std::vector<uint16_t> pmtPids;
+    pmtPids = m_tsUtil.getPmtPids();
+    EXPECT_EQ(pmtPids.size(), kNumPmts - 1);
+
+    std::map<int, mpeg2ts::PmtTable> pmtTables;
+    pmtTables = m_tsUtil.getPmtTables();
+
+    EXPECT_EQ(pmtTables.size(), 1);
+    EXPECT_EQ(pmtTables[1010].streams.size(), 4);
+    EXPECT_EQ(pmtTables[1010].descriptors.size(), 0);
+
+    // Verify streams PIDs
+    EXPECT_EQ(pmtTables[1010].streams.at(0).elementary_PID, 1004);
+    EXPECT_EQ(pmtTables[1010].streams.at(1).elementary_PID, 1018);
+    EXPECT_EQ(pmtTables[1010].streams.at(2).elementary_PID, 1017);
+    EXPECT_EQ(pmtTables[1010].streams.at(3).elementary_PID, 1019);
+}

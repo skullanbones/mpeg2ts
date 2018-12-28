@@ -1,9 +1,10 @@
+
+#include <fstream>
+
 #include "JsonSettings.h"
 #include "Logging.h"
 #include <public/TsUtilities.h>
 #include <public/Ts_IEC13818-1.h>
-
-#include <fstream>
 
 /// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
@@ -300,7 +301,6 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-
     // Do nothing if same PMT
     if (instance->mPmts.find(pid) != instance->mPmts.end())
     {
@@ -308,7 +308,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    LOGD << "Adding PMT to list...";
+    LOGD << "Adding PMT to list with PID: " << pid;
     instance->mPmts[pid] = *pmt;
 
     for (auto& stream : pmt->streams)
