@@ -1,7 +1,9 @@
 
+#include <iostream>
+#include <fstream>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <iostream>
 
 // Project files
 #include "public/mpeg2ts.h"
@@ -18,10 +20,34 @@ class TsUtilitiesTest : public ::testing::Test
 public:
     void SetUp() override
     {
+        createSettingsFile();
     }
 
     void TearDown() override
     {
+        deleteSettingsFile();
+    }
+
+    void createSettingsFile() 
+    {
+        std::ofstream outfile ("settings.json");
+        outfile << "\{\n"
+        "\"settings\": {\n"
+        "\"logLevel\": \"ERROR\",\n"
+        "\"logFileName\": \"mpeg2ts_log.csv\",\n"
+        "\"logFileMaxSize\": 102400,\n"
+        "\"logFileMaxNumberOf\": 10\n"
+        "}\n"
+        "}" << std::endl;
+        outfile.close();
+    }
+
+    void deleteSettingsFile()
+    {
+        if( remove("settings.json") != 0 )
+            perror("Error deleting file");
+        else
+            puts("File settings.json successfully deleted");
     }
 
     TsUtilities m_tsUtil;
@@ -44,10 +70,19 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2)
     mpeg2ts::PatTable pat;
     pat =  m_tsUtil.getPatTable();
     const int kNumPmts = 17;
-    EXPECT_EQ(pat.programs.size(), kNumPmts); // FOUND bug!
+    EXPECT_EQ(pat.programs.size(), kNumPmts);
+    EXPECT_EQ(pat.programs.at(0).program_map_PID, 16);
+    // The first is a NIT table
+    EXPECT_EQ(pat.programs.at(0).type, ProgramType::NIT);
+    // The rest should be PMTs
+    for (int i  {1}; i < kNumPmts; ++i) 
+    {
+        EXPECT_EQ(pat.programs.at(i).type, ProgramType::PMT);
+    }
+
     std::vector<uint16_t> pmtPids;
     pmtPids = m_tsUtil.getPmtPids();
-    EXPECT_EQ(pmtPids.size(), kNumPmts - 1); // BUG!!! ????
+    EXPECT_EQ(pmtPids.size(), kNumPmts - 1);
     EXPECT_EQ(pmtPids.at(0), 5180); // Check description in TsPacketTestData.h
     EXPECT_EQ(pmtPids.at(1), 5050);
     EXPECT_EQ(pmtPids.at(2), 5070);
