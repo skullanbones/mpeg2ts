@@ -20,6 +20,19 @@ There are 2 sets of APIs, the core API called mpeg2ts under the same namespace a
 * TsUtilities.h High level API to simplify usage
 ![](images/Ts-lib_SW_Architecture.png)
 
+## Settings
+Edit the `settings.json` file to change log level, log file name and other properties. These are global settings for the mpeg2ts set of libraries. Log levels are:
+```
+VERBOSE
+DEBUG
+INFO
+WARNING
+ERROR
+FATAL
+NONE
+```
+where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
+
 ## Releases
 *V0.1*
 
@@ -153,7 +166,7 @@ branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
 
 ## Static code analysis
-Right now there is no online tool. Use `docker-make cppcheck` or `docker-make clang-tidy`.
+Right now there is no online tool. Use `docker-make cppcheck` and `docker-make clang-tidy`.
 
 ## Acronyms
 | Abbreviation  | Meaning                             |
