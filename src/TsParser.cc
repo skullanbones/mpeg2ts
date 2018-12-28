@@ -374,7 +374,6 @@ PmtTable TsParser::parsePmtPacket(int pid)
 
         LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
         DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
-        std::cout << "came here descriptor_tag: " << static_cast<int>(descriptorTag) << '\n';
         switch (tag)
         {
         case DescriptorTag::maximum_bitrate_descriptor:
