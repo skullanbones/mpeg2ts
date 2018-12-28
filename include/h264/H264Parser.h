@@ -10,7 +10,7 @@
 
 struct EsInfoH264 : public EsInfo
 {
-    int nalUnitType;
+    uint64_t nalUnitType;
     std::string msg;
 };
 
@@ -60,13 +60,13 @@ public:
 
     std::vector<std::shared_ptr<EsInfo>> analyze() override;
     uint64_t getBitsDecodeUGolomb();
-    void scaling_list(uint8_t* scalingList, size_t sizeOfScalingList);
+    void scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList);
     std::shared_ptr<EsInfoH264SequenceParameterSet> seq_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264PictureParameterSet> pic_parameter_set_rbsp(int nal_unit_type);
     std::shared_ptr<EsInfoH264SliceHeader> slice_header(int nal_unit_type);
     void parse_vui();
     // sps data
-    uint64_t log2_max_frame_num_minus4;
+    uint8_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;
     uint64_t frame_mbs_only_flag;
 };

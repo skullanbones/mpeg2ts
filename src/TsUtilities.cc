@@ -1,9 +1,10 @@
+
+#include <fstream>
+
 #include "JsonSettings.h"
 #include "Logging.h"
 #include <public/TsUtilities.h>
 #include <public/Ts_IEC13818-1.h>
-
-#include <fstream>
 
 /// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
@@ -107,11 +108,12 @@ void TsUtilities::initParse()
     mPmts.clear();
     mEsPids.clear();
     mAddedPmts = false;
-    // Register PAT callback
-    mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT,
-                       std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
-                                 std::placeholders::_3, std::placeholders::_4),
-                       reinterpret_cast<void*>(this));
+    // Register PAT callback  
+    auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+    {
+        PATCallback(rawTable, table, aPid, hdl);
+    };
+    mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT, f, reinterpret_cast<void*>(this));
 }
 
 void TsUtilities::registerPmtCallback()
@@ -120,11 +122,12 @@ void TsUtilities::registerPmtCallback()
     {
         for (auto pid : mPmtPids)
         {
-            // LOGD << "Adding PSI PID for parsing: " << pid;
-            mDemuxer.addPsiPid(pid,
-                               std::bind(&PMTCallback, std::placeholders::_1, std::placeholders::_2,
-                                         std::placeholders::_3, std::placeholders::_4),
-                               reinterpret_cast<void*>(this));
+            LOGD << "Adding PSI PID for parsing: " << pid;
+            auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
+            {
+                PMTCallback(rawTable, table, aPid, hdl);
+            };
+            mDemuxer.addPsiPid(pid, f, reinterpret_cast<void*>(this));
         }
         mAddedPmts = true;
     }
@@ -135,10 +138,11 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        mDemuxer.addPesPid(pid,
-                           std::bind(&PESCallback, std::placeholders::_1, std::placeholders::_2,
-                                     std::placeholders::_3, std::placeholders::_4),
-                           reinterpret_cast<void*>(this));
+        auto f = [](const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int aPid, void* hdl)
+        {
+            PESCallback(rawPes, pes, aPid, hdl);
+        };
+        mDemuxer.addPesPid(pid, f, reinterpret_cast<void*>(this));
     }
 }
 
@@ -168,7 +172,7 @@ bool TsUtilities::parseTransportFile(const std::string& file)
 
 bool TsUtilities::parseTransportUdpStream(const IpAddress& /* ip*/, const Port& /* p*/)
 {
-    return true;
+    return false;
 }
 
 
@@ -205,7 +209,7 @@ bool TsUtilities::parseTransportStreamData(const uint8_t* data, std::size_t size
 }
 
 
-void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl); // TODO try/catch
     LOGV_(FileLog) << "PATCallback pid:" << pid;
@@ -220,7 +224,7 @@ void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    if (pat == NULL)
+    if (pat == nullptr)
     {
         LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
@@ -236,7 +240,7 @@ void TsUtilities::PATCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
 
 
     // Check if MPTS or SPTS
-    int numPrograms = pat->programs.size();
+    std::size_t numPrograms = pat->programs.size();
     if (numPrograms == 0)
     {
         LOGD_(FileLog) << "No programs found in PAT, exiting...";
@@ -274,7 +278,7 @@ std::vector<uint16_t> TsUtilities::getPmtPids() const
     return mPmtPids;
 }
 
-void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl)
+void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::PsiTable* table, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
@@ -291,12 +295,11 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    if (pmt == NULL)
+    if (pmt == nullptr)
     {
         LOGE_(FileLog) << "ERROR: This should not happen. You have some corrupt stream!!!";
         return;
     }
-
 
     // Do nothing if same PMT
     if (instance->mPmts.find(pid) != instance->mPmts.end())
@@ -305,7 +308,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         return;
     }
 
-    LOGD << "Adding PMT to list...";
+    LOGD << "Adding PMT to list with PID: " << pid;
     instance->mPmts[pid] = *pmt;
 
     for (auto& stream : pmt->streams)
@@ -319,7 +322,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
         if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pmt->PCR_PID) ||
             std::count(g_Options["write"].begin(), g_Options["write"].end(), pmt->PCR_PID))
         {
-            //LOGD << "Add PCR PID: " << pmt->PCR_PID << std::endl;
+            //LOGD << "Add PCR PID: " << pmt->PCR_PID << '\n';
             instance->mEsPids.push_back(pmt->PCR_PID);
         }
     }*/
@@ -327,7 +330,7 @@ void TsUtilities::PMTCallback(const mpeg2ts::ByteVector& /* rawPes*/, mpeg2ts::P
     instance->registerPesCallback();
 }
 
-std::map<uint16_t, mpeg2ts::PmtTable> TsUtilities::getPmtTables() const
+std::map<int, mpeg2ts::PmtTable> TsUtilities::getPmtTables() const
 {
     return mPmts;
 }
@@ -337,13 +340,13 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl)
+void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& pes, int pid, void* hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(hdl);
 
     // LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
     //     << " (" << pid << ")\n";
-    // LOGV << pes << std::endl;
+    // LOGV << pes << '\n';
 
     LOGV << "Adding PES to list...";
     instance->mPesPackets[pid].push_back(pes);
@@ -373,11 +376,11 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg
 
 
     //    LOGD << "Write " << "PES" << ": " << pes.mPesBuffer.size() - writeOffset
-    //       << " bytes, pid: " << pid << std::endl;
+    //       << " bytes, pid: " << pid << '\n';
 }
 
 
-std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() const
+std::map<int, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() const
 {
     return mPesPackets;
 }

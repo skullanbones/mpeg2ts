@@ -88,7 +88,7 @@ public:
      * @param tsPacketInfo Input packet inforamtion
      * @param table_id Collected table id
      */
-    void collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, uint8_t& table_id);
+    void collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, int& table_id);
     /*!
      * Parses PSI table
      * @param packet
@@ -129,21 +129,21 @@ public:
      * several TS-Packets for generating a complete PES-Packet. This function is used
      * internally by collectPes().
      */
-    void parsePesPacket(int16_t pid);
+    void parsePesPacket(int pid);
 
     /*!
      * Return raw bytes of table at pid
      */
-    ByteVector& getRawTable(int16_t pid);
+    ByteVector& getRawTable(int pid);
     TsStatistics mStatistics;
 
 private:
     // TODO maybe 1 parser per pid?
-    std::map<uint16_t, ByteVector> mSectionBuffer;
-    std::map<uint16_t, int> mSectionLength;
-    std::map<uint16_t, int> mTableId;
-    std::map<uint16_t, int> mReadSectionLength;
-    std::map<uint16_t, PesPacket> mPesPacket;
+    std::map<int, ByteVector> mSectionBuffer;
+    std::map<int, int> mSectionLength;
+    std::map<int, int> mTableId;
+    std::map<int, int> mReadSectionLength;
+    std::map<int, PesPacket> mPesPacket;
 };
 
 } // namespace mpeg2ts

@@ -52,6 +52,7 @@ CXXFLAGS = 	-Wall \
 			-Wformat=2 \
 			-Winline \
 			-Werror \
+			-Wconversion \
 			-pipe \
 			-std=c++11 \
 			-fPIC \
@@ -62,6 +63,7 @@ CXXFLAGS = 	-Wall \
 #			-Wduplicated-cond \
 #			-Wduplicated-branches \
 #			-Wnull-dereference \
+#			-Wlifetime \
 
 # Doesnt work with nlohmann 
 #			-Wlogical-op \
@@ -181,7 +183,7 @@ clang-format:
 	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 clang-tidy:
-	clang-tidy-5.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
+	clang-tidy-6.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
 cppcheck:
 	cppcheck --enable=all $(SRCDIR)

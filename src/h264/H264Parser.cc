@@ -97,7 +97,7 @@ std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
         return std::vector<std::shared_ptr<EsInfo>>();
     }
     skipBits(2);
-    auto nal_unit_type = getBits(5);
+    auto nal_unit_type = static_cast<int>(getBits(5));
     auto rete = std::make_shared<EsInfoH264>();
     rete->nalUnitType = nal_unit_type;
     switch (nal_unit_type)
@@ -184,7 +184,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
     LOGD << "first_mb_in_slice " << first_mb_in_slice;
-    auto slice_type = getBitsDecodeUGolomb();
+    auto slice_type = static_cast<int>(getBitsDecodeUGolomb());
     ret->sliceType = slice_type;
     switch (slice_type)
     {
@@ -222,13 +222,13 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
         ret->sliceTypeStr = "slice_type: Uknown";
     }
     auto pic_parameter_set_id = getBitsDecodeUGolomb();
-    ret->ppsId = pic_parameter_set_id;
+    ret->ppsId = static_cast<int>(pic_parameter_set_id);
     if (separate_colour_plane_flag == 1)
     {
         auto colour_plane_id = getBits(2);
         (void)colour_plane_id;
     }
-    ret->frame_num = getBits(log2_max_frame_num_minus4 + 4);
+    ret->frame_num = static_cast<int>(getBits(static_cast<uint8_t>(log2_max_frame_num_minus4 + 4)));
     if (!frame_mbs_only_flag) // field or frame
     {
         auto field_pic_flag = getBits(1);
@@ -248,7 +248,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
 
 uint64_t H264EsParser::getBitsDecodeUGolomb()
 {
-    unsigned int leading_zeros = 0;
+    uint8_t leading_zeros = 0;
     while (getBits(1) == 0)
     {
         leading_zeros++;
@@ -265,7 +265,7 @@ uint64_t H264EsParser::getBitsDecodeUGolomb()
     }
 }
 
-void H264EsParser::scaling_list(uint8_t* scalingList, size_t sizeOfScalingList)
+void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList)
 {
     uint8_t lastScale = 8;
     uint8_t nextScale = 8;
@@ -288,7 +288,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     ret->nalUnitType = nal_unit_type;
     ret->msg = "Sequence parameter set: ";
     auto profile_idc = getBits(8);
-    ret->profileIdc = profile_idc;
+    ret->profileIdc = static_cast<int>(profile_idc);
     std::ostringstream msg;
     msg << "profile: ";
     if (profile_idc == 66)
@@ -335,11 +335,11 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     LOGD << "constraint_set4_flag " << getBits(1);
     skipBits(3);
     auto level_idc = getBits(8);
-    ret->levelIdc = level_idc;
+    ret->levelIdc = static_cast<int>(level_idc);
     msg << " level: " << level_idc / 10 << "." << level_idc % 10;
     ret->msg += msg.str();
     auto seq_parameter_set_id = getBitsDecodeUGolomb();
-    ret->spsId = seq_parameter_set_id;
+    ret->spsId = static_cast<int>(seq_parameter_set_id);
     if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc == 244 ||
         profile_idc == 44 || profile_idc == 83 || profile_idc == 86 || profile_idc == 118 || profile_idc == 128 ||
         profile_idc == 138 || profile_idc == 139 || profile_idc == 134 || profile_idc == 135)
@@ -351,14 +351,14 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         }
         auto bit_depth_luma_minus8 = getBitsDecodeUGolomb();
         auto bit_depth_chroma_minus8 = getBitsDecodeUGolomb();
-        ret->lumaBits = bit_depth_luma_minus8 + 8;
-        ret->chromaBits = bit_depth_chroma_minus8 + 8;
+        ret->lumaBits = static_cast<int>(bit_depth_luma_minus8 + 8);
+        ret->chromaBits = static_cast<int>(bit_depth_chroma_minus8 + 8);
         auto qpprime_y_zero_transform_bypass_flag = getBits(1);
         (void)qpprime_y_zero_transform_bypass_flag;
         auto seq_scaling_matrix_present_flag = getBits(1);
         if (seq_scaling_matrix_present_flag)
         {
-            for (auto i = 0; i < ((chroma_format_idc != 3) ? 8 : 12); i++)
+            for (auto i = 0; i < ((chroma_format_idc != 3) ? 8 : 12); ++i)
             {
                 auto seq_scaling_list_present_flag = getBits(1);
                 if (seq_scaling_list_present_flag)
@@ -377,7 +377,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
             }
         }
     }
-    log2_max_frame_num_minus4 = getBitsDecodeUGolomb();
+    log2_max_frame_num_minus4 = static_cast<uint8_t>(getBitsDecodeUGolomb());
     auto pic_order_cnt_type = getBitsDecodeUGolomb();
     if (pic_order_cnt_type == 0)
     {
@@ -392,20 +392,20 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         auto offset_for_top_to_bottom_field = getBitsDecodeUGolomb(); // TODO: it is se(v) !
         (void)offset_for_top_to_bottom_field;
         auto num_ref_frames_in_pic_order_cnt_cycle = getBitsDecodeUGolomb();
-        for (auto i = 0u; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
+        for (auto i = 0u; i < num_ref_frames_in_pic_order_cnt_cycle; ++i)
         {
             auto offset_for_ref_frame = getBitsDecodeUGolomb(); // TODO: it is se(v) !
             (void)offset_for_ref_frame;
         }
     }
     auto num_ref_frames = getBitsDecodeUGolomb();
-    ret->numRefPics = num_ref_frames;
+    ret->numRefPics = static_cast<int>(num_ref_frames);
     skipBits(1); // gaps_in_frame_num_value_allowed_flag
     auto pic_width_in_mbs_minus1s = getBitsDecodeUGolomb();
     auto pic_height_in_map_units_minus1s = getBitsDecodeUGolomb();
     frame_mbs_only_flag = getBits(1); // 0 - coded field or coded frame; 1 - coded frame
-    ret->width = (pic_width_in_mbs_minus1s + 1) * 16;
-    ret->height = (2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16;
+    ret->width = static_cast<int>((pic_width_in_mbs_minus1s + 1) * 16);
+    ret->height = static_cast<int>((2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16);
     if (!frame_mbs_only_flag)
     {
         // coded pictures of the coded video sequence may either be coded fields or coded frames
@@ -512,17 +512,17 @@ void H264EsParser::parse_vui()
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";
+        std::cout << '\n';
         for (int i =0; i<32;++i)
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";
+        std::cout << '\n';
         for (int i =0; i<1;++i)
         {
             std::cout << getBits(1) << " ";
         }
-        std::cout << "\n";*/
+        std::cout << '\n';*/
     }
     auto nal_hrd_parameters_present_flag = getBits(1);
     if (nal_hrd_parameters_present_flag)
@@ -557,8 +557,8 @@ std::shared_ptr<EsInfoH264PictureParameterSet> H264EsParser::pic_parameter_set_r
     ret->nalUnitType = nal_unit_type;
     auto pic_parameter_set_id = getBitsDecodeUGolomb();
     auto seq_parameter_set_id = getBitsDecodeUGolomb();
-    ret->spsId = seq_parameter_set_id;
-    ret->ppsId = pic_parameter_set_id;
+    ret->spsId = static_cast<int>(seq_parameter_set_id);
+    ret->ppsId = static_cast<int>(pic_parameter_set_id);
     auto entropy_coding_mode_flag = getBitsDecodeUGolomb();
     if (entropy_coding_mode_flag == 0)
     {

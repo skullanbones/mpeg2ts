@@ -31,7 +31,7 @@ const uint8_t pat_packet_1[] =
 
 void PATCallback(PsiTable* table, uint16_t pid, void* hdl)
 {
-    std::cout << "came here PATCallback" << std::endl;
+    std::cout << "came here PATCallback" << '\n';
 
     PatTable* pat;
     try
@@ -44,7 +44,7 @@ void PATCallback(PsiTable* table, uint16_t pid, void* hdl)
         return;
     }
 
-    std::cout << "Got PAT callback with PMT PID: " << pat->programs.at(0).program_map_PID << std::endl;
+    std::cout << "Got PAT callback with PMT PID: " << pat->programs.at(0).program_map_PID << '\n';
 }
 
 int main()
@@ -56,13 +56,13 @@ int main()
     bool success = util.parseTransportFile("../../../../assets/bbc_one.ts");
     if (!success)
     {
-        std::cerr << "Could not open file" << std::endl;
+        std::cerr << "Could not open file" << '\n';
         system("PAUSE");
         return EXIT_FAILURE;
     }
 
     PatTable pat = util.getPatTable();
-    std::cout << "Got PAT: " << pat << std::endl;
+    std::cout << "Got PAT: " << pat << '\n';
 
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
@@ -70,33 +70,33 @@ int main()
 
     for (auto pid : pmtPids)
     {
-        std::cout << "Got PMT pid: " << pid << std::endl;
+        std::cout << "Got PMT pid: " << pid << '\n';
         for (auto stream : pmtTables[pid].streams)
         {
-            std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << std::endl;
+            std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << '\n';
         }
     }
 
     for (auto table : pmtTables)
     {
-        std::cout << "PMT PID: " << table.first << std::endl;
-        std::cout << table.second << std::endl;
+        std::cout << "PMT PID: " << table.first << '\n';
+        std::cout << table.second << '\n';
     }
 
     std::vector<uint16_t> mEsPids = util.getEsPids();
     for (auto esPid : mEsPids)
     {
-        std::cout << "Found elementary stream with Pid: " << esPid << std::endl;
+        std::cout << "Found elementary stream with Pid: " << esPid << '\n';
     }
 
     std::map<uint16_t, std::vector<PesPacket>> pesPackets = util.getPesPackets();
 
-    std::cout << "Got number of PES packets: " << pesPackets.size() << std::endl;
+    std::cout << "Got number of PES packets: " << pesPackets.size() << '\n';
 
     for (auto& pes : pesPackets)
     {
-        std::cout << "Got PES with PID: " << pes.first << std::endl;
-        std::cout << "Size of PES packets: " << pes.second.size() << std::endl;
+        std::cout << "Got PES with PID: " << pes.first << '\n';
+        std::cout << "Size of PES packets: " << pes.second.size() << '\n';
     }
 
     // typedef std::map<int, PidStatistic> PidStatisticsType;
@@ -104,23 +104,23 @@ int main()
 
     for (auto pid : stat)
     {
-        std::cout << "PID: " << pid.first << std::endl;
-        std::cout << "numberOfCCErrors: " << pid.second.numberOfCCErrors << std::endl;
-        std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << std::endl;
-        std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << std::endl;
+        std::cout << "PID: " << pid.first << '\n';
+        std::cout << "numberOfCCErrors: " << pid.second.numberOfCCErrors << '\n';
+        std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << '\n';
+        std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << '\n';
     }
 
 
     /* Demonstrates non-orthogonality between APIs...
     try
     {
-        std::cout << "Size of pmtTables: " << pmtTables.size() << std::endl;
+        std::cout << "Size of pmtTables: " << pmtTables.size() << '\n';
         std::cout << "Got PMT with first stream PID: " <<
-    pmtTables[pmtPids.at(0)].streams.at(0).elementary_PID << std::endl;
+    pmtTables[pmtPids.at(0)].streams.at(0).elementary_PID << '\n';
     }
     catch (std::exception& e)
     {
-        std::cerr << "Got exception..." << e.what() << std::endl;
+        std::cerr << "Got exception..." << e.what() << '\n';
     }*/
 
     // Low level API

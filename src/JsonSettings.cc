@@ -31,7 +31,7 @@ bool Settings::loadFile(std::string file)
     }
     catch (std::exception& e)
     {
-        std::cerr << "Could not load asset file: " << file << ", with exception: " << e.what() << std::endl;
+        std::cerr << "Could not load asset file: " << file << ", with exception: " << e.what() << '\n';
         std::string errMsg = "Could not load asset file: " + file + ", with exception: " + e.what();
         throw LoadException(errMsg);
         return false;

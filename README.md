@@ -153,11 +153,7 @@ branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
 
 ## Static code analysis
-![](images/codacy.png)
-
-For static and feedback in pull-requests we use a tool called Codacy which will run different
-tools to check for mistakes and coding quality/best practises. You can check that status here:
-[Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
+Right now there is no online tool. Use `docker-make cppcheck` or `docker-make clang-tidy`.
 
 ## Acronyms
 | Abbreviation  | Meaning                             |

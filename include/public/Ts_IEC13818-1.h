@@ -65,24 +65,24 @@ struct TsHeader
     bool transport_error_indicator;
     bool payload_unit_start_indicator;
     bool transport_priority;
-    uint16_t PID;
+    int PID;
     uint8_t transport_scrambling_control;
     uint8_t adaptation_field_control;
     uint8_t continuity_counter;
 
     friend std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
     {
-        ss << "-------------TsHeader------------- " << std::endl;
-        ss << "sync_byte:  0x" << std::hex << static_cast<int>(rhs.sync_byte) << std::dec << std::endl;
-        ss << "transport_error_indicator: " << static_cast<int>(rhs.transport_error_indicator) << std::endl;
+        ss << "-------------TsHeader------------- \n";
+        ss << "sync_byte:  0x" << std::hex << static_cast<int>(rhs.sync_byte) << std::dec << '\n';
+        ss << "transport_error_indicator: " << static_cast<int>(rhs.transport_error_indicator) << '\n';
         ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator)
-           << std::endl;
-        ss << "transport_priority: " << static_cast<int>(rhs.transport_priority) << std::endl;
-        ss << "PID: " << rhs.PID << std::endl;
+           << '\n';
+        ss << "transport_priority: " << static_cast<int>(rhs.transport_priority) << '\n';
+        ss << "PID: " << rhs.PID << '\n';
         ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control)
-           << std::endl;
-        ss << "adaptation_field_control: " << static_cast<int>(rhs.adaptation_field_control) << std::endl;
-        ss << "continuity_counter: " << static_cast<int>(rhs.continuity_counter) << std::endl;
+           << '\n';
+        ss << "adaptation_field_control: " << static_cast<int>(rhs.adaptation_field_control) << '\n';
+        ss << "continuity_counter: " << static_cast<int>(rhs.continuity_counter) << '\n';
         return ss;
     }
 };

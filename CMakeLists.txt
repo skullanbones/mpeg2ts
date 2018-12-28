@@ -23,7 +23,7 @@ else()
                         -Woverloaded-virtual # warn if you overload (not override) a virtual
                                              # function
                         -Wpedantic # warn if non-standard C++ is used
-#                        -Wconversion # warn on type conversions that may lose data
+                        -Wconversion # warn on type conversions that may lose data
 #                        -Wsign-conversion # warn on sign conversions
 #                        -Wmisleading-indentation # warn if identation implies blocks where blocks
                                                   # do not exist

@@ -91,11 +91,11 @@ public:
 
     //* callbacks *//
     static void
-    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
     static void
-    PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, uint16_t pid, void* hdl);
+    PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
     static void
-    PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, uint16_t pid, void* hdl);
+    PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int pid, void* hdl);
 
     //* PAT *//
     //! \brief Returns the PAT table found in stream
@@ -110,7 +110,7 @@ public:
 
     //! \brief Returns a map with all PMT tables found in stream
     //! \return Map containing PMTs ordered by their respective PID as keys
-    MPEG2TS_API std::map<uint16_t, mpeg2ts::PmtTable> getPmtTables() const;
+    MPEG2TS_API std::map<int, mpeg2ts::PmtTable> getPmtTables() const;
 
     //* ES / PES *//
     //! \brief Returns a vector with all Elementary Stream PIDs found in stream
@@ -120,7 +120,7 @@ public:
 
     //! \brief Returns a map with all PES packets found in stream
     //! \return Map containing PES packets ordered by their respective PID as keys
-    MPEG2TS_API std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> getPesPackets() const;
+    MPEG2TS_API std::map<int, std::vector<mpeg2ts::PesPacket>> getPesPackets() const;
 
     MPEG2TS_API mpeg2ts::PidStatisticsMap getPidStatistics() const;
 
@@ -140,10 +140,10 @@ private:
     mpeg2ts::TsDemuxer mDemuxer;
     mpeg2ts::PatTable mPrevPat;
     std::vector<uint16_t> mPmtPids;
-    std::map<uint16_t, mpeg2ts::PmtTable> mPmts;
+    std::map<int, mpeg2ts::PmtTable> mPmts;
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
-    std::map<uint16_t, std::vector<mpeg2ts::PesPacket>> mPesPackets;
+    std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
 };
 
 } // namespace tsutil

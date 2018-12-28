@@ -203,7 +203,7 @@ public:
     {
     }
 
-    uint16_t pid; // This Packet Identifier.
+    int pid; // This Packet Identifier.
     TsHeader hdr; // This packet Ts Header
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
@@ -215,7 +215,7 @@ public:
     bool isScrambled;        // If this packet is scrambled
     bool isDiscontinuity;    // If this packet has discontinuity flag set
 
-    uint8_t continuityCounter : 4; // 4-bit continuity counter
+    uint8_t continuityCounter; // 4-bit continuity counter
 
     // Adaptation field data:
     int64_t pcr; // PCR clock...
@@ -230,7 +230,7 @@ public:
     uint32_t privateDataOffset;
 
     // Payload data:
-    size_t payloadSize;         // The size of the payload
+    std::size_t payloadSize;         // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
     bool isError; // If a parser error or TS not following standards.
@@ -282,8 +282,8 @@ struct TsCounters
 };
 
 
-typedef std::function<void(const ByteVector& rawTable, PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
-typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, uint16_t pid, void* hdl)> PesCallBackFnc;
+typedef std::function<void(const ByteVector& rawTable, PsiTable* table, int pid, void* hdl)> PsiCallBackFnc;
+typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, int pid, void* hdl)> PesCallBackFnc;
 typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
 /// @brief Demux ts packets into PSI and PES (plus TS pass through)
