@@ -13,51 +13,51 @@
 namespace mpeg2ts
 {
 
-void TsParser::parseTsPacketInfo(const uint8_t* packet, TsPacketInfo& outInfo)
+void TsParser::parseTsPacketInfo(const uint8_t* a_packet, TsPacketInfo& a_outInfo)
 {
     TsPacketInfo zero;
-    outInfo = zero;
+    a_outInfo = zero;
 
-    TsHeader hdr = parseTsHeader(packet);
-    outInfo.pid = hdr.PID;
-    outInfo.hdr = hdr;
-    outInfo.errorIndicator = hdr.transport_error_indicator;
-    outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
-    outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
-    outInfo.hasPayload = checkHasPayload(hdr);
-    outInfo.continuityCounter = hdr.continuity_counter;
+    TsHeader hdr = parseTsHeader(a_packet);
+    a_outInfo.pid = hdr.PID;
+    a_outInfo.hdr = hdr;
+    a_outInfo.errorIndicator = hdr.transport_error_indicator;
+    a_outInfo.isPayloadStart = hdr.payload_unit_start_indicator;
+    a_outInfo.hasAdaptationField = checkHasAdaptationField(hdr);
+    a_outInfo.hasPayload = checkHasPayload(hdr);
+    a_outInfo.continuityCounter = hdr.continuity_counter;
 
-    if (outInfo.hasAdaptationField)
+    if (a_outInfo.hasAdaptationField)
     {
-        parseAdaptationFieldData(packet, outInfo);
+        parseAdaptationFieldData(a_packet, a_outInfo);
 
-        if (outInfo.privateDataSize > 0)
+        if (a_outInfo.privateDataSize > 0)
         {
-            outInfo.hasPrivateData = true;
+            a_outInfo.hasPrivateData = true;
         }
         else
         {
-            outInfo.hasPrivateData = false;
+            a_outInfo.hasPrivateData = false;
         }
     }
-    if (outInfo.hasPayload)
+    if (a_outInfo.hasPayload)
     {
-        outInfo.payloadSize = TS_PACKET_SIZE - getByteInx();
-        outInfo.payloadStartOffset = static_cast<uint8_t>(getByteInx());
+        a_outInfo.payloadSize = TS_PACKET_SIZE - getByteInx();
+        a_outInfo.payloadStartOffset = static_cast<uint8_t>(getByteInx());
     }
 }
 
 
-bool TsParser::checkSyncByte(const uint8_t* byte)
+bool TsParser::checkSyncByte(const uint8_t* a_byte)
 {
-    return TS_PACKET_SYNC_BYTE == byte[0];
+    return TS_PACKET_SYNC_BYTE == a_byte[0];
 }
 
 
-TsHeader TsParser::parseTsHeader(const uint8_t* packet)
+TsHeader TsParser::parseTsHeader(const uint8_t* a_packet)
 {
     TsHeader hdr;
-    resetBits(packet, TS_PACKET_SIZE);
+    resetBits(a_packet, TS_PACKET_SIZE);
 
     hdr.sync_byte = static_cast<uint8_t>(getBits(8));
     hdr.transport_error_indicator = getBits(1);
@@ -71,17 +71,17 @@ TsHeader TsParser::parseTsHeader(const uint8_t* packet)
 }
 
 
-bool TsParser::checkHasAdaptationField(TsHeader hdr)
+bool TsParser::checkHasAdaptationField(TsHeader a_hdr)
 {
-    return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+    return (a_hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_ONLY ||
+            a_hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
-bool TsParser::checkHasPayload(TsHeader hdr)
+bool TsParser::checkHasPayload(TsHeader a_hdr)
 {
-    return (hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
-            hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
+    return (a_hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_PAYLOAD_ONLY ||
+            a_hdr.adaptation_field_control == TS_ADAPTATION_FIELD_CONTROL_ADAPTATION_PAYLOAD);
 }
 
 
@@ -107,12 +107,12 @@ TsAdaptationFieldHeader TsParser::parseAdaptationFieldHeader()
 
 
 // Following spec Table 2-6 Transport stream adaptation field, see ISO/IEC 13818-1:2015.
-void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& outInfo)
+void TsParser::parseAdaptationFieldData(const uint8_t* a_packet, TsPacketInfo& a_outInfo)
 {
     const TsAdaptationFieldHeader adaptHdr = parseAdaptationFieldHeader();
     // printf("AF len: %d\n", adaptHdr.adaptation_field_length);
-    outInfo.pcr = -1;
-    outInfo.opcr = -1;
+    a_outInfo.pcr = -1;
+    a_outInfo.opcr = -1;
     if (adaptHdr.adaptation_field_length == 0)
     {
         return;
@@ -123,11 +123,11 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.PCR_flag)
     {
-        outInfo.pcr = parsePcr();
+        a_outInfo.pcr = parsePcr();
     }
     if (adaptHdr.OPCR_flag)
     {
-        outInfo.opcr = parsePcr();
+        a_outInfo.opcr = parsePcr();
     }
     if (adaptHdr.splicing_point_flag)
     {
@@ -136,18 +136,18 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
 
     if (adaptHdr.transport_private_data_flag)
     {
-        outInfo.privateDataSize = static_cast<uint32_t>(getBits(8));
-        outInfo.privateDataOffset = static_cast<uint32_t>(getByteInx());
+        a_outInfo.privateDataSize = static_cast<uint32_t>(getBits(8));
+        a_outInfo.privateDataOffset = static_cast<uint32_t>(getByteInx());
 
         // Check if data size is within boundary of a TS Packet
-        if (outInfo.privateDataSize > (TS_PACKET_SIZE - outInfo.privateDataOffset))
+        if (a_outInfo.privateDataSize > (TS_PACKET_SIZE - a_outInfo.privateDataOffset))
         {
             LOGE_(FileLog) << "Found out of bound private data. Error in input.";
-            outInfo.isError = true;
+            a_outInfo.isError = true;
             return;
         }
 
-        for (uint32_t i = 0; i < outInfo.privateDataSize; ++i) // skip it for now
+        for (uint32_t i = 0; i < a_outInfo.privateDataSize; ++i) // skip it for now
         {
             getBits(8);
         }
@@ -161,7 +161,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
         if (adaptation_field_extension_length > (TS_PACKET_SIZE - getByteInx()))
         {
             LOGE_(FileLog) << "Found out of bound adaptation field extension data. Error in input.";
-            outInfo.isError = true;
+            a_outInfo.isError = true;
             return;
         }
 
@@ -170,10 +170,10 @@ void TsParser::parseAdaptationFieldData(const uint8_t* packet, TsPacketInfo& out
             getBits(8);
         }
     }
-    outInfo.isDiscontinuity = adaptHdr.discontinuity_indicator;
+    a_outInfo.isDiscontinuity = adaptHdr.discontinuity_indicator;
 
     // 0..N stuffing bytes goes here and we have to adjust read offset
-    resetBits(packet, TS_PACKET_SIZE, ofsAfterAF);
+    resetBits(a_packet, TS_PACKET_SIZE, ofsAfterAF);
 }
 
 
@@ -193,7 +193,7 @@ uint64_t TsParser::parsePcr()
 }
 
 
-void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, int& table_id)
+void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, int& a_table_id)
 {
     // NOTE!! this is not as easy as one might think. There maybe be alternating PSI long tables and
     // it has been confirmed by assets that some long PMT can be mixed with PAT tables in between.
@@ -201,19 +201,19 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
     // we don't do it, the alternating table will reset the previous collected table since it start
     // over all from the beginning.
     int PID =
-    tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
-    uint16_t pointerOffset = tsPacketInfo.payloadStartOffset;
+    a_tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
+    uint16_t pointerOffset = a_tsPacketInfo.payloadStartOffset;
 
-    mStatistics.checkCCError(tsPacketInfo.pid, tsPacketInfo.continuityCounter);
-    mStatistics.checkTsDiscontinuity(tsPacketInfo.pid,
-                                     tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
+    mStatistics.checkCCError(a_tsPacketInfo.pid, a_tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(a_tsPacketInfo.pid,
+                                     a_tsPacketInfo.hasAdaptationField && a_tsPacketInfo.isDiscontinuity);
 
-    if (tsPacketInfo.hdr.payload_unit_start_indicator)
+    if (a_tsPacketInfo.hdr.payload_unit_start_indicator)
     {
         mSectionBuffer[PID].clear();
         mReadSectionLength[PID] = 0;
 
-        uint16_t pointer_field = tsPacket[pointerOffset];
+        uint16_t pointer_field = a_tsPacket[pointerOffset];
 
         pointerOffset++;  //pointerOffset += sizeof(pointer_field);
         pointerOffset = static_cast<uint16_t>(pointerOffset + pointer_field);
@@ -223,7 +223,7 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
         // any PSI table info, just continuation of their content in the ts-packet payload...
         PsiTable tableInfo;
         ByteVector tmpBuffer;
-        tmpBuffer.insert(tmpBuffer.begin(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+        tmpBuffer.insert(tmpBuffer.begin(), &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
         resetBits(tmpBuffer.data(), TS_PACKET_SIZE - pointerOffset, 0);
         parsePsiTable(tmpBuffer, tableInfo);
 
@@ -232,26 +232,26 @@ void TsParser::collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacke
         mTableId[PID] = tableInfo.table_id;
     }
 
-    mSectionBuffer[PID].insert(mSectionBuffer[PID].end(), &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
-    mReadSectionLength[PID] = mReadSectionLength[PID] + static_cast<int>(&tsPacket[TS_PACKET_SIZE] - &tsPacket[pointerOffset]);
-    table_id = (mSectionLength[PID] > mReadSectionLength[PID]) ? PSI_TABLE_ID_INCOMPLETE : mTableId[PID];
+    mSectionBuffer[PID].insert(mSectionBuffer[PID].end(), &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
+    mReadSectionLength[PID] = mReadSectionLength[PID] + static_cast<int>(&a_tsPacket[TS_PACKET_SIZE] - &a_tsPacket[pointerOffset]);
+    a_table_id = (mSectionLength[PID] > mReadSectionLength[PID]) ? PSI_TABLE_ID_INCOMPLETE : mTableId[PID];
 }
 
 
-bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket)
+bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, PesPacket& a_pesPacket)
 {
     bool ret = false;
-    const uint8_t pointerOffset = tsPacketInfo.payloadStartOffset;
-    auto pid = tsPacketInfo.pid;
+    const uint8_t pointerOffset = a_tsPacketInfo.payloadStartOffset;
+    auto pid = a_tsPacketInfo.pid;
 
-    mStatistics.checkCCError(pid, tsPacketInfo.continuityCounter);
-    mStatistics.checkTsDiscontinuity(pid, tsPacketInfo.hasAdaptationField && tsPacketInfo.isDiscontinuity);
-    if (tsPacketInfo.hasAdaptationField)
+    mStatistics.checkCCError(pid, a_tsPacketInfo.continuityCounter);
+    mStatistics.checkTsDiscontinuity(pid, a_tsPacketInfo.hasAdaptationField && a_tsPacketInfo.isDiscontinuity);
+    if (a_tsPacketInfo.hasAdaptationField)
     {
-        mStatistics.buildPcrHistogram(pid, tsPacketInfo.pcr);
+        mStatistics.buildPcrHistogram(pid, a_tsPacketInfo.pcr);
     }
 
-    if (tsPacketInfo.isPayloadStart)
+    if (a_tsPacketInfo.isPayloadStart)
     {
         // We have start. So if we have any cached data it's time to return it.
         if (!mPesPacket[pid].mPesBuffer.empty())
@@ -263,10 +263,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
             }
             else
             {
-                pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
+                a_pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
 
-                mStatistics.buildPtsHistogram(pid, pesPacket.pts);
-                mStatistics.buildDtsHistogram(pid, pesPacket.dts);
+                mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
+                mStatistics.buildDtsHistogram(pid, a_pesPacket.dts);
 
                 ret = true;
             }
@@ -274,10 +274,10 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Create new PES
         mPesPacket[pid] = PesPacket();
-        pid = tsPacketInfo.pid;
+        pid = a_tsPacketInfo.pid;
 
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+                                          &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
     }
@@ -291,34 +291,34 @@ bool TsParser::collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketI
 
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
-                                          &tsPacket[pointerOffset], &tsPacket[TS_PACKET_SIZE]);
+                                          &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
         // TODO: check if we have boud PES and return it if it is coplete
     }
 
     return ret;
 }
 
-void TsParser::parsePsiTable(const ByteVector& /* table*/, PsiTable& tableInfo)
+void TsParser::parsePsiTable(const ByteVector& /* table*/, PsiTable& a_tableInfo)
 {
-    tableInfo.table_id = static_cast<uint8_t>(getBits(8));
-    tableInfo.section_syntax_indicator = getBits(1);
+    a_tableInfo.table_id = static_cast<uint8_t>(getBits(8));
+    a_tableInfo.section_syntax_indicator = getBits(1);
     getBits(1); // '0'
     getBits(2); // reserved
-    tableInfo.section_length = static_cast<uint16_t>(getBits(12));
-    tableInfo.transport_stream_id = static_cast<uint16_t>(getBits(16));
+    a_tableInfo.section_length = static_cast<uint16_t>(getBits(12));
+    a_tableInfo.transport_stream_id = static_cast<uint16_t>(getBits(16));
     getBits(2); // reserved
-    tableInfo.version_number = static_cast<uint8_t>(getBits(5));
-    tableInfo.current_next_indicator = getBits(1);
-    tableInfo.section_number = static_cast<uint8_t>(getBits(8));
-    tableInfo.last_section_number = static_cast<uint8_t>(getBits(8));
+    a_tableInfo.version_number = static_cast<uint8_t>(getBits(5));
+    a_tableInfo.current_next_indicator = getBits(1);
+    a_tableInfo.section_number = static_cast<uint8_t>(getBits(8));
+    a_tableInfo.last_section_number = static_cast<uint8_t>(getBits(8));
 }
 
 
-PatTable TsParser::parsePatPacket(int pid)
+PatTable TsParser::parsePatPacket(int a_pid)
 {
     PatTable pat;
-    resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
-    parsePsiTable(mSectionBuffer[pid], pat);
+    resetBits(mSectionBuffer[a_pid].data(), mSectionBuffer[a_pid].size(), 0);
+    parsePsiTable(mSectionBuffer[a_pid], pat);
 
     const int numberOfPrograms =
     (pat.section_length - PAT_PACKET_OFFSET_LENGTH - CRC32_SIZE) / PAT_PACKET_PROGRAM_SIZE;
@@ -348,11 +348,11 @@ PatTable TsParser::parsePatPacket(int pid)
 }
 
 
-PmtTable TsParser::parsePmtPacket(int pid)
+PmtTable TsParser::parsePmtPacket(int a_pid)
 {
     PmtTable pmt;
-    resetBits(mSectionBuffer[pid].data(), mSectionBuffer[pid].size(), 0);
-    parsePsiTable(mSectionBuffer[pid], pmt);
+    resetBits(mSectionBuffer[a_pid].data(), mSectionBuffer[a_pid].size(), 0);
+    parsePsiTable(mSectionBuffer[a_pid], pmt);
 
     getBits(3); // reserved
     pmt.PCR_PID = static_cast<uint16_t>(getBits(13));
@@ -448,49 +448,49 @@ PmtTable TsParser::parsePmtPacket(int pid)
 }
 
 
-void TsParser::parsePesPacket(int pid)
+void TsParser::parsePesPacket(int a_pid)
 {
-    resetBits(mPesPacket[pid].mPesBuffer.data(), TS_PACKET_SIZE, 0);
+    resetBits(mPesPacket[a_pid].mPesBuffer.data(), TS_PACKET_SIZE, 0);
 
-    mPesPacket[pid].packet_start_code_prefix = static_cast<uint32_t>(getBits(24));
-    mPesPacket[pid].stream_id = static_cast<uint8_t>(getBits(8));
-    mPesPacket[pid].PES_packet_length = static_cast<uint16_t>(getBits(16));
-    mPesPacket[pid].elementary_data_offset = 0;
+    mPesPacket[a_pid].packet_start_code_prefix = static_cast<uint32_t>(getBits(24));
+    mPesPacket[a_pid].stream_id = static_cast<uint8_t>(getBits(8));
+    mPesPacket[a_pid].PES_packet_length = static_cast<uint16_t>(getBits(16));
+    mPesPacket[a_pid].elementary_data_offset = 0;
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
-    if (mPesPacket[pid].stream_id != STREAM_ID_program_stream_map &&
-        mPesPacket[pid].stream_id != STREAM_ID_padding_stream && mPesPacket[pid].stream_id != STREAM_ID_private_stream_2 &&
-        mPesPacket[pid].stream_id != STREAM_ID_ECM_stream && mPesPacket[pid].stream_id != STREAM_ID_EMM_stream &&
-        mPesPacket[pid].stream_id != STREAM_ID_program_stream_directory &&
-        mPesPacket[pid].stream_id != STREAM_ID_DSMCC_stream &&
-        mPesPacket[pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
+    if (mPesPacket[a_pid].stream_id != STREAM_ID_program_stream_map &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_padding_stream && mPesPacket[a_pid].stream_id != STREAM_ID_private_stream_2 &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_ECM_stream && mPesPacket[a_pid].stream_id != STREAM_ID_EMM_stream &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_program_stream_directory &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_DSMCC_stream &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
         getBits(2); // '10'
-        mPesPacket[pid].PES_scrambling_control = getBits(2);
+        mPesPacket[a_pid].PES_scrambling_control = getBits(2);
 
-        mPesPacket[pid].PES_priority = getBits(1);
-        mPesPacket[pid].data_alignment_indicator = getBits(1);
-        mPesPacket[pid].copyright = getBits(1);
-        mPesPacket[pid].original_or_copy = getBits(1);
-        mPesPacket[pid].PTS_DTS_flags = static_cast<uint8_t>(getBits(2));
-        mPesPacket[pid].ESCR_flag = getBits(1);
-        mPesPacket[pid].ES_rate_flag = getBits(1);
-        mPesPacket[pid].DSM_trick_mode_flag = getBits(1);
-        mPesPacket[pid].additional_copy_info_flag = getBits(1);
-        mPesPacket[pid].PES_CRC_flag = getBits(1);
-        mPesPacket[pid].PES_extension_flag = getBits(1);
+        mPesPacket[a_pid].PES_priority = getBits(1);
+        mPesPacket[a_pid].data_alignment_indicator = getBits(1);
+        mPesPacket[a_pid].copyright = getBits(1);
+        mPesPacket[a_pid].original_or_copy = getBits(1);
+        mPesPacket[a_pid].PTS_DTS_flags = static_cast<uint8_t>(getBits(2));
+        mPesPacket[a_pid].ESCR_flag = getBits(1);
+        mPesPacket[a_pid].ES_rate_flag = getBits(1);
+        mPesPacket[a_pid].DSM_trick_mode_flag = getBits(1);
+        mPesPacket[a_pid].additional_copy_info_flag = getBits(1);
+        mPesPacket[a_pid].PES_CRC_flag = getBits(1);
+        mPesPacket[a_pid].PES_extension_flag = getBits(1);
 
-        mPesPacket[pid].PES_header_data_length = static_cast<uint8_t>(getBits(8));
-        mPesPacket[pid].elementary_data_offset = static_cast<uint16_t>(mPesPacket[pid].PES_header_data_length + getByteInx());
+        mPesPacket[a_pid].PES_header_data_length = static_cast<uint8_t>(getBits(8));
+        mPesPacket[a_pid].elementary_data_offset = static_cast<uint16_t>(mPesPacket[a_pid].PES_header_data_length + getByteInx());
 
-        mPesPacket[pid].pts = -1;
-        mPesPacket[pid].dts = -1;
+        mPesPacket[a_pid].pts = -1;
+        mPesPacket[a_pid].dts = -1;
         // Forbidden value
-        if (mPesPacket[pid].PTS_DTS_flags == 0x01)
+        if (mPesPacket[a_pid].PTS_DTS_flags == 0x01)
         {
-            LOGE_(FileLog) << "Forbidden PTS_DTS_flags:" << mPesPacket[pid].PTS_DTS_flags;
+            LOGE_(FileLog) << "Forbidden PTS_DTS_flags:" << mPesPacket[a_pid].PTS_DTS_flags;
         }
-        else if (mPesPacket[pid].PTS_DTS_flags == 0x02) // Only PTS value
+        else if (mPesPacket[a_pid].PTS_DTS_flags == 0x02) // Only PTS value
         {
             getBits(4);
             uint64_t pts = 0;
@@ -503,10 +503,10 @@ void TsParser::parsePesPacket(int pid)
 
             pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
 
-            mPesPacket[pid].pts = pts;
-            mPesPacket[pid].dts = -1;
+            mPesPacket[a_pid].pts = pts;
+            mPesPacket[a_pid].dts = -1;
         }
-        else if (mPesPacket[pid].PTS_DTS_flags == 0x03) // Both PTS and DTS
+        else if (mPesPacket[a_pid].PTS_DTS_flags == 0x03) // Both PTS and DTS
         {
             getBits(4);
             uint64_t pts = 0;
@@ -519,7 +519,7 @@ void TsParser::parsePesPacket(int pid)
 
             pts = (pts_32_30 << 30) + (pts_29_15 << 15) + pts_14_0;
 
-            mPesPacket[pid].pts = pts;
+            mPesPacket[a_pid].pts = pts;
 
             getBits(4);
             uint64_t dts = 0;
@@ -532,14 +532,14 @@ void TsParser::parsePesPacket(int pid)
 
             dts = (dts_32_30 << 30) + (dts_29_15 << 15) + dts_14_0;
 
-            mPesPacket[pid].dts = dts;
+            mPesPacket[a_pid].dts = dts;
         }
     }
 }
 
-ByteVector& TsParser::getRawTable(int pid)
+ByteVector& TsParser::getRawTable(int a_pid)
 {
-    return mSectionBuffer[pid];
+    return mSectionBuffer[a_pid];
 }
 
 } // namespace mpeg2ts

@@ -33,10 +33,10 @@ TsDemuxer::~TsDemuxer()
 }
 
 
-void TsDemuxer::demux(const uint8_t* tsPacket)
+void TsDemuxer::demux(const uint8_t* a_tsPacket)
 {
     TsPacketInfo tsPacketInfo = {};
-    mParser->parseTsPacketInfo(tsPacket, tsPacketInfo);
+    mParser->parseTsPacketInfo(a_tsPacket, tsPacketInfo);
 
     if (tsPacketInfo.errorIndicator)
     {
@@ -51,14 +51,14 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
 
     if (mTsCallbackMap.find(tsPacketInfo.pid) != mTsCallbackMap.end())
     {
-        mTsCallbackMap[tsPacketInfo.pid](tsPacket, tsPacketInfo, mHandlers[tsPacketInfo.pid]);
+        mTsCallbackMap[tsPacketInfo.pid](a_tsPacket, tsPacketInfo, mHandlers[tsPacketInfo.pid]);
     }
 
     if (mPsiCallbackMap.find(tsPacketInfo.pid) != mPsiCallbackMap.end())
     {
         // Check what table
         int table_id;
-        mParser->collectTable(tsPacket, tsPacketInfo, table_id);
+        mParser->collectTable(a_tsPacket, tsPacketInfo, table_id);
 
         if (table_id == PSI_TABLE_ID_PAT)
         {
@@ -86,7 +86,7 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     if (mPesCallbackMap.find(tsPacketInfo.pid) != mPesCallbackMap.end())
     {
         PesPacket pes;
-        if (mParser->collectPes(tsPacket, tsPacketInfo, pes))
+        if (mParser->collectPes(a_tsPacket, tsPacketInfo, pes))
         {
             mPesCallbackMap[tsPacketInfo.pid](pes.mPesBuffer, pes, tsPacketInfo.pid,
                                               mHandlers[tsPacketInfo.pid]);
@@ -96,22 +96,22 @@ void TsDemuxer::demux(const uint8_t* tsPacket)
     mParser->mStatistics.addTsPacketCounter();
 }
 
-void TsDemuxer::addPsiPid(int pid, PsiCallBackFnc cb, void* hdl)
+void TsDemuxer::addPsiPid(int a_pid, PsiCallBackFnc a_cb, void* a_hdl)
 {
-    mPsiCallbackMap[pid] = cb;
-    mHandlers[pid] = hdl;
+    mPsiCallbackMap[a_pid] = a_cb;
+    mHandlers[a_pid] = a_hdl;
 }
 
-void TsDemuxer::addPesPid(int pid, PesCallBackFnc cb, void* hdl)
+void TsDemuxer::addPesPid(int a_pid, PesCallBackFnc a_cb, void* a_hdl)
 {
-    mPesCallbackMap[pid] = cb;
-    mHandlers[pid] = hdl;
+    mPesCallbackMap[a_pid] = a_cb;
+    mHandlers[a_pid] = a_hdl;
 }
 
-void TsDemuxer::addTsPid(int pid, TsCallBackFnc cb, void* hdl)
+void TsDemuxer::addTsPid(int a_pid, TsCallBackFnc a_cb, void* a_hdl)
 {
-    mTsCallbackMap[pid] = cb;
-    mHandlers[pid] = hdl;
+    mTsCallbackMap[a_pid] = a_cb;
+    mHandlers[a_pid] = a_hdl;
 }
 
 PidStatisticsMap TsDemuxer::getPidStatistics() const
