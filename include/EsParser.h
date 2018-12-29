@@ -1,11 +1,11 @@
-#pragma once
 
-#include "Types.h" // For ssize_t
+#pragma once
 
 #include <algorithm>
 #include <cstdint>
 #include <list>
 #include <memory>
+#include <vector>
 
 struct EsInfo
 {
