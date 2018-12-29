@@ -19,7 +19,7 @@ public:
      * @param data Data to parse
      * @return Parsed bits
      */
-    uint64_t getBits(int requestedBits);
+    uint64_t getBits(int a_requestedBits);
 
     /*!
      * Resets bit reader to start over reading from a buffer with
@@ -28,7 +28,7 @@ public:
      * @param srcSize The buffer size to read from
      * @param inx The start byte offset to start read from
      */
-    void resetBits(const uint8_t* srcBytes, std::size_t srcSize, std::size_t inx = 0);
+    void resetBits(const uint8_t* a_srcBytes, std::size_t a_srcSize, std::size_t a_inx = 0);
 
     /*!
      * Skips amount of bits of any size. This function can skip any number
@@ -36,7 +36,7 @@ public:
      * an out of bound exception.
      * @param skipBits Skip amount of bits.
      */
-    void skipBits(int skipBits);
+    void skipBits(int a_skipBits);
 
     /*!
      * Return offset to current byte
@@ -47,7 +47,7 @@ public:
      * Skips entire bytes instead of bits. Good to use when skip large block of data.
      * @param skipBytes Number of bytes to skip.
      */
-    void skipBytes(int skipBytes);
+    void skipBytes(int a_skipBytes);
 
     /*!
      * For debugging the data in store up to current parsed index.

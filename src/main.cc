@@ -71,7 +71,7 @@ bool hasPid(std::string param, int pid)
 
 bool hasPids(std::string param, std::vector<uint16_t> pids)
 {
-    bool ret { 0 };
+    bool ret { false };
     for (auto pid : pids)
     {
         ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);

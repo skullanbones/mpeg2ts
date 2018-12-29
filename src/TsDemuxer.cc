@@ -12,11 +12,11 @@
  * Strictly Confidential - Do not duplicate or distribute without written
  * permission from authors
  */
+#include <cstdint>
+
 #include "Logging.h"
 #include "TsParser.h"
 #include "public/mpeg2ts.h"
-
-#include <cstdint>
 
 /// 3rd-party
 #include <plog/Log.h>

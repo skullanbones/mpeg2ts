@@ -358,7 +358,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
     pmt.PCR_PID = static_cast<uint16_t>(getBits(13));
     getBits(4); // reserved
     pmt.program_info_length = static_cast<uint16_t>(getBits(12));
-    int control_bits = pmt.program_info_length & 0xC00;
+    uint32_t control_bits = pmt.program_info_length & 0xC00;
     if ((control_bits >> 10) != 0)
     {
         LOGE_(FileLog)
@@ -438,7 +438,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
             LOGE_(FileLog)
             << "Stream not following ISO/IEC 13818-1 in ES_info_length control bits != 0.";
         }
-        int ES_info_length = hdr.ES_info_length & 0x3FF;
+        uint32_t ES_info_length = hdr.ES_info_length & 0x3FF;
         skipBytes(ES_info_length);
         readSize += (ES_info_length + PMT_STREAM_TYPE_LENGTH);
         pmt.streams.push_back(std::move(hdr));

@@ -18,7 +18,7 @@ public:
     ~Settings() = default;
 
     bool loadFile(std::string);
-    void loadJson(json js);
+    void loadJson(json);
     std::string getLogLevel() const;
     std::string getLogFileName() const;
     int getLogFileMaxSize() const;
@@ -31,14 +31,14 @@ private:
 class LoadException : public std::exception
 {
 private:
-    std::string message_;
+    std::string m_message;
 
 public:
     explicit LoadException() = default;
-    explicit LoadException(const std::string& message);
-    explicit LoadException(const std::exception e);
+    explicit LoadException(const std::string& a_message);
+    explicit LoadException(const std::exception a_e);
     virtual const char* what() const throw()
     {
-        return message_.c_str();
+        return m_message.c_str();
     }
 };
