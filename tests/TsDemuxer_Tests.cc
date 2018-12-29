@@ -1,11 +1,13 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+
 #include <iostream>
 #include <memory>
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 /// Project files
 #include "TsPacketTestData.h"
-#include <public/mpeg2ts.h>
+#include "public/mpeg2ts.h"
 
 using namespace mpeg2ts;
 

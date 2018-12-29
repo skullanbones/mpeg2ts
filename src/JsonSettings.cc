@@ -12,13 +12,13 @@
 using json = nlohmann::json;
 
 
-bool Settings::loadFile(std::string file)
+bool Settings::loadFile(std::string a_file)
 {
     // 1. Open file
-    std::ifstream ifs(file);
+    std::ifstream ifs(a_file);
     if (ifs.fail())
     {
-        std::string errMsg = "Could not find settings file: " + file;
+        std::string errMsg = "Could not find settings file: " + a_file;
         throw LoadException(errMsg);
         return false;
     }
@@ -31,16 +31,16 @@ bool Settings::loadFile(std::string file)
     }
     catch (std::exception& e)
     {
-        std::cerr << "Could not load asset file: " << file << ", with exception: " << e.what() << '\n';
-        std::string errMsg = "Could not load asset file: " + file + ", with exception: " + e.what();
+        std::cerr << "Could not load asset file: " << a_file << ", with exception: " << e.what() << '\n';
+        std::string errMsg = "Could not load asset file: " + a_file + ", with exception: " + e.what();
         throw LoadException(errMsg);
         return false;
     }
 }
 
-void Settings::loadJson(json js)
+void Settings::loadJson(json a_js)
 {
-    mJ = js;
+    mJ = a_js;
 }
 
 std::string Settings::getLogLevel() const
@@ -67,12 +67,12 @@ int Settings::getLogFileMaxNumberOf() const
 
 ///////////////// LoadException /////////////////////////
 
-LoadException::LoadException(const std::string& message)
-    : message_(message)
+LoadException::LoadException(const std::string& a_message)
+    : m_message(a_message)
 {
 }
 
-LoadException::LoadException(const std::exception e)
-    : message_(e.what())
+LoadException::LoadException(const std::exception a_e)
+    : m_message(a_e.what())
 {
 }

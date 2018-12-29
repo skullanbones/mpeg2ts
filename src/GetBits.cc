@@ -1,3 +1,4 @@
+
 #include "GetBits.h"
 
 GetBits::GetBits()
@@ -9,7 +10,7 @@ GetBits::GetBits()
 {
 }
 
-uint64_t GetBits::getBits(int requestedBits)
+uint64_t GetBits::getBits(int a_requestedBits)
 {
     uint64_t ret { 0 };
 
@@ -18,12 +19,12 @@ uint64_t GetBits::getBits(int requestedBits)
         throw GetBitsException("null input data");
     }
 
-    if (requestedBits > 64)
+    if (a_requestedBits > 64)
     {
         throw GetBitsException("Cannot parse more than 64 individual bits at a time.");
     }
 
-    while (requestedBits > 0)
+    while (a_requestedBits > 0)
     {
         if (mNumStoredBits == 0)
         {
@@ -36,10 +37,10 @@ uint64_t GetBits::getBits(int requestedBits)
             mBitStore = mSrcBytes[mSrcInx++];
         }
 
-        int bitsToFromStore = mNumStoredBits > requestedBits ? requestedBits : mNumStoredBits;
+        int bitsToFromStore = mNumStoredBits > a_requestedBits ? a_requestedBits : mNumStoredBits;
         ret = (ret << bitsToFromStore) | (mBitStore >> (8 - bitsToFromStore));
 
-        requestedBits -= bitsToFromStore;
+        a_requestedBits -= bitsToFromStore;
         mNumStoredBits = static_cast<uint8_t>(mNumStoredBits - bitsToFromStore);
         mBitStore = static_cast<uint8_t>(mBitStore << bitsToFromStore);
     }
@@ -47,25 +48,25 @@ uint64_t GetBits::getBits(int requestedBits)
     return ret;
 }
 
-void GetBits::resetBits(const uint8_t* srcBytes, std::size_t srcSize, size_t inx)
+void GetBits::resetBits(const uint8_t* a_srcBytes, std::size_t a_srcSize, size_t a_inx)
 {
     mNumStoredBits = 0;
     mBitStore = 0;
-    mSrcInx = inx;
-    mSize = srcSize;
-    mSrcBytes = srcBytes;
+    mSrcInx = a_inx;
+    mSize = a_srcSize;
+    mSrcBytes = a_srcBytes;
 }
 
-void GetBits::skipBits(int skipBits)
+void GetBits::skipBits(int a_skipBits)
 {
-    if (skipBits <= 64)
+    if (a_skipBits <= 64)
     {
-        getBits(skipBits);
+        getBits(a_skipBits);
         return;
     }
 
-    int n { skipBits / 64 };
-    int rem { skipBits % 64 };
+    int n { a_skipBits / 64 };
+    int rem { a_skipBits % 64 };
 
     for (int i = 0; i < n; ++i)
     {
@@ -82,9 +83,9 @@ void GetBits::skipBits(int skipBits)
     getBits(rem);
 }
 
-void GetBits::skipBytes(int skipBytes)
+void GetBits::skipBytes(int a_skipBytes)
 {
-    if ((mSrcInx + skipBytes) >= mSize)
+    if ((mSrcInx + a_skipBytes) >= mSize)
     {
         throw GetBitsException("getBits: Out of bound read mSrcInx: " + std::to_string(mSrcInx));
     }
@@ -92,7 +93,7 @@ void GetBits::skipBytes(int skipBytes)
     {
         mNumStoredBits = 0;
         mBitStore = 0;
-        mSrcInx += skipBytes;
+        mSrcInx += a_skipBytes;
     }
 }
 

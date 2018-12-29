@@ -7,6 +7,9 @@
 #include "EsParser.h"
 #include "GetBits.h"
 
+namespace mpeg2
+{
+
 struct EsInfoMpeg2 : public EsInfo
 {
     //    EsInfoMpeg2(int picture, const std::string& msg)
@@ -50,3 +53,5 @@ public:
     int foundStartCodes;
     std::vector<uint8_t> mPicture;
 };
+
+}

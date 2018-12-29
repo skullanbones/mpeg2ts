@@ -131,10 +131,10 @@ private:
     void registerPesCallback();
 
     // Default constants
-    static const LogLevel DEFAULT_LOG_LEVEL; // = LogLevel::DEBUG;
+    static constexpr const LogLevel DEFAULT_LOG_LEVEL { LogLevel::DEBUG };
     static const std::string LOGFILE_NAME;   // = "mpeg2ts_log.csv";
-    static const int LOGFILE_MAXSIZE;        // = 100 * 1024;
-    static const int LOGFILE_MAXNUMBEROF;    // = 10;
+    static constexpr const int LOGFILE_MAXSIZE { 100 * 1024 };
+    static constexpr const int LOGFILE_MAXNUMBEROF { 10 };
 
     // members
     mpeg2ts::TsDemuxer mDemuxer;

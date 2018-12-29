@@ -1,11 +1,16 @@
-///
+
 #include <iostream>
 #include <sstream>
+
 /// 3rd-party
 #include <plog/Log.h>
 
 /// Project files
 #include "h264/H264Parser.h"
+
+namespace h264
+{
+
 static std::string seipayloadTypeToString(uint64_t payloadType)
 {
     if (payloadType == 0)
@@ -570,4 +575,6 @@ std::shared_ptr<EsInfoH264PictureParameterSet> H264EsParser::pic_parameter_set_r
     }
 
     return ret;
+}
+
 }

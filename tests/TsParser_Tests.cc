@@ -8,7 +8,7 @@
 /// Project files
 #include "TsPacketTestData.h"
 #include "TsParser.h"
-#include <public/mpeg2ts.h>
+#include "public/mpeg2ts.h"
 
 using namespace mpeg2ts;
 
