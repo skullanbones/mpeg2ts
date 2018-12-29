@@ -8,7 +8,10 @@
 #include "GetBits.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
 
-struct EsInfoH264 : public EsInfo
+namespace h264
+{
+
+struct EsInfoH264 : public ::EsInfo
 {
     uint64_t nalUnitType;
     std::string msg;
@@ -42,7 +45,7 @@ struct EsInfoH264PictureParameterSet : public EsInfoH264
     int spsId;
 };
 
-class H264EsParser : public Mpeg2VideoEsParser
+class H264EsParser : public mpeg2::Mpeg2VideoEsParser
 {
 public:
     H264EsParser(const H264EsParser& arg) = delete;
@@ -70,3 +73,5 @@ public:
     uint64_t separate_colour_plane_flag;
     uint64_t frame_mbs_only_flag;
 };
+
+}

@@ -5,7 +5,10 @@
 #include <plog/Log.h>
 
 /// Project files
-#include <mpeg2vid/Mpeg2VideoParser.h>
+#include "mpeg2vid/Mpeg2VideoParser.h"
+
+namespace mpeg2
+{
 
 std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
 {
@@ -153,3 +156,5 @@ std::map<uint8_t, std::string> Mpeg2VideoEsParser::FrameRateToString =
   { 4, "29.97" },     { 5, "30" },        { 6, "50" },        { 7, "59.94" },
   { 8, "60" },        { 9, "reserved" },  { 10, "reserved" }, { 11, "reserved" },
   { 12, "reserved" }, { 13, "reserved" }, { 14, "reserved" }, { 15, "reserved" } };
+
+}

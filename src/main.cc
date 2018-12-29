@@ -42,8 +42,8 @@ bool addedPmts { false };
 std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
 [](std::map<StreamType, std::unique_ptr<EsParser>>&) {
     std::map<StreamType, std::unique_ptr<EsParser>> map;
-    map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<Mpeg2VideoEsParser>(new Mpeg2VideoEsParser()));
-    map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<H264EsParser>(new H264EsParser()));
+    map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser()));
+    map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser()));
     return map;
 }(g_EsParsers);
 
@@ -305,29 +305,29 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                                            rawPes.size() - pes.elementary_data_offset);
                         for (auto& esinfo : ret)
                         {
-                            if (std::dynamic_pointer_cast<EsInfoMpeg2>(esinfo))
+                            if (std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo))
                             {
-                                auto i = std::dynamic_pointer_cast<EsInfoMpeg2>(esinfo);
+                                auto i = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo);
                                 LOGD << "mpeg2 picture: " << i->picture << " " << i->msg;
-                                if (std::dynamic_pointer_cast<EsInfoMpeg2PictureSliceCode>(i))
+                                if (std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(i))
                                 {
-                                    auto j = std::dynamic_pointer_cast<EsInfoMpeg2PictureSliceCode>(i);
+                                    auto j = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(i);
                                     LOGD << "mpeg2 picture type: " << j->picType << " " << j->msg;
                                 }
-                                else if (std::dynamic_pointer_cast<EsInfoMpeg2SequenceHeader>(i))
+                                else if (std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(i))
                                 {
-                                    auto j = std::dynamic_pointer_cast<EsInfoMpeg2SequenceHeader>(i);
+                                    auto j = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(i);
                                     LOGD << j->width << " x " << j->height << ", aspect: " << j->aspect
                                          << ", frame rate: " << j->framerate;
                                 }
                             }
-                            if (std::dynamic_pointer_cast<EsInfoH264>(esinfo))
+                            if (std::dynamic_pointer_cast<h264::EsInfoH264>(esinfo))
                             {
-                                auto i = std::dynamic_pointer_cast<EsInfoH264>(esinfo);
+                                auto i = std::dynamic_pointer_cast<h264::EsInfoH264>(esinfo);
                                 LOGD << "nal: " << i->nalUnitType << " " << i->msg;
-                                if (std::dynamic_pointer_cast<EsInfoH264SliceHeader>(i))
+                                if (std::dynamic_pointer_cast<h264::EsInfoH264SliceHeader>(i))
                                 {
-                                    auto j = std::dynamic_pointer_cast<EsInfoH264SliceHeader>(i);
+                                    auto j = std::dynamic_pointer_cast<h264::EsInfoH264SliceHeader>(i);
                                     LOGD << j->sliceTypeStr << ", pps id: " << j->ppsId;
                                     if (j->field)
                                     {
@@ -338,16 +338,16 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                         LOGD << "frame encoded";
                                     }
                                 }
-                                else if (std::dynamic_pointer_cast<EsInfoH264SequenceParameterSet>(i))
+                                else if (std::dynamic_pointer_cast<h264::EsInfoH264SequenceParameterSet>(i))
                                 {
-                                    auto j = std::dynamic_pointer_cast<EsInfoH264SequenceParameterSet>(i);
+                                    auto j = std::dynamic_pointer_cast<h264::EsInfoH264SequenceParameterSet>(i);
                                     LOGD << "sps id: " << j->spsId << ", luma bits: " << j->lumaBits
                                          << ", chroma bits: " << j->chromaBits << ", width: " << j->width
                                          << " x " << j->height << ", ref pic: " << j->numRefPics;
                                 }
-                                else if (std::dynamic_pointer_cast<EsInfoH264PictureParameterSet>(i))
+                                else if (std::dynamic_pointer_cast<h264::EsInfoH264PictureParameterSet>(i))
                                 {
-                                    auto j = std::dynamic_pointer_cast<EsInfoH264PictureParameterSet>(i);
+                                    auto j = std::dynamic_pointer_cast<h264::EsInfoH264PictureParameterSet>(i);
                                     LOGD << "sps id: " << j->spsId << "pps id: " << j->ppsId;
                                 }
                             }

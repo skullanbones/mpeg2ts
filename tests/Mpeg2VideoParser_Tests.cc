@@ -5,6 +5,7 @@
 /// Project files CUT (Class Under Test)
 #include <mpeg2vid/Mpeg2VideoParser.h>
 
+using namespace mpeg2;
 
 TEST(Mpeg2VideoTests, Parse1)
 {

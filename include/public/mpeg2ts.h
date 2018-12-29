@@ -242,7 +242,7 @@ public:
 
 struct PidStatistic
 {
-    static const uint8_t INVALID_CC = 16;
+    static constexpr const uint8_t INVALID_CC { 16 };
     PidStatistic()
         : lastCC{ INVALID_CC }
         , numberOfCCErrors{ 0 }
