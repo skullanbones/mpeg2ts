@@ -63,7 +63,6 @@ set(    TsLibSourcesList
         include/Logging.h
         include/TsParser.h
         include/TsStatistics.h
-        include/Types.h
         src/h264/H264Parser.cc
         src/mpeg2vid/Mpeg2VideoParser.cc
         src/GetBits.cc
