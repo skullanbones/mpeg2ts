@@ -14,7 +14,7 @@
  */
 #include "Logging.h"
 #include "TsParser.h"
-#include <public/mpeg2ts.h>
+#include "public/mpeg2ts.h"
 
 #include <cstdint>
 
