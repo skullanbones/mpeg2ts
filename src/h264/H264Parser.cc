@@ -11,86 +11,7 @@
 namespace h264
 {
 
-static std::string seipayloadTypeToString(uint64_t payloadType)
-{
-    if (payloadType == 0)
-    {
-        return "buffering_period(payloadSize)";
-    }
-    else if (payloadType == 1)
-    {
-        return "pic_timing(payloadSize)";
-    }
-    else if (payloadType == 2)
-    {
-        return "pan_scan_rect(payloadSize)";
-    }
-    else if (payloadType == 3)
-    {
-        return "filler_payload(payloadSize)";
-    }
-    else if (payloadType == 4)
-    {
-        return "user_data_registered_itu_t_t35(payloadSize)";
-    }
-    else if (payloadType == 5)
-    {
-        return "user_data_unregistered(payloadSize)";
-    }
-    else if (payloadType == 6)
-    {
-        return "recovery_point(payloadSize)";
-    }
-    else if (payloadType == 7)
-    {
-        return "dec_ref_pic_marking_repetition(payloadSize)";
-    }
-    else if (payloadType == 8)
-    {
-        return "spare_pic(payloadSize)";
-    }
-    else if (payloadType == 9)
-    {
-        return "scene_info(payloadSize)";
-    }
-    else if (payloadType == 10)
-    {
-        return "sub_seq_info(payloadSize)";
-    }
-    else if (payloadType == 11)
-    {
-        return "sub_seq_layer_characteristics(payloadSize)";
-    }
-    else if (payloadType == 12)
-    {
-        return "sub_seq_characteristics(payloadSize)";
-    }
-    else if (payloadType == 13)
-    {
-        return "full_frame_freeze(payloadSize)";
-    }
-    else if (payloadType == 14)
-    {
-        return "full_frame_freeze_release(payloadSize)";
-    }
-    else if (payloadType == 15)
-    {
-        return "full_frame_snapshot(payloadSize)";
-    }
-    else if (payloadType == 16)
-    {
-        return "progressive_refinement_segment_start(payloadSize)";
-    }
-    else if (payloadType == 17)
-    {
-        return "progressive_refinement_segment_end(payloadSize)";
-    }
-    else if (payloadType == 18)
-    {
-        return "motion_constrained_slice_group_set(payloadSize)";
-    }
-    return "reserved_sei_message(payloadSize)";
-}
+
 std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 {
     resetBits(mPicture.data() + 4, mPicture.size() - 4);
@@ -181,6 +102,89 @@ std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
     return ret;
 }
 
+
+std::string H264EsParser::seipayloadTypeToString(uint64_t payloadType)
+{
+    if (payloadType == 0)
+    {
+        return "buffering_period(payloadSize)";
+    }
+    else if (payloadType == 1)
+    {
+        return "pic_timing(payloadSize)";
+    }
+    else if (payloadType == 2)
+    {
+        return "pan_scan_rect(payloadSize)";
+    }
+    else if (payloadType == 3)
+    {
+        return "filler_payload(payloadSize)";
+    }
+    else if (payloadType == 4)
+    {
+        return "user_data_registered_itu_t_t35(payloadSize)";
+    }
+    else if (payloadType == 5)
+    {
+        return "user_data_unregistered(payloadSize)";
+    }
+    else if (payloadType == 6)
+    {
+        return "recovery_point(payloadSize)";
+    }
+    else if (payloadType == 7)
+    {
+        return "dec_ref_pic_marking_repetition(payloadSize)";
+    }
+    else if (payloadType == 8)
+    {
+        return "spare_pic(payloadSize)";
+    }
+    else if (payloadType == 9)
+    {
+        return "scene_info(payloadSize)";
+    }
+    else if (payloadType == 10)
+    {
+        return "sub_seq_info(payloadSize)";
+    }
+    else if (payloadType == 11)
+    {
+        return "sub_seq_layer_characteristics(payloadSize)";
+    }
+    else if (payloadType == 12)
+    {
+        return "sub_seq_characteristics(payloadSize)";
+    }
+    else if (payloadType == 13)
+    {
+        return "full_frame_freeze(payloadSize)";
+    }
+    else if (payloadType == 14)
+    {
+        return "full_frame_freeze_release(payloadSize)";
+    }
+    else if (payloadType == 15)
+    {
+        return "full_frame_snapshot(payloadSize)";
+    }
+    else if (payloadType == 16)
+    {
+        return "progressive_refinement_segment_start(payloadSize)";
+    }
+    else if (payloadType == 17)
+    {
+        return "progressive_refinement_segment_end(payloadSize)";
+    }
+    else if (payloadType == 18)
+    {
+        return "motion_constrained_slice_group_set(payloadSize)";
+    }
+    return "reserved_sei_message(payloadSize)";
+}
+
+
 std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_type)
 {
     auto ret = std::make_shared<EsInfoH264SliceHeader>();
@@ -251,6 +255,7 @@ std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_t
     return ret;
 }
 
+
 uint64_t H264EsParser::getBitsDecodeUGolomb()
 {
     uint8_t leading_zeros = 0;
@@ -270,6 +275,7 @@ uint64_t H264EsParser::getBitsDecodeUGolomb()
     }
 }
 
+
 void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList)
 {
     uint8_t lastScale = 8;
@@ -286,6 +292,7 @@ void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingL
         lastScale = scalingList[j];
     }
 }
+
 
 std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_rbsp(int nal_unit_type)
 {
@@ -448,6 +455,7 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     return ret;
 }
 
+
 void H264EsParser::parse_vui()
 {
     auto aspect_ratio_info_present_flag = getBits(1);
@@ -554,6 +562,7 @@ void H264EsParser::parse_vui()
         LOGE << "bitstream_restriction_flag";
     }
 }
+
 
 std::shared_ptr<EsInfoH264PictureParameterSet> H264EsParser::pic_parameter_set_rbsp(int nal_unit_type)
 {
