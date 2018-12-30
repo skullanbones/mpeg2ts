@@ -14,7 +14,7 @@ TEST(Mpeg2VideoTests, Parse1)
 
     parser(testVec.data(), testVec.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes);
+    EXPECT_EQ(1, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse2)
@@ -24,7 +24,7 @@ TEST(Mpeg2VideoTests, Parse2)
 
     parser(testVec.data(), testVec.size());
 
-    EXPECT_EQ(0, parser.foundStartCodes);
+    EXPECT_EQ(0, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse3)
@@ -34,7 +34,7 @@ TEST(Mpeg2VideoTests, Parse3)
 
     parser(testVec.data(), testVec.size());
 
-    EXPECT_EQ(0, parser.foundStartCodes);
+    EXPECT_EQ(0, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse4)
@@ -46,7 +46,7 @@ TEST(Mpeg2VideoTests, Parse4)
     parser(testVec1.data(), testVec1.size());
     parser(testVec2.data(), testVec2.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes);
+    EXPECT_EQ(1, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse5)
@@ -58,7 +58,7 @@ TEST(Mpeg2VideoTests, Parse5)
     parser(testVec1.data(), testVec1.size());
     parser(testVec2.data(), testVec2.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes); // TODO seem its flaky...
+    EXPECT_EQ(1, parser.m_foundStartCodes); // TODO seem its flaky...
 }
 
 TEST(Mpeg2VideoTests, Parse6)
@@ -70,7 +70,7 @@ TEST(Mpeg2VideoTests, Parse6)
     parser(testVec1.data(), testVec1.size());
     parser(testVec2.data(), testVec2.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes);
+    EXPECT_EQ(1, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse7)
@@ -80,7 +80,7 @@ TEST(Mpeg2VideoTests, Parse7)
 
     parser(testVec.data(), testVec.size());
 
-    EXPECT_EQ(2, parser.foundStartCodes);
+    EXPECT_EQ(2, parser.m_foundStartCodes);
 }
 
 TEST(Mpeg2VideoTests, Parse8)
@@ -90,5 +90,5 @@ TEST(Mpeg2VideoTests, Parse8)
 
     parser(testVec.data(), testVec.size());
 
-    EXPECT_EQ(1, parser.foundStartCodes);
+    EXPECT_EQ(1, parser.m_foundStartCodes);
 }

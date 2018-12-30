@@ -45,7 +45,7 @@ struct EsInfoH264PictureParameterSet : public EsInfoH264
     int spsId;
 };
 
-class H264EsParser : public mpeg2::Mpeg2VideoEsParser
+class H264EsParser : public EsParser, public GetBits
 {
 public:
     H264EsParser(const H264EsParser& arg) = delete;
@@ -62,6 +62,7 @@ public:
     }
 
     std::vector<std::shared_ptr<EsInfo>> analyze() override;
+
     uint64_t getBitsDecodeUGolomb();
     void scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList);
     std::shared_ptr<EsInfoH264SequenceParameterSet> seq_parameter_set_rbsp(int nal_unit_type);

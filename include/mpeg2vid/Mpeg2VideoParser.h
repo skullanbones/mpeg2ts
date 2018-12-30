@@ -39,19 +39,10 @@ public:
     Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
 
-    Mpeg2VideoEsParser()
-        : foundStartCodes{ 0 }
-    {
-    }
-
+    Mpeg2VideoEsParser() = default;
     virtual ~Mpeg2VideoEsParser() = default;
 
-
-    std::vector<std::shared_ptr<EsInfo>> operator()(const uint8_t* from, std::size_t length) override;
-    virtual std::vector<std::shared_ptr<EsInfo>> analyze();
-
-    int foundStartCodes;
-    std::vector<uint8_t> mPicture;
+    std::vector<std::shared_ptr<EsInfo>> analyze() override;
 };
 
 }
