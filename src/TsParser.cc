@@ -372,7 +372,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
         // TODO function parseDescriptors...
         uint8_t descriptorTag = static_cast<uint8_t>(getBits(8));
 
-        LOGD << "descriptor_tag: " << static_cast<int>(descriptorTag);
+        LOGV << "descriptor_tag: " << static_cast<int>(descriptorTag);
         DescriptorTag tag = static_cast<DescriptorTag>(descriptorTag);
         switch (tag)
         {
@@ -415,7 +415,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
             break;
         }
         default:
-            LOGD << "skipping descriptor.." << '\n';
+            LOGV << "skipping descriptor.." << '\n';
             skipBytes(program_info_length - 1); // skip descriptors for now
         }
     }

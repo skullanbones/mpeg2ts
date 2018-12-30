@@ -184,7 +184,7 @@ std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
 std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_type)
 {
     auto ret = std::make_shared<EsInfoH264SliceHeader>();
-    ret->msg = (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** pictur";
+    ret->msg = (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
     ret->nalUnitType = nal_unit_type;
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
