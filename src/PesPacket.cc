@@ -6,7 +6,7 @@ namespace mpeg2ts
 
 std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs)
 {
-    ss << "-------------PesPacket------------- " << '\n';
+    ss << "\n-------------PesPacket-------------\n";
     ss << "packet_start_code_prefix:" << std::hex << rhs.packet_start_code_prefix << std::dec << '\n';
     ss << "stream_id: " << static_cast<int>(rhs.stream_id) << '\n';
     ss << "PES_packet_length: " << static_cast<int>(rhs.PES_packet_length) << '\n';

@@ -10,56 +10,7 @@
 namespace mpeg2
 {
 
-std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::operator()(const uint8_t* from, std::size_t length)
-{
-    std::vector<std::shared_ptr<EsInfo>> ret;
-    while (length > 0)
-    {
-        const uint8_t* onePosition = getFirstOne(from, length);
-        auto startCodeFound = false;
-        if (onePosition == from)
-        {
-            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        else if (onePosition == from + 1)
-        {
-            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        else if (onePosition != from + length)
-        {
-            if (*(onePosition - 2) == 0 && *(onePosition - 1) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        const uint8_t* end = (onePosition != from + length) ? onePosition + 1 : onePosition;
-        std::copy(from, end, std::back_inserter(mPicture));
-        if (startCodeFound)
-        {
-            ++foundStartCodes;
-            if (mPicture.size() > 4)
-            {
-                auto vec = analyze();
-                for (auto& l : vec)
-                {
-                    ret.push_back(l);
-                }
-            }
-            mPicture = { 0, 0, 0, 1 };
-        }
-        std::size_t diff = (onePosition + 1 - from);
-        length = diff > length ? 0 : length - diff;
-        from = onePosition + 1;
-    }
 
-    return ret;
-}
 
 std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
