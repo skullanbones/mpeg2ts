@@ -39,13 +39,9 @@ PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
 bool addedPmts { false };
 
-std::map<StreamType, std::unique_ptr<EsParser>> g_EsParsers =
-[](std::map<StreamType, std::unique_ptr<EsParser>>&) {
-    std::map<StreamType, std::unique_ptr<EsParser>> map;
-    map.emplace(STREAMTYPE_VIDEO_MPEG2, std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser()));
-    map.emplace(STREAMTYPE_VIDEO_H264, std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser()));
-    return map;
-}(g_EsParsers);
+// Codec parsers
+std::unique_ptr<mpeg2::Mpeg2VideoEsParser> g_Mpeg2Parser = std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser());
+std::unique_ptr<h264::H264EsParser> g_H264Parser = std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser());
 
 const char LOGFILE_NAME[] { "tsparser.csv" };
 int LOGFILE_MAXSIZE { 100 * 1024 };
@@ -299,11 +295,18 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                 if (it != g_prevPmts[pmtPid].streams.end())
                 {
                     try
-                    {
-                        auto ret =
-                        (*g_EsParsers.at(it->stream_type))(&rawPes[pes.elementary_data_offset],
+                    {                        
+                        class std::vector<std::shared_ptr<EsInfo>> ret;
+                        if (it->stream_type == STREAMTYPE_VIDEO_MPEG2){
+                            ret = g_Mpeg2Parser->operator()(&rawPes[pes.elementary_data_offset],
                                                            rawPes.size() - pes.elementary_data_offset);
-                        for (auto& esinfo : ret)
+                        }
+                        if (it->stream_type == STREAMTYPE_VIDEO_H264){
+                            ret = g_H264Parser->operator()(&rawPes[pes.elementary_data_offset],
+                                                           rawPes.size() - pes.elementary_data_offset);
+                        }
+
+                        for (std::shared_ptr<EsInfo>& esinfo : ret)
                         {
                             if (std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo))
                             {
