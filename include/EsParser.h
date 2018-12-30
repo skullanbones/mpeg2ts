@@ -31,7 +31,7 @@ public:
         return std::find(from, from + length, 1);
     }
 
-    std::vector<std::shared_ptr<EsInfo>> operator()(const uint8_t* from, std::size_t length);
+    std::vector<std::shared_ptr<EsInfo>> parse(const uint8_t* from, std::size_t length);
     virtual std::vector<std::shared_ptr<EsInfo>> analyze() = 0;
 
     int m_foundStartCodes;
@@ -39,7 +39,7 @@ protected:
     std::vector<uint8_t> mPicture;
 };
 
-inline std::vector<std::shared_ptr<EsInfo>> EsParser::operator()(const uint8_t* from, std::size_t length)
+inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const uint8_t* from, std::size_t length)
 {
     std::vector<std::shared_ptr<EsInfo>> ret;
     while (length > 0)

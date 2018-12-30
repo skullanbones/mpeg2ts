@@ -296,11 +296,11 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                 {
                     try
                     {                        
-                        class std::vector<std::shared_ptr<EsInfo>> ret;
                         if (it->stream_type == STREAMTYPE_VIDEO_MPEG2)
                         {
-                            ret = g_Mpeg2Parser->operator()(&rawPes[pes.elementary_data_offset],
-                                                           rawPes.size() - pes.elementary_data_offset);
+                            class std::vector<std::shared_ptr<EsInfo>> ret =
+                             g_Mpeg2Parser->parse(&rawPes[pes.elementary_data_offset],
+                                                        rawPes.size() - pes.elementary_data_offset);
 
                             for (std::shared_ptr<EsInfo>& esinfo : ret)
                             {
@@ -324,8 +324,9 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                         if (it->stream_type == STREAMTYPE_VIDEO_H264)
                         {
-                            ret = g_H264Parser->operator()(&rawPes[pes.elementary_data_offset],
-                                                           rawPes.size() - pes.elementary_data_offset);
+                            class std::vector<std::shared_ptr<EsInfo>> ret = 
+                            g_H264Parser->parse(&rawPes[pes.elementary_data_offset],
+                                                    rawPes.size() - pes.elementary_data_offset);
 
                             for (std::shared_ptr<EsInfo>& esinfo : ret)
                             {
