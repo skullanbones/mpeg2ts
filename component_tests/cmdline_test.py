@@ -366,4 +366,62 @@ def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
     assert "nal: 8 Picture parameter set: entropy: CAVLC" in out[1]
     assert "sps id: 0pps id: 0" in out[1]
 
-    
+
+def test_b_parse_dolby_asset_pat(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_dolby_asset_pat, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_dolby_asset_pat_short_option(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_dolby_asset_pat_short_option, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_dolby_asset_pmt(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark something, but add some arguments
+    result = benchmark(test_parse_dolby_asset_pmt, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_rubeatles_asset_pmt(benchmark, parser, asset_h265_aac_rubeatles_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_rubeatles_asset_pmt, parser, asset_h265_aac_rubeatles_atmos)
+
+
+def test_b_parse_got_hbo_pat(benchmark, parser, asset_h264_138183_got_hbo):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_got_hbo_pat, parser, asset_h264_138183_got_hbo)
+
+
+def test_b_parse_got_hbo_pmt(benchmark, parser, asset_h264_138183_got_hbo):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_got_hbo_pmt, parser, asset_h264_138183_got_hbo)    
+
+
+def test_b_parse_avsync_mpeg2_ac3LR_PAT(benchmark, parser, asset_avsync_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_avsync_mpeg2_ac3LR_PAT, parser, asset_avsync_mpeg2_ac3LR) 
+
+
+def test_b_parse_avsync_mpeg2_ac3LR_PMT(benchmark, parser, asset_avsync_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_avsync_mpeg2_ac3LR_PMT, parser, asset_avsync_mpeg2_ac3LR) 
+
+
+def test_b_parse_newmobcal1920_mpeg2_ac3LR_PAT(benchmark, parser, asset_newmobcal1920_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_newmobcal1920_mpeg2_ac3LR_PAT, parser, asset_newmobcal1920_mpeg2_ac3LR)
+
+
+def test_b_parse_newmobcal1920_mpeg2_ac3LR_PMT(benchmark, parser, asset_newmobcal1920_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_newmobcal1920_mpeg2_ac3LR_PMT, parser, asset_newmobcal1920_mpeg2_ac3LR)
+
+
+def test_b_parse_eurosport(benchmark, parser, asset_eurosport):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_eurosport, parser, asset_eurosport)
+
+
+def test_b_parse_h264_dolby(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_h264_dolby, parser, asset_h264_dolby_atmos)
