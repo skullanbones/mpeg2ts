@@ -126,6 +126,7 @@ help:
 	@echo '  unit-tests            - run all unit tests.'
 	@echo '  env                   - build python virtual environment for pytest.'
 	@echo '  component-tests       - run all component tests.'
+	@echo '  benchmark-tests       - run all benchmark tests.'
 	@echo '  libs                  - make both static and dynamic libs.'
 	@echo '  shared                - make static object as static linkage library.'
 	@echo '  static                - make shared object as dynamic linkage library.'
@@ -225,7 +226,11 @@ env:
 
 component-tests: env $(BUILDDIR)/tsparser
 	@echo "[Running component tests..]"
-	./env/bin/pytest
+	./env/bin/pytest --benchmark-skip
+
+benchmark-tests: env $(BUILDDIR)/tsparser
+	@echo "[Running component tests..]"
+	./env/bin/pytest --benchmark-enable --benchmark-only
 
 ### 3rd-party stuff
 $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
