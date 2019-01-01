@@ -78,7 +78,7 @@ inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const uint8_t* a_fro
              std::size_t ind = (onePosition - a_from);
             m_indexes.push_back(ind);
             
-            if (mPicture.size() > 4)
+            if ((end - a_from) > 4) // check we have more data than just 1 NAL start code
             {
                 auto vec = analyze();
                 for (auto& l : vec)
