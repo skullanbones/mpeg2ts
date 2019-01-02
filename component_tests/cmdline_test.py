@@ -51,6 +51,7 @@ def test_asset(asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
+    log.debug("test_parse_dolby_asset_pat")
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -62,6 +63,7 @@ def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pat_short_option(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset with short option"""
+    log.debug("test_parse_dolby_asset_pat_short_option")
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     out = parser.start(extra_args=['-i', asset, '-p', 0])
@@ -74,6 +76,7 @@ def test_parse_dolby_asset_pat_short_option(parser, asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
+    log.debug("test_parse_dolby_asset_pmt")
     asset = asset_h264_dolby_atmos.get_asset()
     pmt = asset_h264_dolby_atmos.get_pmt()
     log.debug(pmt)
@@ -106,6 +109,7 @@ def test_parse_rubeatles_asset_pmt(parser, asset_h265_aac_rubeatles_atmos):
     :param asset_h265_aac_rubeatles_atmos:
     :return:
     """
+    log.debug("test_parse_rubeatles_asset_pmt")
     asset = asset_h265_aac_rubeatles_atmos.get_asset()
     pmt = asset_h265_aac_rubeatles_atmos.get_pmt()
     log.debug(pmt)
@@ -122,6 +126,7 @@ def test_parse_got_hbo_pat(parser, asset_h264_138183_got_hbo):
     :param asset_h264_138183_got_hbo:
     :return:
     """
+    log.debug("test_parse_got_hbo_pat")
     asset = asset_h264_138183_got_hbo.get_asset()
     assert "GoT-HBO.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -197,6 +202,7 @@ def test_parse_got_hbo_pmt(parser, asset_h264_138183_got_hbo):
     :param asset_h264_138183_got_hbo:
     :return:
     """
+    log.debug("test_parse_got_hbo_pmt")
     asset = asset_h264_138183_got_hbo.get_asset()
     pmt = asset_h264_138183_got_hbo.get_pmt()
     assert "GoT-HBO.ts" in asset
@@ -245,6 +251,7 @@ def test_parse_avsync_mpeg2_ac3LR_PAT(parser, asset_avsync_mpeg2_ac3LR):
     :param asset_avsync_mpeg2_ac3LR
     :return:
     """
+    log.debug("test_parse_avsync_mpeg2_ac3LR_PAT")
     asset = asset_avsync_mpeg2_ac3LR.get_asset()
     assert "avsync_mpeg2_ac3LR.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -264,6 +271,7 @@ def test_parse_avsync_mpeg2_ac3LR_PMT(parser, asset_avsync_mpeg2_ac3LR):
     :param asset_avsync_mpeg2_ac3LR
     :return:
     """
+    log.debug("test_parse_avsync_mpeg2_ac3LR_PMT")
     asset = asset_avsync_mpeg2_ac3LR.get_asset()
     pmt = asset_avsync_mpeg2_ac3LR.get_pmt()
     assert "avsync_mpeg2_ac3LR.ts" in asset
@@ -291,6 +299,7 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PAT(parser, asset_newmobcal1920_mpeg2_a
     :param asset_newmobcal1920_mpeg2_ac3LR:
     :return:
     """
+    log.debug("test_parse_newmobcal1920_mpeg2_ac3LR_PAT")
     asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -310,6 +319,7 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_a
     :param asset_newmobcal1920_mpeg2_ac3LR:
     :return:
     """
+    log.debug("test_parse_newmobcal1920_mpeg2_ac3LR_PMT")
     asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
     pmt = asset_newmobcal1920_mpeg2_ac3LR.get_pmt()
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
@@ -337,6 +347,7 @@ def test_parse_eurosport(parser, asset_eurosport):
     :param asset_eurosport:
     :return:
     """
+    log.debug("test_parse_h262_eurosport")
     asset = asset_eurosport.get_asset()
     assert "eurosport.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 101, '-l', 'DEBUG'])
@@ -354,6 +365,7 @@ def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
     :param asset_h264_dolby_atmos:
     :return:
     """
+    log.debug("test_parse_h264_dolby")
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 4113, '-l', 'DEBUG'])

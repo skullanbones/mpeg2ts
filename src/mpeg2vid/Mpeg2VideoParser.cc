@@ -14,7 +14,7 @@ namespace mpeg2
 
 std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
 {
-    resetBits(mPicture.data() + 4, mPicture.size() - 4);
+    resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
     std::vector<std::shared_ptr<EsInfo>> ret;
     auto rete = std::make_shared<EsInfoMpeg2>();
