@@ -298,9 +298,11 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                     {                        
                         if (it->stream_type == STREAMTYPE_VIDEO_MPEG2)
                         {
-                            class std::vector<std::shared_ptr<EsInfo>> ret =
-                             g_Mpeg2Parser->parse(&rawPes[pes.elementary_data_offset],
-                                                        rawPes.size() - pes.elementary_data_offset);
+                            std::vector<uint8_t>::const_iterator first = rawPes.begin() + pes.elementary_data_offset;
+                            std::vector<uint8_t>::const_iterator last = rawPes.end();
+                            std::vector<uint8_t> newVec(first, last);
+
+                            std::vector<std::shared_ptr<EsInfo>> ret = g_Mpeg2Parser->parse(newVec);
 
                             for (std::shared_ptr<EsInfo>& esinfo : ret)
                             {
@@ -321,9 +323,11 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                         if (it->stream_type == STREAMTYPE_VIDEO_H264)
                         {
-                            class std::vector<std::shared_ptr<EsInfo>> ret = 
-                            g_H264Parser->parse(&rawPes[pes.elementary_data_offset],
-                                                    rawPes.size() - pes.elementary_data_offset);
+                            std::vector<uint8_t>::const_iterator first = rawPes.begin() + pes.elementary_data_offset;
+                            std::vector<uint8_t>::const_iterator last = rawPes.end();
+                            std::vector<uint8_t> newVec(first, last);
+
+                            std::vector<std::shared_ptr<EsInfo>> ret = g_H264Parser->parse(newVec);
 
                             for (std::shared_ptr<EsInfo>& esinfo : ret)
                             {

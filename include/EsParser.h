@@ -31,7 +31,7 @@ public:
         return std::find(from, from + length, 1);
     }
 
-    std::vector<std::shared_ptr<EsInfo>> parse(const uint8_t* from, std::size_t length);
+    std::vector<std::shared_ptr<EsInfo>> parse(std::vector<uint8_t> buf);
     virtual std::vector<std::shared_ptr<EsInfo>> analyze() = 0;
 
 
@@ -41,44 +41,47 @@ protected:
     std::vector<uint8_t> mPicture;
 };
 
-inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const uint8_t* a_from, std::size_t a_length)
+inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(std::vector<uint8_t> a_buf)
 {
     std::vector<std::shared_ptr<EsInfo>> ret;
+    std::size_t length = a_buf.size();
+    const uint8_t* ptrBuf = a_buf.data();
 
-    while (a_length > 0)
+
+    while (length > 0)
     {
-        const uint8_t* onePosition = getFirstOne(a_from, a_length);
+        const uint8_t* onePosition = getFirstOne(ptrBuf, length);
         auto startCodeFound = false;
-        if (onePosition == a_from)
+        if (onePosition == ptrBuf)
         {
             if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
             {
                 startCodeFound = true;
             }
         }
-        else if (onePosition == a_from + 1)
+        else if (onePosition == ptrBuf + 1)
         {
             if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
-        else if (onePosition != a_from + a_length)
+        else if (onePosition != ptrBuf + length)
         {
             if (*(onePosition - 2) == 0 && *(onePosition - 1) == 0)
             {
                 startCodeFound = true;
             }
         }
-        const uint8_t* end = (onePosition != a_from + a_length) ? onePosition + 1 : onePosition;
-        std::copy(a_from, end, std::back_inserter(mPicture));
+        const uint8_t* end = (onePosition != ptrBuf + length) ? onePosition + 1 : onePosition;
+        std::copy(ptrBuf, end, std::back_inserter(mPicture));
         if (startCodeFound)
         {
             ++m_foundStartCodes;
-             std::size_t ind = (onePosition - a_from);
+             std::size_t ind = (onePosition - ptrBuf);
             m_indexes.push_back(ind);
             
-            if ((end - a_from) > 4) // check we have more data than just 1 NAL start code
+            if ((end - ptrBuf) > 4) // check we have more data than just 1 NAL start code
             {
                 auto vec = analyze();
                 for (auto& l : vec)
@@ -88,9 +91,9 @@ inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const uint8_t* a_fro
             }
             mPicture = { 0, 0, 0, 1 };
         }
-        std::size_t diff = (onePosition + 1 - a_from);
-        a_length = diff > a_length ? 0 : a_length - diff;
-        a_from = onePosition + 1;
+        std::size_t diff = (onePosition + 1 - ptrBuf);
+        length = diff > length ? 0 : length - diff;
+        ptrBuf = onePosition + 1;
     }
 
     return ret;
