@@ -35,7 +35,7 @@ public:
     std::vector<std::size_t> findStartCodes(const std::vector<uint8_t>& buf);
 
     /// @brief Specialization to analyze the content on data after startcodes.
-    virtual std::vector<std::shared_ptr<EsInfo>> analyze() = 0;
+    virtual void analyze() = 0;
 
 protected:
     std::vector<uint8_t> mPicture;

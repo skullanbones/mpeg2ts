@@ -10,31 +10,30 @@
 namespace mpeg2
 {
 
-struct EsInfoMpeg2 : public EsInfo
+
+struct EsInfoMpeg2PictureSliceCode
 {
-    //    EsInfoMpeg2(int picture, const std::string& msg)
-    //        : picture{picture}, msg{msg} {}
-    int picture; // slice
-    std::string msg;
+    uint64_t picType{ 0 }; // I, B, P
 };
 
-struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
+struct EsInfoMpeg2SequenceHeader
 {
-    uint64_t picType; // I, B, P
+    int width{ 0 }, height { 0 };
+    std::string aspect { 0 };
+    std::string framerate { 0 };
 };
 
-struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
+struct EsInfoMpeg2
 {
-    int width, height;
-    std::string aspect;
-    std::string framerate;
+    int picture{ 0 }; // slice
+    std::string msg{ "" };
+    EsInfoMpeg2PictureSliceCode slice;
+    EsInfoMpeg2SequenceHeader sequence;
 };
+
 
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
-    static std::map<uint8_t, std::string> AspectToString;
-    static std::map<uint8_t, std::string> FrameRateToString;
-
 public:
     Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
@@ -46,7 +45,25 @@ public:
     
     virtual ~Mpeg2VideoEsParser() = default;
 
-    std::vector<std::shared_ptr<EsInfo>> analyze() override;
+    void analyze() override;
+
+    std::vector<EsInfoMpeg2> getMpeg2Info();
+    void clearInfo();
+
+    private : static std::map<uint8_t, std::string> AspectToString;
+    static std::map<uint8_t, std::string> FrameRateToString;
+
+    std::vector<EsInfoMpeg2> m_infos;
 };
+
+inline std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::getMpeg2Info()
+{
+    return m_infos;
+}
+
+inline void Mpeg2VideoEsParser::clearInfo()
+{
+    m_infos.clear();
+}
 
 }

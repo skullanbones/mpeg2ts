@@ -12,20 +12,18 @@ namespace mpeg2
 
 
 
-std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
+void Mpeg2VideoEsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
-    std::vector<std::shared_ptr<EsInfo>> ret;
-    auto rete = std::make_shared<EsInfoMpeg2>();
-    rete->picture = mPicture[0];
-    if (rete->picture == 0 && mPicture.size() > 4)
+
+    EsInfoMpeg2 info;
+    info.picture = mPicture[0];
+    if (info.picture == 0 && mPicture.size() > 4)
     {
-        auto retel = std::make_shared<EsInfoMpeg2PictureSliceCode>();
-        retel->picture = rete->picture;
         skipBits(10 + 8);
-        retel->picType = static_cast<int>(getBits(3));
-        switch (retel->picType)
+        info.slice.picType = static_cast<int>(getBits(3));
+        switch (info.slice.picType)
         {
         case 1:
             msg << "I";
@@ -39,63 +37,52 @@ std::vector<std::shared_ptr<EsInfo>> Mpeg2VideoEsParser::analyze()
         default:
             msg << "forbiden/reserved";
         };
-        retel->msg = msg.str();
-        ret.push_back(retel);
+        info.msg = msg.str();
     }
-    else if (rete->picture >= 0x01 && rete->picture <= 0xaf)
+    else if (info.picture >= 0x01 && info.picture <= 0xaf)
     {
-        rete->msg = "slice_start_code";
-        ret.push_back(rete);
+        info.msg = "slice_start_code";
     }
-    else if (rete->picture == 0xb0 && rete->picture == 0xb1 && rete->picture == 0xb6)
+    else if (info.picture == 0xb0 && info.picture == 0xb1 && info.picture == 0xb6)
     {
-        rete->msg = "reserved";
-        ret.push_back(rete);
+        info.msg = "reserved";
     }
-    else if (rete->picture == 0xb2)
+    else if (info.picture == 0xb2)
     {
-        rete->msg = "user_data_start_code";
-        ret.push_back(rete);
+        info.msg = "user_data_start_code";
     }
-    else if (rete->picture == 0xb3)
+    else if (info.picture == 0xb3)
     {
-        auto retel = std::make_shared<EsInfoMpeg2SequenceHeader>();
-        retel->msg = "sequence_header_code ";
+        info.msg = "sequence_header_code ";
         skipBits(8);
-        retel->width = static_cast<int>(getBits(12));
-        retel->height = static_cast<int>(getBits(12));
+        info.sequence.width = static_cast<int>(getBits(12));
+        info.sequence.height = static_cast<int>(getBits(12));
         uint8_t aspect_ratio_information = static_cast<uint8_t>(getBits(4));
         uint8_t frame_rate_code = static_cast<uint8_t>(getBits(4));
-        retel->aspect = AspectToString[aspect_ratio_information];
-        retel->framerate = FrameRateToString[frame_rate_code];
-        ret.push_back(retel);
+        info.sequence.aspect = AspectToString[aspect_ratio_information];
+        info.sequence.framerate = FrameRateToString[frame_rate_code];
     }
-    else if (rete->picture == 0xb4)
+    else if (info.picture == 0xb4)
     {
-        rete->msg = "sequence_error_code";
-        ret.push_back(rete);
+        info.msg = "sequence_error_code";
     }
-    else if (rete->picture == 0xb5)
+    else if (info.picture == 0xb5)
     {
-        rete->msg = "extension_start_code";
-        ret.push_back(rete);
+        info.msg = "extension_start_code";
     }
-    else if (rete->picture == 0xb7)
+    else if (info.picture == 0xb7)
     {
-        rete->msg = "sequence_end_code";
-        ret.push_back(rete);
+        info.msg = "sequence_end_code";
     }
-    else if (rete->picture == 0xb8)
+    else if (info.picture == 0xb8)
     {
-        rete->msg = "group_start_code";
-        ret.push_back(rete);
+        info.msg = "group_start_code";
     }
     else
     {
-        rete->msg = "system start code";
-        ret.push_back(rete);
+        info.msg = "system start code";
     }
-    return ret;
+    m_infos.push_back(std::move(info));
 }
 
 std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString =

@@ -302,23 +302,19 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            std::vector<std::shared_ptr<EsInfo>> ret = g_Mpeg2Parser->parse(newVec);
+                            g_Mpeg2Parser->parse(newVec);
 
-                            for (std::shared_ptr<EsInfo>& esinfo : ret)
+                            std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->getMpeg2Info();
+                            for (auto info: infos)
                             {
-                                class std::shared_ptr<mpeg2::EsInfoMpeg2> i =
-                                std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo);
-                                LOGD << "mpeg2 picture: " << i->picture << " " << i->msg;
-                                if (auto a = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(i))
-                                {
-                                    LOGD << "mpeg2 picture type: " << a->picType << " " << a->msg;
-                                }
-                                else if (auto b = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(i))
-                                {
-                                    LOGD << b->width << " x " << b->height << ", aspect: " << b->aspect
-                                         << ", frame rate: " << b->framerate;
-                                }
+                                LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
+                                LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
+                                LOGD << info.sequence.width << " x " << info.sequence.height
+                                     << ", aspect: " << info.sequence.aspect
+                                     << ", frame rate: " << info.sequence.framerate;
                             }
+                            g_Mpeg2Parser->clearInfo();
+
                         } // STREAMTYPE_VIDEO_MPEG2
 
                         if (it->stream_type == STREAMTYPE_VIDEO_H264)
@@ -327,35 +323,32 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            std::vector<std::shared_ptr<EsInfo>> ret = g_H264Parser->parse(newVec);
+                            g_H264Parser->parse(newVec);
 
-                            for (std::shared_ptr<EsInfo>& esinfo : ret)
+                            std::vector<h264::EsInfoH264> infos = g_H264Parser->getInfo();
+
+                            for (auto info : infos)
                             {
-                                auto i = std::dynamic_pointer_cast<h264::EsInfoH264>(esinfo);
-                                LOGD << "nal: " << i->nalUnitType << " " << i->msg;
-                                if (auto a = std::dynamic_pointer_cast<h264::EsInfoH264SliceHeader>(i))
+                                LOGD << "nal: " << info.nalUnitType << " " << info.msg;
+
+                                LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
+                                if (info.slice.field)
                                 {
-                                    LOGD << a->sliceTypeStr << ", pps id: " << a->ppsId;
-                                    if (a->field)
-                                    {
-                                        LOGD << "field encoded: " << (a->top ? " top" : " bottom");
-                                    }
-                                    else
-                                    {
-                                        LOGD << "frame encoded";
-                                    }
+                                    LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
                                 }
-                                else if (auto b = std::dynamic_pointer_cast<h264::EsInfoH264SequenceParameterSet>(i))
+                                else
                                 {
-                                    LOGD << "sps id: " << b->spsId << ", luma bits: " << b->lumaBits
-                                         << ", chroma bits: " << b->chromaBits << ", width: " << b->width
-                                         << " x " << b->height << ", ref pic: " << b->numRefPics;
+                                    LOGD << "frame encoded";
                                 }
-                                else if (auto c = std::dynamic_pointer_cast<h264::EsInfoH264PictureParameterSet>(i))
-                                {
-                                    LOGD << "sps id: " << c->spsId << "pps id: " << c->ppsId;
-                                }
+
+                                LOGD << "sps id: " << info.pps.spsId << ", luma bits: " << info.sps.lumaBits
+                                     << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
+                                     << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
+
+
+                                LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
                             }
+                            g_H264Parser->clearInfo();
                         } // STREAMTYPE_VIDEO_H264
                     }
                     catch (const std::out_of_range&)

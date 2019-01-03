@@ -41,11 +41,7 @@ std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const std::vector<uint8_t>&
             std::vector<uint8_t> newVec(first, last);
             mPicture = newVec;
         
-            auto vec = analyze();
-            for (auto& l : vec)
-            {
-                ret.push_back(l);
-            }
+            analyze();
         }
         catch (std::bad_alloc& e)
         {
