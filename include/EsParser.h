@@ -62,34 +62,6 @@ inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const std::vector<ui
     if (a_buf.size() <= m_startCode.size() )
         return ret;
 
-    // Only have 1 startcode is a corner case
-    if (startCodes.size() == 1 && a_buf.size() > m_startCode.size())
-    {
-        try
-        {
-            mPicture.clear();
-            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[0] + m_startCode.size(); // skip start code
-            std::vector<uint8_t>::const_iterator last = a_buf.end();             
-            std::vector<uint8_t> newVec(first, last);
-            mPicture = newVec;
-        
-            auto vec = analyze();
-            for (auto& l : vec)
-            {
-                ret.push_back(l);
-            }
-        }
-        catch (std::bad_alloc& e)
-        {
-            printf("std::Exception what: %s\n", e.what());
-        }
-        catch (...)
-        {
-            printf("exception e:\n");
-        }
-        return ret;
-    }
-
     printf("startCode[0]: %d\n", static_cast<int>(startCodes[0]));
     printf("startCode[1]: %d\n", static_cast<int>(startCodes[1]));
     printf("startCode[2]: %d\n", static_cast<int>(startCodes[2]));
@@ -109,7 +81,9 @@ inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const std::vector<ui
             mPicture.clear();
             std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
             std::vector<uint8_t>::const_iterator last;
-            if (ind == (startCodes.size() - 1))
+            // the last startcode is a corner case
+            // also only have 1 startcode is a corner case
+            if (ind == (startCodes.size() - 1) || startCodes.size() == 1)
             {
                 last = a_buf.end();
             }
