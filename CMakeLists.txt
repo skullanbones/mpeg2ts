@@ -73,7 +73,8 @@ set(    TsLibSourcesList
         src/TsPacketInfo.cc
         src/TsParser.cc
         src/TsStatistics.cc
-        src/TsUtilities.cc)
+        src/TsUtilities.cc
+        src/EsParser.cc)
 
 set(    3rdPartySources
         3rd-party/nlohmann/include/json.hpp

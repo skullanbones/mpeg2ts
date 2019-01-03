@@ -94,7 +94,8 @@ SRCS = 	TsParser.cc \
         PsiTables.cc \
         TsPacketInfo.cc \
         JsonSettings.cc \
-		TsUtilities.cc
+		TsUtilities.cc \
+		EsParser.cc
 
 HDRS = 	include/public/mpeg2ts.h \
 		include/public/Ts_IEC13818-1.h \
