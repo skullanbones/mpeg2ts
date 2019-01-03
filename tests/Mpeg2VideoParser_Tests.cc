@@ -23,17 +23,6 @@ public:
     Mpeg2VideoEsParser parser;
 };
 
-// Not sure this should be supposed to be correct
-// NAL unit start codes is 4 bytes not 3...??
-TEST_F(Mpeg2VideoTest, Parse0)
-{
-    std::vector<uint8_t> testVec = { 0, 0, 1 };
-
-    parser.parse(testVec);
-
-    EXPECT_EQ(1, parser.m_indexes.size());
-}
-
 
 TEST_F(Mpeg2VideoTest, test_bare_findStartCodes)
 {
@@ -41,9 +30,12 @@ TEST_F(Mpeg2VideoTest, test_bare_findStartCodes)
     std::vector<uint8_t> testVec2 = { 0, 0, 0, 1 };
 
     std::vector<std::size_t> ret = parser.findStartCodes(testVec);
+    std::vector<std::size_t> ret2 = parser.findStartCodes(testVec2);
 
     EXPECT_EQ(1, ret.size());
     EXPECT_EQ(0, ret[0]);
+    EXPECT_EQ(1, ret2.size());
+    EXPECT_EQ(1, ret2[0]);
 }
 
 
