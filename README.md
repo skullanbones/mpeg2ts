@@ -1,6 +1,6 @@
 # MPEG-2 Transport Stream utility library
 A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
-international specification ISO/IEC 13818-1.
+international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS.
 
 Artifacts:
 ```
@@ -13,6 +13,9 @@ Applications:
 Win32: TestTsLib located under msvs/2015
 Linux: tsparser
 ```
+
+## Requirements / example usage
+C++11 is the minial requirement. The library is written as platform independent code and tested on Mac OS X, Ubuntu 16.04/18.04, Windows 10.
 
 ## SW Architecture
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:

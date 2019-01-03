@@ -6,6 +6,9 @@
 #include <list>
 #include <memory>
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 
 struct EsInfo
 {
@@ -15,77 +18,38 @@ struct EsInfo
 class EsParser
 {
 public:
-    EsParser()
-        : m_foundStartCodes{ 0 }
+    EsParser(std::vector<uint8_t> a_startCode)
+        : m_startCode{ a_startCode }
     {
     }
 
-    virtual ~EsParser()
-    {
-    }
+    virtual ~EsParser() = default;
 
-    const uint8_t* getFirstOne(const uint8_t* from, std::size_t length)
-    {
-        // TODO: avx2 can compare 32 bytes within one cycle
-        //      and return pattern position using one more cycle
-        return std::find(from, from + length, 1);
-    }
+    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
+    /// let the specialization analyze the results.
+    /// @param buf The binary data to parse
+    std::vector<std::shared_ptr<EsInfo>> parse(const std::vector<uint8_t>& buf);
+    
+    /// @brief Finds startcode in a binary buffer by using std search algorithm
+    /// @param buf The binary data to find startcodes in
+    std::vector<std::size_t> findStartCodes(const std::vector<uint8_t>& buf);
 
-    std::vector<std::shared_ptr<EsInfo>> parse(const uint8_t* from, std::size_t length);
+    /// @brief Specialization to analyze the content on data after startcodes.
     virtual std::vector<std::shared_ptr<EsInfo>> analyze() = 0;
 
-    int m_foundStartCodes;
 protected:
     std::vector<uint8_t> mPicture;
+    std::vector<uint8_t> m_startCode;
 };
 
-inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const uint8_t* from, std::size_t length)
+inline std::vector<std::size_t> EsParser::findStartCodes(const std::vector<uint8_t>& a_buf)
 {
-    std::vector<std::shared_ptr<EsInfo>> ret;
-    while (length > 0)
+    std::vector<std::size_t> indexes{};
+    auto it{a_buf.begin()};
+    while ((it = std::search(it, a_buf.end(), m_startCode.begin(), m_startCode.end())) != a_buf.end()) 
     {
-        const uint8_t* onePosition = getFirstOne(from, length);
-        auto startCodeFound = false;
-        if (onePosition == from)
-        {
-            if (mPicture.size() >= 2 && mPicture[mPicture.size() - 2] == 0 && mPicture[mPicture.size() - 1] == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        else if (onePosition == from + 1)
-        {
-            if (mPicture.size() >= 1 && mPicture[mPicture.size() - 1] == 0 && *(onePosition - 1) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        else if (onePosition != from + length)
-        {
-            if (*(onePosition - 2) == 0 && *(onePosition - 1) == 0)
-            {
-                startCodeFound = true;
-            }
-        }
-        const uint8_t* end = (onePosition != from + length) ? onePosition + 1 : onePosition;
-        std::copy(from, end, std::back_inserter(mPicture));
-        if (startCodeFound)
-        {
-            ++m_foundStartCodes;
-            if (mPicture.size() > 4)
-            {
-                auto vec = analyze();
-                for (auto& l : vec)
-                {
-                    ret.push_back(l);
-                }
-            }
-            mPicture = { 0, 0, 0, 1 };
-        }
-        std::size_t diff = (onePosition + 1 - from);
-        length = diff > length ? 0 : length - diff;
-        from = onePosition + 1;
+        indexes.push_back(std::distance(a_buf.begin(), it++));
     }
-
-    return ret;
+    return indexes;
 }
+

@@ -16,6 +16,7 @@ SRCS = 	TsParser_Tests.cc \
 		TsDemuxer_Tests.cc \
 		Mpeg2VideoParser_Tests.cc \
 		TsUtilities_Tests.cc \
+		H264Parser_Tests.cc \
 		gtest_main.cc
 
 OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))

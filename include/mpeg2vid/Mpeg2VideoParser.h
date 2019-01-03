@@ -39,7 +39,11 @@ public:
     Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
 
-    Mpeg2VideoEsParser() = default;
+    Mpeg2VideoEsParser()
+        : EsParser({0x00, 0x00, 0x01})
+    {
+    }
+    
     virtual ~Mpeg2VideoEsParser() = default;
 
     std::vector<std::shared_ptr<EsInfo>> analyze() override;
