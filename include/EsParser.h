@@ -10,8 +10,6 @@
 #include <iostream>
 
 
-#include "plog/Log.h"
-
 struct EsInfo
 {
     virtual ~EsInfo(){};
@@ -101,9 +99,6 @@ inline std::vector<std::shared_ptr<EsInfo>> EsParser::parse(const std::vector<ui
     
     std::cout << "startCode[0]:" << static_cast<int>(startCodes[0]) << '\n';
     std::cout << "startCode[1]:" << static_cast<int>(startCodes[1]) << '\n';
-
-    LOGD << "startCode[0]:" << static_cast<int>(startCodes[0]) << '\n';
-    LOGD << "startCode[1]:" << static_cast<int>(startCodes[1]) << '\n';
 
 
     for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
