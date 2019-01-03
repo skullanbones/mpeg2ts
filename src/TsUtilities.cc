@@ -3,8 +3,10 @@
 
 #include "JsonSettings.h"
 #include "Logging.h"
-#include <public/TsUtilities.h>
-#include <public/Ts_IEC13818-1.h>
+#include "public/TsUtilities.h"
+#include "public/Ts_IEC13818-1.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "h264/H264Parser.h"
 
 /// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
@@ -12,6 +14,10 @@
 
 namespace tsutil
 {
+
+TsUtilities::~TsUtilities()
+{
+}
 
 // Constants
 const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
@@ -21,6 +27,8 @@ TsUtilities::TsUtilities()
     , mPmts {}
     , mEsPids {}
     , mAddedPmts{ false }
+    , m_Mpeg2Parser{ std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser()) }
+    , m_H264Parser{ std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser()) }
 {
 }
 
@@ -340,43 +348,94 @@ std::vector<uint16_t> TsUtilities::getEsPids() const
     return mEsPids;
 }
 
-void TsUtilities::PESCallback(const mpeg2ts::ByteVector& /* rawPes*/, const mpeg2ts::PesPacket& a_pes, int pid, void* a_hdl)
+void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts::PesPacket& a_pes, int a_pid, void* a_hdl)
 {
     auto instance = reinterpret_cast<TsUtilities*>(a_hdl);
 
-    // LOGV << "PES ENDING at Ts packet " << instance->mDemuxer.getTsStatistics().mTsPacketCounter
-    //     << " (" << pid << ")\n";
-    // LOGV << pes << '\n';
-
     LOGV << "Adding PES to list...";
-    instance->mPesPackets[pid].push_back(a_pes);
-    /*
-    // @TODO add "if parse pid" option to cmd line
+    instance->mPesPackets[a_pid].push_back(a_pes);
+
+    for (auto& pmtPid : instance->mPmtPids)
     {
-        for (auto& pmtPid : instance->mPmtPids)
+        if (instance->mPmts.find(pmtPid) != instance->mPmts.end())
         {
-            if (instance->mPmts.find(pmtPid) != instance->mPmts.end())
+            auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(), instance->mPmts[pmtPid].streams.end(),
+                                   [&](mpeg2ts::StreamTypeHeader& stream) {
+                                       return stream.elementary_PID == a_pid;
+                                   });
+            if (it != instance->mPmts[pmtPid].streams.end())
             {
-                auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(),
-    instance->mPmts[pmtPid].streams.end(), [&](StreamTypeHeader& stream) {return
-    stream.elementary_PID == pid; }); if (it != instance->mPmts[pmtPid].streams.end())
+                try
                 {
-                    try
+                    if (it->stream_type == mpeg2ts::STREAMTYPE_VIDEO_MPEG2)
                     {
-                        (*g_EsParsers.at(it->stream_type))(&a_pes.mPesBuffer[a_pes.elementary_data_offset],
-    a_pes.mPesBuffer.size() - a_pes.elementary_data_offset);
-                    }
-                    catch (const std::out_of_range&) {
-                        LOGD << "No parser for stream type " << StreamTypeToString[it->stream_type];
-                    }
+                        std::vector<uint8_t>::const_iterator first = a_rawPes.begin() + a_pes.elementary_data_offset;
+                        std::vector<uint8_t>::const_iterator last = a_rawPes.end();
+                        std::vector<uint8_t> newVec(first, last);
+
+                        std::vector<std::shared_ptr<EsInfo>> ret = instance->m_Mpeg2Parser->parse(newVec);
+
+                        for (std::shared_ptr<EsInfo>& esinfo : ret)
+                        {
+                            class std::shared_ptr<mpeg2::EsInfoMpeg2> mpeg2info =
+                            std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo);
+                            LOGD << "mpeg2 picture: " << mpeg2info->picture << " " << mpeg2info->msg;
+                            if (auto sliceCode = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(mpeg2info))
+                            {
+                                LOGD << "mpeg2 picture type: " << sliceCode->picType << " " << sliceCode->msg;
+                            }
+                            else if (auto sequence = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(mpeg2info))
+                            {
+                                LOGD << sequence->width << " x " << sequence->height << ", aspect: " << sequence->aspect
+                                     << ", frame rate: " << sequence->framerate;
+                            }
+                        }
+                    } // STREAMTYPE_VIDEO_MPEG2
+
+                    if (it->stream_type == mpeg2ts::STREAMTYPE_VIDEO_H264)
+                    {
+                        std::vector<uint8_t>::const_iterator first = a_rawPes.begin() + a_pes.elementary_data_offset;
+                        std::vector<uint8_t>::const_iterator last = a_rawPes.end();
+                        std::vector<uint8_t> newVec(first, last);
+
+                        std::vector<std::shared_ptr<EsInfo>> ret = instance->m_H264Parser->parse(newVec);
+
+                        for (std::shared_ptr<EsInfo>& esinfo : ret)
+                        {
+                            auto h264info = std::dynamic_pointer_cast<h264::EsInfoH264>(esinfo);
+                            LOGD << "nal: " << h264info->nalUnitType << " " << h264info->msg;
+                            if (auto slice = std::dynamic_pointer_cast<h264::EsInfoH264SliceHeader>(h264info))
+                            {
+                                LOGD << slice->sliceTypeStr << ", pps id: " << slice->ppsId;
+                                if (slice->field)
+                                {
+                                    LOGD << "field encoded: " << (slice->top ? " top" : " bottom");
+                                }
+                                else
+                                {
+                                    LOGD << "frame encoded";
+                                }
+                            }
+                            else if (auto sps = std::dynamic_pointer_cast<h264::EsInfoH264SequenceParameterSet>(h264info))
+                            {
+                                LOGD << "sps id: " << sps->spsId << ", luma bits: " << sps->lumaBits
+                                     << ", chroma bits: " << sps->chromaBits << ", width: " << sps->width
+                                     << " x " << sps->height << ", ref pic: " << sps->numRefPics;
+                            }
+                            else if (auto c = std::dynamic_pointer_cast<h264::EsInfoH264PictureParameterSet>(h264info))
+                            {
+                                LOGD << "sps id: " << c->spsId << "pps id: " << c->ppsId;
+                            }
+                        }
+                    } // STREAMTYPE_VIDEO_H264
+                }
+                catch (const std::out_of_range&)
+                {
+                    LOGD << "No parser for stream type " << mpeg2ts::StreamTypeToString[it->stream_type];
                 }
             }
         }
-    }*/
-
-
-    //    LOGD << "Write " << "PES" << ": " << a_pes.mPesBuffer.size() - writeOffset
-    //       << " bytes, pid: " << pid << '\n';
+    }
 }
 
 

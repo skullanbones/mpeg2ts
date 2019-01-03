@@ -4,9 +4,18 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <memory>
 
 #include "public/mpeg2ts.h"
 
+
+// Forward decl
+namespace mpeg2 {
+class Mpeg2VideoEsParser;
+}
+namespace h264 {
+class H264EsParser;
+}
 
 /*
  * High level API on mpeg2ts library
@@ -64,7 +73,7 @@ class TsUtilities
 public:
     MPEG2TS_API explicit TsUtilities();
 
-    MPEG2TS_API ~TsUtilities() = default;
+    MPEG2TS_API ~TsUtilities();
 
     TsUtilities(const TsUtilities&) = delete;
     const TsUtilities& operator=(const TsUtilities&) = delete;
@@ -143,7 +152,10 @@ private:
     std::map<int, mpeg2ts::PmtTable> mPmts;
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
+
     std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
+    std::unique_ptr<mpeg2::Mpeg2VideoEsParser> m_Mpeg2Parser;
+    std::unique_ptr<h264::H264EsParser> m_H264Parser;
 };
 
 } // namespace tsutil
