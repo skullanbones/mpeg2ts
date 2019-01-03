@@ -50,6 +50,7 @@ set(TestSources
     TsParser_Tests.cc
     TsStatistics_Tests.cc
     TsUtilities_Tests.cc
+    H264Parser_Tests.cc
 )
 
 
