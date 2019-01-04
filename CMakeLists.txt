@@ -4,7 +4,9 @@ project(ts_lib)
 #-------------------
 # sub modules
 #-------------------
+set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory (tests)
+add_subdirectory (bench)
 
 set(CMAKE_CXX_STANDARD 11)
 if (MSVC)
