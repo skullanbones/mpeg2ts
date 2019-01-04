@@ -157,7 +157,7 @@ public:
 
     MPEG2TS_API mpeg2ts::PidStatisticsMap getPidStatistics() const;
 
-    VideoMediaInfo getVideoMediaInfo() const;
+    MPEG2TS_API VideoMediaInfo getVideoMediaInfo() const;
 
 private:
     void initLogging() const;
