@@ -25,17 +25,10 @@ public:
 
     virtual ~EsParser() = default;
 
-    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
-    /// let the specialization analyze the results.
-    /// @param buf The binary data to parse
-    std::vector<std::shared_ptr<EsInfo>> parse(const std::vector<uint8_t>& buf);
     
     /// @brief Finds startcode in a binary buffer by using std search algorithm
     /// @param buf The binary data to find startcodes in
     std::vector<std::size_t> findStartCodes(const std::vector<uint8_t>& buf);
-
-    /// @brief Specialization to analyze the content on data after startcodes.
-    virtual std::vector<std::shared_ptr<EsInfo>> analyze() = 0;
 
 protected:
     std::vector<uint8_t> mPicture;

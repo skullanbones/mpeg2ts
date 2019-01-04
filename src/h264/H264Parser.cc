@@ -11,46 +11,100 @@
 namespace h264
 {
 
+std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
+{
+    std::vector<EsInfoH264> ret;
 
-std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
+    std::vector<std::size_t> startCodes = findStartCodes(a_buf);
+
+    // No startcodes -> no parsing
+    if (startCodes.size() == 0)
+        return ret;
+
+    // There is nothing to parse if the frame only contains a NAL startcode
+    if (a_buf.size() <= m_startCode.size() )
+        return ret;
+
+    for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
+    {
+        // create sub vector
+        try
+        {
+            mPicture.clear();
+            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
+            std::vector<uint8_t>::const_iterator last;
+            // the last startcode is a corner case
+            // also only have 1 startcode is a corner case
+            if (ind == (startCodes.size() - 1) || startCodes.size() == 1)
+            {
+                last = a_buf.end();
+            }
+            else {
+                last = a_buf.begin() + startCodes[ind + 1];
+            }
+             
+            std::vector<uint8_t> newVec(first, last);
+            mPicture = newVec;
+        
+            std::vector<EsInfoH264> b = analyze();
+            ret.insert(std::end(ret), std::begin(b), std::end(b));
+        }
+        catch (std::bad_alloc& e)
+        {
+            LOGE << "std::Exception what: %s\n" << e.what();
+        }
+        
+    }
+
+    return ret;
+}
+
+
+std::vector<EsInfoH264> H264EsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
-    std::vector<std::shared_ptr<EsInfo>> ret;
+
+    EsInfoH264 info;
+    std::vector<EsInfoH264> infos;
+
     auto forbidden_zero_bit = getBits(1);
     if (forbidden_zero_bit != 0)
     {
         LOGD << "Syntax error: forbidden_zero_bit != 0";
-        return std::vector<std::shared_ptr<EsInfo>>();
     }
     skipBits(2);
-    auto nal_unit_type = static_cast<int>(getBits(5));
-    auto rete = std::make_shared<EsInfoH264>();
-    rete->nalUnitType = nal_unit_type;
+    auto nal_unit_type = static_cast<NalUnitType>(getBits(5));
+    info.type = H264InfoType::Info;
+    info.nalUnitType = nal_unit_type;
     switch (nal_unit_type)
     {
-    case 0:
-        rete->msg = "Unspecified";
-        ret.push_back(rete);
+    case NalUnitType::Unspecified:
+        info.msg = "Unspecified";
+        infos.push_back(info);
         break;
-    case 1:
-        ret.push_back(slice_header(nal_unit_type));
+    case NalUnitType::Coded_slice_of_a_non_IDR_picture:
+        info.type = H264InfoType::SliceHeader;
+        slice_header(nal_unit_type, info);
+        infos.push_back(info);
         break;
-    case 2:
-        rete->msg = "Coded slice data partition A";
-        ret.push_back(rete);
+    case NalUnitType::Coded_slice_data_partition_A:
+        info.msg = "Coded slice data partition A";
+        infos.push_back(info);
         break;
-    case 3:
-        rete->msg = "Coded slice data partition B";
-        ret.push_back(rete);
+    case NalUnitType::Coded_slice_data_partition_B:
+        info.msg = "Coded slice data partition B";
+        infos.push_back(info);
         break;
-    case 4:
-        rete->msg = "Coded slice data partition C";
-        ret.push_back(rete);
+    case NalUnitType::Coded_slice_data_partition_C:
+        info.msg = "Coded slice data partition C";
+        infos.push_back(info);
         break;
-    case 5:
-        ret.push_back(slice_header(nal_unit_type));
+    case NalUnitType::Coded_slice_of_an_IDR_picture:
+        info.type = H264InfoType::SliceHeader;
+        slice_header(nal_unit_type, info);
+        infos.push_back(info);
         break;
-    case 6:
+    case NalUnitType::Supplemental_enhancement_information_SEI:
     {
         uint64_t payloadType = 0;
         while (getBits(8) == 0xff)
@@ -60,46 +114,49 @@ std::vector<std::shared_ptr<EsInfo>> H264EsParser::analyze()
         auto last_payload_type_byte = getBits(8);
         payloadType += last_payload_type_byte;
 
-        rete->msg = "Supplemental enhancement information (SEI), type: " + seipayloadTypeToString(payloadType);
+        info.msg = "Supplemental enhancement information (SEI), type: " + seipayloadTypeToString(payloadType);
     }
-        ret.push_back(rete);
+        infos.push_back(info);
         break;
-    case 7:
-        ret.push_back(seq_parameter_set_rbsp(nal_unit_type));
+    case NalUnitType::Sequence_parameter_set:
+        info.type = H264InfoType::SequenceParameterSet;
+        seq_parameter_set_rbsp(nal_unit_type, info);
+        infos.push_back(info);
         break;
-    case 8:
-        ret.push_back(pic_parameter_set_rbsp(nal_unit_type));
+    case NalUnitType::Picture_parameter_set:
+        info.type = H264InfoType::PictureParameterSet;
+        pic_parameter_set_rbsp(nal_unit_type, info);
+        infos.push_back(info);
         break;
-    case 9:
-        rete->msg = "Access unit delimiter";
-        ret.push_back(rete);
+    case NalUnitType::Access_unit_delimiter:
+        info.msg = "Access unit delimiter";
+        infos.push_back(info);
         break;
-    case 10:
-        rete->msg = "End of sequence";
-        ret.push_back(rete);
+    case NalUnitType::End_of_sequence:
+        info.msg = "End of sequence";
+        infos.push_back(info);
         break;
-    case 11:
-        rete->msg = "End of stream";
-        ret.push_back(rete);
+    case NalUnitType::End_of_stream:
+        info.msg = "End of stream";
+        infos.push_back(info);
         break;
-    case 12:
-        rete->msg = "Filler data";
-        ret.push_back(rete);
+    case NalUnitType::Filler_data:
+        info.msg = "Filler data";
+        infos.push_back(info);
         break;
     default:
-        if (nal_unit_type >= 13 && nal_unit_type <= 23)
+        if (static_cast<int>(nal_unit_type) >= 13 && static_cast<int>(nal_unit_type) <= 23)
         {
-            rete->msg = "Reserved";
-            ret.push_back(rete);
+            info.msg = "Reserved";
+            infos.push_back(info);
         }
         else
         {
-            rete->msg = "Unspecified";
-            ret.push_back(rete);
+            info.msg = "Unspecified";
+            infos.push_back(info);
         }
     }
-
-    return ret;
+    return infos;
 }
 
 
@@ -185,74 +242,72 @@ std::string H264EsParser::seipayloadTypeToString(uint64_t payloadType)
 }
 
 
-std::shared_ptr<EsInfoH264SliceHeader> H264EsParser::slice_header(int nal_unit_type)
+void H264EsParser::slice_header(NalUnitType nal_unit_type, EsInfoH264& info)
 {
-    auto ret = std::make_shared<EsInfoH264SliceHeader>();
-    ret->msg = (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
-    ret->nalUnitType = nal_unit_type;
+    info.msg = (nal_unit_type != NalUnitType::Coded_slice_of_an_IDR_picture) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
+    info.nalUnitType = nal_unit_type;
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
     LOGD << "first_mb_in_slice " << first_mb_in_slice;
     auto slice_type = static_cast<int>(getBitsDecodeUGolomb());
-    ret->sliceType = slice_type;
+    info.slice.sliceType = slice_type;
     switch (slice_type)
     {
     case 0:
-        ret->sliceTypeStr = "slice_type: P";
+        info.slice.sliceTypeStr = "slice_type: P";
         break;
     case 1:
-        ret->sliceTypeStr = "slice_type: B";
+        info.slice.sliceTypeStr = "slice_type: B";
         break;
     case 2:
-        ret->sliceTypeStr = "slice_type: I";
+        info.slice.sliceTypeStr = "slice_type: I";
         break;
     case 3:
-        ret->sliceTypeStr = "slice_type: SP";
+        info.slice.sliceTypeStr = "slice_type: SP";
         break;
     case 4:
-        ret->sliceTypeStr = "slice_type: SI";
+        info.slice.sliceTypeStr = "slice_type: SI";
         break;
     case 5:
-        ret->sliceTypeStr = "slice_type: P";
+        info.slice.sliceTypeStr = "slice_type: P";
         break;
     case 6:
-        ret->sliceTypeStr = "slice_type: B";
+        info.slice.sliceTypeStr = "slice_type: B";
         break;
     case 7:
-        ret->sliceTypeStr = "slice_type: I";
+        info.slice.sliceTypeStr = "slice_type: I";
         break;
     case 8:
-        ret->sliceTypeStr = "slice_type: SP";
+        info.slice.sliceTypeStr = "slice_type: SP";
         break;
     case 9:
-        ret->sliceTypeStr = "slice_type: SI";
+        info.slice.sliceTypeStr = "slice_type: SI";
         break;
     default:
-        ret->sliceTypeStr = "slice_type: Uknown";
+        info.slice.sliceTypeStr = "slice_type: Uknown";
     }
     auto pic_parameter_set_id = getBitsDecodeUGolomb();
-    ret->ppsId = static_cast<int>(pic_parameter_set_id);
+    info.slice.ppsId = static_cast<int>(pic_parameter_set_id);
     if (separate_colour_plane_flag == 1)
     {
         auto colour_plane_id = getBits(2);
         (void)colour_plane_id;
     }
-    ret->frame_num = static_cast<int>(getBits(static_cast<uint8_t>(log2_max_frame_num_minus4 + 4)));
+    info.slice.frame_num = static_cast<int>(getBits(static_cast<uint8_t>(log2_max_frame_num_minus4 + 4)));
     if (!frame_mbs_only_flag) // field or frame
     {
         auto field_pic_flag = getBits(1);
-        ret->field = field_pic_flag;
+        info.slice.field = field_pic_flag;
         if (field_pic_flag)
         {
             auto bottom_field_flag = getBits(1);
-            ret->top = !bottom_field_flag;
+            info.slice.top = !bottom_field_flag;
         }
     }
     else
     {
-        ret->field = 0; // only frames
+        info.slice.field = 0; // only frames
     }
-    return ret;
 }
 
 
@@ -294,13 +349,12 @@ void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingL
 }
 
 
-std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_rbsp(int nal_unit_type)
+void H264EsParser::seq_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info)
 {
-    auto ret = std::make_shared<EsInfoH264SequenceParameterSet>();
-    ret->nalUnitType = nal_unit_type;
-    ret->msg = "Sequence parameter set: ";
+    info.nalUnitType = nal_unit_type;
+    info.msg = "Sequence parameter set: ";
     auto profile_idc = getBits(8);
-    ret->profileIdc = static_cast<int>(profile_idc);
+    info.sps.profileIdc = static_cast<int>(profile_idc);
     std::ostringstream msg;
     msg << "profile: ";
     if (profile_idc == 66)
@@ -347,11 +401,11 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     LOGD << "constraint_set4_flag " << getBits(1);
     skipBits(3);
     auto level_idc = getBits(8);
-    ret->levelIdc = static_cast<int>(level_idc);
+    info.sps.levelIdc = static_cast<int>(level_idc);
     msg << " level: " << level_idc / 10 << "." << level_idc % 10;
-    ret->msg += msg.str();
+    info.msg += msg.str();
     auto seq_parameter_set_id = getBitsDecodeUGolomb();
-    ret->spsId = static_cast<int>(seq_parameter_set_id);
+    info.sps.spsId = static_cast<int>(seq_parameter_set_id);
     if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc == 244 ||
         profile_idc == 44 || profile_idc == 83 || profile_idc == 86 || profile_idc == 118 || profile_idc == 128 ||
         profile_idc == 138 || profile_idc == 139 || profile_idc == 134 || profile_idc == 135)
@@ -363,8 +417,8 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         }
         auto bit_depth_luma_minus8 = getBitsDecodeUGolomb();
         auto bit_depth_chroma_minus8 = getBitsDecodeUGolomb();
-        ret->lumaBits = static_cast<int>(bit_depth_luma_minus8 + 8);
-        ret->chromaBits = static_cast<int>(bit_depth_chroma_minus8 + 8);
+        info.sps.lumaBits = static_cast<int>(bit_depth_luma_minus8 + 8);
+        info.sps.chromaBits = static_cast<int>(bit_depth_chroma_minus8 + 8);
         auto qpprime_y_zero_transform_bypass_flag = getBits(1);
         (void)qpprime_y_zero_transform_bypass_flag;
         auto seq_scaling_matrix_present_flag = getBits(1);
@@ -411,13 +465,13 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
         }
     }
     auto num_ref_frames = getBitsDecodeUGolomb();
-    ret->numRefPics = static_cast<int>(num_ref_frames);
+    info.sps.numRefPics = static_cast<int>(num_ref_frames);
     skipBits(1); // gaps_in_frame_num_value_allowed_flag
     auto pic_width_in_mbs_minus1s = getBitsDecodeUGolomb();
     auto pic_height_in_map_units_minus1s = getBitsDecodeUGolomb();
     frame_mbs_only_flag = getBits(1); // 0 - coded field or coded frame; 1 - coded frame
-    ret->width = static_cast<int>((pic_width_in_mbs_minus1s + 1) * 16);
-    ret->height = static_cast<int>((2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16);
+    info.sps.width = static_cast<int>((pic_width_in_mbs_minus1s + 1) * 16);
+    info.sps.height = static_cast<int>((2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16);
     if (!frame_mbs_only_flag)
     {
         // coded pictures of the coded video sequence may either be coded fields or coded frames
@@ -452,7 +506,6 @@ std::shared_ptr<EsInfoH264SequenceParameterSet> H264EsParser::seq_parameter_set_
     {
         parse_vui();
     }
-    return ret;
 }
 
 
@@ -564,26 +617,23 @@ void H264EsParser::parse_vui()
 }
 
 
-std::shared_ptr<EsInfoH264PictureParameterSet> H264EsParser::pic_parameter_set_rbsp(int nal_unit_type)
+void H264EsParser::pic_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info)
 {
-    auto ret = std::make_shared<EsInfoH264PictureParameterSet>();
-    ret->msg = "Picture parameter set: ";
-    ret->nalUnitType = nal_unit_type;
+    info.msg = "Picture parameter set: ";
+    info.nalUnitType = nal_unit_type;
     auto pic_parameter_set_id = getBitsDecodeUGolomb();
     auto seq_parameter_set_id = getBitsDecodeUGolomb();
-    ret->spsId = static_cast<int>(seq_parameter_set_id);
-    ret->ppsId = static_cast<int>(pic_parameter_set_id);
+    info.pps.spsId = static_cast<int>(seq_parameter_set_id);
+    info.pps.ppsId = static_cast<int>(pic_parameter_set_id);
     auto entropy_coding_mode_flag = getBitsDecodeUGolomb();
     if (entropy_coding_mode_flag == 0)
     {
-        ret->msg += "entropy: CAVLC";
+        info.msg += "entropy: CAVLC";
     }
     else
     {
-        ret->msg += "entropy: CABAC";
+        info.msg += "entropy: CABAC";
     }
-
-    return ret;
 }
 
 }

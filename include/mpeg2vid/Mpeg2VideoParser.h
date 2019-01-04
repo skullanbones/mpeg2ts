@@ -10,31 +10,37 @@
 namespace mpeg2
 {
 
-struct EsInfoMpeg2 : public EsInfo
+enum class Mpeg2Type
 {
-    //    EsInfoMpeg2(int picture, const std::string& msg)
-    //        : picture{picture}, msg{msg} {}
-    int picture; // slice
-    std::string msg;
+    Info,
+    SliceCode,
+    SequenceHeader
 };
 
-struct EsInfoMpeg2PictureSliceCode : public EsInfoMpeg2
+struct EsInfoMpeg2PictureSliceCode
 {
-    uint64_t picType; // I, B, P
+    uint64_t picType{ 0 }; // I, B, P
 };
 
-struct EsInfoMpeg2SequenceHeader : public EsInfoMpeg2
+struct EsInfoMpeg2SequenceHeader
 {
-    int width, height;
-    std::string aspect;
-    std::string framerate;
+    int width{ 0 }, height { 0 };
+    std::string aspect { "" };
+    std::string framerate { "" };
 };
+
+struct EsInfoMpeg2
+{
+    Mpeg2Type type;
+    int picture{ 0 }; // slice
+    std::string msg{ "" };
+    EsInfoMpeg2PictureSliceCode slice;
+    EsInfoMpeg2SequenceHeader sequence;
+};
+
 
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
-    static std::map<uint8_t, std::string> AspectToString;
-    static std::map<uint8_t, std::string> FrameRateToString;
-
 public:
     Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
@@ -46,7 +52,31 @@ public:
     
     virtual ~Mpeg2VideoEsParser() = default;
 
-    std::vector<std::shared_ptr<EsInfo>> analyze() override;
+    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
+    /// let the specialization analyze the results.
+    /// @param buf The binary data to parse
+    std::vector<EsInfoMpeg2> parse(const std::vector<uint8_t>& buf);
+
+    /// @brief Analyze the content on data after startcodes.
+    std::vector<EsInfoMpeg2> analyze();
+
+    static std::string toString (Mpeg2Type e);
+
+private:
+    static std::map<uint8_t, std::string> AspectToString;
+    static std::map<uint8_t, std::string> FrameRateToString;
 };
+
+
+inline std::string Mpeg2VideoEsParser::toString (Mpeg2Type e)
+{
+    const std::map<Mpeg2Type, std::string> MyEnumStrings {
+        { Mpeg2Type::Info, "Info" },
+        { Mpeg2Type::SliceCode, "SliceCode" },
+        { Mpeg2Type::SequenceHeader, "SequenceHeader" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
 
 }

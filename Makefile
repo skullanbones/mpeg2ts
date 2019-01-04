@@ -94,8 +94,7 @@ SRCS = 	TsParser.cc \
         PsiTables.cc \
         TsPacketInfo.cc \
         JsonSettings.cc \
-		TsUtilities.cc \
-		EsParser.cc
+		TsUtilities.cc
 
 HDRS = 	include/public/mpeg2ts.h \
 		include/public/Ts_IEC13818-1.h \
@@ -259,7 +258,6 @@ clean:
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)
-	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done

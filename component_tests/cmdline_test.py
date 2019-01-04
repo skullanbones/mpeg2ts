@@ -340,7 +340,7 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_a
     assert "ES_info_length: 3" in out[1]
 
 
-def test_parse_eurosport(parser, asset_eurosport):
+def test_parse_mpeg2_eurosport(parser, asset_eurosport):
     """
     Test eurosport mpeg2 video parsing
     :param parser:
@@ -372,10 +372,10 @@ def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
     log.debug(out[0])
     log.debug(out[1])
     print(out[1])
-    assert "nal: 9 Access unit delimiter" in out[1]
-    assert "nal: 7 Sequence parameter set: profile: High level: 4.1" in out[1]
+    assert "nal: Access_unit_delimiter Access unit delimiter" in out[1]
+    assert "nal: Sequence_parameter_set Sequence parameter set: profile: High level: 4.1" in out[1]
     assert "sps id: 0, luma bits: 8, chroma bits: 8, width: 1920 x 1088, ref pic: 4" in out[1]
-    assert "nal: 8 Picture parameter set: entropy: CAVLC" in out[1]
+    assert "nal: Picture_parameter_set Picture parameter set: entropy: CAVLC" in out[1]
     assert "sps id: 0pps id: 0" in out[1]
 
 
@@ -429,9 +429,9 @@ def test_b_parse_newmobcal1920_mpeg2_ac3LR_PMT(benchmark, parser, asset_newmobca
     result = benchmark(test_parse_newmobcal1920_mpeg2_ac3LR_PMT, parser, asset_newmobcal1920_mpeg2_ac3LR)
 
 
-def test_b_parse_eurosport(benchmark, parser, asset_eurosport):
+def test_b_parse_h262_eurosport(benchmark, parser, asset_eurosport):
     # benchmark test_parse_h264_dolby
-    result = benchmark(test_parse_eurosport, parser, asset_eurosport)
+    result = benchmark(test_parse_mpeg2_eurosport, parser, asset_eurosport)
 
 
 def test_b_parse_h264_dolby(benchmark, parser, asset_h264_dolby_atmos):
