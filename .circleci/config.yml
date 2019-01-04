@@ -20,3 +20,6 @@ jobs:
       - run:
           name: Run CTest
           command: cd build && tests/run_gtests
+      - run:
+          name: Run micro benchmark
+          command: cd build && bench/Parser_Benchmark
