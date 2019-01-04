@@ -81,6 +81,9 @@ public:
     /// @brief Analyze the content on data after startcodes.
     std::vector<EsInfoH264> analyze();
 
+    static std::string toString (H264InfoType e);
+
+private:
     std::string seipayloadTypeToString(uint64_t payloadType);
 
     void slice_header(int nal_unit_type, EsInfoH264& info);
@@ -91,12 +94,6 @@ public:
     
     void parse_vui();
 
-    std::vector<EsInfoH264> getInfo();
-    void clearInfo();
-
-    static std::string toString (H264InfoType e);
-
-private:
     // sps data
     uint8_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;

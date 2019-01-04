@@ -60,12 +60,10 @@ public:
     /// @brief Analyze the content on data after startcodes.
     std::vector<EsInfoMpeg2> analyze();
 
-    std::vector<EsInfoMpeg2> getMpeg2Info();
-    void clearInfo();
-
     static std::string toString (Mpeg2Type e);
 
-    private : static std::map<uint8_t, std::string> AspectToString;
+private:
+    static std::map<uint8_t, std::string> AspectToString;
     static std::map<uint8_t, std::string> FrameRateToString;
 };
 
