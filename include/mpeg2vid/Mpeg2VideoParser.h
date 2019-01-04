@@ -52,7 +52,13 @@ public:
     
     virtual ~Mpeg2VideoEsParser() = default;
 
-    void analyze() override;
+    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
+    /// let the specialization analyze the results.
+    /// @param buf The binary data to parse
+    std::vector<EsInfoMpeg2> parse(const std::vector<uint8_t>& buf);
+
+    /// @brief Analyze the content on data after startcodes.
+    std::vector<EsInfoMpeg2> analyze();
 
     std::vector<EsInfoMpeg2> getMpeg2Info();
     void clearInfo();
@@ -61,19 +67,8 @@ public:
 
     private : static std::map<uint8_t, std::string> AspectToString;
     static std::map<uint8_t, std::string> FrameRateToString;
-
-    std::vector<EsInfoMpeg2> m_infos;
 };
 
-inline std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::getMpeg2Info()
-{
-    return m_infos;
-}
-
-inline void Mpeg2VideoEsParser::clearInfo()
-{
-    m_infos.clear();
-}
 
 inline std::string Mpeg2VideoEsParser::toString (Mpeg2Type e)
 {

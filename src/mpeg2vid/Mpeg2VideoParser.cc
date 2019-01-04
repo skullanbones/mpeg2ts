@@ -11,13 +11,63 @@ namespace mpeg2
 {
 
 
+std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::parse(const std::vector<uint8_t>& a_buf)
+{
+    std::vector<EsInfoMpeg2> ret;
 
-void Mpeg2VideoEsParser::analyze()
+    std::vector<std::size_t> startCodes = findStartCodes(a_buf);
+
+    // No startcodes -> no parsing
+    if (startCodes.size() == 0)
+        return ret;
+
+    // There is nothing to parse if the frame only contains a NAL startcode
+    if (a_buf.size() <= m_startCode.size() )
+        return ret;
+
+    for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
+    {
+        // create sub vector
+        try
+        {
+            mPicture.clear();
+            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
+            std::vector<uint8_t>::const_iterator last;
+            // the last startcode is a corner case
+            // also only have 1 startcode is a corner case
+            if (ind == (startCodes.size() - 1) || startCodes.size() == 1)
+            {
+                last = a_buf.end();
+            }
+            else {
+                last = a_buf.begin() + startCodes[ind + 1];
+            }
+             
+            std::vector<uint8_t> newVec(first, last);
+            mPicture = newVec;
+        
+            std::vector<EsInfoMpeg2> b = analyze();
+            ret.insert(std::end(ret), std::begin(b), std::end(b));
+        }
+        catch (std::bad_alloc& e)
+        {
+            LOGE << "std::Exception what: %s\n" << e.what();
+        }
+        
+    }
+
+    return ret;
+}
+
+
+std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
     std::ostringstream msg;
 
     EsInfoMpeg2 info;
+    std::vector<EsInfoMpeg2> ret;
+
     info.type = Mpeg2Type::Info;
     info.picture = mPicture[0];
     if (info.picture == 0 && mPicture.size() > 4)
@@ -85,7 +135,8 @@ void Mpeg2VideoEsParser::analyze()
     {
         info.msg = "system start code";
     }
-    m_infos.push_back(std::move(info));
+    ret.push_back(std::move(info));
+    return ret;
 }
 
 std::map<uint8_t, std::string> Mpeg2VideoEsParser::AspectToString =

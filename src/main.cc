@@ -300,9 +300,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            g_Mpeg2Parser->parse(newVec);
+                            std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->parse(newVec);
 
-                            std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->getMpeg2Info();
                             for (auto info: infos)
                             {
                                 LOGD << "\n----------------------------------------------";
@@ -313,7 +312,6 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                      << ", aspect: " << info.sequence.aspect
                                      << ", frame rate: " << info.sequence.framerate;
                             }
-                            g_Mpeg2Parser->clearInfo();
 
                         } // STREAMTYPE_VIDEO_MPEG2
 
@@ -323,9 +321,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            g_H264Parser->parse(newVec);
-
-                            std::vector<h264::EsInfoH264> infos = g_H264Parser->getInfo();
+                            std::vector<h264::EsInfoH264> infos = g_H264Parser->parse(newVec);
 
                             for (auto info : infos)
                             {
@@ -350,7 +346,6 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                                 LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
                             }
-                            g_H264Parser->clearInfo();
                         } // STREAMTYPE_VIDEO_H264
                     }
                     catch (const std::out_of_range&)

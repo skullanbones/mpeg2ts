@@ -73,7 +73,13 @@ public:
 
     virtual ~H264EsParser() = default;
 
-    void analyze() override;
+    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
+    /// let the specialization analyze the results.
+    /// @param buf The binary data to parse
+    std::vector<EsInfoH264> parse(const std::vector<uint8_t>& buf);
+
+    /// @brief Analyze the content on data after startcodes.
+    std::vector<EsInfoH264> analyze();
 
     std::string seipayloadTypeToString(uint64_t payloadType);
 
@@ -95,18 +101,7 @@ private:
     uint8_t log2_max_frame_num_minus4;
     uint64_t separate_colour_plane_flag;
     uint64_t frame_mbs_only_flag;
-    std::vector<EsInfoH264> m_infos;
 };
-
-inline std::vector<EsInfoH264> H264EsParser::getInfo()
-{
-    return m_infos;
-}
-
-inline void H264EsParser::clearInfo()
-{
-    m_infos.clear();
-}
 
 inline std::string H264EsParser::toString (H264InfoType e)
 {

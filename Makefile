@@ -259,7 +259,6 @@ clean:
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)
-	rm -rf env/
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done

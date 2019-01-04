@@ -11,10 +11,61 @@
 namespace h264
 {
 
+std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
+{
+    std::vector<EsInfoH264> ret;
 
-void H264EsParser::analyze()
+    std::vector<std::size_t> startCodes = findStartCodes(a_buf);
+
+    // No startcodes -> no parsing
+    if (startCodes.size() == 0)
+        return ret;
+
+    // There is nothing to parse if the frame only contains a NAL startcode
+    if (a_buf.size() <= m_startCode.size() )
+        return ret;
+
+    for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
+    {
+        // create sub vector
+        try
+        {
+            mPicture.clear();
+            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
+            std::vector<uint8_t>::const_iterator last;
+            // the last startcode is a corner case
+            // also only have 1 startcode is a corner case
+            if (ind == (startCodes.size() - 1) || startCodes.size() == 1)
+            {
+                last = a_buf.end();
+            }
+            else {
+                last = a_buf.begin() + startCodes[ind + 1];
+            }
+             
+            std::vector<uint8_t> newVec(first, last);
+            mPicture = newVec;
+        
+            std::vector<EsInfoH264> b = analyze();
+            ret.insert(std::end(ret), std::begin(b), std::end(b));
+        }
+        catch (std::bad_alloc& e)
+        {
+            LOGE << "std::Exception what: %s\n" << e.what();
+        }
+        
+    }
+
+    return ret;
+}
+
+
+std::vector<EsInfoH264> H264EsParser::analyze()
 {
     resetBits(mPicture.data(), mPicture.size());
+
+    EsInfoH264 info;
+    std::vector<EsInfoH264> infos;
 
     auto forbidden_zero_bit = getBits(1);
     if (forbidden_zero_bit != 0)
@@ -23,36 +74,35 @@ void H264EsParser::analyze()
     }
     skipBits(2);
     auto nal_unit_type = static_cast<int>(getBits(5));
-    EsInfoH264 info;
     info.type = H264InfoType::Info;
     info.nalUnitType = nal_unit_type;
     switch (nal_unit_type)
     {
     case 0:
         info.msg = "Unspecified";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 1:
         info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 2:
         info.msg = "Coded slice data partition A";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 3:
         info.msg = "Coded slice data partition B";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 4:
         info.msg = "Coded slice data partition C";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 5:
         info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 6:
     {
@@ -66,46 +116,47 @@ void H264EsParser::analyze()
 
         info.msg = "Supplemental enhancement information (SEI), type: " + seipayloadTypeToString(payloadType);
     }
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 7:
         info.type = H264InfoType::SequenceParameterSet;
         seq_parameter_set_rbsp(nal_unit_type, info);
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 8:
         info.type = H264InfoType::PictureParameterSet;
         pic_parameter_set_rbsp(nal_unit_type, info);
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 9:
         info.msg = "Access unit delimiter";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 10:
         info.msg = "End of sequence";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 11:
         info.msg = "End of stream";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     case 12:
         info.msg = "Filler data";
-        m_infos.push_back(info);
+        infos.push_back(info);
         break;
     default:
         if (nal_unit_type >= 13 && nal_unit_type <= 23)
         {
             info.msg = "Reserved";
-            m_infos.push_back(info);
+            infos.push_back(info);
         }
         else
         {
             info.msg = "Unspecified";
-            m_infos.push_back(info);
+            infos.push_back(info);
         }
     }
+    return infos;
 }
 
 
