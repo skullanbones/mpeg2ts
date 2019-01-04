@@ -159,6 +159,10 @@ public:
 
     MPEG2TS_API VideoMediaInfo getVideoMediaInfo() const;
 
+    MPEG2TS_API std::string toString (MediaType e) const;
+
+    MPEG2TS_API std::string toString (VideoCodecType e) const;
+
 private:
     void initLogging() const;
     void initParse();
@@ -188,6 +192,28 @@ private:
 inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const
 {
     return mVideoMediaInfo;
+}
+
+inline std::string TsUtilities::toString (MediaType e) const
+{
+    const std::map<MediaType, std::string> MyEnumStrings {
+        { MediaType::Audio, "Audio" },
+        { MediaType::Video, "Video" },
+        { MediaType::Private, "Private" },
+        { MediaType::Unknown, "Unknown" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
+
+inline std::string TsUtilities::toString (VideoCodecType e) const
+{
+    const std::map<VideoCodecType, std::string> MyEnumStrings {
+        { VideoCodecType::MPEG2, "MPEG2" },
+        { VideoCodecType::H264, "H264" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 
 } // namespace tsutil
