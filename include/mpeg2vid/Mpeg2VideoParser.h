@@ -25,8 +25,8 @@ struct EsInfoMpeg2PictureSliceCode
 struct EsInfoMpeg2SequenceHeader
 {
     int width{ 0 }, height { 0 };
-    std::string aspect { 0 };
-    std::string framerate { 0 };
+    std::string aspect { "" };
+    std::string framerate { "" };
 };
 
 struct EsInfoMpeg2

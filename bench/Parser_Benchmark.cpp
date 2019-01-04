@@ -43,7 +43,7 @@ static void BM_H264EsParser_parse(benchmark::State& state)
     h264::H264EsParser parser;
 
     for (auto _ : state) {
-        std::vector<std::shared_ptr<EsInfo>> data = parser.parse(h262_with_sequence_header_code);
+        std::vector<h264::EsInfoH264> data = parser.parse(h262_with_sequence_header_code);
     }
 }
 BENCHMARK(BM_H264EsParser_parse);
@@ -65,7 +65,7 @@ static void BM_Mpeg2VideoEsParser_parse(benchmark::State& state)
     mpeg2::Mpeg2VideoEsParser parser;
 
     for (auto _ : state) {
-        std::vector<std::shared_ptr<EsInfo>> data = parser.parse(h262_with_sequence_header_code);
+        std::vector<mpeg2::EsInfoMpeg2> data = parser.parse(h262_with_sequence_header_code);
     }
 }
 BENCHMARK(BM_Mpeg2VideoEsParser_parse);

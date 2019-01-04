@@ -141,28 +141,21 @@ TEST_F(Mpeg2VideoTest, test_findStartCodes_sequence_header)
 
 TEST_F(Mpeg2VideoTest, test_parse_sequence_header)
 {
-    std::vector<std::shared_ptr<EsInfo>> ret = parser.parse(h262_with_sequence_header_code);
+    std::vector<EsInfoMpeg2> ret = parser.parse(h262_with_sequence_header_code);
     
-    for (std::shared_ptr<EsInfo>& esinfo : ret)
-    {
-        std::shared_ptr<mpeg2::EsInfoMpeg2PictureSliceCode> a = nullptr;
-        std::shared_ptr<mpeg2::EsInfoMpeg2SequenceHeader> b = nullptr;
-        class std::shared_ptr<mpeg2::EsInfoMpeg2> i = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo);
-        std::cout << "mpeg2 picture: " << i->picture << " " << i->msg;
-        
-        //EXPECT_EQ(i->msg, "sequence_header_code");
-        
-        if (a = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(i))
+    for (const EsInfoMpeg2& esinfo : ret)
+    {        
+        if (esinfo.type == mpeg2::Mpeg2Type::SliceCode)
         {
-            EXPECT_EQ(a->picType, 1);
-            EXPECT_EQ(a->msg, "I");
+            EXPECT_EQ(esinfo.slice.picType, 1);
+            EXPECT_EQ(esinfo.msg, "I");
         }
-        else if (b = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(i))
+        else if (esinfo.type == mpeg2::Mpeg2Type::SequenceHeader)
         {
-            EXPECT_EQ(b->width, 704);
-            EXPECT_EQ(b->height, 576);
-            EXPECT_EQ(b->framerate, "25");
-            EXPECT_EQ(b->aspect, "3x4");
+            EXPECT_EQ(esinfo.sequence.width, 704);
+            EXPECT_EQ(esinfo.sequence.height, 576);
+            EXPECT_EQ(esinfo.sequence.framerate, "25");
+            EXPECT_EQ(esinfo.sequence.aspect, "3x4");
         }
     }
 }
@@ -185,26 +178,25 @@ TEST_F(Mpeg2VideoTest, test_findStartCodes_sequence_header_2)
 
 TEST_F(Mpeg2VideoTest, test_parse_sequence_header_2)
 {
-    std::vector<std::shared_ptr<EsInfo>> ret = parser.parse(h262_with_sequence_header_code_2);
+    std::vector<EsInfoMpeg2> ret = parser.parse(h262_with_sequence_header_code_2);
 
-    for (std::shared_ptr<EsInfo>& esinfo : ret)
+    for (const EsInfoMpeg2& esinfo : ret)
     {
-        class std::shared_ptr<mpeg2::EsInfoMpeg2> i = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2>(esinfo);
-        std::cout << "mpeg2 picture: " << i->picture << " " << i->msg;
-        if (auto a = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2PictureSliceCode>(i))
+       // std::cout << "mpeg2 picture: " << i->picture << " " << i->msg;
+        if (esinfo.type == mpeg2::Mpeg2Type::SliceCode)
         {
-            EXPECT_EQ(a->picType, 1);
-            EXPECT_EQ(a->msg, "I");
-            std::cout << "mpeg2 picture type: " << a->picType << " " << a->msg;
+            EXPECT_EQ(esinfo.slice.picType, 1);
+            EXPECT_EQ(esinfo.msg, "I");
+            std::cout << "mpeg2 picture type: " << esinfo.slice.picType << " " << esinfo.msg;
         }
-        else if (auto b = std::dynamic_pointer_cast<mpeg2::EsInfoMpeg2SequenceHeader>(i))
+        else if (esinfo.type == mpeg2::Mpeg2Type::SequenceHeader)
         {
-            EXPECT_EQ(b->width, 704);
-            EXPECT_EQ(b->height, 576);
-            EXPECT_EQ(b->framerate, "25");
-            EXPECT_EQ(b->aspect, "3x4");
-            std::cout << b->width << " x " << b->height << ", aspect: " << b->aspect
-                      << ", frame rate: " << b->framerate;
+            EXPECT_EQ(esinfo.sequence.width, 704);
+            EXPECT_EQ(esinfo.sequence.height, 576);
+            EXPECT_EQ(esinfo.sequence.framerate, "25");
+            EXPECT_EQ(esinfo.sequence.aspect, "3x4");
+            std::cout << esinfo.sequence.width << " x " << esinfo.sequence.height << ", aspect: " << esinfo.sequence.aspect
+                      << ", frame rate: " << esinfo.sequence.framerate;
         }
     }
 }
