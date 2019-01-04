@@ -73,38 +73,38 @@ std::vector<EsInfoH264> H264EsParser::analyze()
         LOGD << "Syntax error: forbidden_zero_bit != 0";
     }
     skipBits(2);
-    auto nal_unit_type = static_cast<int>(getBits(5));
+    auto nal_unit_type = static_cast<NalUnitType>(getBits(5));
     info.type = H264InfoType::Info;
     info.nalUnitType = nal_unit_type;
     switch (nal_unit_type)
     {
-    case 0:
+    case NalUnitType::Unspecified:
         info.msg = "Unspecified";
         infos.push_back(info);
         break;
-    case 1:
+    case NalUnitType::Coded_slice_of_a_non_IDR_picture:
         info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
         infos.push_back(info);
         break;
-    case 2:
+    case NalUnitType::Coded_slice_data_partition_A:
         info.msg = "Coded slice data partition A";
         infos.push_back(info);
         break;
-    case 3:
+    case NalUnitType::Coded_slice_data_partition_B:
         info.msg = "Coded slice data partition B";
         infos.push_back(info);
         break;
-    case 4:
+    case NalUnitType::Coded_slice_data_partition_C:
         info.msg = "Coded slice data partition C";
         infos.push_back(info);
         break;
-    case 5:
+    case NalUnitType::Coded_slice_of_an_IDR_picture:
         info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
         infos.push_back(info);
         break;
-    case 6:
+    case NalUnitType::Supplemental_enhancement_information_SEI:
     {
         uint64_t payloadType = 0;
         while (getBits(8) == 0xff)
@@ -118,34 +118,34 @@ std::vector<EsInfoH264> H264EsParser::analyze()
     }
         infos.push_back(info);
         break;
-    case 7:
+    case NalUnitType::Sequence_parameter_set:
         info.type = H264InfoType::SequenceParameterSet;
         seq_parameter_set_rbsp(nal_unit_type, info);
         infos.push_back(info);
         break;
-    case 8:
+    case NalUnitType::Picture_parameter_set:
         info.type = H264InfoType::PictureParameterSet;
         pic_parameter_set_rbsp(nal_unit_type, info);
         infos.push_back(info);
         break;
-    case 9:
+    case NalUnitType::Access_unit_delimiter:
         info.msg = "Access unit delimiter";
         infos.push_back(info);
         break;
-    case 10:
+    case NalUnitType::End_of_sequence:
         info.msg = "End of sequence";
         infos.push_back(info);
         break;
-    case 11:
+    case NalUnitType::End_of_stream:
         info.msg = "End of stream";
         infos.push_back(info);
         break;
-    case 12:
+    case NalUnitType::Filler_data:
         info.msg = "Filler data";
         infos.push_back(info);
         break;
     default:
-        if (nal_unit_type >= 13 && nal_unit_type <= 23)
+        if (static_cast<int>(nal_unit_type) >= 13 && static_cast<int>(nal_unit_type) <= 23)
         {
             info.msg = "Reserved";
             infos.push_back(info);
@@ -242,9 +242,9 @@ std::string H264EsParser::seipayloadTypeToString(uint64_t payloadType)
 }
 
 
-void H264EsParser::slice_header(int nal_unit_type, EsInfoH264& info)
+void H264EsParser::slice_header(NalUnitType nal_unit_type, EsInfoH264& info)
 {
-    info.msg = (nal_unit_type != 5) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
+    info.msg = (nal_unit_type != NalUnitType::Coded_slice_of_an_IDR_picture) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
     info.nalUnitType = nal_unit_type;
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
@@ -349,7 +349,7 @@ void H264EsParser::scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingL
 }
 
 
-void H264EsParser::seq_parameter_set_rbsp(int nal_unit_type, EsInfoH264& info)
+void H264EsParser::seq_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info)
 {
     info.nalUnitType = nal_unit_type;
     info.msg = "Sequence parameter set: ";
@@ -617,7 +617,7 @@ void H264EsParser::parse_vui()
 }
 
 
-void H264EsParser::pic_parameter_set_rbsp(int nal_unit_type, EsInfoH264& info)
+void H264EsParser::pic_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info)
 {
     info.msg = "Picture parameter set: ";
     info.nalUnitType = nal_unit_type;

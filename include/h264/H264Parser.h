@@ -11,6 +11,7 @@
 namespace h264
 {
 
+
 enum class H264InfoType
 {
     Info,
@@ -30,6 +31,7 @@ struct EsInfoH264SliceHeader
     int frame_num { 0 };
 };
 
+
 struct EsInfoH264SequenceParameterSet
 {
     int profileIdc { 0 };
@@ -42,21 +44,43 @@ struct EsInfoH264SequenceParameterSet
     int height { 0 };
 };
 
+
 struct EsInfoH264PictureParameterSet
 {
     int ppsId { 0 };
     int spsId { 0 };
 };
 
+
+/// ITU-T Rec.H H.264 Table 7-1 – NAL unit type codes
+enum class NalUnitType
+{
+    Unspecified = 0,
+    Coded_slice_of_a_non_IDR_picture = 1,
+    Coded_slice_data_partition_A = 2,
+    Coded_slice_data_partition_B = 3, 
+    Coded_slice_data_partition_C = 4,
+    Coded_slice_of_an_IDR_picture = 5,
+    Supplemental_enhancement_information_SEI = 6,
+    Sequence_parameter_set = 7,
+    Picture_parameter_set = 8,
+    Access_unit_delimiter = 9,
+    End_of_sequence = 10,
+    End_of_stream = 11,
+    Filler_data = 12
+};
+
+
 struct EsInfoH264
 {
     H264InfoType type;
-    uint64_t nalUnitType { 0 };
+    NalUnitType nalUnitType { NalUnitType::Unspecified };
     std::string msg { "" };
     EsInfoH264SliceHeader slice;
     EsInfoH264SequenceParameterSet sps;
     EsInfoH264PictureParameterSet pps;
 };
+
 
 class H264EsParser : public EsParser, public GetBits
 {
@@ -82,15 +106,16 @@ public:
     std::vector<EsInfoH264> analyze();
 
     static std::string toString (H264InfoType e);
+    static std::string toString (NalUnitType e);
 
 private:
     std::string seipayloadTypeToString(uint64_t payloadType);
 
-    void slice_header(int nal_unit_type, EsInfoH264& info);
+    void slice_header(NalUnitType nal_unit_type, EsInfoH264& info);
     uint64_t getBitsDecodeUGolomb();
     void scaling_list(uint8_t* scalingList, std::size_t sizeOfScalingList);
-    void seq_parameter_set_rbsp(int nal_unit_type, EsInfoH264& info);
-    void pic_parameter_set_rbsp(int nal_unit_type, EsInfoH264& info);
+    void seq_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info);
+    void pic_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264& info);
     
     void parse_vui();
 
@@ -107,6 +132,27 @@ inline std::string H264EsParser::toString (H264InfoType e)
         { H264InfoType::SliceHeader, "SliceHeader" },
         { H264InfoType::SequenceParameterSet, "SequenceParameterSet" },
         { H264InfoType::PictureParameterSet, "PictureParameterSet" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
+
+inline std::string H264EsParser::toString (NalUnitType e)
+{
+    const std::map<NalUnitType, std::string> MyEnumStrings {
+        { NalUnitType::Unspecified, "Unspecified" },
+        { NalUnitType::Coded_slice_of_a_non_IDR_picture, "Coded_slice_of_a_non_IDR_picture" },
+        { NalUnitType::Coded_slice_data_partition_A, "Coded_slice_data_partition_A" },
+        { NalUnitType::Coded_slice_data_partition_B, "Coded_slice_data_partition_B" },
+        { NalUnitType::Coded_slice_data_partition_C, "Coded_slice_data_partition_C" },
+        { NalUnitType::Coded_slice_of_an_IDR_picture, "Coded_slice_of_an_IDR_picture" },
+        { NalUnitType::Supplemental_enhancement_information_SEI, "Supplemental_enhancement_information_SEI" },
+        { NalUnitType::Sequence_parameter_set, "Sequence_parameter_set" },
+        { NalUnitType::Picture_parameter_set, "Picture_parameter_set" },
+        { NalUnitType::Access_unit_delimiter, "Access_unit_delimiter" },
+        { NalUnitType::End_of_sequence, "End_of_sequence" },
+        { NalUnitType::End_of_stream, "End_of_stream" },
+        { NalUnitType::Filler_data, "Filler_data" }
     };
     auto   it  = MyEnumStrings.find(e);
     return it == MyEnumStrings.end() ? "Out of range" : it->second;

@@ -304,7 +304,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                             for (auto info: infos)
                             {
-                                LOGD << "\n----------------------------------------------";
+                                LOGD << "----------------------------------------------";
                                 LOGD << "mpeg2 bytestream type: " << mpeg2::Mpeg2VideoEsParser::toString(info.type);
                                 LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
                                 LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
@@ -325,9 +325,9 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                             for (auto info : infos)
                             {
-                                LOGD << "\n----------------------------------------------";
+                                LOGD << "----------------------------------------------";
                                 LOGD << "h264 nal type: " << h264::H264EsParser::toString(info.type);
-                                LOGD << "nal: " << info.nalUnitType << " " << info.msg;
+                                LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
 
                                 LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
                                 if (info.slice.field)
