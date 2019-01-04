@@ -18,9 +18,11 @@ void Mpeg2VideoEsParser::analyze()
     std::ostringstream msg;
 
     EsInfoMpeg2 info;
+    info.type = Mpeg2Type::Info;
     info.picture = mPicture[0];
     if (info.picture == 0 && mPicture.size() > 4)
     {
+        info.type = Mpeg2Type::SliceCode;
         skipBits(10 + 8);
         info.slice.picType = static_cast<int>(getBits(3));
         switch (info.slice.picType)
@@ -53,6 +55,7 @@ void Mpeg2VideoEsParser::analyze()
     }
     else if (info.picture == 0xb3)
     {
+        info.type = Mpeg2Type::SequenceHeader;
         info.msg = "sequence_header_code ";
         skipBits(8);
         info.sequence.width = static_cast<int>(getBits(12));

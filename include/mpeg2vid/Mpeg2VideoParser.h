@@ -10,6 +10,12 @@
 namespace mpeg2
 {
 
+enum class Mpeg2Type
+{
+    Info,
+    SliceCode,
+    SequenceHeader
+};
 
 struct EsInfoMpeg2PictureSliceCode
 {
@@ -25,6 +31,7 @@ struct EsInfoMpeg2SequenceHeader
 
 struct EsInfoMpeg2
 {
+    Mpeg2Type type;
     int picture{ 0 }; // slice
     std::string msg{ "" };
     EsInfoMpeg2PictureSliceCode slice;
@@ -50,6 +57,8 @@ public:
     std::vector<EsInfoMpeg2> getMpeg2Info();
     void clearInfo();
 
+    static std::string toString (Mpeg2Type e);
+
     private : static std::map<uint8_t, std::string> AspectToString;
     static std::map<uint8_t, std::string> FrameRateToString;
 
@@ -64,6 +73,17 @@ inline std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::getMpeg2Info()
 inline void Mpeg2VideoEsParser::clearInfo()
 {
     m_infos.clear();
+}
+
+inline std::string Mpeg2VideoEsParser::toString (Mpeg2Type e)
+{
+    const std::map<Mpeg2Type, std::string> MyEnumStrings {
+        { Mpeg2Type::Info, "Info" },
+        { Mpeg2Type::SliceCode, "SliceCode" },
+        { Mpeg2Type::SequenceHeader, "SequenceHeader" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 
 }

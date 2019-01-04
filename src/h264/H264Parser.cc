@@ -20,11 +20,11 @@ void H264EsParser::analyze()
     if (forbidden_zero_bit != 0)
     {
         LOGD << "Syntax error: forbidden_zero_bit != 0";
-        //return std::vector<std::shared_ptr<EsInfo>>();
     }
     skipBits(2);
     auto nal_unit_type = static_cast<int>(getBits(5));
     EsInfoH264 info;
+    info.type = H264InfoType::Info;
     info.nalUnitType = nal_unit_type;
     switch (nal_unit_type)
     {
@@ -33,6 +33,7 @@ void H264EsParser::analyze()
         m_infos.push_back(info);
         break;
     case 1:
+        info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
         m_infos.push_back(info);
         break;
@@ -49,6 +50,7 @@ void H264EsParser::analyze()
         m_infos.push_back(info);
         break;
     case 5:
+        info.type = H264InfoType::SliceHeader;
         slice_header(nal_unit_type, info);
         m_infos.push_back(info);
         break;
@@ -67,10 +69,12 @@ void H264EsParser::analyze()
         m_infos.push_back(info);
         break;
     case 7:
+        info.type = H264InfoType::SequenceParameterSet;
         seq_parameter_set_rbsp(nal_unit_type, info);
         m_infos.push_back(info);
         break;
     case 8:
+        info.type = H264InfoType::PictureParameterSet;
         pic_parameter_set_rbsp(nal_unit_type, info);
         m_infos.push_back(info);
         break;

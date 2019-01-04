@@ -11,6 +11,15 @@
 namespace h264
 {
 
+enum class H264InfoType
+{
+    Info,
+    SliceHeader,
+    SequenceParameterSet,
+    PictureParameterSet
+};
+
+
 struct EsInfoH264SliceHeader
 {
     int sliceType { 0 };
@@ -41,6 +50,7 @@ struct EsInfoH264PictureParameterSet
 
 struct EsInfoH264
 {
+    H264InfoType type;
     uint64_t nalUnitType { 0 };
     std::string msg { "" };
     EsInfoH264SliceHeader slice;
@@ -78,6 +88,8 @@ public:
     std::vector<EsInfoH264> getInfo();
     void clearInfo();
 
+    static std::string toString (H264InfoType e);
+
 private:
     // sps data
     uint8_t log2_max_frame_num_minus4;
@@ -94,6 +106,18 @@ inline std::vector<EsInfoH264> H264EsParser::getInfo()
 inline void H264EsParser::clearInfo()
 {
     m_infos.clear();
+}
+
+inline std::string H264EsParser::toString (H264InfoType e)
+{
+    const std::map<H264InfoType, std::string> MyEnumStrings {
+        { H264InfoType::Info, "Info" },
+        { H264InfoType::SliceHeader, "SliceHeader" },
+        { H264InfoType::SequenceParameterSet, "SequenceParameterSet" },
+        { H264InfoType::PictureParameterSet, "PictureParameterSet" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 
 }

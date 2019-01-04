@@ -276,8 +276,6 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
 
 void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 {
-
-
     if (hasPid("pid", pid))
     {
         LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
@@ -307,6 +305,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->getMpeg2Info();
                             for (auto info: infos)
                             {
+                                LOGD << "\n----------------------------------------------";
+                                LOGD << "mpeg2 bytestream type: " << mpeg2::Mpeg2VideoEsParser::toString(info.type);
                                 LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
                                 LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
                                 LOGD << info.sequence.width << " x " << info.sequence.height
@@ -329,6 +329,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                             for (auto info : infos)
                             {
+                                LOGD << "\n----------------------------------------------";
+                                LOGD << "h264 nal type: " << h264::H264EsParser::toString(info.type);
                                 LOGD << "nal: " << info.nalUnitType << " " << info.msg;
 
                                 LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
