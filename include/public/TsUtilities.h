@@ -68,6 +68,30 @@ enum class LogLevel
     NONE
 };
 
+enum class MediaType
+{
+    Audio,
+    Video,
+    Private,
+    Unknown
+};
+
+enum class VideoCodecType
+{
+    MPEG2,
+    H264
+};
+
+struct VideoMediaInfo
+{
+    MediaType mediaType {MediaType::Unknown};
+    int PID { -1 };
+    VideoCodecType codec;
+    int width;
+    int height;
+    std::string frameRate;
+};
+
 class TsUtilities
 {
 public:
@@ -133,6 +157,8 @@ public:
 
     MPEG2TS_API mpeg2ts::PidStatisticsMap getPidStatistics() const;
 
+    VideoMediaInfo getVideoMediaInfo() const;
+
 private:
     void initLogging() const;
     void initParse();
@@ -152,10 +178,16 @@ private:
     std::map<int, mpeg2ts::PmtTable> mPmts;
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
+    VideoMediaInfo mVideoMediaInfo;
 
     std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
     std::unique_ptr<mpeg2::Mpeg2VideoEsParser> m_Mpeg2Parser;
     std::unique_ptr<h264::H264EsParser> m_H264Parser;
 };
+
+inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const
+{
+    return mVideoMediaInfo;
+}
 
 } // namespace tsutil

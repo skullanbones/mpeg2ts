@@ -369,6 +369,9 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                 {
                     if (it->stream_type == mpeg2ts::STREAMTYPE_VIDEO_MPEG2)
                     {
+                        instance->mVideoMediaInfo.codec = VideoCodecType::MPEG2;
+                        instance->mVideoMediaInfo.mediaType = MediaType::Video;
+                        instance->mVideoMediaInfo.PID = a_pid;
                         std::vector<uint8_t>::const_iterator first = a_rawPes.begin() + a_pes.elementary_data_offset;
                         std::vector<uint8_t>::const_iterator last = a_rawPes.end();
                         std::vector<uint8_t> newVec(first, last);
@@ -384,6 +387,9 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                             }
                             else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                             {
+                                instance->mVideoMediaInfo.width = info.sequence.width;
+                                instance->mVideoMediaInfo.height = info.sequence.height;
+                                instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                                 LOGD << info.sequence.width << " x " << info.sequence.height << ", aspect: " << info.sequence.aspect
                                      << ", frame rate: " << info.sequence.framerate;
                             }
@@ -392,6 +398,9 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                     if (it->stream_type == mpeg2ts::STREAMTYPE_VIDEO_H264)
                     {
+                        instance->mVideoMediaInfo.codec = VideoCodecType::H264;
+                        instance->mVideoMediaInfo.mediaType = MediaType::Video;
+                        instance->mVideoMediaInfo.PID = a_pid;
                         std::vector<uint8_t>::const_iterator first = a_rawPes.begin() + a_pes.elementary_data_offset;
                         std::vector<uint8_t>::const_iterator last = a_rawPes.end();
                         std::vector<uint8_t> newVec(first, last);
@@ -415,6 +424,9 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                             }
                             else if (info.type == h264::H264InfoType::SequenceParameterSet)
                             {
+                                instance->mVideoMediaInfo.width = info.sps.width;
+                                instance->mVideoMediaInfo.height = info.sps.height;
+                               // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                                 LOGD << "sps id: " << info.sps.spsId << ", luma bits: " << info.sps.lumaBits
                                      << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
                                      << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
