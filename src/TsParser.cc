@@ -384,8 +384,6 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
 
             maxDesc.reserved = static_cast<uint8_t>(getBits(2));
             maxDesc.maximum_bitrate = static_cast<uint32_t>(getBits(22));
-            LOGD << "reserved: " << static_cast<int>(maxDesc.reserved)
-                 << ", maximum_bitrate: " << static_cast<int>(maxDesc.maximum_bitrate);
             pmt.descriptors.push_back(std::move(maxDesc));
             skipBytes(program_info_length - 2 - 3);
             break;

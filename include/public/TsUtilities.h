@@ -4,9 +4,18 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <memory>
 
 #include "public/mpeg2ts.h"
 
+
+// Forward decl
+namespace mpeg2 {
+class Mpeg2VideoEsParser;
+}
+namespace h264 {
+class H264EsParser;
+}
 
 /*
  * High level API on mpeg2ts library
@@ -59,12 +68,36 @@ enum class LogLevel
     NONE
 };
 
+enum class MediaType
+{
+    Audio,
+    Video,
+    Private,
+    Unknown
+};
+
+enum class VideoCodecType
+{
+    MPEG2,
+    H264
+};
+
+struct VideoMediaInfo
+{
+    MediaType mediaType {MediaType::Unknown};
+    int PID { -1 };
+    VideoCodecType codec;
+    int width;
+    int height;
+    std::string frameRate;
+};
+
 class TsUtilities
 {
 public:
     MPEG2TS_API explicit TsUtilities();
 
-    MPEG2TS_API ~TsUtilities() = default;
+    MPEG2TS_API ~TsUtilities();
 
     TsUtilities(const TsUtilities&) = delete;
     const TsUtilities& operator=(const TsUtilities&) = delete;
@@ -124,6 +157,12 @@ public:
 
     MPEG2TS_API mpeg2ts::PidStatisticsMap getPidStatistics() const;
 
+    MPEG2TS_API VideoMediaInfo getVideoMediaInfo() const;
+
+    MPEG2TS_API std::string toString (MediaType e) const;
+
+    MPEG2TS_API std::string toString (VideoCodecType e) const;
+
 private:
     void initLogging() const;
     void initParse();
@@ -143,7 +182,38 @@ private:
     std::map<int, mpeg2ts::PmtTable> mPmts;
     std::vector<uint16_t> mEsPids;
     bool mAddedPmts;
+    VideoMediaInfo mVideoMediaInfo;
+
     std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
+    std::unique_ptr<mpeg2::Mpeg2VideoEsParser> m_Mpeg2Parser;
+    std::unique_ptr<h264::H264EsParser> m_H264Parser;
 };
+
+inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const
+{
+    return mVideoMediaInfo;
+}
+
+inline std::string TsUtilities::toString (MediaType e) const
+{
+    const std::map<MediaType, std::string> MyEnumStrings {
+        { MediaType::Audio, "Audio" },
+        { MediaType::Video, "Video" },
+        { MediaType::Private, "Private" },
+        { MediaType::Unknown, "Unknown" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
+
+inline std::string TsUtilities::toString (VideoCodecType e) const
+{
+    const std::map<VideoCodecType, std::string> MyEnumStrings {
+        { VideoCodecType::MPEG2, "MPEG2" },
+        { VideoCodecType::H264, "H264" }
+    };
+    auto   it  = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
 
 } // namespace tsutil

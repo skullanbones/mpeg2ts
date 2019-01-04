@@ -210,3 +210,15 @@ TEST_F(TsUtilitiesTest, test_parseTransportUdpStream_fail)
     Port port {"1234"};
     EXPECT_FALSE(m_tsUtil.parseTransportUdpStream(ip, port));
 }
+
+TEST_F(TsUtilitiesTest, test_VideoMediaInfo )
+{
+    EXPECT_TRUE(m_tsUtil.parseTransportFile("../assets/bbc_one.ts"));
+    VideoMediaInfo mediaInfo = m_tsUtil.getVideoMediaInfo();
+    EXPECT_EQ(mediaInfo.PID, 2304);
+    EXPECT_EQ(mediaInfo.mediaType, MediaType::Video);
+    EXPECT_EQ(mediaInfo.codec, VideoCodecType::MPEG2);
+    EXPECT_EQ(mediaInfo.width, 720);
+    EXPECT_EQ(mediaInfo.height, 576);
+    EXPECT_EQ(mediaInfo.frameRate, "25");
+}
