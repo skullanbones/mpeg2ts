@@ -401,7 +401,7 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                         for (const h264::EsInfoH264& info : ret)
                         {
                             LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
-                            if (info.type == h264::H264InfoType::SliceHeader)// auto slice = std::dynamic_pointer_cast<h264::EsInfoH264SliceHeader>(h264info))
+                            if (info.type == h264::H264InfoType::SliceHeader)
                             {
                                 LOGD << info.slice.sliceTypeStr << ", pps id: " << info.slice.ppsId;
                                 if (info.slice.field)
@@ -413,13 +413,13 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                                     LOGD << "frame encoded";
                                 }
                             }
-                            else if (info.type == h264::H264InfoType::SequenceParameterSet) // auto sps = std::dynamic_pointer_cast<h264::EsInfoH264SequenceParameterSet>(h264info))
+                            else if (info.type == h264::H264InfoType::SequenceParameterSet)
                             {
                                 LOGD << "sps id: " << info.sps.spsId << ", luma bits: " << info.sps.lumaBits
                                      << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
                                      << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
                             }
-                            else if (info.type == h264::H264InfoType::PictureParameterSet)  //auto c = std::dynamic_pointer_cast<h264::EsInfoH264PictureParameterSet>(h264info))
+                            else if (info.type == h264::H264InfoType::PictureParameterSet)
                             {
                                 LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
                             }

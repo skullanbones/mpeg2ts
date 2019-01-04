@@ -305,14 +305,21 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             for (auto info: infos)
                             {
                                 LOGD << "----------------------------------------------";
-                                LOGD << "mpeg2 bytestream type: " << mpeg2::Mpeg2VideoEsParser::toString(info.type);
+                                LOGD << "mpeg2 bytestream type: "
+                                     << mpeg2::Mpeg2VideoEsParser::toString(info.type);
                                 LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
-                                LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
-                                LOGD << info.sequence.width << " x " << info.sequence.height
-                                     << ", aspect: " << info.sequence.aspect
-                                     << ", frame rate: " << info.sequence.framerate;
+                                if (info.type == mpeg2::Mpeg2Type::SliceCode)
+                                {
+                                    LOGD << "mpeg2 picture type: " << info.slice.picType << " "
+                                         << info.msg;
+                                }
+                                else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
+                                {
+                                    LOGD << info.sequence.width << " x " << info.sequence.height
+                                         << ", aspect: " << info.sequence.aspect
+                                         << ", frame rate: " << info.sequence.framerate;
+                                }
                             }
-
                         } // STREAMTYPE_VIDEO_MPEG2
 
                         if (it->stream_type == STREAMTYPE_VIDEO_H264)
@@ -328,23 +335,30 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                 LOGD << "----------------------------------------------";
                                 LOGD << "h264 nal type: " << h264::H264EsParser::toString(info.type);
                                 LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
-
-                                LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
-                                if (info.slice.field)
+                                if (info.type == h264::H264InfoType::SliceHeader)
                                 {
-                                    LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
+                                    LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
+                                    if (info.slice.field)
+                                    {
+                                        LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
+                                    }
+                                    else
+                                    {
+                                        LOGD << "frame encoded";
+                                    }
                                 }
-                                else
+                                else if (info.type == h264::H264InfoType::SequenceParameterSet)
                                 {
-                                    LOGD << "frame encoded";
+                                    LOGD << "sps id: " << info.pps.spsId
+                                         << ", luma bits: " << info.sps.lumaBits
+                                         << ", chroma bits: " << info.sps.chromaBits
+                                         << ", width: " << info.sps.width << " x "
+                                         << info.sps.height << ", ref pic: " << info.sps.numRefPics;
                                 }
-
-                                LOGD << "sps id: " << info.pps.spsId << ", luma bits: " << info.sps.lumaBits
-                                     << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
-                                     << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
-
-
-                                LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
+                                else if (info.type == h264::H264InfoType::PictureParameterSet)
+                                {
+                                    LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
+                                }
                             }
                         } // STREAMTYPE_VIDEO_H264
                     }
