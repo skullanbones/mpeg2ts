@@ -380,18 +380,18 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                         for (const mpeg2::EsInfoMpeg2& info : ret)
                         {
-                            LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
+                            //LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
                             if (info.type == mpeg2::Mpeg2Type::SliceCode )
                             {
-                                LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
+                                //LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
                             }
                             else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                             {
                                 instance->mVideoMediaInfo.width = info.sequence.width;
                                 instance->mVideoMediaInfo.height = info.sequence.height;
                                 instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-                                LOGD << info.sequence.width << " x " << info.sequence.height << ", aspect: " << info.sequence.aspect
-                                     << ", frame rate: " << info.sequence.framerate;
+                                //LOGD << info.sequence.width << " x " << info.sequence.height << ", aspect: " << info.sequence.aspect
+                                //     << ", frame rate: " << info.sequence.framerate;
                             }
                         }
                     } // STREAMTYPE_VIDEO_MPEG2
@@ -409,17 +409,17 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                         for (const h264::EsInfoH264& info : ret)
                         {
-                            LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
+                            //LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
                             if (info.type == h264::H264InfoType::SliceHeader)
                             {
-                                LOGD << info.slice.sliceTypeStr << ", pps id: " << info.slice.ppsId;
+                                //LOGD << info.slice.sliceTypeStr << ", pps id: " << info.slice.ppsId;
                                 if (info.slice.field)
                                 {
-                                    LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
+                                    //LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
                                 }
                                 else
                                 {
-                                    LOGD << "frame encoded";
+                                    //LOGD << "frame encoded";
                                 }
                             }
                             else if (info.type == h264::H264InfoType::SequenceParameterSet)
@@ -427,20 +427,20 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                                 instance->mVideoMediaInfo.width = info.sps.width;
                                 instance->mVideoMediaInfo.height = info.sps.height;
                                // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-                                LOGD << "sps id: " << info.sps.spsId << ", luma bits: " << info.sps.lumaBits
-                                     << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
-                                     << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
+                                // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " << info.sps.lumaBits
+                                //      << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
+                                //      << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
                             }
                             else if (info.type == h264::H264InfoType::PictureParameterSet)
                             {
-                                LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
+                                // LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
                             }
                         }
                     } // STREAMTYPE_VIDEO_H264
                 }
                 catch (const std::out_of_range&)
                 {
-                    LOGD << "No parser for stream type " << mpeg2ts::StreamTypeToString[it->stream_type];
+                    LOGE << "No parser for stream type " << mpeg2ts::StreamTypeToString[it->stream_type];
                 }
             }
         }
