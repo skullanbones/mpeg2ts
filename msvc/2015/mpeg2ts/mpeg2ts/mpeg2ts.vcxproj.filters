@@ -25,6 +25,12 @@
     <Filter Include="tests">
       <UniqueIdentifier>{090a03cc-66bf-4011-95b9-956fb784406d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\h264">
+      <UniqueIdentifier>{bf288ccc-f94c-45b6-ae20-49c40ee3721d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\h264">
+      <UniqueIdentifier>{95d2f2bc-5ba9-456e-872f-6f74bddd863a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\mpeg2vid\Mpeg2VideoParser.h">
@@ -60,6 +66,9 @@
     <ClInclude Include="..\..\..\..\include\TsStatistics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\include\h264\H264Parser.h">
+      <Filter>Header Files\h264</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\GetBits.cc">
@@ -91,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\JsonSettings.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\h264\H264Parser.cc">
+      <Filter>Source Files\h264</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -110,7 +110,7 @@ TEST_F(TsUtilitiesTest, test_getPmtTables_1_success)
 {
     int totSize = sizeof(pat_packet_2) + sizeof(pmt_packet_1);
     printf("total size: %d\n", totSize);
-    uint8_t buf[totSize];
+    uint8_t buf[376]; // 188 * 2
     memcpy(buf, pat_packet_2, sizeof(pat_packet_2));
     memcpy(buf + sizeof(pat_packet_2), pmt_packet_1, sizeof(pmt_packet_1));
     
