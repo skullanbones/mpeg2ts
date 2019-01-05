@@ -124,3 +124,14 @@ add_library(mpeg2ts SHARED
         ${3rdPartySources})
 # shared libraries need PIC
 set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+#-------------------
+# add custom targets
+#-------------------
+add_custom_target(unit-tests
+     COMMAND ./tests/run_gtests
+)
+
+add_custom_target(benchmark-tests
+     COMMAND ./bench/Parser_Benchmark
+)
