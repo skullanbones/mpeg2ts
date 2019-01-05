@@ -89,9 +89,9 @@ public:
     H264EsParser& operator=(const H264EsParser& arg) = delete;
     H264EsParser()
         : EsParser({0x00, 0x00, 0x00, 0x01})
-        , log2_max_frame_num_minus4{ 0 }
-        , separate_colour_plane_flag{ 0 }
-        , frame_mbs_only_flag{ 0 }
+        , log2_max_frame_num_minus4( 0 )
+        , separate_colour_plane_flag( 0 )
+        , frame_mbs_only_flag( 0 )
     {
     }
 

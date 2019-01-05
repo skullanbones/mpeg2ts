@@ -66,7 +66,7 @@ int main()
 
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
-    std::map<uint16_t, PmtTable> pmtTables = util.getPmtTables();
+    std::map<int, PmtTable> pmtTables = util.getPmtTables();
 
     for (auto pid : pmtPids)
     {
@@ -89,7 +89,7 @@ int main()
         std::cout << "Found elementary stream with Pid: " << esPid << '\n';
     }
 
-    std::map<uint16_t, std::vector<PesPacket>> pesPackets = util.getPesPackets();
+    std::map<int, std::vector<PesPacket>> pesPackets = util.getPesPackets();
 
     std::cout << "Got number of PES packets: " << pesPackets.size() << '\n';
 

@@ -15,7 +15,7 @@ Linux: tsparser
 ```
 
 ## Requirements / example usage
-C++11 is the minial requirement. The library is written as platform independent code and tested on Mac OS X, Ubuntu 16.04/18.04, Windows 10.
+C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X, Ubuntu 16.04/18.04, Windows 10.
 
 ## SW Architecture
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
@@ -155,10 +155,9 @@ This will spin up a docker container with gtest/gmock and execute all tests.
 Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
 There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
 mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
-called TestTsLib that uses the dynamic mpeg2ts.dll library. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
-change to dynamic project. These are the VS2015 solution files:
+called TestTsLib that uses the dynamic mpeg2ts.dll library in the same solution. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
+change to dynamic project. This is the VS2015 solution file:
 * mpeg2ts.sln
-* TestTsLib.sln
 
 ## Continuous integration (CI)
 ![](images/circleci.png)

@@ -18,6 +18,9 @@
     <ClInclude Include="..\..\..\..\tests\TsPacketTestData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\tests\CodecTestData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\tests\GetBits_Tests.cc">
@@ -38,7 +41,13 @@
     <ClCompile Include="..\..\..\..\tests\TsStatistics_Tests.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\tests\main.cc">
+    <ClCompile Include="..\..\..\..\tests\gtest_main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\tests\TsUtilities_Tests.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\tests\H264Parser_Tests.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
