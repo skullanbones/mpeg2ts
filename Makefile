@@ -170,7 +170,7 @@ $(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 
 shared: folders $(BUILDDIR)/$(DYNAMIC)
 
-$(BUILDDIR)/$(DYNAMIC): $(OBJS) $(HDRS)
+$(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
 	$(CXX) -shared -o $@ $^
 
