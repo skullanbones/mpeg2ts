@@ -38,6 +38,8 @@ RUN apt-get install --yes --no-install-recommends python3-virtualenv=15.0.1+ds-3
 RUN apt-get install --yes --no-install-recommends wget=1.17.1-1ubuntu1.4
 RUN apt-get install --yes --no-install-recommends lcov=1.12-2
 RUN apt-get install --yes --no-install-recommends sudo=1.8.16-0ubuntu1.5
+RUN apt-get install --yes --no-install-recommends zip=3.0-11
+RUN apt-get install --yes --no-install-recommends unzip=6.0-20ubuntu1
 
 # Install latest git
 RUN apt-add-repository ppa:git-core/ppa \

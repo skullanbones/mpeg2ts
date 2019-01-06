@@ -3,7 +3,7 @@
 // Dont allow json.hpp throw exceptions
 #define JSON_THROW_USER
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <fstream>
 #include <iostream>
