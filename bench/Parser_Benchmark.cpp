@@ -69,3 +69,5 @@ static void BM_Mpeg2VideoEsParser_parse(benchmark::State& state)
     }
 }
 BENCHMARK(BM_Mpeg2VideoEsParser_parse);
+
+BENCHMARK_MAIN();

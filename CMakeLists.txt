@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 project(ts_lib)
 
 #-------------------
+# global settings
+#-------------------
+set(USE_DOCKER ON) # To use dependencies from Docker instead of local build
+
+#-------------------
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
