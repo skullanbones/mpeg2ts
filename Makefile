@@ -27,7 +27,7 @@ INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
 				-I$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)/include
 
 export INCLUDE_DIRS
-BUILD_TYPE ?= DEBUG
+BUILD_TYPE ?= RELEASE
 
 ## Machine
 CORES ?= $(shell nproc)
@@ -51,7 +51,6 @@ CXXFLAGS = 	-Wall \
 			-Wuseless-cast \
 			-Wdouble-promotion \
 			-Wformat=2 \
-			-Winline \
 			-Werror \
 			-Wconversion \
 			-pipe \

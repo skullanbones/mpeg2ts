@@ -574,7 +574,7 @@ int main(int argc, char** argv)
 
     for (count = 0;; ++count)
     {
-        unsigned char packet[TS_PACKET_SIZE];
+        unsigned char packet[TS_PACKET_SIZE + 1];
         // SYNC
         // Check for the sync byte. When found start a new ts-packet parser...
         char b;
