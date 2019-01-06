@@ -142,9 +142,9 @@ TEST_F(Mpeg2VideoTest, test_findStartCodes_sequence_header)
 TEST_F(Mpeg2VideoTest, test_parse_sequence_header)
 {
     std::vector<EsInfoMpeg2> ret = parser.parse(h262_with_sequence_header_code);
-    
+
     for (const EsInfoMpeg2& esinfo : ret)
-    {        
+    {
         if (esinfo.type == mpeg2::Mpeg2Type::SliceCode)
         {
             EXPECT_EQ(esinfo.slice.picType, 1);
@@ -182,7 +182,7 @@ TEST_F(Mpeg2VideoTest, test_parse_sequence_header_2)
 
     for (const EsInfoMpeg2& esinfo : ret)
     {
-       // std::cout << "mpeg2 picture: " << i->picture << " " << i->msg;
+        // std::cout << "mpeg2 picture: " << i->picture << " " << i->msg;
         if (esinfo.type == mpeg2::Mpeg2Type::SliceCode)
         {
             EXPECT_EQ(esinfo.slice.picType, 1);
@@ -195,7 +195,8 @@ TEST_F(Mpeg2VideoTest, test_parse_sequence_header_2)
             EXPECT_EQ(esinfo.sequence.height, 576);
             EXPECT_EQ(esinfo.sequence.framerate, "25");
             EXPECT_EQ(esinfo.sequence.aspect, "3x4");
-            std::cout << esinfo.sequence.width << " x " << esinfo.sequence.height << ", aspect: " << esinfo.sequence.aspect
+            std::cout << esinfo.sequence.width << " x " << esinfo.sequence.height
+                      << ", aspect: " << esinfo.sequence.aspect
                       << ", frame rate: " << esinfo.sequence.framerate;
         }
     }

@@ -2,12 +2,15 @@ version: 2
 jobs:
   build:
     docker:
-      - image: heliconwave/circleci:v8
+      - image: heliconwave/circleci:latest
     steps:
       - checkout
       - run:
           name: Build
           command: make all
+      - run:
+          name: Build Libs
+          command: make libs     
       - run:
           name: Unit Test
           command: make gtests && make unit-tests

@@ -1,13 +1,13 @@
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 // Project files
-#include "public/mpeg2ts.h"
 #include "TsPacketTestData.h"
+#include "public/mpeg2ts.h"
 
 // Class Under Test (CUT)
 #include "public/TsUtilities.h"
@@ -28,23 +28,24 @@ public:
         deleteSettingsFile();
     }
 
-    void createSettingsFile() 
+    void createSettingsFile()
     {
-        std::ofstream outfile ("settings.json");
+        std::ofstream outfile("settings.json");
         outfile << "\{\n"
-        "\"settings\": {\n"
-        "\"logLevel\": \"ERROR\",\n"
-        "\"logFileName\": \"mpeg2ts_log.csv\",\n"
-        "\"logFileMaxSize\": 102400,\n"
-        "\"logFileMaxNumberOf\": 10\n"
-        "}\n"
-        "}" << std::endl;
+                   "\"settings\": {\n"
+                   "\"logLevel\": \"ERROR\",\n"
+                   "\"logFileName\": \"mpeg2ts_log.csv\",\n"
+                   "\"logFileMaxSize\": 102400,\n"
+                   "\"logFileMaxNumberOf\": 10\n"
+                   "}\n"
+                   "}"
+                << std::endl;
         outfile.close();
     }
 
     void deleteSettingsFile()
     {
-        if( remove("settings.json") != 0 )
+        if (remove("settings.json") != 0)
             perror("Error deleting file");
         else
             puts("File settings.json successfully deleted");
@@ -57,7 +58,7 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_1_success)
 {
     EXPECT_TRUE(m_tsUtil.parseTransportStreamData(pat_packet_1, sizeof(pat_packet_1)));
     mpeg2ts::PatTable pat;
-    pat =  m_tsUtil.getPatTable();
+    pat = m_tsUtil.getPatTable();
     std::vector<uint16_t> pmtPids;
     pmtPids = m_tsUtil.getPmtPids();
     EXPECT_EQ(pmtPids.size(), 1);
@@ -73,14 +74,14 @@ TEST_F(TsUtilitiesTest, test_parseTransportStreamData_2_success)
 {
     EXPECT_TRUE(m_tsUtil.parseTransportStreamData(pat_packet_2, sizeof(pat_packet_2)));
     mpeg2ts::PatTable pat;
-    pat =  m_tsUtil.getPatTable();
+    pat = m_tsUtil.getPatTable();
     const int kNumPmts = 17;
     EXPECT_EQ(pat.programs.size(), kNumPmts);
     EXPECT_EQ(pat.programs.at(0).program_map_PID, 16);
     // The first is a NIT table
     EXPECT_EQ(pat.programs.at(0).type, ProgramType::NIT);
     // The rest should be PMTs
-    for (int i  {1}; i < kNumPmts; ++i) 
+    for (int i{ 1 }; i < kNumPmts; ++i)
     {
         EXPECT_EQ(pat.programs.at(i).type, ProgramType::PMT);
     }
@@ -113,10 +114,10 @@ TEST_F(TsUtilitiesTest, test_getPmtTables_1_success)
     uint8_t buf[376]; // 188 * 2
     memcpy(buf, pat_packet_2, sizeof(pat_packet_2));
     memcpy(buf + sizeof(pat_packet_2), pmt_packet_1, sizeof(pmt_packet_1));
-    
+
     EXPECT_TRUE(m_tsUtil.parseTransportStreamData(buf, totSize));
     mpeg2ts::PatTable pat;
-    pat =  m_tsUtil.getPatTable();
+    pat = m_tsUtil.getPatTable();
     const int kNumPmts = 17;
     EXPECT_EQ(pat.programs.size(), kNumPmts);
 
@@ -151,7 +152,7 @@ TEST_F(TsUtilitiesTest, test_parseTransportFile_success)
 {
     EXPECT_TRUE(m_tsUtil.parseTransportFile("../assets/bbc_one.ts"));
     mpeg2ts::PatTable pat;
-    pat =  m_tsUtil.getPatTable();
+    pat = m_tsUtil.getPatTable();
     std::vector<uint16_t> pmtPids;
     pmtPids = m_tsUtil.getPmtPids();
     EXPECT_EQ(pmtPids.size(), 1);
@@ -206,12 +207,12 @@ TEST_F(TsUtilitiesTest, test_parseTransportFile_fail)
 
 TEST_F(TsUtilitiesTest, test_parseTransportUdpStream_fail)
 {
-    IpAddress ip {"192.168.1.1"};
-    Port port {"1234"};
+    IpAddress ip{ "192.168.1.1" };
+    Port port{ "1234" };
     EXPECT_FALSE(m_tsUtil.parseTransportUdpStream(ip, port));
 }
 
-TEST_F(TsUtilitiesTest, test_VideoMediaInfo )
+TEST_F(TsUtilitiesTest, test_VideoMediaInfo)
 {
     EXPECT_TRUE(m_tsUtil.parseTransportFile("../assets/bbc_one.ts"));
     VideoMediaInfo mediaInfo = m_tsUtil.getVideoMediaInfo();

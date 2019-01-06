@@ -29,7 +29,7 @@
 
 using namespace mpeg2ts;
 
-static const std::string VERSION { "0.1" };
+static const std::string VERSION{ "0.1" };
 
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
@@ -37,15 +37,17 @@ std::vector<uint16_t> g_ESPIDS;
 mpeg2ts::TsDemuxer g_tsDemux;
 PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
-bool addedPmts { false };
+bool addedPmts{ false };
 
 // Codec parsers
-std::unique_ptr<mpeg2::Mpeg2VideoEsParser> g_Mpeg2Parser = std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser());
-std::unique_ptr<h264::H264EsParser> g_H264Parser = std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser());
+std::unique_ptr<mpeg2::Mpeg2VideoEsParser> g_Mpeg2Parser =
+std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser());
+std::unique_ptr<h264::H264EsParser> g_H264Parser =
+std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser());
 
-const char LOGFILE_NAME[] { "tsparser.csv" };
-int LOGFILE_MAXSIZE { 100 * 1024 };
-int LOGFILE_MAXNUMBEROF { 10 };
+const char LOGFILE_NAME[]{ "tsparser.csv" };
+int LOGFILE_MAXSIZE{ 100 * 1024 };
+int LOGFILE_MAXNUMBEROF{ 10 };
 
 const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
 
@@ -67,7 +69,7 @@ bool hasPid(std::string param, int pid)
 
 bool hasPids(std::string param, std::vector<uint16_t> pids)
 {
-    bool ret { false };
+    bool ret{ false };
     for (auto pid : pids)
     {
         ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);
@@ -129,7 +131,7 @@ void display_statistics(mpeg2ts::PidStatisticsMap statistics)
 
 void TsCallback(const uint8_t* packet, TsPacketInfo tsPacketInfo)
 {
-    auto pid { tsPacketInfo.pid };
+    auto pid{ tsPacketInfo.pid };
     LOGD << "demuxed TS packet \n" << tsPacketInfo;
     if (hasPid("pid", pid))
     {
@@ -293,7 +295,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                 if (it != g_prevPmts[pmtPid].streams.end())
                 {
                     try
-                    {                        
+                    {
                         if (it->stream_type == STREAMTYPE_VIDEO_MPEG2)
                         {
                             std::vector<uint8_t>::const_iterator first = rawPes.begin() + pes.elementary_data_offset;
@@ -302,7 +304,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
                             std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->parse(newVec);
 
-                            for (auto info: infos)
+                            for (auto info : infos)
                             {
                                 LOGD << "----------------------------------------------";
                                 LOGD << "mpeg2 bytestream type: "
@@ -334,7 +336,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             {
                                 LOGD << "----------------------------------------------";
                                 LOGD << "h264 nal type: " << h264::H264EsParser::toString(info.type);
-                                LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
+                                LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType)
+                                     << " " << info.msg;
                                 if (info.type == h264::H264InfoType::SliceHeader)
                                 {
                                     LOGD << info.slice.sliceTypeStr << ", pps id: " << info.pps.ppsId;
@@ -373,8 +376,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 
     if (hasPid("write", pid))
     {
-        auto writeOffset { 0 };
-        auto writeModeString { "" };
+        auto writeOffset{ 0 };
+        auto writeModeString{ "" };
         if (g_WriteMode.front() == OptionWriteMode::TS)
         {
             return;
@@ -489,7 +492,8 @@ int main(int argc, char** argv)
             LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
             std::string logLevel = std::string(optarg);
             LOGD << "Got input log-level setting: " << logLevel;
-            for (auto& c : logLevel) {
+            for (auto& c : logLevel)
+            {
                 c = static_cast<char>(toupper(c));
             }
             plog::Severity severity = plog::severityFromString(logLevel.c_str());
@@ -541,9 +545,8 @@ int main(int argc, char** argv)
     if (g_WriteMode.front() == OptionWriteMode::TS)
     {
         for (auto pid : g_Options["write"])
-        {      
-            auto f = [](const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)
-            {
+        {
+            auto f = [](const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl) {
                 (void)hdl;
                 TsCallback(packet, tsPacketInfo);
             };
@@ -563,12 +566,11 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    auto f1 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
-    {
+    auto f1 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl) {
         (void)hdl;
         PATCallback(rawTable, table, aPid);
     };
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, f1, nullptr);     // Find PAT
+    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, f1, nullptr); // Find PAT
 
     for (count = 0;; ++count)
     {
@@ -637,8 +639,7 @@ int main(int argc, char** argv)
             for (auto pid : g_PMTPIDS)
             {
                 LOGD << "Adding PSI PID for parsing: " << pid;
-                auto f2 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
-                {
+                auto f2 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl) {
                     (void)hdl;
                     PMTCallback(rawTable, table, aPid);
                 };
@@ -650,13 +651,11 @@ int main(int argc, char** argv)
         for (auto pid : g_ESPIDS)
         {
             LOGD << "Adding PES PID for parsing: " << pid;
-            auto f3 = [](const ByteVector& rawPes, const PesPacket& pes, int aPid, void* hdl)
-            {
+            auto f3 = [](const ByteVector& rawPes, const PesPacket& pes, int aPid, void* hdl) {
                 (void)hdl;
                 PESCallback(rawPes, pes, aPid);
             };
             g_tsDemux.addPesPid(pid, f3, nullptr);
-
         }
         g_ESPIDS.clear();
 

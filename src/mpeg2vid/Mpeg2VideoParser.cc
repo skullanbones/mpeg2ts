@@ -22,7 +22,7 @@ std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::parse(const std::vector<uint8_t>& a
         return ret;
 
     // There is nothing to parse if the frame only contains a NAL startcode
-    if (a_buf.size() <= m_startCode.size() )
+    if (a_buf.size() <= m_startCode.size())
         return ret;
 
     for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
@@ -31,7 +31,8 @@ std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::parse(const std::vector<uint8_t>& a
         try
         {
             mPicture.clear();
-            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
+            std::vector<uint8_t>::const_iterator first =
+            a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
             std::vector<uint8_t>::const_iterator last;
             // the last startcode is a corner case
             // also only have 1 startcode is a corner case
@@ -39,13 +40,14 @@ std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::parse(const std::vector<uint8_t>& a
             {
                 last = a_buf.end();
             }
-            else {
+            else
+            {
                 last = a_buf.begin() + startCodes[ind + 1];
             }
-             
+
             std::vector<uint8_t> newVec(first, last);
             mPicture = newVec;
-        
+
             std::vector<EsInfoMpeg2> b = analyze();
             ret.insert(std::end(ret), std::begin(b), std::end(b));
         }
@@ -53,7 +55,6 @@ std::vector<EsInfoMpeg2> Mpeg2VideoEsParser::parse(const std::vector<uint8_t>& a
         {
             LOGE << "std::Exception what: %s\n" << e.what();
         }
-        
     }
 
     return ret;
@@ -148,5 +149,4 @@ std::map<uint8_t, std::string> Mpeg2VideoEsParser::FrameRateToString =
   { 4, "29.97" },     { 5, "30" },        { 6, "50" },        { 7, "59.94" },
   { 8, "60" },        { 9, "reserved" },  { 10, "reserved" }, { 11, "reserved" },
   { 12, "reserved" }, { 13, "reserved" }, { 14, "reserved" }, { 15, "reserved" } };
-
 }

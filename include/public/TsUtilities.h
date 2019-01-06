@@ -3,17 +3,19 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string>
 #include <memory>
+#include <string>
 
 #include "public/mpeg2ts.h"
 
 
 // Forward decl
-namespace mpeg2 {
+namespace mpeg2
+{
 class Mpeg2VideoEsParser;
 }
-namespace h264 {
+namespace h264
+{
 class H264EsParser;
 }
 
@@ -84,8 +86,8 @@ enum class VideoCodecType
 
 struct VideoMediaInfo
 {
-    MediaType mediaType {MediaType::Unknown};
-    int PID { -1 };
+    MediaType mediaType{ MediaType::Unknown };
+    int PID{ -1 };
     VideoCodecType codec;
     int width;
     int height;
@@ -123,12 +125,9 @@ public:
     MPEG2TS_API bool parseTransportStreamData(const uint8_t* data, std::size_t size);
 
     //* callbacks *//
-    static void
-    PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
-    static void
-    PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
-    static void
-    PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int pid, void* hdl);
+    static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
+    static void PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
+    static void PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int pid, void* hdl);
 
     //* PAT *//
     //! \brief Returns the PAT table found in stream
@@ -159,9 +158,9 @@ public:
 
     MPEG2TS_API VideoMediaInfo getVideoMediaInfo() const;
 
-    MPEG2TS_API std::string toString (MediaType e) const;
+    MPEG2TS_API std::string toString(MediaType e) const;
 
-    MPEG2TS_API std::string toString (VideoCodecType e) const;
+    MPEG2TS_API std::string toString(VideoCodecType e) const;
 
 private:
     void initLogging() const;
@@ -170,10 +169,10 @@ private:
     void registerPesCallback();
 
     // Default constants
-    static constexpr const LogLevel DEFAULT_LOG_LEVEL { LogLevel::DEBUG };
-    static const std::string LOGFILE_NAME;   // = "mpeg2ts_log.csv";
-    static constexpr const int LOGFILE_MAXSIZE { 100 * 1024 };
-    static constexpr const int LOGFILE_MAXNUMBEROF { 10 };
+    static constexpr const LogLevel DEFAULT_LOG_LEVEL{ LogLevel::DEBUG };
+    static const std::string LOGFILE_NAME; // = "mpeg2ts_log.csv";
+    static constexpr const int LOGFILE_MAXSIZE{ 100 * 1024 };
+    static constexpr const int LOGFILE_MAXNUMBEROF{ 10 };
 
     // members
     mpeg2ts::TsDemuxer mDemuxer;
@@ -194,25 +193,21 @@ inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const
     return mVideoMediaInfo;
 }
 
-inline std::string TsUtilities::toString (MediaType e) const
+inline std::string TsUtilities::toString(MediaType e) const
 {
-    const std::map<MediaType, std::string> MyEnumStrings {
-        { MediaType::Audio, "Audio" },
-        { MediaType::Video, "Video" },
-        { MediaType::Private, "Private" },
-        { MediaType::Unknown, "Unknown" }
-    };
-    auto   it  = MyEnumStrings.find(e);
+    const std::map<MediaType, std::string> MyEnumStrings{ { MediaType::Audio, "Audio" },
+                                                          { MediaType::Video, "Video" },
+                                                          { MediaType::Private, "Private" },
+                                                          { MediaType::Unknown, "Unknown" } };
+    auto it = MyEnumStrings.find(e);
     return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 
-inline std::string TsUtilities::toString (VideoCodecType e) const
+inline std::string TsUtilities::toString(VideoCodecType e) const
 {
-    const std::map<VideoCodecType, std::string> MyEnumStrings {
-        { VideoCodecType::MPEG2, "MPEG2" },
-        { VideoCodecType::H264, "H264" }
-    };
-    auto   it  = MyEnumStrings.find(e);
+    const std::map<VideoCodecType, std::string> MyEnumStrings{ { VideoCodecType::MPEG2, "MPEG2" },
+                                                               { VideoCodecType::H264, "H264" } };
+    auto it = MyEnumStrings.find(e);
     return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 

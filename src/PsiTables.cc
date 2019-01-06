@@ -79,8 +79,7 @@ bool PatTable::operator==(const PatTable& rhs) const
     {
         if (prg != rhs.programs.at(i))
         {
-            LOGD_(FileLog)
-            << "PatTable programs content unequal for program: " << prg.program_number << '\n';
+            LOGD_(FileLog) << "PatTable programs content unequal for program: " << prg.program_number << '\n';
             return false;
         }
         ++i;
@@ -172,8 +171,7 @@ bool PmtTable::operator==(const PmtTable& rhs) const
     {
         if (stream != rhs.streams.at(i))
         {
-            LOGD_(FileLog)
-            << "PmtTable stream content unequal for stream_type: " << stream.stream_type << '\n';
+            LOGD_(FileLog) << "PmtTable stream content unequal for stream_type: " << stream.stream_type << '\n';
             return false;
         }
         ++i;

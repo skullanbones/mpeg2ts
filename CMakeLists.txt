@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 project(ts_lib)
 
 #-------------------
+# global settings
+#-------------------
+if(EXISTS /.dockerenv)
+   message("Detected running inside docker container. Using container dependencies instead.")
+   set(USE_DOCKER ON) # To use dependencies from Docker instead of local build
+else()
+   set(USE_DOCKER OFF)
+endif()
+
+
+#-------------------
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
@@ -50,8 +61,11 @@ endif()
 include_directories(include)
 
 ## 3rd-party
-include_directories(3rd-party/nlohmann/include)
-include_directories(3rd-party/plog-1.1.4/include)
+set(PLOG_VERSION 1.1.4)
+set(NLOHMANN_VERSION 3.5.0)
+
+include_directories(3rd-party/nlohmann-${NLOHMANN_VERSION}/include)
+include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
 set(    TsLibSourcesList
         include/public/mpeg2ts.h
@@ -78,27 +92,27 @@ set(    TsLibSourcesList
         src/TsUtilities.cc)
 
 set(    3rdPartySources
-        3rd-party/nlohmann/include/json.hpp
-        3rd-party/plog-1.1.4/include/plog/Appenders/AndroidAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/ColorConsoleAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/ConsoleAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/DebugOutputAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/EventLogAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/IAppender.h
-        3rd-party/plog-1.1.4/include/plog/Appenders/RollingFileAppender.h
-        3rd-party/plog-1.1.4/include/plog/Converters/NativeEOLConverter.h
-        3rd-party/plog-1.1.4/include/plog/Converters/UTF8Converter.h
-        3rd-party/plog-1.1.4/include/plog/Formatters/CsvFormatter.h
-        3rd-party/plog-1.1.4/include/plog/Formatters/FuncMessageFormatter.h
-        3rd-party/plog-1.1.4/include/plog/Formatters/MessageOnlyFormatter.h
-        3rd-party/plog-1.1.4/include/plog/Formatters/TxtFormatter.h
-        3rd-party/plog-1.1.4/include/plog/Init.h
-        3rd-party/plog-1.1.4/include/plog/Log.h
-        3rd-party/plog-1.1.4/include/plog/Logger.h
-        3rd-party/plog-1.1.4/include/plog/Record.h
-        3rd-party/plog-1.1.4/include/plog/Severity.h
-        3rd-party/plog-1.1.4/include/plog/Util.h
-        3rd-party/plog-1.1.4/include/plog/WinApi.h)
+        3rd-party/nlohmann-${NLOHMANN_VERSION}/include/nlohmann/json.hpp
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/AndroidAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ColorConsoleAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ConsoleAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/DebugOutputAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/EventLogAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/IAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/RollingFileAppender.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/NativeEOLConverter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/UTF8Converter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/CsvFormatter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/FuncMessageFormatter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/MessageOnlyFormatter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/TxtFormatter.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Init.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Log.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Logger.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Record.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Severity.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/Util.h
+        3rd-party/plog-${PLOG_VERSION}/include/plog/WinApi.h)
 
 #-------------------
 # static lib
@@ -124,3 +138,14 @@ add_library(mpeg2ts SHARED
         ${3rdPartySources})
 # shared libraries need PIC
 set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+#-------------------
+# add custom targets
+#-------------------
+add_custom_target(unit-tests
+     COMMAND ./tests/run_gtests
+)
+
+add_custom_target(benchmark-tests
+     COMMAND ./bench/Parser_Benchmark
+)

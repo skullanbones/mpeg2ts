@@ -24,9 +24,9 @@ struct EsInfoMpeg2PictureSliceCode
 
 struct EsInfoMpeg2SequenceHeader
 {
-    int width{ 0 }, height { 0 };
-    std::string aspect { "" };
-    std::string framerate { "" };
+    int width{ 0 }, height{ 0 };
+    std::string aspect{ "" };
+    std::string framerate{ "" };
 };
 
 struct EsInfoMpeg2
@@ -46,10 +46,10 @@ public:
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
 
     Mpeg2VideoEsParser()
-        : EsParser({0x00, 0x00, 0x01})
+        : EsParser({ 0x00, 0x00, 0x01 })
     {
     }
-    
+
     virtual ~Mpeg2VideoEsParser() = default;
 
     /// @brief Parses a binary buffer containing codec data like H262 or H264 and
@@ -60,7 +60,7 @@ public:
     /// @brief Analyze the content on data after startcodes.
     std::vector<EsInfoMpeg2> analyze();
 
-    static std::string toString (Mpeg2Type e);
+    static std::string toString(Mpeg2Type e);
 
 private:
     static std::map<uint8_t, std::string> AspectToString;
@@ -68,15 +68,13 @@ private:
 };
 
 
-inline std::string Mpeg2VideoEsParser::toString (Mpeg2Type e)
+inline std::string Mpeg2VideoEsParser::toString(Mpeg2Type e)
 {
-    const std::map<Mpeg2Type, std::string> MyEnumStrings {
-        { Mpeg2Type::Info, "Info" },
-        { Mpeg2Type::SliceCode, "SliceCode" },
-        { Mpeg2Type::SequenceHeader, "SequenceHeader" }
-    };
-    auto   it  = MyEnumStrings.find(e);
+    const std::map<Mpeg2Type, std::string> MyEnumStrings{ { Mpeg2Type::Info, "Info" },
+                                                          { Mpeg2Type::SliceCode, "SliceCode" },
+                                                          { Mpeg2Type::SequenceHeader,
+                                                            "SequenceHeader" } };
+    auto it = MyEnumStrings.find(e);
     return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
-
 }

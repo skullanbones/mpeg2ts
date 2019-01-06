@@ -37,6 +37,29 @@ NONE
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Releases
+*V0.2*
+* [*] Compile on Windows fixes
+* [FEAT-163] Add codec parsers to TsUtilities
+* [BUG-157] Codec parsers missing API
+* [FEAT-166] Add micro google benchmark tests
+* [BUG-161] Add H264/H262 unit tests
+* [FEAT-158] Add benchmark tests
+* [*] Add component tests to H264 parsing
+* [*] Update README.
+* [*] Apply C++ best practises (Lefticus)
+* [*] Apply clang formating/analyze
+* [FEAT-117] Use move instead of copying
+* [FEAT-51/52] Add codec parsing (H264/H262)
+* [FEAT-54] Add basic descriptor parsing
+* [FEAT-128] Add CMake
+* [FEAT-132] Add better code coverage
+* [FEAT-126] Use Wextra and Wpedantic with GCC
+* [FEAT-130] Add docker commands via bash
+* [FEAT-32] Add code coverage
+* [*] Added gtests to Windows proj
+* [*] Merge TestTsLib.proj into mpeg2ts.sln
+* [FEAT-102] Fixed some TODOs
+
 *V0.1*
 
 * Added first version of API (mpeg2ts.h)

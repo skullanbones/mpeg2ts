@@ -20,10 +20,11 @@ TOOLSDIR = $(PROJ_ROOT)/tools
 
 ## 3rd-party settings
 PLOG_VERSION=1.1.4
+NLOHMANN_VERSION=3.5.0
 
 INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
 				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
-				-I$(3RDPARTYDIR)/nlohmann/include
+				-I$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)/include
 
 export INCLUDE_DIRS
 BUILD_TYPE ?= DEBUG
@@ -121,7 +122,6 @@ help:
 	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
-	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
 	@echo '  tests                 - run all tests unit & component.'
 	@echo '  unit-tests            - run all unit tests.'
 	@echo '  env                   - build python virtual environment for pytest.'
@@ -170,7 +170,7 @@ $(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
 
 shared: folders $(BUILDDIR)/$(DYNAMIC)
 
-$(BUILDDIR)/$(DYNAMIC): $(OBJS) $(HDRS)
+$(BUILDDIR)/$(DYNAMIC): $(OBJS)
 	@echo "[Link (Dynamic)]"
 	$(CXX) -shared -o $@ $^
 
@@ -241,16 +241,20 @@ $(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
 	touch $@
 
-$(3RDPARTYDIR)/.json_extracted: $(3RDPARTYDIR)/nlohmann.tar.gz
+$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip:
+	wget https://github.com/nlohmann/json/releases/download/v$(NLOHMANN_VERSION)/include.zip -O $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip
+
+$(3RDPARTYDIR)/.nlohmann_extracted: $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip
 	cd $(3RDPARTYDIR)
-	tar xvf $(3RDPARTYDIR)/nlohmann.tar.gz -C $(3RDPARTYDIR)
+	mkdir -p nlohmann-$(NLOHMANN_VERSION)
+	unzip $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip -d $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)
 	touch $@
 
 3rd-party: plog json
 
 plog: $(3RDPARTYDIR)/.plog_extracted
 
-json: $(3RDPARTYDIR)/.json_extracted
+json: $(3RDPARTYDIR)/.nlohmann_extracted
 
 clean:
 	rm -f $(OBJS)
@@ -270,9 +274,10 @@ clean:
 
 ### Will force clean download cache & build directory
 clean-all: clean
-	rm -f $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
 	rm -f $(3RDPARTYDIR)/.plog_extracted
 	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
+	rm -f $(3RDPARTYDIR)/.nlohmann_extracted
+	rm -rf $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)
 	rm -rf $(BUILDDIR)
 	rm -rf $(PROJ_ROOT)/component_tests/downloaded_files
 

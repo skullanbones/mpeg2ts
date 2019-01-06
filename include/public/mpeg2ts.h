@@ -203,7 +203,7 @@ public:
     {
     }
 
-    int pid; // This Packet Identifier.
+    int pid;      // This Packet Identifier.
     TsHeader hdr; // This packet Ts Header
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
@@ -230,7 +230,7 @@ public:
     uint32_t privateDataOffset;
 
     // Payload data:
-    std::size_t payloadSize;         // The size of the payload
+    std::size_t payloadSize;    // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
     bool isError; // If a parser error or TS not following standards.
@@ -242,7 +242,7 @@ public:
 
 struct PidStatistic
 {
-    static constexpr const uint8_t INVALID_CC { 16 };
+    static constexpr const uint8_t INVALID_CC{ 16 };
     PidStatistic()
         : lastCC{ INVALID_CC }
         , numberOfCCErrors{ 0 }

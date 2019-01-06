@@ -3,10 +3,10 @@
 
 #include "JsonSettings.h"
 #include "Logging.h"
+#include "h264/H264Parser.h"
+#include "mpeg2vid/Mpeg2VideoParser.h"
 #include "public/TsUtilities.h"
 #include "public/Ts_IEC13818-1.h"
-#include "mpeg2vid/Mpeg2VideoParser.h"
-#include "h264/H264Parser.h"
 
 /// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
@@ -23,9 +23,9 @@ TsUtilities::~TsUtilities()
 const std::string TsUtilities::LOGFILE_NAME = "mpeg2ts_log.csv";
 
 TsUtilities::TsUtilities()
-    : mPmtPids {}
-    , mPmts {}
-    , mEsPids {}
+    : mPmtPids{}
+    , mPmts{}
+    , mEsPids{}
     , mAddedPmts{ false }
     , m_Mpeg2Parser{ std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser()) }
     , m_H264Parser{ std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser()) }
@@ -116,11 +116,9 @@ void TsUtilities::initParse()
     mPmts.clear();
     mEsPids.clear();
     mAddedPmts = false;
-    // Register PAT callback  
-    auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
-    {
-        PATCallback(rawTable, table, aPid, hdl);
-    };
+    // Register PAT callback
+    auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid,
+                void* hdl) { PATCallback(rawTable, table, aPid, hdl); };
     mDemuxer.addPsiPid(mpeg2ts::TS_PACKET_PID_PAT, f, reinterpret_cast<void*>(this));
 }
 
@@ -131,10 +129,8 @@ void TsUtilities::registerPmtCallback()
         for (auto pid : mPmtPids)
         {
             LOGD << "Adding PSI PID for parsing: " << pid;
-            auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl)
-            {
-                PMTCallback(rawTable, table, aPid, hdl);
-            };
+            auto f = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid,
+                        void* hdl) { PMTCallback(rawTable, table, aPid, hdl); };
             mDemuxer.addPsiPid(pid, f, reinterpret_cast<void*>(this));
         }
         mAddedPmts = true;
@@ -146,10 +142,8 @@ void TsUtilities::registerPesCallback()
     for (auto pid : mEsPids)
     {
         LOGD << "Adding PES PID for parsing: " << pid;
-        auto f = [](const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts::PesPacket& a_pes, int a_pid, void* a_hdl)
-        {
-            PESCallback(a_rawPes, a_pes, a_pid, a_hdl);
-        };
+        auto f = [](const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts::PesPacket& a_pes, int a_pid,
+                    void* a_hdl) { PESCallback(a_rawPes, a_pes, a_pid, a_hdl); };
         mDemuxer.addPesPid(pid, f, reinterpret_cast<void*>(this));
     }
 }
@@ -359,7 +353,8 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
     {
         if (instance->mPmts.find(pmtPid) != instance->mPmts.end())
         {
-            auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(), instance->mPmts[pmtPid].streams.end(),
+            auto it = std::find_if(instance->mPmts[pmtPid].streams.begin(),
+                                   instance->mPmts[pmtPid].streams.end(),
                                    [&](mpeg2ts::StreamTypeHeader& stream) {
                                        return stream.elementary_PID == a_pid;
                                    });
@@ -380,17 +375,19 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                         for (const mpeg2::EsInfoMpeg2& info : ret)
                         {
-                            //LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
-                            if (info.type == mpeg2::Mpeg2Type::SliceCode )
+                            // LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
+                            if (info.type == mpeg2::Mpeg2Type::SliceCode)
                             {
-                                //LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
+                                // LOGD << "mpeg2 picture type: " << info.slice.picType << " " <<
+                                // info.msg;
                             }
                             else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                             {
                                 instance->mVideoMediaInfo.width = info.sequence.width;
                                 instance->mVideoMediaInfo.height = info.sequence.height;
                                 instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-                                //LOGD << info.sequence.width << " x " << info.sequence.height << ", aspect: " << info.sequence.aspect
+                                // LOGD << info.sequence.width << " x " << info.sequence.height <<
+                                // ", aspect: " << info.sequence.aspect
                                 //     << ", frame rate: " << info.sequence.framerate;
                             }
                         }
@@ -409,31 +406,38 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                         for (const h264::EsInfoH264& info : ret)
                         {
-                            //LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
+                            // LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) <<
+                            // " " << info.msg;
                             if (info.type == h264::H264InfoType::SliceHeader)
                             {
-                                //LOGD << info.slice.sliceTypeStr << ", pps id: " << info.slice.ppsId;
+                                // LOGD << info.slice.sliceTypeStr << ", pps id: " <<
+                                // info.slice.ppsId;
                                 if (info.slice.field)
                                 {
-                                    //LOGD << "field encoded: " << (info.slice.top ? " top" : " bottom");
+                                    // LOGD << "field encoded: " << (info.slice.top ? " top" : "
+                                    // bottom");
                                 }
                                 else
                                 {
-                                    //LOGD << "frame encoded";
+                                    // LOGD << "frame encoded";
                                 }
                             }
                             else if (info.type == h264::H264InfoType::SequenceParameterSet)
                             {
                                 instance->mVideoMediaInfo.width = info.sps.width;
                                 instance->mVideoMediaInfo.height = info.sps.height;
-                               // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-                                // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " << info.sps.lumaBits
-                                //      << ", chroma bits: " << info.sps.chromaBits << ", width: " << info.sps.width
-                                //      << " x " << info.sps.height << ", ref pic: " << info.sps.numRefPics;
+                                // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
+                                // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " <<
+                                // info.sps.lumaBits
+                                //      << ", chroma bits: " << info.sps.chromaBits << ", width: "
+                                //      << info.sps.width
+                                //      << " x " << info.sps.height << ", ref pic: " <<
+                                //      info.sps.numRefPics;
                             }
                             else if (info.type == h264::H264InfoType::PictureParameterSet)
                             {
-                                // LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
+                                // LOGD << "sps id: " << info.pps.spsId << "pps id: " <<
+                                // info.pps.ppsId;
                             }
                         }
                     } // STREAMTYPE_VIDEO_H264
