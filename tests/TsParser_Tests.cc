@@ -4,12 +4,11 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <iostream>
 
 /// Project files
-#include <public/mpeg2ts.h>
 #include "TsPacketTestData.h"
 #include "TsParser.h"
+#include "public/mpeg2ts.h"
 
 using namespace mpeg2ts;
 
@@ -70,16 +69,18 @@ TEST(TsParserTests, CheckParsePatTable)
     TsParser parser;
     // TsHeader hdr = parser.parseTsHeader(packet_1);
 
-    PsiTable pat;
+    PatTable pat;
     TsPacketInfo info;
     parser.parseTsPacketInfo(pat_packet_1, info);
-    uint8_t table_id;
+    int table_id;
+    EXPECT_EQ(info.pid, 0);
     parser.collectTable(pat_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
     pat = parser.parsePatPacket(info.pid);
-    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid);
-    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id);
-    //    EXPECT_EQ(598, pat.network_PID);
+    EXPECT_EQ(TS_PACKET_PID_PAT, info.pid) << "Wrong PID for PAT, should be 0!";
+    EXPECT_EQ(PSI_TABLE_ID_PAT, pat.table_id) << "Wrong Table id for PAT";
+    EXPECT_EQ(pat.programs.size(), 1) << "Got wrong numbers of PMTs in PAT!";
+    EXPECT_EQ(pat.programs.at(0).program_map_PID, 598) << "Got wrong PMT PID!";
 }
 
 TEST(TsParserTests, CheckParsePatTable2)
@@ -89,7 +90,7 @@ TEST(TsParserTests, CheckParsePatTable2)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pat_packet_2, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pat_packet_2, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PAT, table_id);
     pat = parser.parsePatPacket(info.pid);
@@ -166,7 +167,7 @@ TEST(TsParserTests, CheckParsePmtTable)
     TsPacketInfo info;
 
     parser.parseTsPacketInfo(pmt_packet_1, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pmt_packet_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
     pmt = parser.parsePmtPacket(info.pid);
@@ -231,7 +232,7 @@ TEST(TsParserTests, CheckParsePmtTable2)
 
     TsPacketInfo info;
     parser.parseTsPacketInfo(pmt_packet_2_1, info);
-    uint8_t table_id;
+    int table_id;
     parser.collectTable(pmt_packet_2_1, info, table_id);
     EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
     parser.parseTsPacketInfo(pmt_packet_2_2, info);
@@ -263,7 +264,7 @@ TEST(TsParserTests, CheckParseLargePmtTable)
         TsParser parser;
 
         TsPacketInfo info;
-        uint8_t table_id;
+        int table_id;
         parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
         EXPECT_EQ(50, info.pid);
         parser.collectTable(large_pmt_ts_packet_1, info, table_id);
@@ -305,9 +306,9 @@ TEST(TsParserTests, CheckParseLargePmtTable)
         EXPECT_EQ(1310, pmt.streams[4].elementary_PID);
         EXPECT_EQ(20, pmt.streams[4].ES_info_length);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
-        std::cout << "Got exception: " << e.what() << std::endl;
+        FAIL() << "Should not catch exception";
     }
 }
 
@@ -359,9 +360,61 @@ TEST(TsParserTests, TestParsePcr)
     EXPECT_EQ(31571712, info.pcr);
 }
 
-int main(int argc, char** argv)
+TEST(TsParserTests, parse_descriptor)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();
+    try
+    {
+        TsParser parser;
+        TsPacketInfo info;
+        int table_id;
+        parser.parseTsPacketInfo(pmt_packet_2_1, info);
+        EXPECT_EQ(32, info.pid);
+
+        parser.collectTable(pmt_packet_2_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(pmt_packet_2_2, info);
+        parser.collectTable(pmt_packet_2_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(1, pmt.descriptors.size());
+        Descriptor d = pmt.descriptors.back();
+        EXPECT_TRUE(d.descriptor_tag == static_cast<uint8_t>(DescriptorTag::metadata_pointer_descriptor));
+        EXPECT_EQ(d.descriptor_length, 15); // TODO check this
+    }
+    catch (std::exception& e)
+    {
+        FAIL() << "Should not catch exception";
+    }
+}
+
+TEST(TsParserTests, parse_descriptor_large_pmt)
+{
+    try
+    {
+        TsParser parser;
+        TsPacketInfo info;
+        int table_id;
+        parser.parseTsPacketInfo(large_pmt_ts_packet_1, info);
+        EXPECT_EQ(50, info.pid);
+
+        parser.collectTable(large_pmt_ts_packet_1, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_2, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_INCOMPLETE, table_id);
+
+        parser.parseTsPacketInfo(large_pmt_ts_packet_2, info);
+        parser.collectTable(large_pmt_ts_packet_3, info, table_id);
+        EXPECT_EQ(PSI_TABLE_ID_PMT, table_id);
+
+        auto pmt = parser.parsePmtPacket(info.pid);
+        EXPECT_EQ(1, pmt.descriptors.size());
+    }
+    catch (std::exception& e)
+    {
+        FAIL() << "Should not catch exception";
+    }
 }

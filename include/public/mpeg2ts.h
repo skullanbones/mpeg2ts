@@ -17,11 +17,11 @@
 #endif
 
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
 #include <vector>
-#include <cstdint>
 
 /// project files
 #include <public/Ts_IEC13818-1.h> // For TsHeader  Program
@@ -29,20 +29,15 @@
 
 namespace mpeg2ts
 {
+// Forward declarations
+class TsParser;
+struct PidStatistic;
+
 // Common types
 typedef std::vector<uint8_t> ByteVector;
 typedef std::shared_ptr<ByteVector> ByteVectorPtr;
+typedef std::map<int, PidStatistic> PidStatisticsMap;
 
-// Internal types // TODO remove to internal h-file
-/// Window types
-#ifdef WIN32
-#define ssize_t size_t
-typedef char TCHAR;
-#endif
-
-
-// forward declarations
-class TsParser;
 
 /*!
  * @class PES-Packet prototype containing buffer
@@ -155,9 +150,15 @@ struct StreamTypeHeader
 class PmtTable : public PsiTable
 {
 public:
+    PmtTable()
+        : PCR_PID(0)
+        , program_info_length(0)
+    {
+    }
+
     uint16_t PCR_PID;
     uint16_t program_info_length;
-    //    std::vector<Descriptor> descriptors; // TODO
+    std::vector<Descriptor> descriptors;
     std::vector<StreamTypeHeader> streams;
 
 
@@ -167,10 +168,6 @@ public:
     MPEG2TS_API bool operator==(const PmtTable& rhs) const;
 
     MPEG2TS_API bool operator!=(const PmtTable& rhs) const;
-};
-
-struct CatDescriptor
-{
 };
 
 class CatTable : public PsiTable
@@ -183,7 +180,30 @@ public:
 class TsPacketInfo
 {
 public:
-    uint16_t pid; // This Packet Identifier.
+    TsPacketInfo()
+        : pid{ 0x1fff }
+        , errorIndicator{ false }
+        , isPayloadStart{ false }
+        , hasAdaptationField{ false }
+        , hasPayload{ false }
+        , hasPrivateData{ false }
+        , hasRandomAccess{ false }
+        , isScrambled{ false }
+        , isDiscontinuity{ false }
+        , continuityCounter{ 0 }
+        , pcr{ -1 }
+        , opcr{ -1 }
+        , pts{ -1 }
+        , dts{ -1 }
+        , privateDataSize{ 0 }
+        , privateDataOffset{ 0 }
+        , payloadSize{ 0 }
+        , payloadStartOffset{ 0 }
+        , isError{ false }
+    {
+    }
+
+    int pid;      // This Packet Identifier.
     TsHeader hdr; // This packet Ts Header
 
     bool errorIndicator;     // If indication of at least 1 uncorrectable bit in ts-packet
@@ -195,22 +215,22 @@ public:
     bool isScrambled;        // If this packet is scrambled
     bool isDiscontinuity;    // If this packet has discontinuity flag set
 
-    uint8_t continuityCounter : 4; // 4-bit continuity counter
+    uint8_t continuityCounter; // 4-bit continuity counter
 
     // Adaptation field data:
-    uint64_t pcr; // PCR clock...
-    uint64_t opcr;
+    int64_t pcr; // PCR clock...
+    int64_t opcr;
 
     // For elementary-streams
-    uint64_t pts;
-    uint64_t dts;
+    int64_t pts;
+    int64_t dts;
 
     // Private data:
     uint32_t privateDataSize;
     uint32_t privateDataOffset;
 
     // Payload data:
-    size_t payloadSize;         // The size of the payload
+    std::size_t payloadSize;    // The size of the payload
     uint8_t payloadStartOffset; // Offset from and sync byte to start of payload.
 
     bool isError; // If a parser error or TS not following standards.
@@ -219,23 +239,19 @@ public:
     MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
 };
 
-// TODO check these
-const int64_t CLOCK_90_KHZ = 90000;
-const int64_t TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ; // 3s
-
 
 struct PidStatistic
 {
-    static const uint8_t INVALID_CC = 16;
+    static constexpr const uint8_t INVALID_CC{ 16 };
     PidStatistic()
-            : lastCC{ INVALID_CC }
-            , numberOfCCErrors{ 0 }
-            , numberOfTsDiscontinuities{ 0 }
-            , lastPts{ -1 }
-            , lastDts{ -1 }
-            , lastPcr{ -1 }
-            , numberOfMissingPts{ 0 }
-            , numberOfMissingDts{ 0 }
+        : lastCC{ INVALID_CC }
+        , numberOfCCErrors{ 0 }
+        , numberOfTsDiscontinuities{ 0 }
+        , lastPts{ -1 }
+        , lastDts{ -1 }
+        , lastPcr{ -1 }
+        , numberOfMissingPts{ 0 }
+        , numberOfMissingDts{ 0 }
     {
     }
 
@@ -258,59 +274,16 @@ struct PidStatistic
     uint64_t numberOfMissingDts;
 };
 
-
-
-class TsStatistics
+struct TsCounters
 {
-public:
-    explicit TsStatistics();
-
-    /*!
-     * Calculates Continuity errors.
-     * @param pid Filtered PID.
-     * @param cc Current TS packets Continuity Counter.
-     */
-    void checkCCError(int pid, uint8_t cc);
-
-    /*!
-     * Book keep flagged TS packets discontinuities.
-     * @param pid Filtered PID.
-     * @param isDiscontinuous Whether or not this is a discontinuity.
-     */
-    void checkTsDiscontinuity(int pid, bool isDiscontinuous);
-
-    /*!
-     * Build a histogram of PTS differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Program Time Stamp value.
-     */
-    void buildPtsHistogram(int pid, int64_t pts);
-
-    /*!
-     * Build a histogram of DTS differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Display Time Stamp value.
-     */
-    void buildDtsHistogram(int pid, int64_t dts);
-
-    /*!
-     * Build a histogram of PCR differences between 2 time samples.
-     * @param pid Filtered PID.
-     * @param pts Program Clock Reference value.
-     */
-    void buildPcrHistogram(int pid, int64_t pcr);
-
-    std::map<int, PidStatistic> mPidStatistics;
-    uint64_t mTsPacketCounter;
-    uint64_t mTsPacketNullPacketCounter;
-    uint64_t mTsPacketErrorIndicator;
+    uint64_t mTsPacketCounter{ 0 };
+    uint64_t mTsPacketNullPacketCounter{ 0 };
+    uint64_t mTsPacketErrorIndicator{ 0 };
 };
 
 
-
-
-typedef std::function<void(PsiTable* table, uint16_t pid, void* hdl)> PsiCallBackFnc;
-typedef std::function<void(const PesPacket& table, uint16_t pid, void* hdl)> PesCallBackFnc;
+typedef std::function<void(const ByteVector& rawTable, PsiTable* table, int pid, void* hdl)> PsiCallBackFnc;
+typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, int pid, void* hdl)> PesCallBackFnc;
 typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
 /// @brief Demux ts packets into PSI and PES (plus TS pass through)
@@ -357,11 +330,16 @@ public:
 
     /*!
      * Returns statistics on parsed transport stream packets.
-     * @return TsStatistics containing collected statistics for all demuxed packets.
+     * @return PidStatisticsType containing collected statistics for each pid on all demuxed
+     * packets.
      */
-    MPEG2TS_API TsStatistics
+    MPEG2TS_API PidStatisticsMap getPidStatistics() const;
 
-    getTsStatistics() const;
+    /*!
+     * Returns counter statistics on parsed transport stream packets.
+     * @return TsCounters
+     */
+    MPEG2TS_API TsCounters getTsCounters() const;
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
@@ -370,7 +348,8 @@ protected:
     std::map<int, void*> mHandlers;
 
 private:
-     TsParser* mParser;
+    std::unique_ptr<TsParser> mParser;
 };
+
 
 } // namespace mpeg2ts

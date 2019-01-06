@@ -14,6 +14,9 @@
 #include <iostream>
 #include <map>
 
+namespace mpeg2ts
+{
+
 #define ENUM_TO_STR(ENUM) std::string(#ENUM)
 
 // TS Packet
@@ -46,26 +49,38 @@ const int PMT_STREAM_TYPE_LENGTH = 5;
  */
 struct TsHeader
 {
+    TsHeader()
+        : sync_byte{ 0 }
+        , transport_error_indicator{ false }
+        , payload_unit_start_indicator{ false }
+        , transport_priority{ false }
+        , PID{ 0x1fff }
+        , transport_scrambling_control{ 0 }
+        , adaptation_field_control{ 0 }
+        , continuity_counter{ 0 }
+    {
+    }
+
     uint8_t sync_byte;
     bool transport_error_indicator;
     bool payload_unit_start_indicator;
     bool transport_priority;
-    uint16_t PID;
+    int PID;
     uint8_t transport_scrambling_control;
     uint8_t adaptation_field_control;
     uint8_t continuity_counter;
 
     friend std::ostream& operator<<(std::ostream& ss, const TsHeader& rhs)
     {
-        ss << "-------------TsHeader------------- " << std::endl;
-        ss << "sync_byte:  0x" << std::hex << (int)rhs.sync_byte << std::dec << std::endl;
-        ss << "transport_error_indicator: " << (int)rhs.transport_error_indicator << std::endl;
-        ss << "payload_unit_start_indicator: " << (int)rhs.payload_unit_start_indicator << std::endl;
-        ss << "transport_priority: " << (int)rhs.transport_priority << std::endl;
-        ss << "PID: " << rhs.PID << std::endl;
-        ss << "transport_scrambling_control: " << (int)rhs.transport_scrambling_control << std::endl;
-        ss << "adaptation_field_control: " << (int)rhs.adaptation_field_control << std::endl;
-        ss << "continuity_counter: " << (int)rhs.continuity_counter << std::endl;
+        ss << "-------------TsHeader------------- \n";
+        ss << "sync_byte:  0x" << std::hex << static_cast<int>(rhs.sync_byte) << std::dec << '\n';
+        ss << "transport_error_indicator: " << static_cast<int>(rhs.transport_error_indicator) << '\n';
+        ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator) << '\n';
+        ss << "transport_priority: " << static_cast<int>(rhs.transport_priority) << '\n';
+        ss << "PID: " << rhs.PID << '\n';
+        ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control) << '\n';
+        ss << "adaptation_field_control: " << static_cast<int>(rhs.adaptation_field_control) << '\n';
+        ss << "continuity_counter: " << static_cast<int>(rhs.continuity_counter) << '\n';
         return ss;
     }
 };
@@ -247,3 +262,93 @@ enum StreamId
     STREAM_ID_ITU_T_Rec_H222_1_type_E_stream = 0xF8,
     STREAM_ID_program_stream_directory = 0xFF
 };
+
+/*! @brief Descriptor tags Table 2-45
+ */
+
+enum struct DescriptorTag : uint32_t
+{
+    Reserved = 0,
+    Forbidden = 1,
+    video_stream_descriptor = 2,
+    audio_stream_descriptor = 3,
+    hierarchy_descriptor = 4,
+    registration_descriptor = 5,
+    data_stream_alignment_descriptor = 6,
+    target_background_grid_descriptor = 7,
+    video_window_descriptor = 8,
+    CA_descriptor = 9,
+    ISO_639_language_descriptor = 10,
+    system_clock_descriptor = 11,
+    multiplex_buffer_utilization_descriptor = 12,
+    copyright_descriptor = 13,
+    maximum_bitrate_descriptor = 14,
+    private_data_indicator_descriptor = 15,
+    smoothing_buffer_descriptor = 16,
+    STD_descriptor = 17,
+    IBP_descriptor = 18,
+    MPEG4_video_descriptor = 27,
+    MPEG4_audio_descriptor = 28,
+    IOD_descriptor = 29,
+    SL_descriptor = 30,
+    FMC_descriptor = 31,
+    external_ES_ID_descriptor = 32,
+    MuxCode_descriptor = 33,
+    FmxBufferSize_descriptor = 34,
+    multiplexBuffer_descriptor = 35,
+    content_labeling_descriptor = 36,
+    metadata_pointer_descriptor = 37,
+    metadata_descriptor,
+    metadata_STD_descriptor,
+    AVC_video_descriptor,
+    IPMP_descriptor,
+    AVC_timing_HRD_descriptor,
+    MPEG2_AAC_audio_descriptor,
+    FlexMuxTiming_descriptor,
+    MPEG4_text_descriptor,
+    MPEG4_audio_extension_descriptor,
+    Auxiliary_video_stream_descriptor,
+    SVC_extension_descriptor,
+    MVC_extension_descriptor,
+    J2K_video_descriptor,
+    MVC_operation_point_descriptor,
+    MPEG2_stereoscopic_video_format_descriptor,
+    Stereoscopic_program_info_descriptor,
+    Stereoscopic_video_info_descriptor,
+    Transport_profile_descriptor,
+    HEVC_video_descriptor,
+    Reserved2,
+    Extension_descriptor,
+    user_private_178 = 178
+};
+
+/*! From 2.6.1 */
+struct Descriptor
+{
+    uint8_t descriptor_tag;
+    uint8_t descriptor_length;
+};
+
+/*! Table 2-59 – Conditional access descriptor */
+struct CatDescriptor : public Descriptor
+{
+    uint16_t CA_system_ID;
+    uint8_t reserved;
+    uint16_t CA_PID;
+};
+
+/*! Table 2-65 – Maximum bitrate descriptor */
+struct MaximumBitrateDescriptor : public Descriptor
+{
+    uint8_t reserved;
+    uint32_t maximum_bitrate;
+};
+
+/*! Table 2-84 – Metadata pointer descriptor */
+struct Metadata_pointer_descriptor : public Descriptor
+{
+    uint16_t metadata_application_format;
+    // TODO
+};
+
+} // namespace mpeg2ts

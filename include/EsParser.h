@@ -1,35 +1,47 @@
+
 #pragma once
 
-#include <public/mpeg2ts.h> // For ssize_t
-
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <memory>
+#include <vector>
+
+
+struct EsInfo
+{
+    virtual ~EsInfo(){};
+};
 
 class EsParser
 {
-    public:
-    
-    EsParser()
+public:
+    EsParser(std::vector<uint8_t> a_startCode)
+        : m_startCode{ a_startCode }
     {
-    
-    }
-    
-    virtual ~EsParser()
-    {
-    
     }
 
-    uint8_t* getFirstOne(const uint8_t* from, ssize_t length)
-    {
-        //TODO: avx2 can compare 32 bytes within one cycle
-        //      and return pattern position using one more cycle
-        return (uint8_t*)std::find((char*)from, (char*)from + length, 1);
-    }
-    
-    virtual bool operator()(const uint8_t* from, ssize_t length)
-    {
-        return true;
-    }
+    virtual ~EsParser() = default;
+
+
+    /// @brief Finds startcode in a binary buffer by using std search algorithm
+    /// @param buf The binary data to find startcodes in
+    std::vector<std::size_t> findStartCodes(const std::vector<uint8_t>& buf);
+
+protected:
+    std::vector<uint8_t> mPicture;
+    std::vector<uint8_t> m_startCode;
 };
 
-
+inline std::vector<std::size_t> EsParser::findStartCodes(const std::vector<uint8_t>& a_buf)
+{
+    std::vector<std::size_t> indexes{};
+    auto it{ a_buf.begin() };
+    while ((it = std::search(it, a_buf.end(), m_startCode.begin(), m_startCode.end())) != a_buf.end())
+    {
+        indexes.push_back(std::distance(a_buf.begin(), it++));
+    }
+    return indexes;
+}

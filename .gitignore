@@ -59,3 +59,20 @@ Release/
 # 3rd-party
 3rd-party/nlohmann/*
 3rd-party/plog-1.1.4/*
+3rd-party/.json_extracted
+3rd-party/.plog_extracted
+
+
+.vscode/
+.pytest_cache/
+*.PES
+component_tests/__pycache__/
+env/
+
+# TestTsLib
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.pdb
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.ilk
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.dll
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.lib
+msvc/2015/TestTsLib/TestTsLib/mpeg2ts.exp
+msvc/2015/TestTsLib/TestTsLib/settings.json

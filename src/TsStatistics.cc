@@ -17,111 +17,118 @@
 #include <plog/Log.h>
 
 /// project files
-#include <public/mpeg2ts.h>
 #include "Logging.h"
+#include "TsStatistics.h"
+#include "public/mpeg2ts.h"
 
 namespace mpeg2ts
 {
 
+// constants
+const int64_t TsStatistics::CLOCK_90_KHZ = 90000;
+const int64_t TsStatistics::TIME_STAMP_JUMP_DISCONTINUITY_LEVEL = 3 * CLOCK_90_KHZ;
 
 TsStatistics::TsStatistics()
-    : mTsPacketCounter{ 0 }
 {
 }
 
-void TsStatistics::checkCCError(int pid, uint8_t cc)
+void TsStatistics::checkCCError(int a_pid, uint8_t a_cc)
 {
-    if (mPidStatistics[pid].lastCC == PidStatistic::INVALID_CC)
+    if (mPidStatistics[a_pid].lastCC == PidStatistic::INVALID_CC)
     {
-        mPidStatistics[pid].lastCC = cc;
+        mPidStatistics[a_pid].lastCC = a_cc;
     }
-    if (mPidStatistics[pid].lastCC != cc)
+    if (mPidStatistics[a_pid].lastCC != a_cc)
     {
-        if (((mPidStatistics[pid].lastCC + 1) & 0x0f) != cc)
+        if (((mPidStatistics[a_pid].lastCC + 1) & 0x0f) != a_cc)
         {
-            ++mPidStatistics[pid].numberOfCCErrors;
-            LOGD_(FileLog) << "Continuity counter error at ts packet " << mTsPacketCounter << " on pid "
-                << pid << "\n";
+            ++mPidStatistics[a_pid].numberOfCCErrors;
+            LOGD_(FileLog) << "Continuity counter error at ts packet " << mCounters.mTsPacketCounter << " on pid "
+                           << a_pid << ", last: " << static_cast<int>(mPidStatistics[a_pid].lastCC)
+                           << ", cur: " << static_cast<int>(a_cc) << '\n';
         }
-        mPidStatistics[pid].lastCC = cc;
+        mPidStatistics[a_pid].lastCC = a_cc;
     }
 }
 
-void TsStatistics::checkTsDiscontinuity(int pid, bool isDiscontinuous)
+void TsStatistics::checkTsDiscontinuity(int a_pid, bool a_isDiscontinuous)
 {
-    if (isDiscontinuous)
+    if (a_isDiscontinuous)
     {
-        ++mPidStatistics[pid].numberOfTsDiscontinuities;
-        LOGD_(FileLog) << "Transport stream discontinuity at ts packet " << mTsPacketCounter
-            << " on pid " << pid << "\n";
+        ++mPidStatistics[a_pid].numberOfTsDiscontinuities;
+        LOGD_(FileLog) << "Transport stream discontinuity at ts packet "
+                       << mCounters.mTsPacketCounter << " on pid " << a_pid << '\n';
     }
 }
 
-void TsStatistics::buildPtsHistogram(int pid, int64_t pts)
+void TsStatistics::buildPtsHistogram(int a_pid, int64_t a_pts)
 {
-    if (pts == -1)
+    if (a_pts == -1)
     {
-        mPidStatistics[pid].numberOfMissingPts++;
+        mPidStatistics[a_pid].numberOfMissingPts++;
         return;
     }
-    if (mPidStatistics[pid].lastPts == -1)
+    if (mPidStatistics[a_pid].lastPts == -1)
     {
-        mPidStatistics[pid].lastPts = pts;
+        mPidStatistics[a_pid].lastPts = a_pts;
         return;
     }
-    auto diff = pts - mPidStatistics[pid].lastPts;
-    mPidStatistics[pid].ptsHistogram[diff]++;
+    auto diff = a_pts - mPidStatistics[a_pid].lastPts;
+    mPidStatistics[a_pid].ptsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        LOGD_(FileLog) << "PTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pts-1 "
-            << mPidStatistics[pid].lastPts << " pts-0 " << pts << " pts diff " << diff;
+        LOGD_(FileLog)
+        << "PTS discontinuity at ts packet " << mCounters.mTsPacketCounter << " on pid " << a_pid
+        << " pts-1 " << mPidStatistics[a_pid].lastPts << " pts-0 " << a_pts << " pts diff " << diff;
     }
-    mPidStatistics[pid].lastPts = pts;
+    mPidStatistics[a_pid].lastPts = a_pts;
 }
 
-void TsStatistics::buildDtsHistogram(int pid, int64_t dts)
+void TsStatistics::buildDtsHistogram(int a_pid, int64_t a_dts)
 {
-    if (dts == -1)
+    if (a_dts == -1)
     {
-        mPidStatistics[pid].numberOfMissingDts++;
+        mPidStatistics[a_pid].numberOfMissingDts++;
         return;
     }
-    if (mPidStatistics[pid].lastDts == -1)
+    if (mPidStatistics[a_pid].lastDts == -1)
     {
-        mPidStatistics[pid].lastDts = dts;
+        mPidStatistics[a_pid].lastDts = a_dts;
         return;
     }
-    auto diff = dts - mPidStatistics[pid].lastDts;
-    mPidStatistics[pid].dtsHistogram[diff]++;
+    auto diff = a_dts - mPidStatistics[a_pid].lastDts;
+    mPidStatistics[a_pid].dtsHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
-        LOGD_(FileLog) << "DTS discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " dts-1 "
-            << mPidStatistics[pid].lastDts << " dts-0 " << dts << " dts diff " << diff << "\n";
+        LOGD_(FileLog) << "DTS discontinuity at ts packet " << mCounters.mTsPacketCounter
+                       << " on pid " << a_pid << " dts-1 " << mPidStatistics[a_pid].lastDts
+                       << " dts-0 " << a_dts << " dts diff " << diff << '\n';
     }
 
-    mPidStatistics[pid].lastDts = dts;
+    mPidStatistics[a_pid].lastDts = a_dts;
 }
 
-void TsStatistics::buildPcrHistogram(int pid, int64_t pcr)
+void TsStatistics::buildPcrHistogram(int a_pid, int64_t a_pcr)
 {
-    if (pcr == -1)
+    if (a_pcr == -1)
     {
         return;
     }
-    if (mPidStatistics[pid].lastPcr == -1)
+    if (mPidStatistics[a_pid].lastPcr == -1)
     {
-        mPidStatistics[pid].lastPcr = pcr;
+        mPidStatistics[a_pid].lastPcr = a_pcr;
         return;
     }
-    auto diff = pcr - mPidStatistics[pid].lastPcr;
-    mPidStatistics[pid].pcrHistogram[diff]++;
+    auto diff = a_pcr - mPidStatistics[a_pid].lastPcr;
+    mPidStatistics[a_pid].pcrHistogram[diff]++;
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
     {
-        LOGD_(FileLog) << "PCR discontinuity at ts packet " << mTsPacketCounter << " on pid " << pid << " pcr-1 "
-            << mPidStatistics[pid].lastPcr << " pcr-0 " << pcr << " pcr diff " << diff << "\n";
+        LOGD_(FileLog) << "PCR discontinuity at ts packet " << mCounters.mTsPacketCounter
+                       << " on pid " << a_pid << " pcr-1 " << mPidStatistics[a_pid].lastPcr
+                       << " pcr-0 " << a_pcr << " pcr diff " << diff << '\n';
     }
 
-    mPidStatistics[pid].lastPcr = pcr;
+    mPidStatistics[a_pid].lastPcr = a_pcr;
 }
 
 } // namespace mpeg2ts

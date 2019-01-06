@@ -51,6 +51,7 @@ def test_asset(asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
+    log.debug("test_parse_dolby_asset_pat")
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -62,6 +63,7 @@ def test_parse_dolby_asset_pat(parser, asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pat_short_option(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset with short option"""
+    log.debug("test_parse_dolby_asset_pat_short_option")
     asset = asset_h264_dolby_atmos.get_asset()
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
     out = parser.start(extra_args=['-i', asset, '-p', 0])
@@ -74,11 +76,12 @@ def test_parse_dolby_asset_pat_short_option(parser, asset_h264_dolby_atmos):
 
 def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     """Test we can parse the first asset"""
+    log.debug("test_parse_dolby_asset_pmt")
     asset = asset_h264_dolby_atmos.get_asset()
     pmt = asset_h264_dolby_atmos.get_pmt()
     log.debug(pmt)
     assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
-    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
+    out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid'], '--pid', 4113])
     log.debug(out[0])
     log.debug(out[1])
     assert "PMT at Ts packet: 1" in out[1]
@@ -99,15 +102,16 @@ def test_parse_dolby_asset_pmt(parser, asset_h264_dolby_atmos):
     assert "ES_info_length: 12" in out[1]
 
 
-def test_parse_rubeatles_asset_pmt(parser, asset_h2646_aac_rubeatles_atmos):
+def test_parse_rubeatles_asset_pmt(parser, asset_h265_aac_rubeatles_atmos):
     """
     Test new asset
     :param parser:
-    :param asset_h2646_aac_rubeatles_atmos:
+    :param asset_h265_aac_rubeatles_atmos:
     :return:
     """
-    asset = asset_h2646_aac_rubeatles_atmos.get_asset()
-    pmt = asset_h2646_aac_rubeatles_atmos.get_pmt()
+    log.debug("test_parse_rubeatles_asset_pmt")
+    asset = asset_h265_aac_rubeatles_atmos.get_asset()
+    pmt = asset_h265_aac_rubeatles_atmos.get_pmt()
     log.debug(pmt)
     assert "RuBeatles_h265_aac_short.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', pmt['Pid']])
@@ -122,6 +126,7 @@ def test_parse_got_hbo_pat(parser, asset_h264_138183_got_hbo):
     :param asset_h264_138183_got_hbo:
     :return:
     """
+    log.debug("test_parse_got_hbo_pat")
     asset = asset_h264_138183_got_hbo.get_asset()
     assert "GoT-HBO.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -197,6 +202,7 @@ def test_parse_got_hbo_pmt(parser, asset_h264_138183_got_hbo):
     :param asset_h264_138183_got_hbo:
     :return:
     """
+    log.debug("test_parse_got_hbo_pmt")
     asset = asset_h264_138183_got_hbo.get_asset()
     pmt = asset_h264_138183_got_hbo.get_pmt()
     assert "GoT-HBO.ts" in asset
@@ -245,6 +251,7 @@ def test_parse_avsync_mpeg2_ac3LR_PAT(parser, asset_avsync_mpeg2_ac3LR):
     :param asset_avsync_mpeg2_ac3LR
     :return:
     """
+    log.debug("test_parse_avsync_mpeg2_ac3LR_PAT")
     asset = asset_avsync_mpeg2_ac3LR.get_asset()
     assert "avsync_mpeg2_ac3LR.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -264,6 +271,7 @@ def test_parse_avsync_mpeg2_ac3LR_PMT(parser, asset_avsync_mpeg2_ac3LR):
     :param asset_avsync_mpeg2_ac3LR
     :return:
     """
+    log.debug("test_parse_avsync_mpeg2_ac3LR_PMT")
     asset = asset_avsync_mpeg2_ac3LR.get_asset()
     pmt = asset_avsync_mpeg2_ac3LR.get_pmt()
     assert "avsync_mpeg2_ac3LR.ts" in asset
@@ -284,7 +292,6 @@ def test_parse_avsync_mpeg2_ac3LR_PMT(parser, asset_avsync_mpeg2_ac3LR):
     assert "ES_info_length: 3" in out[1]
 
 
-
 def test_parse_newmobcal1920_mpeg2_ac3LR_PAT(parser, asset_newmobcal1920_mpeg2_ac3LR):
     """
     Test Newmbcal1920 PAT table
@@ -292,6 +299,7 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PAT(parser, asset_newmobcal1920_mpeg2_a
     :param asset_newmobcal1920_mpeg2_ac3LR:
     :return:
     """
+    log.debug("test_parse_newmobcal1920_mpeg2_ac3LR_PAT")
     asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 0])
@@ -311,6 +319,7 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_a
     :param asset_newmobcal1920_mpeg2_ac3LR:
     :return:
     """
+    log.debug("test_parse_newmobcal1920_mpeg2_ac3LR_PMT")
     asset = asset_newmobcal1920_mpeg2_ac3LR.get_asset()
     pmt = asset_newmobcal1920_mpeg2_ac3LR.get_pmt()
     assert "newmobcal1920_mpeg2_ac3LR.ts" in asset
@@ -330,17 +339,101 @@ def test_parse_newmobcal1920_mpeg2_ac3LR_PMT(parser, asset_newmobcal1920_mpeg2_a
     assert "elementary_PID: 50" in out[1]
     assert "ES_info_length: 3" in out[1]
 
-def test_parse_eurosport(parser, asset_eurosport):
+
+def test_parse_mpeg2_eurosport(parser, asset_eurosport):
     """
-    Test eurosport meg2 video parsing
+    Test eurosport mpeg2 video parsing
     :param parser:
     :param asset_eurosport:
     :return:
     """
+    log.debug("test_parse_h262_eurosport")
     asset = asset_eurosport.get_asset()
     assert "eurosport.ts" in asset
     out = parser.start(extra_args=['--input', asset, '--pid', 101, '-l', 'DEBUG'])
     log.debug(out[0])
     log.debug(out[1])
     print(out[1])
-    assert "sequence_header_code size 704 x 576, aspect 3x4, frame rate 25" in out[1]
+    assert "sequence_header_code" in out[1]
+    assert "704 x 576, aspect: 3x4, frame rate: 25" in out[1]
+
+
+def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
+    """
+    Test eurosport h264 video parsing
+    :param parser:
+    :param asset_h264_dolby_atmos:
+    :return:
+    """
+    log.debug("test_parse_h264_dolby")
+    asset = asset_h264_dolby_atmos.get_asset()
+    assert "Dolby_ATMOS_Helicopter_h264_ac3_eac3_192B.m2ts" in asset
+    out = parser.start(extra_args=['--input', asset, '--pid', 4113, '-l', 'DEBUG'])
+    log.debug(out[0])
+    log.debug(out[1])
+    print(out[1])
+    assert "nal: Access_unit_delimiter Access unit delimiter" in out[1]
+    assert "nal: Sequence_parameter_set Sequence parameter set: profile: High level: 4.1" in out[1]
+    assert "sps id: 0, luma bits: 8, chroma bits: 8, width: 1920 x 1088, ref pic: 4" in out[1]
+    assert "nal: Picture_parameter_set Picture parameter set: entropy: CAVLC" in out[1]
+    assert "sps id: 0pps id: 0" in out[1]
+
+
+def test_b_parse_dolby_asset_pat(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_dolby_asset_pat, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_dolby_asset_pat_short_option(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_dolby_asset_pat_short_option, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_dolby_asset_pmt(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark something, but add some arguments
+    result = benchmark(test_parse_dolby_asset_pmt, parser, asset_h264_dolby_atmos)
+
+
+def test_b_parse_rubeatles_asset_pmt(benchmark, parser, asset_h265_aac_rubeatles_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_rubeatles_asset_pmt, parser, asset_h265_aac_rubeatles_atmos)
+
+
+def test_b_parse_got_hbo_pat(benchmark, parser, asset_h264_138183_got_hbo):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_got_hbo_pat, parser, asset_h264_138183_got_hbo)
+
+
+def test_b_parse_got_hbo_pmt(benchmark, parser, asset_h264_138183_got_hbo):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_got_hbo_pmt, parser, asset_h264_138183_got_hbo)    
+
+
+def test_b_parse_avsync_mpeg2_ac3LR_PAT(benchmark, parser, asset_avsync_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_avsync_mpeg2_ac3LR_PAT, parser, asset_avsync_mpeg2_ac3LR) 
+
+
+def test_b_parse_avsync_mpeg2_ac3LR_PMT(benchmark, parser, asset_avsync_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_avsync_mpeg2_ac3LR_PMT, parser, asset_avsync_mpeg2_ac3LR) 
+
+
+def test_b_parse_newmobcal1920_mpeg2_ac3LR_PAT(benchmark, parser, asset_newmobcal1920_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_newmobcal1920_mpeg2_ac3LR_PAT, parser, asset_newmobcal1920_mpeg2_ac3LR)
+
+
+def test_b_parse_newmobcal1920_mpeg2_ac3LR_PMT(benchmark, parser, asset_newmobcal1920_mpeg2_ac3LR):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_newmobcal1920_mpeg2_ac3LR_PMT, parser, asset_newmobcal1920_mpeg2_ac3LR)
+
+
+def test_b_parse_h262_eurosport(benchmark, parser, asset_eurosport):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_mpeg2_eurosport, parser, asset_eurosport)
+
+
+def test_b_parse_h264_dolby(benchmark, parser, asset_h264_dolby_atmos):
+    # benchmark test_parse_h264_dolby
+    result = benchmark(test_parse_h264_dolby, parser, asset_h264_dolby_atmos)

@@ -1,6 +1,6 @@
 # MPEG-2 Transport Stream utility library
 A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
-international specification ISO/IEC 13818-1.
+international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS.
 
 Artifacts:
 ```
@@ -14,13 +14,52 @@ Win32: TestTsLib located under msvs/2015
 Linux: tsparser
 ```
 
+## Requirements / example usage
+C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X, Ubuntu 16.04/18.04, Windows 10.
+
 ## SW Architecture
-There are 2 sets of API, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage. These are the APIs:
+There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
 * TsUtilities.h High level API to simplify usage
-![](https://github.com/skullanbones/ts-lib/blob/develop/Ts-lib_SW_Architecture.png)
+![](images/Ts-lib_SW_Architecture.png)
+
+## Settings
+Edit the `settings.json` file to change log level, log file name and other properties. These are global settings for the mpeg2ts set of libraries. Log levels are:
+```
+VERBOSE
+DEBUG
+INFO
+WARNING
+ERROR
+FATAL
+NONE
+```
+where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Releases
+*V0.2*
+* [*] Compile on Windows fixes
+* [FEAT-163] Add codec parsers to TsUtilities
+* [BUG-157] Codec parsers missing API
+* [FEAT-166] Add micro google benchmark tests
+* [BUG-161] Add H264/H262 unit tests
+* [FEAT-158] Add benchmark tests
+* [*] Add component tests to H264 parsing
+* [*] Update README.
+* [*] Apply C++ best practises (Lefticus)
+* [*] Apply clang formating/analyze
+* [FEAT-117] Use move instead of copying
+* [FEAT-51/52] Add codec parsing (H264/H262)
+* [FEAT-54] Add basic descriptor parsing
+* [FEAT-128] Add CMake
+* [FEAT-132] Add better code coverage
+* [FEAT-126] Use Wextra and Wpedantic with GCC
+* [FEAT-130] Add docker commands via bash
+* [FEAT-32] Add code coverage
+* [*] Added gtests to Windows proj
+* [*] Merge TestTsLib.proj into mpeg2ts.sln
+* [FEAT-102] Fixed some TODOs
+
 *V0.1*
 
 * Added first version of API (mpeg2ts.h)
@@ -54,7 +93,26 @@ There are 2 sets of API, the core API called mpeg2ts under the same namespace an
 * Added PAT parsing
 * Added Demuxer
 
-## Linux
+## CMake
+![](images/cmake.png)
+
+To simplify the crosscompile process we use CMake. Under Linux just do this:
+```
+mkdir build
+cd build/
+cmake ..
+make
+```
+You will get the following artifacts:
+```
+libmpeg2ts.so*
+libmpeg2ts_static.a
+tsparser*
+```
+If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
+
+## Linux Make
+This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
 
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
@@ -75,6 +133,29 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ./tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
+### Docker
+![](images/docker.png)
+
+Some targets requires docker in order to run since you most likely will not have
+all build dependencies in your native environment. To virtualize the Application
+build time dependencies they have been collected inside a docker image following
+docker best practises. You only need to remember to source the 
+```
+source docker-commands.sh
+```
+and you will be ready to run commands inside the docker container by:
+```
+docker-make unit-tests
+```
+for example.
+If you want to run a custom bash command you can do it by:
+```
+docker-bash make help
+```
+for instance. To get an interactive bash session type:
+```
+docker-interactive
+```
 
 ### Docker image
 To just use the latest image just pull from our private registry/repository @ DockerHub:
@@ -85,12 +166,6 @@ To build the image your self:
 ```
 make docker-image
 ```
-To spin-up a container:
-```
-make docker-bash
-```
-From here you can use the 3rd-party dependencies like
-tstools, clang-format-5.0 etc...
 
 ### How to test it
 In order to run all unit tests just type:
@@ -100,19 +175,23 @@ make test
 This will spin up a docker container with gtest/gmock and execute all tests.
 
 ## Windows
-Currently only WIN32 (x86) is supported unser VC14 VS2015 compiler which has a fairly large C++11
-support. There is a VS2015 solution file unser msvc/2015 for this project. No unit tests or main application exist at current state. It's is a pure DLL project that builds tslib.dll artifacts under windows. No cross compilation exist.
+Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
+There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
+mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
+called TestTsLib that uses the dynamic mpeg2ts.dll library in the same solution. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
+change to dynamic project. This is the VS2015 solution file:
+* mpeg2ts.sln
 
 ## Continuous integration (CI)
+![](images/circleci.png)
+
 For CI we use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
 
 ## Static code analysis
-For static and feedback in pull-requests we use a tool called Codacy which will run different
-tools to check for mistakes and coding quality/best practises. You can check that status here:
-[Codacy](https://app.codacy.com/app/skullanbones/ts-lib/dashboard)
+Right now there is no online tool. Use `docker-make cppcheck` and `docker-make clang-tidy`.
 
 ## Acronyms
 | Abbreviation  | Meaning                             |
@@ -124,8 +203,22 @@ tools to check for mistakes and coding quality/best practises. You can check tha
 | ISO           | International Organization for Standardization  |
 | MC            | Multicast                           |
 | MPEG          | Moving Picture Experts Group        |
+| OSS           | Open Source Software                |
 | PS            | Program Stream                      |
 | SDK           | Software Development Kit            |
 | SW            | Software                            |
 | TS            | Transport Stream                    |
 | VCS           | Version Control System              |
+
+
+## Technologies / Open Source Software (OSS)
+* C++
+* Docker
+* CMake
+* GNU Make
+* GCC
+* Python
+* Git
+* Google test
+
+![](images/ts_lib_oss.png)

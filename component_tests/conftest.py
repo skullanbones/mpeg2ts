@@ -130,7 +130,7 @@ def asset_h264_dolby_atmos(request, downloader):
       {"Pid": 302, "StreamType": "audio"},
       {"Pid": 300, "StreamType": "pmt"}])
 ])
-def asset_h2646_aac_rubeatles_atmos(request, downloader):
+def asset_h265_aac_rubeatles_atmos(request, downloader):
     """
     Asset for dolby atmos
     :param request:

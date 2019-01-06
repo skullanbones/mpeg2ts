@@ -1,33 +1,80 @@
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
 /// Project files
 #include "EsParser.h"
 #include "GetBits.h"
 
+namespace mpeg2
+{
+
+enum class Mpeg2Type
+{
+    Info,
+    SliceCode,
+    SequenceHeader
+};
+
+struct EsInfoMpeg2PictureSliceCode
+{
+    uint64_t picType{ 0 }; // I, B, P
+};
+
+struct EsInfoMpeg2SequenceHeader
+{
+    int width{ 0 }, height{ 0 };
+    std::string aspect{ "" };
+    std::string framerate{ "" };
+};
+
+struct EsInfoMpeg2
+{
+    Mpeg2Type type;
+    int picture{ 0 }; // slice
+    std::string msg{ "" };
+    EsInfoMpeg2PictureSliceCode slice;
+    EsInfoMpeg2SequenceHeader sequence;
+};
+
+
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
-    static std::map<uint8_t, std::string> AspectToString;
-    static std::map<uint8_t, std::string> FrameRateToString;
 public:
     Mpeg2VideoEsParser(const Mpeg2VideoEsParser& arg) = delete;
     Mpeg2VideoEsParser& operator=(const Mpeg2VideoEsParser& arg) = delete;
 
     Mpeg2VideoEsParser()
-        : foundStartCodes{0}
-
-    {
-    }
-    virtual ~Mpeg2VideoEsParser()
+        : EsParser({ 0x00, 0x00, 0x01 })
     {
     }
 
-    virtual bool operator()(const uint8_t* from, ssize_t length);
-    virtual bool analyze();
+    virtual ~Mpeg2VideoEsParser() = default;
 
-    std::vector<uint8_t> last;
-    int foundStartCodes;
-    std::vector<uint8_t> mPicture;
+    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
+    /// let the specialization analyze the results.
+    /// @param buf The binary data to parse
+    std::vector<EsInfoMpeg2> parse(const std::vector<uint8_t>& buf);
+
+    /// @brief Analyze the content on data after startcodes.
+    std::vector<EsInfoMpeg2> analyze();
+
+    static std::string toString(Mpeg2Type e);
+
+private:
+    static std::map<uint8_t, std::string> AspectToString;
+    static std::map<uint8_t, std::string> FrameRateToString;
 };
+
+
+inline std::string Mpeg2VideoEsParser::toString(Mpeg2Type e)
+{
+    const std::map<Mpeg2Type, std::string> MyEnumStrings{ { Mpeg2Type::Info, "Info" },
+                                                          { Mpeg2Type::SliceCode, "SliceCode" },
+                                                          { Mpeg2Type::SequenceHeader,
+                                                            "SequenceHeader" } };
+    auto it = MyEnumStrings.find(e);
+    return it == MyEnumStrings.end() ? "Out of range" : it->second;
+}
+}

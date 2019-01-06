@@ -7,7 +7,7 @@
 #include <string>
 
 /// 3rd-party
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
@@ -18,25 +18,27 @@ public:
     ~Settings() = default;
 
     bool loadFile(std::string);
-    void loadJson(json js);
+    void loadJson(json);
     std::string getLogLevel() const;
     std::string getLogFileName() const;
     int getLogFileMaxSize() const;
     int getLogFileMaxNumberOf() const;
-    
+
 private:
     json mJ;
 };
 
-class LoadException: public std::exception 
+class LoadException : public std::exception
 {
 private:
-    std::string message_;
+    std::string m_message;
+
 public:
     explicit LoadException() = default;
-    explicit LoadException(const std::string& message);
-    explicit LoadException(const std::exception e);
-    virtual const char* what() const throw() {
-        return message_.c_str();
+    explicit LoadException(const std::string& a_message);
+    explicit LoadException(const std::exception a_e);
+    virtual const char* what() const throw()
+    {
+        return m_message.c_str();
     }
 };

@@ -1,5 +1,6 @@
-#include <public/mpeg2ts.h>
+
 #include "Logging.h"
+#include "public/mpeg2ts.h"
 
 /// 3rd-party
 #include <plog/Log.h>
@@ -9,25 +10,25 @@ namespace mpeg2ts
 
 std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs)
 {
-    ss << std::endl << "-------------PsiTable------------- " << std::endl;
-    ss << "table_id:" << std::hex << (int)rhs.table_id << std::dec << std::endl;
-    ss << "section_syntax_indicator: " << (int)rhs.section_syntax_indicator << std::endl;
-    ss << "section_length: " << (int)rhs.section_length << std::endl;
-    ss << "transport_stream_id: " << (int)rhs.transport_stream_id << std::endl;
-    ss << "version_number: " << (int)rhs.version_number << std::endl;
-    ss << "current_next_indicator: " << (int)rhs.current_next_indicator << std::endl;
-    ss << "section_number: " << (int)rhs.section_number << std::endl;
-    ss << "last_section_number: " << (int)rhs.last_section_number << std::endl;
+    ss << '\n' << "-------------PsiTable-------------" << '\n';
+    ss << "table_id:" << std::hex << static_cast<int>(rhs.table_id) << std::dec << '\n';
+    ss << "section_syntax_indicator: " << static_cast<int>(rhs.section_syntax_indicator) << '\n';
+    ss << "section_length: " << static_cast<int>(rhs.section_length) << '\n';
+    ss << "transport_stream_id: " << static_cast<int>(rhs.transport_stream_id) << '\n';
+    ss << "version_number: " << static_cast<int>(rhs.version_number) << '\n';
+    ss << "current_next_indicator: " << static_cast<int>(rhs.current_next_indicator) << '\n';
+    ss << "section_number: " << static_cast<int>(rhs.section_number) << '\n';
+    ss << "last_section_number: " << static_cast<int>(rhs.last_section_number) << '\n';
     return ss;
 }
 
 bool PsiTable::operator==(const PsiTable& rhs) const
 {
     return CRC_32 == rhs.CRC_32 && table_id == rhs.table_id &&
-        section_syntax_indicator == rhs.section_syntax_indicator &&
-        section_length == rhs.section_length && transport_stream_id == rhs.transport_stream_id &&
-        version_number == rhs.version_number && current_next_indicator == rhs.current_next_indicator &&
-        section_number == rhs.section_number && last_section_number == rhs.last_section_number;
+           section_syntax_indicator == rhs.section_syntax_indicator &&
+           section_length == rhs.section_length && transport_stream_id == rhs.transport_stream_id &&
+           version_number == rhs.version_number && current_next_indicator == rhs.current_next_indicator &&
+           section_number == rhs.section_number && last_section_number == rhs.last_section_number;
 }
 
 bool PsiTable::operator!=(const PsiTable& rhs) const
@@ -37,21 +38,21 @@ bool PsiTable::operator!=(const PsiTable& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const PatTable& rhs)
 {
-    ss << std::endl << "-------------PatTable------------- " << std::endl;
-    // ss << static_cast<const PsiTable&>(rhs) << std::endl;
-    // ss << PsiTable::operator<<(rhs) << std::endl;
-    ss << "programs.size(): " << (int)rhs.programs.size() << std::endl;
-    for (unsigned int i = 0; i < rhs.programs.size(); i++)
+    ss << '\n' << "-------------PatTable-------------" << '\n';
+    // ss << static_cast<const PsiTable&>(rhs) << '\n';
+    // ss << PsiTable::operator<<(rhs) << '\n';
+    ss << "programs.size(): " << static_cast<int>(rhs.programs.size()) << '\n';
+    for (unsigned int i = 0; i < rhs.programs.size(); ++i)
     {
-        ss << "-------------program " << i << "--------------" << std::endl;
-        ss << "program_number: " << rhs.programs[i].program_number << std::endl;
+        ss << "-------------program " << i << "--------------" << '\n';
+        ss << "program_number: " << rhs.programs[i].program_number << '\n';
         if (rhs.programs[i].type == ProgramType::PMT)
         {
-            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << std::endl;
+            ss << "program_map_PID: " << rhs.programs[i].program_map_PID << '\n';
         }
         else if (rhs.programs[i].type == ProgramType::NIT)
         {
-            ss << "network_PID: " << rhs.programs[i].network_PID << std::endl;
+            ss << "network_PID: " << rhs.programs[i].network_PID << '\n';
         }
     }
 
@@ -69,7 +70,7 @@ bool PatTable::operator==(const PatTable& rhs) const
     // 1. check number of programs
     if (this->programs.size() != rhs.programs.size())
     {
-        LOGD_(FileLog) << "PatTable number of programs unequal." << std::endl;
+        LOGD_(FileLog) << "PatTable number of programs unequal." << '\n';
         return false;
     }
     // 2. check content of each programs
@@ -78,11 +79,10 @@ bool PatTable::operator==(const PatTable& rhs) const
     {
         if (prg != rhs.programs.at(i))
         {
-            LOGD_(FileLog) << "PatTable programs content unequal for program: " << prg.program_number
-                << std::endl;
+            LOGD_(FileLog) << "PatTable programs content unequal for program: " << prg.program_number << '\n';
             return false;
         }
-        i++;
+        ++i;
     }
     return true;
 }
@@ -94,17 +94,18 @@ bool PatTable::operator!=(const PatTable& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const StreamTypeHeader& rhs)
 {
-    ss << std::endl << "-------------StreamTypeHeader------------- " << std::endl;
-    ss << "stream_type: " << (int)rhs.stream_type << std::endl;
-    ss << "elementary_PID: " << rhs.elementary_PID << std::endl;
-    ss << "ES_info_length: " << rhs.ES_info_length << std::endl;
+    ss << '\n' << "-------------StreamTypeHeader-------------" << '\n';
+    ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.stream_type)] << ",  ("
+       << static_cast<int>(rhs.stream_type) << ")" << '\n';
+    ss << "elementary_PID: " << rhs.elementary_PID << '\n';
+    ss << "ES_info_length: " << rhs.ES_info_length << '\n';
     return ss;
 }
 
 bool StreamTypeHeader::operator==(const StreamTypeHeader& rhs) const
 {
     return stream_type == rhs.stream_type && elementary_PID == rhs.elementary_PID &&
-        ES_info_length == rhs.ES_info_length;
+           ES_info_length == rhs.ES_info_length;
 }
 
 bool StreamTypeHeader::operator!=(const StreamTypeHeader& rhs) const
@@ -116,17 +117,17 @@ bool StreamTypeHeader::operator!=(const StreamTypeHeader& rhs) const
 
 std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs)
 {
-    ss << std::endl << "-------------PmtTable------------- " << std::endl;
-    ss << "PCR_PID: " << (int)rhs.PCR_PID << std::endl;
-    ss << "program_info_length: " << (int)rhs.program_info_length << std::endl;
-    ss << "streams.size(): " << (int)rhs.streams.size() << std::endl;
-    for (unsigned int i = 0; i < rhs.streams.size(); i++)
+    ss << '\n' << "-------------PmtTable-------------" << '\n';
+    ss << "PCR_PID: " << static_cast<int>(rhs.PCR_PID) << '\n';
+    ss << "program_info_length: " << static_cast<int>(rhs.program_info_length) << '\n';
+    ss << "streams.size(): " << static_cast<int>(rhs.streams.size()) << '\n';
+    for (std::size_t i = 0; i < rhs.streams.size(); ++i)
     {
-        ss << "-------------stream " << i << "--------------" << std::endl;
-        ss << "stream_type: " << StreamTypeToString[(int)rhs.streams[i].stream_type] << ",  ("
-            << (int)rhs.streams[i].stream_type << ")" << std::endl;
-        ss << "elementary_PID: " << (int)rhs.streams[i].elementary_PID << std::endl;
-        ss << "ES_info_length: " << (int)rhs.streams[i].ES_info_length << std::endl;
+        ss << "-------------stream " << i << "--------------" << '\n';
+        ss << "stream_type: " << StreamTypeToString[static_cast<int>(rhs.streams[i].stream_type)]
+           << ",  (" << static_cast<int>(rhs.streams[i].stream_type) << ")" << '\n';
+        ss << "elementary_PID: " << static_cast<int>(rhs.streams[i].elementary_PID) << '\n';
+        ss << "ES_info_length: " << static_cast<int>(rhs.streams[i].ES_info_length) << '\n';
     }
 
     return ss;
@@ -143,25 +144,25 @@ bool PmtTable::operator==(const PmtTable& rhs) const
     // 1. First check CRC 32
     if (this->CRC_32 != rhs.CRC_32)
     {
-        LOGD_(FileLog) << "PmtTable CRC_32 unequal." << std::endl;
+        LOGD_(FileLog) << "PmtTable CRC_32 unequal." << '\n';
         return false;
     }
     // 2. Secondly check PCR_PID
     if (this->PCR_PID != rhs.PCR_PID)
     {
-        LOGD_(FileLog) << "PmtTable PCR_PID unequal." << std::endl;
+        LOGD_(FileLog) << "PmtTable PCR_PID unequal." << '\n';
         return false;
     }
     // 3. Thirdly check program_info_length
     if (this->program_info_length != rhs.program_info_length)
     {
-        LOGD_(FileLog) << "PmtTable program_info_length unequal." << std::endl;
+        LOGD_(FileLog) << "PmtTable program_info_length unequal." << '\n';
         return false;
     }
     // 4. check number of streams
     if (this->streams.size() != rhs.streams.size())
     {
-        LOGD_(FileLog) << "PmtTable number of streams unequal." << std::endl;
+        LOGD_(FileLog) << "PmtTable number of streams unequal." << '\n';
         return false;
     }
     // 5. check content of each streams
@@ -170,11 +171,10 @@ bool PmtTable::operator==(const PmtTable& rhs) const
     {
         if (stream != rhs.streams.at(i))
         {
-            LOGD_(FileLog) << "PmtTable stream content unequal for stream_type: " << stream.stream_type
-                << std::endl;
+            LOGD_(FileLog) << "PmtTable stream content unequal for stream_type: " << stream.stream_type << '\n';
             return false;
         }
-        i++;
+        ++i;
     }
     return true;
 }
