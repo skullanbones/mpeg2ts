@@ -205,8 +205,8 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
     uint16_t pointerOffset = a_tsPacketInfo.payloadStartOffset;
 
     mStatistics.checkCCError(a_tsPacketInfo.pid, a_tsPacketInfo.continuityCounter);
-    mStatistics.checkTsDiscontinuity(a_tsPacketInfo.pid,
-                                     a_tsPacketInfo.hasAdaptationField && a_tsPacketInfo.isDiscontinuity);
+    mStatistics.checkTsDiscontinuity(a_tsPacketInfo.pid, a_tsPacketInfo.hasAdaptationField &&
+                                                         a_tsPacketInfo.isDiscontinuity);
 
     if (a_tsPacketInfo.hdr.payload_unit_start_indicator)
     {
@@ -215,7 +215,7 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
 
         uint16_t pointer_field = a_tsPacket[pointerOffset];
 
-        pointerOffset++;  //pointerOffset += sizeof(pointer_field);
+        pointerOffset++; // pointerOffset += sizeof(pointer_field);
         pointerOffset = static_cast<uint16_t>(pointerOffset + pointer_field);
         //
         // It does only make sense to get PSI table info when start of a PSI.
@@ -233,7 +233,8 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
     }
 
     mSectionBuffer[PID].insert(mSectionBuffer[PID].end(), &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
-    mReadSectionLength[PID] = mReadSectionLength[PID] + static_cast<int>(&a_tsPacket[TS_PACKET_SIZE] - &a_tsPacket[pointerOffset]);
+    mReadSectionLength[PID] =
+    mReadSectionLength[PID] + static_cast<int>(&a_tsPacket[TS_PACKET_SIZE] - &a_tsPacket[pointerOffset]);
     a_table_id = (mSectionLength[PID] > mReadSectionLength[PID]) ? PSI_TABLE_ID_INCOMPLETE : mTableId[PID];
 }
 
@@ -420,7 +421,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
 
 
     int streamsSize = (pmt.section_length - PMT_PACKET_OFFSET_LENGTH - CRC32_SIZE - pmt.program_info_length);
-    int readSize { 0 };
+    int readSize{ 0 };
 
     while (readSize < streamsSize)
     {
@@ -457,7 +458,8 @@ void TsParser::parsePesPacket(int a_pid)
 
     // ISO/IEC 13818-1:2015: Table 2-21 PES packet
     if (mPesPacket[a_pid].stream_id != STREAM_ID_program_stream_map &&
-        mPesPacket[a_pid].stream_id != STREAM_ID_padding_stream && mPesPacket[a_pid].stream_id != STREAM_ID_private_stream_2 &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_padding_stream &&
+        mPesPacket[a_pid].stream_id != STREAM_ID_private_stream_2 &&
         mPesPacket[a_pid].stream_id != STREAM_ID_ECM_stream && mPesPacket[a_pid].stream_id != STREAM_ID_EMM_stream &&
         mPesPacket[a_pid].stream_id != STREAM_ID_program_stream_directory &&
         mPesPacket[a_pid].stream_id != STREAM_ID_DSMCC_stream &&
@@ -479,7 +481,8 @@ void TsParser::parsePesPacket(int a_pid)
         mPesPacket[a_pid].PES_extension_flag = getBits(1);
 
         mPesPacket[a_pid].PES_header_data_length = static_cast<uint8_t>(getBits(8));
-        mPesPacket[a_pid].elementary_data_offset = static_cast<uint16_t>(mPesPacket[a_pid].PES_header_data_length + getByteInx());
+        mPesPacket[a_pid].elementary_data_offset =
+        static_cast<uint16_t>(mPesPacket[a_pid].PES_header_data_length + getByteInx());
 
         mPesPacket[a_pid].pts = -1;
         mPesPacket[a_pid].dts = -1;

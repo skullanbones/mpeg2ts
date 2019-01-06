@@ -101,8 +101,8 @@ void TsStatistics::buildDtsHistogram(int a_pid, int64_t a_dts)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL)
     {
         LOGD_(FileLog) << "DTS discontinuity at ts packet " << mCounters.mTsPacketCounter
-                       << " on pid " << a_pid << " dts-1 " << mPidStatistics[a_pid].lastDts << " dts-0 "
-                       << a_dts << " dts diff " << diff << '\n';
+                       << " on pid " << a_pid << " dts-1 " << mPidStatistics[a_pid].lastDts
+                       << " dts-0 " << a_dts << " dts diff " << diff << '\n';
     }
 
     mPidStatistics[a_pid].lastDts = a_dts;
@@ -124,8 +124,8 @@ void TsStatistics::buildPcrHistogram(int a_pid, int64_t a_pcr)
     if (diff > TIME_STAMP_JUMP_DISCONTINUITY_LEVEL * 300)
     {
         LOGD_(FileLog) << "PCR discontinuity at ts packet " << mCounters.mTsPacketCounter
-                       << " on pid " << a_pid << " pcr-1 " << mPidStatistics[a_pid].lastPcr << " pcr-0 "
-                       << a_pcr << " pcr diff " << diff << '\n';
+                       << " on pid " << a_pid << " pcr-1 " << mPidStatistics[a_pid].lastPcr
+                       << " pcr-0 " << a_pcr << " pcr diff " << diff << '\n';
     }
 
     mPidStatistics[a_pid].lastPcr = a_pcr;

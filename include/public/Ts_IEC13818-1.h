@@ -75,12 +75,10 @@ struct TsHeader
         ss << "-------------TsHeader------------- \n";
         ss << "sync_byte:  0x" << std::hex << static_cast<int>(rhs.sync_byte) << std::dec << '\n';
         ss << "transport_error_indicator: " << static_cast<int>(rhs.transport_error_indicator) << '\n';
-        ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator)
-           << '\n';
+        ss << "payload_unit_start_indicator: " << static_cast<int>(rhs.payload_unit_start_indicator) << '\n';
         ss << "transport_priority: " << static_cast<int>(rhs.transport_priority) << '\n';
         ss << "PID: " << rhs.PID << '\n';
-        ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control)
-           << '\n';
+        ss << "transport_scrambling_control: " << static_cast<int>(rhs.transport_scrambling_control) << '\n';
         ss << "adaptation_field_control: " << static_cast<int>(rhs.adaptation_field_control) << '\n';
         ss << "continuity_counter: " << static_cast<int>(rhs.continuity_counter) << '\n';
         return ss;

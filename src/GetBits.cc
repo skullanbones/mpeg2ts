@@ -12,7 +12,7 @@ GetBits::GetBits()
 
 uint64_t GetBits::getBits(int a_requestedBits)
 {
-    uint64_t ret { 0 };
+    uint64_t ret{ 0 };
 
     if (mSrcBytes == nullptr)
     {
@@ -65,8 +65,8 @@ void GetBits::skipBits(int a_skipBits)
         return;
     }
 
-    int n { a_skipBits / 64 };
-    int rem { a_skipBits % 64 };
+    int n{ a_skipBits / 64 };
+    int rem{ a_skipBits % 64 };
 
     for (int i = 0; i < n; ++i)
     {

@@ -22,7 +22,7 @@ std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
         return ret;
 
     // There is nothing to parse if the frame only contains a NAL startcode
-    if (a_buf.size() <= m_startCode.size() )
+    if (a_buf.size() <= m_startCode.size())
         return ret;
 
     for (std::size_t ind = 0; ind < startCodes.size(); ++ind)
@@ -31,7 +31,8 @@ std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
         try
         {
             mPicture.clear();
-            std::vector<uint8_t>::const_iterator first = a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
+            std::vector<uint8_t>::const_iterator first =
+            a_buf.begin() + startCodes[ind] + m_startCode.size(); // skip start code
             std::vector<uint8_t>::const_iterator last;
             // the last startcode is a corner case
             // also only have 1 startcode is a corner case
@@ -39,13 +40,14 @@ std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
             {
                 last = a_buf.end();
             }
-            else {
+            else
+            {
                 last = a_buf.begin() + startCodes[ind + 1];
             }
-             
+
             std::vector<uint8_t> newVec(first, last);
             mPicture = newVec;
-        
+
             std::vector<EsInfoH264> b = analyze();
             ret.insert(std::end(ret), std::begin(b), std::end(b));
         }
@@ -53,7 +55,6 @@ std::vector<EsInfoH264> H264EsParser::parse(const std::vector<uint8_t>& a_buf)
         {
             LOGE << "std::Exception what: %s\n" << e.what();
         }
-        
     }
 
     return ret;
@@ -244,7 +245,9 @@ std::string H264EsParser::seipayloadTypeToString(uint64_t payloadType)
 
 void H264EsParser::slice_header(NalUnitType nal_unit_type, EsInfoH264& info)
 {
-    info.msg = (nal_unit_type != NalUnitType::Coded_slice_of_an_IDR_picture) ? "Coded slice of a non-IDR picture" : "Coded slice of an ***IDR*** picture";
+    info.msg = (nal_unit_type != NalUnitType::Coded_slice_of_an_IDR_picture) ?
+               "Coded slice of a non-IDR picture" :
+               "Coded slice of an ***IDR*** picture";
     info.nalUnitType = nal_unit_type;
     auto first_mb_in_slice = getBitsDecodeUGolomb();
     (void)first_mb_in_slice;
@@ -471,7 +474,8 @@ void H264EsParser::seq_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264&
     auto pic_height_in_map_units_minus1s = getBitsDecodeUGolomb();
     frame_mbs_only_flag = getBits(1); // 0 - coded field or coded frame; 1 - coded frame
     info.sps.width = static_cast<int>((pic_width_in_mbs_minus1s + 1) * 16);
-    info.sps.height = static_cast<int>((2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16);
+    info.sps.height =
+    static_cast<int>((2 - frame_mbs_only_flag) * (pic_height_in_map_units_minus1s + 1) * 16);
     if (!frame_mbs_only_flag)
     {
         // coded pictures of the coded video sequence may either be coded fields or coded frames
@@ -635,5 +639,4 @@ void H264EsParser::pic_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264&
         info.msg += "entropy: CABAC";
     }
 }
-
 }
