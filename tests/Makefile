@@ -45,6 +45,7 @@ coverage: $(BUILDDIR)/coverage.info
 
 $(BUILDDIR)/coverage.info: $(BUILDDIR)/coverage-all.info
 	lcov --remove $< "/usr*" -o $@
+	lcov --remove $< "3rd-party/*" -o $@
 
 $(BUILDDIR)/coverage-all.info: gtests
 	$(BUILDDIR)/$(COMPONENT_NAME)
