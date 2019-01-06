@@ -121,7 +121,6 @@ help:
 	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
-	@echo '  docker-bash           - starts a docker bash session with settings in makefile.'
 	@echo '  tests                 - run all tests unit & component.'
 	@echo '  unit-tests            - run all unit tests.'
 	@echo '  env                   - build python virtual environment for pytest.'
