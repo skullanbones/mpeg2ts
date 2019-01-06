@@ -20,7 +20,7 @@ TOOLSDIR = $(PROJ_ROOT)/tools
 
 ## 3rd-party settings
 PLOG_VERSION=1.1.4
-NLOHMANN_VERSION=3.3.0
+NLOHMANN_VERSION=3.5.0
 
 INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
 				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
