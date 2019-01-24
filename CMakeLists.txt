@@ -132,9 +132,15 @@ add_library(${STATIC_LIB} STATIC
 #-------------------
 ## project
 target_include_directories(${STATIC_LIB}
-        PUBLIC
+        PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+set_target_properties(${STATIC_LIB}
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
+
 
 #-------------------
 # tsparser executable
@@ -150,6 +156,11 @@ target_include_directories(tsparser
 
 target_link_libraries(tsparser ${STATIC_LIB})
 
+set_target_properties(tsparser
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
+
 #-------------------
 # shared lib
 #-------------------
@@ -162,6 +173,11 @@ set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
 target_include_directories(${SHARED_LIB}
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+set_target_properties(${SHARED_LIB}
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
 )
 
 #-------------------
