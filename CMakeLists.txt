@@ -1,5 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
-project(ts_lib)
+cmake_minimum_required(VERSION 3.12)
+set(PROJECT_NAME mpeg2ts)
+set(STATIC_LIB ${PROJECT_NAME}_static)
+set(SHARED_LIB ${PROJECT_NAME})
+project(${PROJECT_NAME}
+        VERSION 0.2.1
+        DESCRIPTION "MPEG-2 Parsing of Video streams"
+        LANGUAGES CXX)
 
 #-------------------
 # global settings
@@ -54,19 +60,19 @@ else()
         )
 endif()
 
-#-------------------
-# includes & sources
-#-------------------
-## project
-include_directories(include)
 
-## 3rd-party
+#-------------------
+# 3rd-party
+#-------------------
 set(PLOG_VERSION 1.1.4)
 set(NLOHMANN_VERSION 3.5.0)
 
 include_directories(3rd-party/nlohmann-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
+#-------------------
+# sources
+#-------------------
 set(    TsLibSourcesList
         include/public/mpeg2ts.h
         include/public/Ts_IEC13818-1.h
@@ -117,9 +123,24 @@ set(    3rdPartySources
 #-------------------
 # static lib
 #-------------------
-add_library(mpeg2ts_static STATIC
+add_library(${STATIC_LIB} STATIC
         ${3rdPartySources}
         ${TsLibSourcesList})
+
+#-------------------
+# includes & sources
+#-------------------
+## project
+target_include_directories(${STATIC_LIB}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+set_target_properties(${STATIC_LIB}
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
+
 
 #-------------------
 # tsparser executable
@@ -128,16 +149,36 @@ add_executable(tsparser
         src/main.cc
         ${3rdPartySources})
 
-target_link_libraries(tsparser mpeg2ts_static)        
+target_include_directories(tsparser
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(tsparser ${STATIC_LIB})
+
+set_target_properties(tsparser
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
 
 #-------------------
 # shared lib
 #-------------------
-add_library(mpeg2ts SHARED
+add_library(${SHARED_LIB} SHARED
         ${TsLibSourcesList}
         ${3rdPartySources})
 # shared libraries need PIC
-set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+target_include_directories(${SHARED_LIB}
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+set_target_properties(${SHARED_LIB}
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
 
 #-------------------
 # add custom targets
