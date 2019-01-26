@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 set(PROJECT_NAME mpeg2ts)
+set(EXPORT_NAME mpeg2ts)
 set(STATIC_LIB ${PROJECT_NAME}_static)
 set(SHARED_LIB ${PROJECT_NAME})
 project(${PROJECT_NAME}
@@ -71,61 +72,51 @@ include_directories(3rd-party/nlohmann-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
 #-------------------
-# sources
-#-------------------
-set(    TsLibSourcesList
-        include/public/mpeg2ts.h
-        include/public/Ts_IEC13818-1.h
-        include/public/TsUtilities.h
-        include/h264/H264Parser.h
-        include/mpeg2vid/Mpeg2VideoParser.h
-        include/EsParser.h
-        include/GetBits.h
-        include/JsonSettings.h
-        include/Logging.h
-        include/TsParser.h
-        include/TsStatistics.h
-        src/h264/H264Parser.cc
-        src/mpeg2vid/Mpeg2VideoParser.cc
-        src/GetBits.cc
-        src/JsonSettings.cc
-        src/PesPacket.cc
-        src/PsiTables.cc
-        src/TsDemuxer.cc
-        src/TsPacketInfo.cc
-        src/TsParser.cc
-        src/TsStatistics.cc
-        src/TsUtilities.cc)
-
-set(    3rdPartySources
-        3rd-party/nlohmann-${NLOHMANN_VERSION}/include/nlohmann/json.hpp
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/AndroidAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ColorConsoleAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ConsoleAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/DebugOutputAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/EventLogAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/IAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/RollingFileAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/NativeEOLConverter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/UTF8Converter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/CsvFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/FuncMessageFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/MessageOnlyFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/TxtFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Init.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Log.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Logger.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Record.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Severity.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Util.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/WinApi.h)
-
-#-------------------
 # static lib
 #-------------------
-add_library(${STATIC_LIB} STATIC
-        ${3rdPartySources}
-        ${TsLibSourcesList})
+add_library(${STATIC_LIB} STATIC)
+
+#-------------------
+# sources
+#-------------------
+target_sources(
+        ${STATIC_LIB}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
+
+set(    3rdPartySources
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/nlohmann-${NLOHMANN_VERSION}/include/nlohmann/json.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/AndroidAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ColorConsoleAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ConsoleAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/DebugOutputAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/EventLogAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/IAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/RollingFileAppender.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/NativeEOLConverter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/UTF8Converter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/CsvFormatter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/FuncMessageFormatter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/MessageOnlyFormatter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/TxtFormatter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Init.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Log.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Logger.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Record.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Severity.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Util.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/WinApi.h)
+
 
 #-------------------
 # includes & sources
@@ -146,8 +137,7 @@ set_target_properties(${STATIC_LIB}
 # tsparser executable
 #-------------------
 add_executable(tsparser
-        src/main.cc
-        ${3rdPartySources})
+        src/main.cc)
 
 target_include_directories(tsparser
         PRIVATE
@@ -158,15 +148,15 @@ target_link_libraries(tsparser ${STATIC_LIB})
 
 set_target_properties(tsparser
     PROPERTIES
+    VERSION ${PROJECT_VERSION}
         DEBUG_POSTFIX "-d"
 )
+
 
 #-------------------
 # shared lib
 #-------------------
-add_library(${SHARED_LIB} SHARED
-        ${TsLibSourcesList}
-        ${3rdPartySources})
+add_library(${SHARED_LIB} SHARED)
 # shared libraries need PIC
 set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
 
@@ -176,9 +166,32 @@ target_include_directories(${SHARED_LIB}
 )
 
 set_target_properties(${SHARED_LIB}
-    PROPERTIES
-        DEBUG_POSTFIX "-d"
+  PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    EXPORT_NAME ${EXPORT_NAME}
+    CXX_LINK_WHAT_YOU_USE TRUE
+    DEBUG_POSTFIX "-d"
 )
+
+target_sources(
+        ${SHARED_LIB}
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
 
 #-------------------
 # add custom targets
