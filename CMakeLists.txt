@@ -152,6 +152,9 @@ set_target_properties(tsparser
         DEBUG_POSTFIX "-d"
 )
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
+target_include_directories(tsparser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
 
 #-------------------
 # shared lib
