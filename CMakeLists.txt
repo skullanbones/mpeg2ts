@@ -181,6 +181,14 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
         PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/EsParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/GetBits.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/JsonSettings.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Logging.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsStatistics.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
