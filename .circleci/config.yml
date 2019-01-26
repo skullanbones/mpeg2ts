@@ -12,14 +12,14 @@ jobs:
           name: Unit Test
           command: make gtests && make unit-tests
       - run:
-          name: Component Tests
-          command: make component-tests
-      - run:
           name: Build CMake Debug
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j36
       - run:
           name: Build CMake Release
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j36
+      - run:
+          name: Component Tests
+          command: make component-tests
       - run:
           name: Run CTest
           command: cd build && tests/run_gtests
