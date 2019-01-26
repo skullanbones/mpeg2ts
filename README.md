@@ -5,7 +5,7 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 Artifacts:
 ```
 Win32: mpeg2ts.dll mpeg2ts.lib
-Linux: libmpeg2ts.so libmpeg2ts.a
+Linux: libmpeg2ts.so libmpeg2ts_static.a
 Both: mpeg2ts.h
 ```
 Applications:
@@ -100,7 +100,7 @@ To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```
 mkdir build
 cd build/
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug|Release ..
 make
 ```
 You will get the following artifacts:
@@ -112,7 +112,7 @@ tsparser*
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
 ## Linux Make
-This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
+[Deprecated] This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
 
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
