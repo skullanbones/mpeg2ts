@@ -56,7 +56,7 @@ else()
                         -Wdouble-promotion # warn if float is implicit promoted to double
                         -Wformat=2 # warn on security issues around functions that format output
                                    # (ie printf)
-                        -Winline # Warn if a function that is declared as inline cannot be inlined.
+#                        -Winline # Warn if a function that is declared as inline cannot be inlined.
                         -Werror # Make the specified warning into an error.
         )
 endif()
