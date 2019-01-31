@@ -165,7 +165,8 @@ set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 target_include_directories(${SHARED_LIB}
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 set_target_properties(${SHARED_LIB}
@@ -214,3 +215,18 @@ add_custom_target(unit-tests
 add_custom_target(benchmark-tests
      COMMAND ./bench/Parser_Benchmark
 )
+
+#-------------------
+# installation
+#-------------------
+install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
+         DESTINATION include)

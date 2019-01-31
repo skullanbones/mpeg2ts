@@ -97,23 +97,32 @@ where VERBOSE is the maximum log output as compared to NONE which generates no o
 ![](images/cmake.png)
 
 To simplify the crosscompile process we use CMake. Under Linux just do this:
-```
+```Bash
 mkdir build
 cd build/
 cmake -DCMAKE_BUILD_TYPE=Debug|Release ..
 make
 ```
 You will get the following artifacts:
-```
+```Bash
 libmpeg2ts.so*
 libmpeg2ts_static.a
 tsparser*
 ```
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
+In order to install this library you can type:
+```Bash
+cmake -DCMAKE_INSTALL_PREFIX=../_install ..
+make -j 8
+make install
+```
+and now you will find the installed libraries and headers in `_install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
+
 ## Linux Make
 [Deprecated] This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
 
+## Tsparser
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
