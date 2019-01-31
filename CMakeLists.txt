@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
-set(PROJECT_NAME mpeg2ts)
-set(EXPORT_NAME mpeg2ts)
-set(STATIC_LIB ${PROJECT_NAME}_static)
-set(SHARED_LIB ${PROJECT_NAME})
-project(${PROJECT_NAME}
+
+project(mpeg2ts
         VERSION 0.2.1
         DESCRIPTION "MPEG-2 Parsing of Video streams"
         LANGUAGES CXX)
+
+set(STATIC_LIB ${PROJECT_NAME}_static)
+set(SHARED_LIB ${PROJECT_NAME})
 
 #-------------------
 # global settings
@@ -172,7 +172,7 @@ set_target_properties(${SHARED_LIB}
   PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
-    EXPORT_NAME ${EXPORT_NAME}
+    EXPORT_NAME ${PROJECT_NAME}
     CXX_LINK_WHAT_YOU_USE TRUE
     DEBUG_POSTFIX "-d"
 )
