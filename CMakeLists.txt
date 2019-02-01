@@ -219,14 +219,16 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
+message("CMAKE_INSTALL_BINDIR: " ${CMAKE_INSTALL_BINDIR})
+message("CMAKE_INSTALL_LIBDIR: " ${CMAKE_INSTALL_LIBDIR})
 install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
 )
 
 install(FILES 
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
-         DESTINATION include)
+        DESTINATION include)
