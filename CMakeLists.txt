@@ -94,29 +94,6 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
 
-set(    3rdPartySources
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/nlohmann-${NLOHMANN_VERSION}/include/nlohmann/json.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/AndroidAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ColorConsoleAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ConsoleAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/DebugOutputAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/EventLogAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/IAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/RollingFileAppender.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/NativeEOLConverter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/UTF8Converter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/CsvFormatter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/FuncMessageFormatter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/MessageOnlyFormatter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/TxtFormatter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Init.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Log.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Logger.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Record.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Severity.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/Util.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/plog-${PLOG_VERSION}/include/plog/WinApi.h)
-
 
 #-------------------
 # includes & sources
