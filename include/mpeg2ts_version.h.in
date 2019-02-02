@@ -1,0 +1,26 @@
+#include <string>
+
+inline std::string getMpeg2tsVersion()
+{
+	return "@mpeg2ts_VERSION@";
+}
+
+inline unsigned getMpeg2tsVersionMajor()
+{
+	return @mpeg2ts_VERSION_MAJOR@;
+}
+
+inline unsigned getMpeg2tsVersionMinor()
+{
+	return @mpeg2ts_VERSION_MINOR@ +0;
+}
+
+inline unsigned getMpeg2tsVersionPatch()
+{
+	return @mpeg2ts_VERSION_PATCH@ +0;
+}
+
+inline unsigned getMpeg2tsVersionTweak()
+{
+	return @mpeg2ts_VERSION_TWEAK@ +0;
+}

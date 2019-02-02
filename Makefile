@@ -136,7 +136,7 @@ help:
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
-all: folders $(BUILDDIR)/tsparser
+all: folders
 
 folders: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264
 
@@ -148,9 +148,6 @@ $(BUILDDIR)/mpeg2vid:
 	
 $(BUILDDIR)/h264:	
 	mkdir -p $@
-
-$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o $(LDFLAGS) -L$(BUILDDIR) -l:$(STATIC)
 
 $(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
 	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
@@ -223,7 +220,7 @@ env:
 	virtualenv -p python$(PYTHON_VERSION) $@
 	./env/bin/pip install -r component_tests/requirements.txt
 
-component-tests: env $(BUILDDIR)/tsparser
+component-tests: env
 	@echo "[Running component tests..]"
 	./env/bin/pytest --benchmark-skip
 
@@ -257,7 +254,6 @@ json: $(3RDPARTYDIR)/.nlohmann_extracted
 
 clean:
 	rm -f $(OBJS)
-	rm -f $(BUILDDIR)/tsparser
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)

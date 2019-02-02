@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"
 
 
 // Forward decl
