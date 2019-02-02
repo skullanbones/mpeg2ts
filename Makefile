@@ -254,7 +254,6 @@ json: $(3RDPARTYDIR)/.nlohmann_extracted
 
 clean:
 	rm -f $(OBJS)
-	rm -f $(BUILDDIR)/tsparser
 	rm -f $(BUILDDIR)/main.o
 	rm -f $(BUILDDIR)/$(STATIC)
 	rm -f $(BUILDDIR)/$(DYNAMIC)

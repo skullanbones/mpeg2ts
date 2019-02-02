@@ -208,4 +208,5 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/settings.json
         DESTINATION include)
