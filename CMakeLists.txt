@@ -18,7 +18,6 @@ else()
    set(USE_DOCKER OFF)
 endif()
 
-
 #-------------------
 # sub modules
 #-------------------
@@ -26,7 +25,6 @@ set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory (tests)
 add_subdirectory (bench)
 
-set(CMAKE_CXX_STANDARD 11)
 if (MSVC)
     add_compile_options(/W4)
 else()    
@@ -102,12 +100,15 @@ target_sources(
 target_include_directories(${STATIC_LIB}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 set_target_properties(${STATIC_LIB}
     PROPERTIES
         DEBUG_POSTFIX "-d"
 )
+
+target_compile_features(${STATIC_LIB} PRIVATE cxx_std_11)
 
 
 #-------------------
@@ -118,10 +119,13 @@ add_executable(tsparser
 
 target_include_directories(tsparser
         PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
 )
 
-target_link_libraries(tsparser ${STATIC_LIB})
+target_link_libraries(tsparser PRIVATE ${STATIC_LIB})
 
 set_target_properties(tsparser
     PROPERTIES
@@ -129,8 +133,9 @@ set_target_properties(tsparser
         DEBUG_POSTFIX "-d"
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
 target_include_directories(tsparser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_compile_features(tsparser PRIVATE cxx_std_11)
 
 
 #-------------------
@@ -140,10 +145,15 @@ add_library(${SHARED_LIB} SHARED)
 # shared libraries need PIC
 set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
 
+message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
 target_include_directories(${SHARED_LIB}
         PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
 )
 
 set_target_properties(${SHARED_LIB}
@@ -155,30 +165,32 @@ set_target_properties(${SHARED_LIB}
     DEBUG_POSTFIX "-d"
 )
 
+target_compile_features(${SHARED_LIB} PRIVATE cxx_std_11)
+
 target_sources(
         ${SHARED_LIB}
         PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/EsParser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/GetBits.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/JsonSettings.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Logging.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsParser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsStatistics.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/EsParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
 
@@ -193,6 +205,17 @@ add_custom_target(benchmark-tests
      COMMAND ./bench/Parser_Benchmark
 )
 
+add_custom_target(env
+     COMMAND virtualenv -p python$(PYTHON_VERSION) env
+     COMMAND ./env/bin/pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/component_tests/requirements.txt
+)
+
+message("CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_target(component-tests
+        DEPENDS env
+     COMMAND ./env/bin/pytest --benchmark-skip --ignore=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 #-------------------
 # installation
 #-------------------
@@ -205,8 +228,8 @@ install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
 )
 
 install(FILES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/mpeg2ts.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/Ts_IEC13818-1.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/TsUtilities.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/settings.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
         DESTINATION include)

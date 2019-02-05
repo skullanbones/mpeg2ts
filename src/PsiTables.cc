@@ -1,6 +1,6 @@
 
 #include "Logging.h"
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"
 
 /// 3rd-party
 #include <plog/Log.h>

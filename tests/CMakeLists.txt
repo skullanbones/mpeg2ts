@@ -78,6 +78,7 @@ endif(USE_DOCKER)
 # Now simply link against gtest, gmock, gtest_main or gmock_main as needed. Eg
 add_executable(run_gtests gtest_main.cc ${TestSources})
 include_directories(../include)
+include_directories(../src)
 if(USE_DOCKER)
   target_link_libraries(run_gtests ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)

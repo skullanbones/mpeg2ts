@@ -19,7 +19,7 @@
 /// project files
 #include "Logging.h"
 #include "TsStatistics.h"
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"
 
 namespace mpeg2ts
 {
