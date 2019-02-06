@@ -25,6 +25,10 @@ set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory (tests)
 add_subdirectory (bench)
 
+if(NOT CMAKE_INSTALL_BINDIR)
+    include(GNUInstallDirs)
+endif()
+
 if (MSVC)
     add_compile_options(/W4)
 else()    
@@ -148,7 +152,7 @@ set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
 message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
 target_include_directories(${SHARED_LIB}
         PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -222,9 +226,10 @@ add_custom_target(component-tests
 message("CMAKE_INSTALL_BINDIR: " ${CMAKE_INSTALL_BINDIR})
 message("CMAKE_INSTALL_LIBDIR: " ${CMAKE_INSTALL_LIBDIR})
 install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows
 )
 
 install(FILES 
@@ -232,4 +237,4 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
-        DESTINATION include)
+        DESTINATION include/${PROJECT_NAME})
