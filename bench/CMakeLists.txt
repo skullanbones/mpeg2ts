@@ -45,26 +45,12 @@ if(NOT USE_DOCKER)
 endif(NOT USE_DOCKER)
 
 #-------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 11)
+
 enable_testing()
-#-------------------
-# includes & sources
-#-------------------
-set(TestSources
-    Parser_Benchmark.cc
-)
-
-include_directories(../include)
-include_directories(../src)
-include_directories(../tests)
-
 
 #-------------------
 # tests
 #-------------------
-
-
-##################################
 
 file(GLOB_RECURSE ALL_BENCH_CPP *.cpp)
 
@@ -76,8 +62,16 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
    set(TARGET_NAME Bench_${ONE_BENCH_EXEC})
 
    add_executable(${TARGET_NAME} ${ONE_BENCH_CPP})
+
+   target_include_directories(${TARGET_NAME} PRIVATE ../include)
+  target_include_directories(${TARGET_NAME} PRIVATE ../src)
+  target_include_directories(${TARGET_NAME} PRIVATE ../tests)
+
+  target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
+
    set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_BENCH_EXEC}) 
    target_link_libraries(${TARGET_NAME}
+   PRIVATE
         mpeg2ts_static
         benchmark
         pthread
