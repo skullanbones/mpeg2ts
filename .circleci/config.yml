@@ -5,12 +5,12 @@ jobs:
       - image: heliconwave/circleci:latest
     steps:
       - checkout
-      - run:
-          name: Build Libs
-          command: make libs     
-      - run:
-          name: Unit Test
-          command: make gtests && make unit-tests
+    #   - run:
+    #       name: Build Libs
+    #       command: make libs     
+    #   - run:
+    #       name: Unit Test
+    #       command: make gtests && make unit-tests
       - run:
           name: Build CMake Debug
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j36
@@ -19,10 +19,10 @@ jobs:
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j36
       - run:
           name: Component Tests
-          command: make component-tests
+          command: cd build && make component-tests
       - run:
           name: Run CTest
-          command: cd build && tests/run_gtests
+          command: cd build && make unit-tests
       - run:
           name: Run micro benchmark
-          command: cd build && bench/Parser_Benchmark
+          command: cd build && benchmark-tests

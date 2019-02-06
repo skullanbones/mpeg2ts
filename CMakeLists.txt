@@ -217,14 +217,12 @@ add_custom_target(env
 message("CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR})
 add_custom_target(component-tests
         DEPENDS env
-     COMMAND ./env/bin/pytest --benchmark-skip --ignore=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
+     COMMAND ../env/bin/pytest --benchmark-skip --ignore=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 #-------------------
 # installation
 #-------------------
-message("CMAKE_INSTALL_BINDIR: " ${CMAKE_INSTALL_BINDIR})
-message("CMAKE_INSTALL_LIBDIR: " ${CMAKE_INSTALL_LIBDIR})
 install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
