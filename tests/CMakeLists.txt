@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0)
 #-------------------------------------------------------------
 # Taken from https://github.com/google/googletest/tree/master/googletest#incorporating-into-an-existing-cmake-project
 #-------------------------------------------------------------
@@ -39,23 +40,15 @@ message("NOT using Docker! Downloading & configuring google test...")
 endif(NOT USE_DOCKER)
 
 #-------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 11)
+project(
+  run_gtests
+    VERSION 1.0.0
+    DESCRIPTION "GTests for ts-lib"
+    LANGUAGES CXX
+)
+
 enable_testing()
 
-#-------------------
-# includes & sources
-#-------------------
-set(TestSources
-    GetBits_Tests.cc
-    Mpeg2VideoParser_Tests.cc
-    PsiTables_Tests.cc
-    TsDemuxer_Tests.cc
-    TsPacketTestData.h
-    TsParser_Tests.cc
-    TsStatistics_Tests.cc
-    TsUtilities_Tests.cc
-    H264Parser_Tests.cc
-)
 
 #-------------------
 if(USE_DOCKER)
@@ -76,12 +69,28 @@ endif(USE_DOCKER)
 # tests
 #-------------------
 # Now simply link against gtest, gmock, gtest_main or gmock_main as needed. Eg
-add_executable(run_gtests gtest_main.cc ${TestSources})
-include_directories(../include)
-include_directories(../src)
+add_executable(${PROJECT_NAME})
+
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+
+target_sources(${PROJECT_NAME}
+  PRIVATE
+  gtest_main.cc
+  GetBits_Tests.cc
+  Mpeg2VideoParser_Tests.cc
+  PsiTables_Tests.cc
+  TsDemuxer_Tests.cc
+  TsPacketTestData.h
+  TsParser_Tests.cc
+  TsStatistics_Tests.cc
+  TsUtilities_Tests.cc
+  H264Parser_Tests.cc)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ../include)
+target_include_directories(${PROJECT_NAME} PRIVATE ../src)
 if(USE_DOCKER)
-  target_link_libraries(run_gtests ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)
-  target_link_libraries(run_gtests gmock)
+  target_link_libraries(${PROJECT_NAME} PRIVATE gmock)
 endif(USE_DOCKER)
-target_link_libraries(run_gtests mpeg2ts_static)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpeg2ts_static)
