@@ -25,6 +25,7 @@ set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(tests)
 add_subdirectory(bench)
 add_subdirectory(3rd-party)
+add_subdirectory(component_tests)
 
 if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
@@ -213,17 +214,6 @@ add_custom_target(unit-tests
 
 add_custom_target(benchmark-tests
      COMMAND ./bench/Parser_Benchmark
-)
-
-add_custom_target(env
-     COMMAND virtualenv -p python$(PYTHON_VERSION) env
-     COMMAND ./env/bin/pip install -r ${CMAKE_CURRENT_SOURCE_DIR}/component_tests/requirements.txt
-)
-
-message("CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR})
-add_custom_target(component-tests
-        DEPENDS env
-     COMMAND ../env/bin/pytest --benchmark-skip --ignore=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 #-------------------
