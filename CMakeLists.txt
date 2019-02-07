@@ -22,8 +22,9 @@ endif()
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory (tests)
-add_subdirectory (bench)
+add_subdirectory(tests)
+add_subdirectory(bench)
+add_subdirectory(3rd-party)
 
 if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
@@ -70,7 +71,7 @@ endif()
 set(PLOG_VERSION 1.1.4)
 set(NLOHMANN_VERSION 3.5.0)
 
-include_directories(3rd-party/nlohmann-${NLOHMANN_VERSION}/include)
+include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
 #-------------------
@@ -114,6 +115,8 @@ set_target_properties(${STATIC_LIB}
 
 target_compile_features(${STATIC_LIB} PRIVATE cxx_std_11)
 
+add_dependencies(${STATIC_LIB} plog)
+add_dependencies(${STATIC_LIB} json)
 
 #-------------------
 # tsparser executable
@@ -197,6 +200,9 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
+
+add_dependencies(${SHARED_LIB} plog)
+add_dependencies(${SHARED_LIB} json)
 
 #-------------------
 # add custom targets
