@@ -19,4 +19,4 @@ jobs:
           command: cd build && make unit-tests
       - run:
           name: Run micro benchmark
-          command: cd build && benchmark-tests
+          command: cd build && make benchmark-tests
