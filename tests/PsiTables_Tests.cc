@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 /// Project files
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"
 
 using namespace mpeg2ts;
 

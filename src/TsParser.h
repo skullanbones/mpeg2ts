@@ -19,7 +19,7 @@
 // Project files
 #include "GetBits.h"
 #include "TsStatistics.h"
-#include <public/Ts_IEC13818-1.h>
+#include "Ts_IEC13818-1.h"
 
 namespace mpeg2ts
 {

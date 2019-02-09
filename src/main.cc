@@ -24,8 +24,8 @@
 #include "TsParser.h"
 #include "h264/H264Parser.h"
 #include "mpeg2vid/Mpeg2VideoParser.h"
-#include "public/Ts_IEC13818-1.h"
-#include "public/mpeg2ts.h"
+#include "Ts_IEC13818-1.h"
+#include "mpeg2ts.h"
 #include "mpeg2ts_version.h" // Returns current version of mpeg2ts library
 
 using namespace mpeg2ts;

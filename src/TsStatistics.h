@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"
 
 namespace mpeg2ts
 {
