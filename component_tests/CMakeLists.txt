@@ -4,14 +4,17 @@ project(CmakeVirtualenv)
 
 enable_testing()
 
+set(PYTHON_VERSION 3)
+
 # Find Python and Virtualenv. We don't actually use the output of the
 # find_package, but it'll give nicer errors.
 find_package(PythonInterp 2.7 REQUIRED)
 find_program(VIRTUALENV virtualenv)
 if(NOT VIRTUALENV)
-    message(FATAL_ERROR "Could not find `virtualenv` in PATH")
+    message(FATAL_ERROR "Could not find `virtualenv` in PATH. You may need install by sudo apt-get install virtualenv.")
 endif()
-set(VIRTUALENV ${VIRTUALENV} -p python2.7)
+
+set(VIRTUALENV ${VIRTUALENV} -p python${PYTHON_VERSION})
 
 # Generate the virtualenv and ensure it's up to date.
 add_custom_command(
@@ -27,7 +30,7 @@ add_custom_command(
 
 # Build command line to run py.test.
 set(PYTEST
-    ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/python2
+    ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/python${PYTHON_VERSION}
     ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/py.test
 )
 
