@@ -47,11 +47,13 @@ add_test (NAME python-tests
 )
 
 add_custom_target(component-tests
-        # DEPENDS env
     COMMAND ${PYTEST} --benchmark-skip  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_custom_target(component-benchmark-tests
+    COMMAND ${PYTEST} --benchmark-enable --benchmark-only  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_custom_target(version
-        # DEPENDS env
      COMMAND ${PYTEST} --version
 )
