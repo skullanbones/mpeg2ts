@@ -41,6 +41,9 @@ RUN apt-get install --yes --no-install-recommends sudo=1.8.16-0ubuntu1.5
 RUN apt-get install --yes --no-install-recommends zip=3.0-11
 RUN apt-get install --yes --no-install-recommends unzip=6.0-20ubuntu1
 
+#python packages
+RUN pip install flake8
+
 # Install latest git
 RUN apt-add-repository ppa:git-core/ppa \
   && apt-get update \

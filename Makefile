@@ -16,15 +16,7 @@ SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 TOOLSDIR = $(PROJ_ROOT)/tools
-3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
 
-## 3rd-party settings
-PLOG_VERSION=1.1.4
-NLOHMANN_VERSION=3.5.0
-
-INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
-				-I$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)/include
 
 export INCLUDE_DIRS
 BUILD_TYPE ?= RELEASE
