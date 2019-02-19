@@ -10,7 +10,7 @@ FROM ubuntu:16.04 as base
 FROM base as user
 RUN apt-get update && apt-get -y --no-install-recommends install \
     ca-certificates=20170717~16.04.1 \
-    curl=7.47.0-1ubuntu2.11
+    curl
 
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
 RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.4/gosu-$(dpkg --print-architecture)" \
@@ -23,26 +23,43 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
 FROM user as build
 
 RUN apt-get update && apt-get install --yes --no-install-recommends
-RUN apt-get install --yes --no-install-recommends software-properties-common=0.96.20.7
+RUN apt-get install --yes --no-install-recommends apt-utils
+RUN apt-get install --yes --no-install-recommends software-properties-common
 RUN apt-get install --yes --no-install-recommends build-essential=12.1ubuntu2
-RUN apt-get install --yes --no-install-recommends clang-format-5.0=1:5.0-3~16.04.1
-RUN apt-get install --yes --no-install-recommends clang-tidy-6.0=1:6.0-1ubuntu2~16.04.1
+#RUN apt-get install --yes --no-install-recommends clang-format-5.0=1:5.0-3~16.04.1
+#RUN apt-get install --yes --no-install-recommends clang-tidy-6.0=1:6.0-1ubuntu2~16.04.1
 RUN apt-get install --yes --no-install-recommends tstools=1.11-1ubuntu1
 RUN apt-get install --yes --no-install-recommends gdb=7.11.1-0ubuntu1~16.5
 RUN apt-get install --yes --no-install-recommends gdbserver=7.11.1-0ubuntu1~16.5
-RUN apt-get install --yes --no-install-recommends python3-setuptools=20.7.0-1
-RUN apt-get install --yes --no-install-recommends virtualenv=15.0.1+ds-3ubuntu1
-RUN apt-get install --yes --no-install-recommends python3-pip=8.1.1-2ubuntu0.4
-RUN apt-get install --yes --no-install-recommends python3-dev=3.5.1-3
-RUN apt-get install --yes --no-install-recommends python3-virtualenv=15.0.1+ds-3ubuntu1
 RUN apt-get install --yes --no-install-recommends wget=1.17.1-1ubuntu1.4
 RUN apt-get install --yes --no-install-recommends lcov=1.12-2
 RUN apt-get install --yes --no-install-recommends sudo=1.8.16-0ubuntu1.5
 RUN apt-get install --yes --no-install-recommends zip=3.0-11
 RUN apt-get install --yes --no-install-recommends unzip=6.0-20ubuntu1
+RUN apt-get install --yes --no-install-recommends doxygen
+RUN apt-get install --yes --no-install-recommends graphviz
+
+# LLVM Clang
+ENV CLANG_VERSION=7
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+RUN apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main"
+RUN apt-get update
+#RUN apt-get install --yes --no-install-recommends clang-$CLANG_VERSION
+RUN apt-get install --yes --no-install-recommends clang-tidy-$CLANG_VERSION
+RUN apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION
+
+
+# python support
+RUN apt-get install --yes --no-install-recommends python3-setuptools=20.7.0-1
+RUN apt-get install --yes --no-install-recommends virtualenv=15.0.1+ds-3ubuntu1
+RUN apt-get install --yes --no-install-recommends python3-pip=8.1.1-2ubuntu0.4
+RUN apt-get install --yes --no-install-recommends python3-dev=3.5.1-3
+RUN apt-get install --yes --no-install-recommends python3-virtualenv=15.0.1+ds-3ubuntu1
+RUN apt-get install --yes --no-install-recommends python3-pip
+
 
 #python packages
-RUN pip install flake8
+RUN pip3 install flake8
 
 # Install latest git
 RUN apt-add-repository ppa:git-core/ppa \
