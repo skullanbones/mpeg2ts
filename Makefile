@@ -18,31 +18,11 @@ BUILDDIR = $(PROJ_ROOT)/build
 TOOLSDIR = $(PROJ_ROOT)/tools
 
 
-export INCLUDE_DIRS
-BUILD_TYPE ?= RELEASE
-
 ## Machine
 CORES ?= $(shell nproc)
 MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
-			
-LDFLAGS =
-ifeq ($(BUILD_TYPE),DEBUG)
-	CXXFLAGS += -g -O0 --coverage
-	LDFLAGS += -lgcov
-else ifeq ($(BUILD_TYPE),RELEASE)
-	CXXFLAGS += -O3
-	LDFLAGS +=
-endif
-
-# Only needed if linkage to libts.so
-#export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
-
-## Python
-PYTHON_VERSION ?= 3
-
-$(info OBJS is: $(OBJS))
 
 .PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests cppcheck
 
