@@ -24,8 +24,6 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 
-#message("ALL_SOURCE_FILES " ${ALL_SOURCE_FILES})
-
 add_custom_target(
         clang-format-${CLANG_VERSION}
         COMMAND ${CLANG_FORMAT_EXE}

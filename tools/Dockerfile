@@ -26,8 +26,6 @@ RUN apt-get update && apt-get install --yes --no-install-recommends
 RUN apt-get install --yes --no-install-recommends apt-utils
 RUN apt-get install --yes --no-install-recommends software-properties-common
 RUN apt-get install --yes --no-install-recommends build-essential=12.1ubuntu2
-#RUN apt-get install --yes --no-install-recommends clang-format-5.0=1:5.0-3~16.04.1
-#RUN apt-get install --yes --no-install-recommends clang-tidy-6.0=1:6.0-1ubuntu2~16.04.1
 RUN apt-get install --yes --no-install-recommends tstools=1.11-1ubuntu1
 RUN apt-get install --yes --no-install-recommends gdb=7.11.1-0ubuntu1~16.5
 RUN apt-get install --yes --no-install-recommends gdbserver=7.11.1-0ubuntu1~16.5

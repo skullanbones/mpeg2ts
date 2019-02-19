@@ -32,7 +32,6 @@ help:
 	@echo '  lint                  - run clang formating for c++ and flake8 for python'
 	@echo '  flake                 - run flake8 on python files.'
 	@echo '  clang-tidy            - run clang-tidy on c++ files.'
-	@echo '  clang-format          - run clang-format on c++ files following rules specified in tools dir.'
 	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
@@ -44,13 +43,10 @@ help:
 
 all: help
 
-lint: flake clang-format
+lint: flake
 
 flake:
 	flake8 component_tests
-
-clang-format:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
 
 clang-tidy:
 	clang-tidy-6.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
