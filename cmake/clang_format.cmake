@@ -29,7 +29,7 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 add_custom_target(
         clang-format-${CLANG_VERSION}
         COMMAND ${CLANG_FORMAT_EXE}
-        -style=LLVM
+        -style=file
         -i
         ${ALL_SOURCE_FILES}
 )
