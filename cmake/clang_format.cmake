@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-message("Using clang-format")
+message(STATUS "Using clang-format")
 
 set(CLANG_VERSION 7)
 

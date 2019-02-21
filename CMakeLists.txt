@@ -241,3 +241,4 @@ if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
 endif()
 
 include(clang_format)
+include(cppcheck)
