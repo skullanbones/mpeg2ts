@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
+message("Using clang-format")
+
 set(CLANG_VERSION 7)
 
 find_program(
@@ -9,7 +11,7 @@ find_program(
 )
 
 if(NOT CLANG_FORMAT_EXE)
-    message(STATUS "clang-format not found on your system. Bailing out...")
+    message(WARNING "clang-format not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "clang-format found: ${CLANG_FORMAT_EXE}")
@@ -25,7 +27,7 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 
 add_custom_target(
-        clang-format-${CLANG_VERSION}
+        clang-format
         COMMAND ${CLANG_FORMAT_EXE}
         -style=file
         -i
