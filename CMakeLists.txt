@@ -232,3 +232,13 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
         DESTINATION include/${PROJECT_NAME})
+
+#-------------------
+# modules
+#-------------------
+if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
+        list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+endif()
+
+include(clang_format)
+include(cppcheck)

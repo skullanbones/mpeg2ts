@@ -16,43 +16,15 @@ SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
 TOOLSDIR = $(PROJ_ROOT)/tools
-3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
 
-## 3rd-party settings
-PLOG_VERSION=1.1.4
-NLOHMANN_VERSION=3.5.0
-
-INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
-				-I$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)/include
-
-export INCLUDE_DIRS
-BUILD_TYPE ?= RELEASE
 
 ## Machine
 CORES ?= $(shell nproc)
 MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
-			
-LDFLAGS =
-ifeq ($(BUILD_TYPE),DEBUG)
-	CXXFLAGS += -g -O0 --coverage
-	LDFLAGS += -lgcov
-else ifeq ($(BUILD_TYPE),RELEASE)
-	CXXFLAGS += -O3
-	LDFLAGS +=
-endif
 
-# Only needed if linkage to libts.so
-#export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
-
-## Python
-PYTHON_VERSION ?= 3
-
-$(info OBJS is: $(OBJS))
-
-.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests cppcheck
+.PHONY: all lint flake clang-tidy run docker-image coverage clean docker-bash  
 
 help:
 	@echo
@@ -60,11 +32,8 @@ help:
 	@echo '  lint                  - run clang formating for c++ and flake8 for python'
 	@echo '  flake                 - run flake8 on python files.'
 	@echo '  clang-tidy            - run clang-tidy on c++ files.'
-	@echo '  clang-format          - run clang-format on c++ files following rules specified in tools dir.'
-	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
-	@echo '  benchmark-tests       - run all benchmark tests.'
 	@echo '  coverage              - run code coverage on unit-tests.'
 	@echo '  clean                 - deletes build content.'
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
@@ -72,19 +41,13 @@ help:
 
 all: help
 
-lint: flake clang-format
+lint: flake
 
 flake:
 	flake8 component_tests
 
-clang-format:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
-
 clang-tidy:
 	clang-tidy-6.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
-
-cppcheck:
-	cppcheck --enable=all $(SRCDIR)
 
 run: $(BUILDDIR)/tsparser
 	$(BUILDDIR)/tsparser --input $(PROJ_ROOT)/assets/bbc_one.ts --pid 258 --write 2304 --write 2305 --write 2306 --write 2342
@@ -102,11 +65,6 @@ docker-image:
 
 coverage: build-unit-tests
 	$(MAKE) -C tests coverage
-
-
-benchmark-tests: env $(BUILDDIR)/tsparser
-	@echo "[Running component tests..]"
-	./env/bin/pytest --benchmark-enable --benchmark-only
 
 clean:
 	@for dir in $(SUBDIRS); do \
