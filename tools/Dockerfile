@@ -84,7 +84,4 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Add root password
-RUN echo "root:Docker!" | chpasswd
-
 WORKDIR /tmp/workspace
