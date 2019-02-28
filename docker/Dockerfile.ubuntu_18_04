@@ -43,9 +43,11 @@ ENV CLANG_VERSION=7
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 RUN apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main"
 RUN apt-get update
-#RUN apt-get install --yes --no-install-recommends clang-$CLANG_VERSION
+RUN apt-get install --yes --no-install-recommends clang-$CLANG_VERSION
 RUN apt-get install --yes --no-install-recommends clang-tidy-$CLANG_VERSION
 RUN apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION
+RUN apt-get install --yes --no-install-recommends llvm-$CLANG_VERSION-dev
+RUN apt-get install --yes --no-install-recommends libclang-$CLANG_VERSION-dev
 
 
 # python support
@@ -98,6 +100,14 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cd /benchmark/build \
   && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
   && cd / && rm -rf /benchmark
+
+# Install latest iwyu
+RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /iwyu \
+  && mkdir /iwyu/build \
+  && cd /iwyu && git checkout clang_$CLANG_VERSION.0 \
+  && cd /iwyu/build \
+  && cmake .. && cmake --build . -- -j16 && make install \
+  && cd / && rm -rf /iwyu
 
 # entrypoint
 COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
