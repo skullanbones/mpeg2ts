@@ -15,7 +15,7 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
-TOOLSDIR = $(PROJ_ROOT)/tools
+DOCKER_DIR = $(PROJ_ROOT)/docker
 
 
 ## Machine
@@ -57,7 +57,7 @@ run: $(BUILDDIR)/tsparser
 # Build docker image
 docker-image:
 	docker build \
-		--file=$(TOOLSDIR)/Dockerfile.$(DOCKER_IMAGE_BASE) \
+		--file=$(DOCKER_DIR)/Dockerfile.$(DOCKER_IMAGE_BASE) \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
 		--tag=$(DOCKER_IMAGE_NAME):latest .
 
