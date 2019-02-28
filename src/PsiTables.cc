@@ -1,9 +1,18 @@
 
-#include "Logging.h"
-#include "mpeg2ts.h"
+#include <map>              // for map
+#include <memory>           // for allocator_traits<>::value_type
+#include <ostream>          // for operator<<, basic_ostream::operator<<
+#include <string>           // for string, char_traits, operator<<
+#include <vector>           // for vector
 
 /// 3rd-party
-#include <plog/Log.h>
+#include "plog/Log.h"       // for LOGD_
+#include "plog/Record.h"    // for Record
+
+#include "Logging.h"        // for FileLog
+#include "Ts_IEC13818-1.h"  // for Program, Program::(anonymous), ProgramType
+#include "mpeg2ts.h"        // for PsiTable, PmtTable, PatTable, StreamTypeH...
+
 
 namespace mpeg2ts
 {

@@ -1,5 +1,6 @@
 
-#include "mpeg2ts.h"
+#include <ostream>    // for operator<<, basic_ostream::operator<<, ostream                                                                  
+#include "mpeg2ts.h"  // for PesPacket, operator<<   
 
 namespace mpeg2ts
 {

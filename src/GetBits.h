@@ -1,8 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <stdexcept>
-#include <string>
+#include <bits/stdint-uintn.h>  // for uint8_t, uint64_t                                                                                                                                                                                                      
+#include <iosfwd>               // for size_t                                                                        
+#include <stdexcept>            // for runtime_error                                                            
+#include <string>               // for string   
 
 class GetBits
 {

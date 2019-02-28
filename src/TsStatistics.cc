@@ -13,13 +13,18 @@
  * permission from authors
  */
 
+
+#include <map>            // for map
+#include <ostream>        // for basic_ostream::operator<<
+
 /// 3rd-party
-#include <plog/Log.h>
+#include "plog/Record.h"  // for Record
+#include "plog/Log.h"     // for LOGD_
 
 /// project files
-#include "Logging.h"
+#include "Logging.h"      // for FileLog
+#include "mpeg2ts.h"      // for PidStatistic, PidStatisticsMap, TsCounters
 #include "TsStatistics.h"
-#include "mpeg2ts.h"
 
 namespace mpeg2ts
 {

@@ -1,5 +1,7 @@
 
-#include "GetBits.h"
+#include <stdio.h>  // for printf, size_t
+
+#include "GetBits.h"                                                                                                                                  
 
 GetBits::GetBits()
     : mNumStoredBits{ 0 }

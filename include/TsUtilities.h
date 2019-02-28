@@ -1,23 +1,16 @@
 #pragma once
 
+#include <bits/stdint-uintn.h>  // for uint16_t, uint8_t                                                                                                          
+#include <cstddef>              // for size_t            
+#include <map>                  // for map, _Rb_tree_const_iterator                                                                                             
+#include <memory>               // for unique_ptr                                                                                                                    
+#include <string>               // for string, basic_string
+#include <utility>              // for pair                                                                     
+#include <vector>               // for vector                                                                                                                 
 
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <string>
-
-#include "mpeg2ts.h"
-
-
-// Forward decl
-namespace mpeg2
-{
-class Mpeg2VideoEsParser;
-}
-namespace h264
-{
-class H264EsParser;
-}
+#include "mpeg2ts.h"            // for MPEG2TS_API, ByteVector, PesPacket (p...
+namespace h264 { class H264EsParser; }
+namespace mpeg2 { class Mpeg2VideoEsParser; }
 
 /*
  * High level API on mpeg2ts library
