@@ -3,11 +3,11 @@
 // Dont allow json.hpp throw exceptions
 #define JSON_THROW_USER
 
-#include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp"  // for basic_json<>::value_type, basic_json
 
 #include <fstream>
-#include <iostream>
-#include <string>
+#include <iostream>           // for operator<<, basic_ostream, ifstream, cerr
+#include <string>             // for allocator, operator+, string, char_traits
 
 using json = nlohmann::json;
 

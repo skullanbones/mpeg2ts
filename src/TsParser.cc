@@ -3,12 +3,18 @@
  * permission from authors
  */
 
+#include <cstdint>        // for uint8_t
+#include <iostream>       // for operator<<, basic_ostream::operator<<, basi...
+#include <utility>        // for move
+#include <vector>         // for vector
+
 /// 3rd-party
-#include <plog/Log.h>
+#include "plog/Log.h"     // for LOGE_, LOGV
+#include "plog/Record.h"  // for Record
 
 /// Project files
-#include "Logging.h"
 #include "TsParser.h"
+#include "Logging.h"      // for FileLog
 
 namespace mpeg2ts
 {

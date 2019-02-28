@@ -4,10 +4,13 @@
  * This file loads the settings json file which contains
  * runtime configurations...
  */
-#include <string>
+
+#include <bits/exception.h>   // for exception
+#include <string>             // for string
 
 /// 3rd-party
-#include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp"  // for json
+
 
 using json = nlohmann::json;
 

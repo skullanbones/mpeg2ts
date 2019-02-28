@@ -1,11 +1,15 @@
 #pragma once
 
-#include <map>
-#include <vector>
+#include <bits/stdint-uintn.h>  // for uint8_t, uint64_t                                                                                                                                                                                                      
+#include <cstdint>              // for uint8_t
+#include <map>                  // for map, _Rb_tree_const_iterator
+#include <string>               // for string, basic_string
+#include <utility>              // for pair
+#include <vector>               // for vector
 
 /// Project files
-#include "EsParser.h"
-#include "GetBits.h"
+#include "EsParser.h"           // for EsParser
+#include "GetBits.h"            // for GetBits
 
 namespace mpeg2
 {

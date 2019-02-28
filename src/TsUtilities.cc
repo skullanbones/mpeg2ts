@@ -1,16 +1,32 @@
 
-#include <fstream>
 
-#include "JsonSettings.h"
-#include "Logging.h"
-#include "TsUtilities.h"
-#include "Ts_IEC13818-1.h"
-#include "h264/H264Parser.h"
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include <bits/exception.h>                      // for exception                            
+#include <stdlib.h>                              // for exit, EXIT_SUCCESS                                                                                                                                                                                    
+#include <string.h>                              // for strlen                                                   
+#include <algorithm>                             // for copy, max, find_if
+#include <cstdint>                               // for uint8_t, uint16_t                                                                                      
+#include <fstream>                               // for basic_ostream::opera...                                                                                                                                             
+#include <stdexcept>                             // for out_of_range                                                                         
 
 /// 3rd-party
-#include <plog/Appenders/ConsoleAppender.h>
-#include <plog/Log.h>
+#include "plog/Appenders/ConsoleAppender.h"      // for ConsoleAppender                                                                                   
+#include "plog/Log.h"                            // for LOGD, LOGE, LOGE_
+#include "plog/Appenders/RollingFileAppender.h"  // for RollingFileAppender
+#include "plog/Formatters/CsvFormatter.h"        // for CsvFormatter
+#include "plog/Formatters/TxtFormatter.h"        // for TxtFormatter
+#include "plog/Init.h"                           // for init
+#include "plog/Logger.h"                         // for Logger
+#include "plog/Record.h"                         // for Record
+#include "plog/Severity.h"                       // for Severity, debug, error
+
+/// Project files
+#include "TsUtilities.h"
+#include "JsonSettings.h"                        // for LoadException, Settings                   
+#include "Logging.h"                             // for FileLog
+#include "Ts_IEC13818-1.h"                       // for Program, Program::(a...
+#include "h264/H264Parser.h"                     // for EsInfoH264, H264EsPa...
+#include "mpeg2vid/Mpeg2VideoParser.h"           // for EsInfoMpeg2, Mpeg2Vi...
+
 
 namespace tsutil
 {
