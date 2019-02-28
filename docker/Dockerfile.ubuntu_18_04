@@ -100,7 +100,7 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cd / && rm -rf /benchmark
 
 # entrypoint
-COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 WORKDIR /tmp/workspace
