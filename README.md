@@ -37,6 +37,9 @@ NONE
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Releases
+*V0.2.1*
+* [*]  Fix build Release version and build issues (hotfix-0.2.1)
+
 *V0.2*
 * [*] Compile on Windows fixes
 * [FEAT-163] Add codec parsers to TsUtilities
@@ -93,9 +96,7 @@ where VERBOSE is the maximum log output as compared to NONE which generates no o
 * Added PAT parsing
 * Added Demuxer
 
-## CMake
-![](images/cmake.png)
-
+## Building
 To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```Bash
 mkdir build
@@ -111,6 +112,7 @@ tsparser*
 ```
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
+## Installation
 In order to install this library you can type:
 ```Bash
 cmake -DCMAKE_INSTALL_PREFIX=../_install ..
@@ -119,7 +121,17 @@ make install
 ```
 and now you will find the installed libraries and headers in `_install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
 
-## Linux Make
+## Usage
+To find this package using CMake simply use find_package:
+```Bash
+find_package(mpeg2ts REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
+```
+
+If you want to use ts-lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where ts-lib is being installed if it wasn't installed under your system.
+
+### Linux Make
 [Deprecated] This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
 
 ## Tsparser
@@ -221,13 +233,13 @@ Right now there is no online tool. Use `docker-make cppcheck` and `docker-make c
 
 
 ## Technologies / Open Source Software (OSS)
-* C++
-* Docker
-* CMake
-* GNU Make
-* GCC
-* Python
-* Git
-* Google test
-
-![](images/ts_lib_oss.png)
+| Technology    | Version minimal requirement         |
+|---------------|-------------------------------------|
+| C++           | C++11                               | 
+| Docker        | 17.x                                | 
+| CMake         | 3.11                                |
+| GNU Make      | Ubuntu 16.04                        |
+| GCC           | Ubuntu 16.04 (5.4)                  |
+| Python        | Python 3.x                          |
+| Git           | 2.x                                 |
+| Google test   | 1.8.x                               |
