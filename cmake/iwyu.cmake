@@ -14,5 +14,5 @@ if (USE_IWYU)
   set_property(TARGET mpeg2ts PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
 
 else()
-  message(STATUS "Note include-what-you-use is NOT enabled.")
+  message(STATUS "Note include-what-you-use is NOT enabled. Enable it by append -DUSE_IWYU=ON.")
 endif()
