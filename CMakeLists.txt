@@ -177,10 +177,10 @@ target_compile_features(${SHARED_LIB} PRIVATE cxx_std_11)
 
 target_sources(
         ${SHARED_LIB}
-        PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+#        PUBLIC
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
@@ -219,11 +219,11 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
-install(TARGETS ${SHARED_LIB} ${STATIC_LIB}
+install(TARGETS ${SHARED_LIB} ${STATIC_LIB} EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(FILES 
@@ -231,7 +231,27 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
-        DESTINATION include/${PROJECT_NAME})
+        DESTINATION include/${PROJECT_NAME}
+)
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+)
+
+install(FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/mpeg2tsConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/mpeg2tsConfigVersion.cmake
+        DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
 
 #-------------------
 # modules
