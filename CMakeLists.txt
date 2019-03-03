@@ -231,7 +231,8 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
-        DESTINATION include/${PROJECT_NAME})
+        DESTINATION include/${PROJECT_NAME}
+)
 
 install(EXPORT ${PROJECT_NAME}Targets
         FILE ${PROJECT_NAME}Targets.cmake
@@ -248,7 +249,7 @@ write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
 install(FILES 
         ${CMAKE_CURRENT_SOURCE_DIR}/mpeg2tsConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/mpeg2tsConfigVersion.cmake
-        DESTINATION lib/cmake/mpeg2ts
+        DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
 
