@@ -76,3 +76,6 @@ msvc/2015/TestTsLib/TestTsLib/mpeg2ts.dll
 msvc/2015/TestTsLib/TestTsLib/mpeg2ts.lib
 msvc/2015/TestTsLib/TestTsLib/mpeg2ts.exp
 msvc/2015/TestTsLib/TestTsLib/settings.json
+
+# CPack
+CPackConfig.cmake
