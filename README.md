@@ -37,6 +37,22 @@ NONE
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Releases
+*V0.3.0*
+* [BUG-202] Fix TsUtilities crash when file not aligned to ts-packets
+* [BUG-191] Add CPack and package both debug/release build
+* [BUG-192] Add CMake finder for find_package
+* [BUG-193] Run include-what-you-use
+* [FEAT-181] Add include-what-you-use to CMake
+* [*] Update use Ubuntu 18.04 CircleCI
+* [FEAT_174] Add cppcheck to CMake
+* [*] Port component-tests to CMake
+* [*] Port 3rd-party to CMake
+* [*] Add CMake install target
+* [*] Update CircleCI only use CMake
+* [*] Add version number from CMake to tsparser
+* [*] Add debug and release build
+* [FEAT-175, FEAT-177] Improve CMake considerable using modern CMake
+
 *V0.2.1*
 * [*]  Fix build Release version and build issues (hotfix-0.2.1)
 
