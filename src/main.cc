@@ -22,14 +22,14 @@
 /// Project files
 #include "Logging.h"
 #include "TsParser.h"
+#include "Ts_IEC13818-1.h"
 #include "h264/H264Parser.h"
+#include "mpeg2ts.h"
+#include "mpeg2ts_version.h" // Returns current version of mpeg2ts library
 #include "mpeg2vid/Mpeg2VideoParser.h"
-#include "public/Ts_IEC13818-1.h"
-#include "public/mpeg2ts.h"
 
 using namespace mpeg2ts;
 
-static const std::string VERSION{ "0.1" };
 
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
@@ -479,7 +479,7 @@ int main(int argc, char** argv)
         }
         case 'v':
         {
-            printf("version: %s\n", VERSION.c_str());
+            printf("version: %s\n", getMpeg2tsVersion().c_str());
             exit(EXIT_SUCCESS);
         }
         case 'w':

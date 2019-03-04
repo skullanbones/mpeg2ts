@@ -15,101 +15,16 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
-TOOLSDIR = $(PROJ_ROOT)/tools
-3RDPARTYDIR = $(PROJ_ROOT)/3rd-party
+DOCKER_DIR = $(PROJ_ROOT)/docker
 
-## 3rd-party settings
-PLOG_VERSION=1.1.4
-NLOHMANN_VERSION=3.5.0
-
-INCLUDE_DIRS += -I$(PROJ_ROOT)/include \
-				-I$(3RDPARTYDIR)/plog-$(PLOG_VERSION)/include \
-				-I$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)/include
-
-export INCLUDE_DIRS
-BUILD_TYPE ?= RELEASE
 
 ## Machine
 CORES ?= $(shell nproc)
 MAKEFLAGS+="-j $(CORES)"
 $(info MAKEFLAGS= $(MAKEFLAGS))
 
-## Compiler
-CXX = c++
-STATIC = lib$(COMPONENT_NAME).a
-DYNAMIC = lib$(COMPONENT_NAME).so
 
-CXXFLAGS = 	-Wall \
-			-Wextra \
-			-Wshadow \
-			-Wnon-virtual-dtor \
-			-Wold-style-cast \
-			-Wcast-align \
-			-Wunused \
-			-Woverloaded-virtual \
-			-Wpedantic \
-			-Wuseless-cast \
-			-Wdouble-promotion \
-			-Wformat=2 \
-			-Werror \
-			-Wconversion \
-			-pipe \
-			-std=c++11 \
-			-fPIC \
-
-# These only works on newer compilers:
-# Docker has 16.04 compiler which is the least supported compiler
-#			-Wmisleading-indentation \			
-#			-Wduplicated-cond \
-#			-Wduplicated-branches \
-#			-Wnull-dereference \
-#			-Wlifetime \
-
-# Doesnt work with nlohmann 
-#			-Wlogical-op \
-			
-LDFLAGS =
-ifeq ($(BUILD_TYPE),DEBUG)
-	CXXFLAGS += -g -O0 --coverage
-	LDFLAGS += -lgcov
-else ifeq ($(BUILD_TYPE),RELEASE)
-	CXXFLAGS += -O3
-	LDFLAGS +=
-endif
-
-# Only needed if linkage to libts.so
-#export LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH
-
-## Python
-PYTHON_VERSION ?= 3
-
-## Sources
-SRCS = 	TsParser.cc \
-		GetBits.cc \
-		TsDemuxer.cc \
-		TsStatistics.cc \
-        mpeg2vid/Mpeg2VideoParser.cc \
-        h264/H264Parser.cc \
-        PesPacket.cc \
-        PsiTables.cc \
-        TsPacketInfo.cc \
-        JsonSettings.cc \
-		TsUtilities.cc
-
-HDRS = 	include/public/mpeg2ts.h \
-		include/public/Ts_IEC13818-1.h \
-		include/GetBits.h \
-		include/TsParser.h \
-		include/mpeg2vid/Mpeg2VideoParser.h \
-		include/h264/H264Parser.h \
-		include/JsonSettings.h \
-		include/TsStatistics.h
-
-OBJS = $(patsubst %.cc,$(BUILDDIR)/%.o,$(SRCS))
-
-$(info OBJS is: $(OBJS))
-
-.PHONY: all clean lint flake docker-image docker-bash test gtests run clang-tidy clang-format unit-test component-tests cppcheck
+.PHONY: all lint flake clang-tidy run docker-image coverage clean docker-bash  
 
 help:
 	@echo
@@ -117,75 +32,22 @@ help:
 	@echo '  lint                  - run clang formating for c++ and flake8 for python'
 	@echo '  flake                 - run flake8 on python files.'
 	@echo '  clang-tidy            - run clang-tidy on c++ files.'
-	@echo '  clang-format          - run clang-format on c++ files following rules specified in tools dir.'
-	@echo '  cppcheck              - run cppcheck on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
 	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
-	@echo '  tests                 - run all tests unit & component.'
-	@echo '  unit-tests            - run all unit tests.'
-	@echo '  env                   - build python virtual environment for pytest.'
-	@echo '  component-tests       - run all component tests.'
-	@echo '  benchmark-tests       - run all benchmark tests.'
-	@echo '  libs                  - make both static and dynamic libs.'
-	@echo '  shared                - make static object as static linkage library.'
-	@echo '  static                - make shared object as dynamic linkage library.'
-	@echo '  3rd-party             - install 3rd-party dependencies.'
-	@echo '  plog                  - install 3rd-party plog logging library.'
 	@echo '  coverage              - run code coverage on unit-tests.'
 	@echo '  clean                 - deletes build content.'
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
 	@echo
 
-all: folders $(BUILDDIR)/tsparser
+all: help
 
-folders: $(BUILDDIR) $(BUILDDIR)/mpeg2vid $(BUILDDIR)/h264
-
-$(BUILDDIR):
-	mkdir -p $@
-	
-$(BUILDDIR)/mpeg2vid:	
-	mkdir -p $@
-	
-$(BUILDDIR)/h264:	
-	mkdir -p $@
-
-$(BUILDDIR)/tsparser: $(BUILDDIR)/main.o static $(HDRS)
-	$(CXX) -o $@ $(BUILDDIR)/main.o $(LDFLAGS) -L$(BUILDDIR) -l:$(STATIC)
-
-$(BUILDDIR)/main.o: 3rd-party $(SRCDIR)/main.cc $(HDRS)
-	$(CXX) -o $@ $(INCLUDE_DIRS) -c $(CXXFLAGS) $(SRCDIR)/main.cc
-
-$(OBJS): $(BUILDDIR)/%.o : $(SRCDIR)/%.cc 3rd-party
-	@echo [Compile] $<
-	@$(CXX) $(INCLUDE_DIRS) -c $(CXXFLAGS) $< -o $@
-
-libs: $(BUILDDIR) static shared
-
-static: folders $(BUILDDIR)/$(STATIC)
-
-$(BUILDDIR)/$(STATIC): $(OBJS) $(HDRS)
-	@echo "[Link (Static)]"
-	@ar rcs $@ $^
-
-shared: folders $(BUILDDIR)/$(DYNAMIC)
-
-$(BUILDDIR)/$(DYNAMIC): $(OBJS)
-	@echo "[Link (Dynamic)]"
-	$(CXX) -shared -o $@ $^
-
-lint: flake clang-format
+lint: flake
 
 flake:
 	flake8 component_tests
 
-clang-format:
-	find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\)' -exec clang-format-5.0 -style=file -i {} \;
-
 clang-tidy:
 	clang-tidy-6.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
-
-cppcheck:
-	cppcheck --enable=all $(SRCDIR)
 
 run: $(BUILDDIR)/tsparser
 	$(BUILDDIR)/tsparser --input $(PROJ_ROOT)/assets/bbc_one.ts --pid 258 --write 2304 --write 2305 --write 2306 --write 2342
@@ -195,72 +57,16 @@ run: $(BUILDDIR)/tsparser
 # Build docker image
 docker-image:
 	docker build \
-		--file=$(TOOLSDIR)/Dockerfile \
+		--file=$(DOCKER_DIR)/Dockerfile.$(DOCKER_IMAGE_BASE) \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
-		--tag=$(DOCKER_IMAGE_NAME):latest .
-
-### all tests
-
-tests: unit-tests component-tests
-
-### unit tests
-
-build-unit-tests: static
-	$(MAKE) -C tests gtests
-
-unit-tests: build-unit-tests
-	@echo "[Running unit tests..]"
-	$(MAKE) -C tests run-unit-tests
+		--tag=$(DOCKER_IMAGE_NAME):latest $(DOCKER_DIR)
 
 ### coverage	
 
 coverage: build-unit-tests
 	$(MAKE) -C tests coverage
 
-### component tests
-
-env:
-	virtualenv -p python$(PYTHON_VERSION) $@
-	./env/bin/pip install -r component_tests/requirements.txt
-
-component-tests: env $(BUILDDIR)/tsparser
-	@echo "[Running component tests..]"
-	./env/bin/pytest --benchmark-skip
-
-benchmark-tests: env $(BUILDDIR)/tsparser
-	@echo "[Running component tests..]"
-	./env/bin/pytest --benchmark-enable --benchmark-only
-
-### 3rd-party stuff
-$(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz:
-	wget https://github.com/SergiusTheBest/plog/archive/$(PLOG_VERSION).tar.gz -O $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
-
-$(3RDPARTYDIR)/.plog_extracted: $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz
-	cd $(3RDPARTYDIR)
-	tar xvf $(3RDPARTYDIR)/plog-$(PLOG_VERSION).tar.gz -C $(3RDPARTYDIR)
-	touch $@
-
-$(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip:
-	wget https://github.com/nlohmann/json/releases/download/v$(NLOHMANN_VERSION)/include.zip -O $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip
-
-$(3RDPARTYDIR)/.nlohmann_extracted: $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip
-	cd $(3RDPARTYDIR)
-	mkdir -p nlohmann-$(NLOHMANN_VERSION)
-	unzip $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION).zip -d $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)
-	touch $@
-
-3rd-party: plog json
-
-plog: $(3RDPARTYDIR)/.plog_extracted
-
-json: $(3RDPARTYDIR)/.nlohmann_extracted
-
 clean:
-	rm -f $(OBJS)
-	rm -f $(BUILDDIR)/tsparser
-	rm -f $(BUILDDIR)/main.o
-	rm -f $(BUILDDIR)/$(STATIC)
-	rm -f $(BUILDDIR)/$(DYNAMIC)
 	@for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir clean; \
 	done
@@ -273,10 +79,5 @@ clean:
 
 ### Will force clean download cache & build directory
 clean-all: clean
-	rm -f $(3RDPARTYDIR)/.plog_extracted
-	rm -rf $(3RDPARTYDIR)/plog-$(PLOG_VERSION)
-	rm -f $(3RDPARTYDIR)/.nlohmann_extracted
-	rm -rf $(3RDPARTYDIR)/nlohmann-$(NLOHMANN_VERSION)
 	rm -rf $(BUILDDIR)
 	rm -rf $(PROJ_ROOT)/component_tests/downloaded_files
-

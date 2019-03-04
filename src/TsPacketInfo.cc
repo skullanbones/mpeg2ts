@@ -1,5 +1,7 @@
 
-#include "public/mpeg2ts.h"
+#include <ostream>    // for operator<<, ostream, basic_ostream, basic_ostre...
+
+#include "mpeg2ts.h"  // for TsPacketInfo, operator<<
 
 namespace mpeg2ts
 {

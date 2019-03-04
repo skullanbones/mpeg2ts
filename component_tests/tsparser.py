@@ -65,7 +65,7 @@ class TsParser(object):
         """Wait for the process to exit"""
         print("Waiting for parser process to exit")
         wait_start_time = time.time()
-        out, err = self.proc.communicate(timeout=timeout * 1)
+        out, err = self.proc.communicate()
         print("Parser process done after ",
               round(time.time() - wait_start_time), " seconds")
         exitcode = self.proc.returncode

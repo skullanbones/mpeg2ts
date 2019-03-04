@@ -35,7 +35,7 @@ docker_run() {
 		        --workdir /tmp/workspace$SUB_DIR \
                 --env "TERM=xterm-256color" \
                 --tty \
-                --entrypoint /tmp/workspace/tools/entrypoint.sh \
+                --entrypoint /tmp/workspace/docker/entrypoint.sh \
 				"$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VER" \
 				$*
 }
@@ -62,7 +62,7 @@ docker-interactive() {
 		        --workdir /tmp/workspace$SUB_DIR \
                 --env "TERM=xterm-256color" \
                 --tty \
-                --entrypoint /tmp/workspace/tools/entrypoint.sh \
+                --entrypoint /tmp/workspace/docker/entrypoint.sh \
 				"$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VER" /bin/bash
 }
 

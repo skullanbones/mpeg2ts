@@ -1,9 +1,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include <bits/stdint-intn.h>   // for int64_t
+#include <bits/stdint-uintn.h>  // for uint8_t
 
-#include "public/mpeg2ts.h"
+#include "mpeg2ts.h"            // for TsCounters, PidStatisticsMap
 
 namespace mpeg2ts
 {

@@ -14,12 +14,14 @@
  */
 #pragma once
 
-#include <cstdint>
+#include <bits/stdint-uintn.h>  // for uint8_t, uint64_t
+#include <map>                  // for map
 
 // Project files
-#include "GetBits.h"
-#include "TsStatistics.h"
-#include <public/Ts_IEC13818-1.h>
+#include "GetBits.h"            // for GetBits
+#include "TsStatistics.h"       // for TsStatistics
+#include "Ts_IEC13818-1.h"      // for TsAdaptationFieldHeader, TsHeader
+#include "mpeg2ts.h"            // for ByteVector, TsPacketInfo (ptr only)
 
 namespace mpeg2ts
 {

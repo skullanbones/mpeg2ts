@@ -1,5 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
-project(ts_lib)
+cmake_minimum_required(VERSION 3.12)
+
+project(mpeg2ts
+        VERSION 0.3.0
+        DESCRIPTION "MPEG-2 Parsing of Video streams"
+        LANGUAGES CXX)
+
+set(STATIC_LIB ${PROJECT_NAME}_static)
+set(SHARED_LIB ${PROJECT_NAME})
 
 #-------------------
 # global settings
@@ -11,15 +18,19 @@ else()
    set(USE_DOCKER OFF)
 endif()
 
-
 #-------------------
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory (tests)
-add_subdirectory (bench)
+add_subdirectory(tests)
+add_subdirectory(bench)
+add_subdirectory(3rd-party)
+add_subdirectory(component_tests)
 
-set(CMAKE_CXX_STANDARD 11)
+if(NOT CMAKE_INSTALL_BINDIR)
+    include(GNUInstallDirs)
+endif()
+
 if (MSVC)
     add_compile_options(/W4)
 else()    
@@ -49,95 +60,150 @@ else()
                         -Wdouble-promotion # warn if float is implicit promoted to double
                         -Wformat=2 # warn on security issues around functions that format output
                                    # (ie printf)
-                        -Winline # Warn if a function that is declared as inline cannot be inlined.
+#                        -Winline # Warn if a function that is declared as inline cannot be inlined.
                         -Werror # Make the specified warning into an error.
         )
 endif()
+
+
+#-------------------
+# 3rd-party
+#-------------------
+set(PLOG_VERSION 1.1.4)
+set(NLOHMANN_VERSION 3.5.0)
+
+include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
+include_directories(3rd-party/plog-${PLOG_VERSION}/include)
+
+#-------------------
+# static lib
+#-------------------
+add_library(${STATIC_LIB} STATIC)
+
+#-------------------
+# sources
+#-------------------
+target_sources(
+        ${STATIC_LIB}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
+
 
 #-------------------
 # includes & sources
 #-------------------
 ## project
-include_directories(include)
+target_include_directories(${STATIC_LIB}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
-## 3rd-party
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
+set_target_properties(${STATIC_LIB}
+    PROPERTIES
+        DEBUG_POSTFIX "-d"
+)
 
-include_directories(3rd-party/nlohmann-${NLOHMANN_VERSION}/include)
-include_directories(3rd-party/plog-${PLOG_VERSION}/include)
+target_compile_features(${STATIC_LIB} PRIVATE cxx_std_11)
 
-set(    TsLibSourcesList
-        include/public/mpeg2ts.h
-        include/public/Ts_IEC13818-1.h
-        include/public/TsUtilities.h
-        include/h264/H264Parser.h
-        include/mpeg2vid/Mpeg2VideoParser.h
-        include/EsParser.h
-        include/GetBits.h
-        include/JsonSettings.h
-        include/Logging.h
-        include/TsParser.h
-        include/TsStatistics.h
-        src/h264/H264Parser.cc
-        src/mpeg2vid/Mpeg2VideoParser.cc
-        src/GetBits.cc
-        src/JsonSettings.cc
-        src/PesPacket.cc
-        src/PsiTables.cc
-        src/TsDemuxer.cc
-        src/TsPacketInfo.cc
-        src/TsParser.cc
-        src/TsStatistics.cc
-        src/TsUtilities.cc)
-
-set(    3rdPartySources
-        3rd-party/nlohmann-${NLOHMANN_VERSION}/include/nlohmann/json.hpp
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/AndroidAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ColorConsoleAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/ConsoleAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/DebugOutputAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/EventLogAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/IAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Appenders/RollingFileAppender.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/NativeEOLConverter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Converters/UTF8Converter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/CsvFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/FuncMessageFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/MessageOnlyFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Formatters/TxtFormatter.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Init.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Log.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Logger.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Record.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Severity.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/Util.h
-        3rd-party/plog-${PLOG_VERSION}/include/plog/WinApi.h)
-
-#-------------------
-# static lib
-#-------------------
-add_library(mpeg2ts_static STATIC
-        ${3rdPartySources}
-        ${TsLibSourcesList})
+add_dependencies(${STATIC_LIB} plog)
+add_dependencies(${STATIC_LIB} json)
 
 #-------------------
 # tsparser executable
 #-------------------
 add_executable(tsparser
-        src/main.cc
-        ${3rdPartySources})
+        src/main.cc)
 
-target_link_libraries(tsparser mpeg2ts_static)        
+target_include_directories(tsparser
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
+)
+
+target_link_libraries(tsparser PRIVATE ${STATIC_LIB})
+
+set_target_properties(tsparser
+    PROPERTIES
+    VERSION ${PROJECT_VERSION}
+        DEBUG_POSTFIX "-d"
+)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
+target_include_directories(tsparser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_compile_features(tsparser PRIVATE cxx_std_11)
+
 
 #-------------------
 # shared lib
 #-------------------
-add_library(mpeg2ts SHARED
-        ${TsLibSourcesList}
-        ${3rdPartySources})
+add_library(${SHARED_LIB} SHARED)
 # shared libraries need PIC
-set_property(TARGET mpeg2ts PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
+target_include_directories(${SHARED_LIB}
+        PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
+)
+
+set_target_properties(${SHARED_LIB}
+  PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    EXPORT_NAME ${PROJECT_NAME}
+    CXX_LINK_WHAT_YOU_USE TRUE
+    DEBUG_POSTFIX "-d"
+)
+
+target_compile_features(${SHARED_LIB} PRIVATE cxx_std_11)
+
+target_sources(
+        ${SHARED_LIB}
+#        PUBLIC
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/EsParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
+
+add_dependencies(${SHARED_LIB} plog)
+add_dependencies(${SHARED_LIB} json)
 
 #-------------------
 # add custom targets
@@ -149,3 +215,57 @@ add_custom_target(unit-tests
 add_custom_target(benchmark-tests
      COMMAND ./bench/Parser_Benchmark
 )
+
+#-------------------
+# installation
+#-------------------
+install(TARGETS ${SHARED_LIB} ${STATIC_LIB} EXPORT ${PROJECT_NAME}Targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
+        DESTINATION include/${PROJECT_NAME}
+)
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+)
+
+install(FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/mpeg2tsConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/mpeg2tsConfigVersion.cmake
+        DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+
+#-------------------
+# modules
+#-------------------
+if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
+        list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+endif()
+
+include(clang_format)
+include(cppcheck)
+include(iwyu)
+
+
+#-------------------
+# CPack
+#-------------------
+include(CPack)

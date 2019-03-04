@@ -1,8 +1,11 @@
-///
-#include <sstream>
+
+#include <iterator>       // for end, begin
+#include <new>            // for bad_alloc
+#include <sstream>        // for operator<<, ostringstream, basic_ostream
+
 /// 3rd-party
-#include <plog/Appenders/ConsoleAppender.h>
-#include <plog/Log.h>
+#include <plog/Log.h>     // for LOGE
+#include "plog/Record.h"  // for Record
 
 /// Project files
 #include "mpeg2vid/Mpeg2VideoParser.h"

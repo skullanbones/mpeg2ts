@@ -1,12 +1,15 @@
 
-#include <iostream>
-#include <sstream>
+#include <iostream>       // for operator<<, basic_ostream, ostringstream
+#include <iterator>       // for end, begin
+#include <new>            // for bad_alloc
 
 /// 3rd-party
-#include <plog/Log.h>
+#include "plog/Log.h"    // for LOGD, LOGE
+#include "plog/Record.h"  // for Record
 
 /// Project files
 #include "h264/H264Parser.h"
+
 
 namespace h264
 {

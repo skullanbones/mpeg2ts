@@ -5,7 +5,7 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 Artifacts:
 ```
 Win32: mpeg2ts.dll mpeg2ts.lib
-Linux: libmpeg2ts.so libmpeg2ts.a
+Linux: libmpeg2ts.so libmpeg2ts_static.a
 Both: mpeg2ts.h
 ```
 Applications:
@@ -37,6 +37,27 @@ NONE
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Releases
+*V0.3.0*
+* [BUG-202] Fix TsUtilities crash when file not aligned to ts-packets
+* [BUG-191] Add CPack and package both debug/release build
+* [BUG-192] Add CMake finder for find_package
+* [BUG-193] Run include-what-you-use
+* [FEAT-181] Add include-what-you-use to CMake
+* [*] Update use Ubuntu 18.04 CircleCI
+* [FEAT-182] Improve Docker user
+* [FEAT-178] Port Make to CMake
+* [FEAT-174] Add cppcheck to CMake
+* [*] Port component-tests to CMake
+* [*] Port 3rd-party to CMake
+* [*] Add CMake install target
+* [*] Update CircleCI only use CMake
+* [*] Add version number from CMake to tsparser
+* [*] Add debug and release build
+* [FEAT-175, FEAT-177] Improve CMake considerable using modern CMake
+
+*V0.2.1*
+* [*]  Fix build Release version and build issues (hotfix-0.2.1)
+
 *V0.2*
 * [*] Compile on Windows fixes
 * [FEAT-163] Add codec parsers to TsUtilities
@@ -93,27 +114,56 @@ where VERBOSE is the maximum log output as compared to NONE which generates no o
 * Added PAT parsing
 * Added Demuxer
 
-## CMake
-![](images/cmake.png)
-
+## Building
 To simplify the crosscompile process we use CMake. Under Linux just do this:
-```
+```Bash
 mkdir build
 cd build/
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug|Release ..
 make
 ```
 You will get the following artifacts:
-```
+```Bash
 libmpeg2ts.so*
 libmpeg2ts_static.a
 tsparser*
 ```
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
-## Linux Make
-This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
+## Installation
+In order to install this library you can type:
+```Bash
+cmake -DCMAKE_INSTALL_PREFIX=../_install ..
+make -j 8
+make install
+```
+and now you will find the installed libraries and headers in `_install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
 
+## Packaging
+To generate a package with both debug and release build type:
+```Bash
+./gen_package.sh
+```
+This will generate a package
+```Bash
+mpeg2ts-0.2.1-Linux.tar.gz
+```
+for example.
+
+## Usage
+To find this package using CMake simply use find_package:
+```Bash
+find_package(mpeg2ts REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
+```
+
+If you want to use ts-lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where ts-lib is being installed if it wasn't installed under your system.
+
+### Linux Make
+[Deprecated] This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
+
+## Tsparser
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
@@ -212,13 +262,13 @@ Right now there is no online tool. Use `docker-make cppcheck` and `docker-make c
 
 
 ## Technologies / Open Source Software (OSS)
-* C++
-* Docker
-* CMake
-* GNU Make
-* GCC
-* Python
-* Git
-* Google test
-
-![](images/ts_lib_oss.png)
+| Technology    | Version minimal requirement         |
+|---------------|-------------------------------------|
+| C++           | C++11                               | 
+| Docker        | 17.x                                | 
+| CMake         | 3.11                                |
+| GNU Make      | Ubuntu 16.04                        |
+| GCC           | Ubuntu 16.04 (5.4)                  |
+| Python        | Python 3.x                          |
+| Git           | 2.x                                 |
+| Google test   | 1.8.x                               |
