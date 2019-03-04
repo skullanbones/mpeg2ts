@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(mpeg2ts
-        VERSION 0.2.1
+        VERSION 0.3.0
         DESCRIPTION "MPEG-2 Parsing of Video streams"
         LANGUAGES CXX)
 
