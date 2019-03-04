@@ -201,7 +201,7 @@ bool TsUtilities::parseTransportFile(const std::string& a_file)
         }
 
 
-        mDemuxer.demux(&packet[pos]);
+        mDemuxer.demux(&packet[0]);
         ++no;
     }
     tsFile.close();
