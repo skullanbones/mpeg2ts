@@ -177,11 +177,32 @@ bool TsUtilities::parseTransportFile(const std::string& a_file)
 
     LOGD << "Parsing tsfile:" << a_file;
 
+    int no = 0;
     while (!tsFile.eof())
     {
+        LOGV << "packet no: " << no;
         uint8_t packet[188];
         tsFile.read(reinterpret_cast<char*>(packet), 188); // TODO check sync byte
-        mDemuxer.demux(packet);
+     
+        // Phase lock to sync byte for 1st-packet
+        int pos = 0;
+        if (no == 0)
+        {
+            while (packet[pos] != mpeg2ts::TS_PACKET_SYNC_BYTE)
+            {
+                LOGV << "need to sync...";
+                ++pos;
+            }
+            // rewind and re-read
+            tsFile.clear();
+            tsFile.seekg(0);
+            tsFile.ignore(pos);
+            tsFile.read(reinterpret_cast<char*>(packet), 188);
+        }
+
+
+        mDemuxer.demux(&packet[0]);
+        ++no;
     }
     tsFile.close();
 
