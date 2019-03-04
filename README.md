@@ -121,6 +121,17 @@ make install
 ```
 and now you will find the installed libraries and headers in `_install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
 
+## Packaging
+To generate a package with both debug and release build type:
+```Bash
+./gen_package.sh
+```
+This will generate a package
+```Bash
+mpeg2ts-0.2.1-Linux.tar.gz
+```
+for example.
+
 ## Usage
 To find this package using CMake simply use find_package:
 ```Bash

@@ -263,3 +263,9 @@ endif()
 include(clang_format)
 include(cppcheck)
 include(iwyu)
+
+
+#-------------------
+# CPack
+#-------------------
+include(CPack)
