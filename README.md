@@ -44,7 +44,9 @@ where VERBOSE is the maximum log output as compared to NONE which generates no o
 * [BUG-193] Run include-what-you-use
 * [FEAT-181] Add include-what-you-use to CMake
 * [*] Update use Ubuntu 18.04 CircleCI
-* [FEAT_174] Add cppcheck to CMake
+* [FEAT-182] Improve Docker user
+* [FEAT-178] Port Make to CMake
+* [FEAT-174] Add cppcheck to CMake
 * [*] Port component-tests to CMake
 * [*] Port 3rd-party to CMake
 * [*] Add CMake install target
