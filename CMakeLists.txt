@@ -76,8 +76,12 @@ include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 #-------------------
 # tsparser executable
 #-------------------
-add_executable(tsparser
-        src/main.cc)
+add_executable(tsparser)
+
+target_sources(tsparser
+        PRIVATE
+        src/main.cc
+ )
 
 target_include_directories(tsparser
         PRIVATE
@@ -105,6 +109,7 @@ target_compile_features(tsparser PRIVATE cxx_std_11)
 # use cmake -DBUILD_SHARED_LIBS=YES .. to build shared libs
 #-------------------
 add_library(${PROJECT_NAME})
+
 # shared libraries need PIC
 if (BUILD_SHARED_LIBS)
         set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
@@ -122,12 +127,12 @@ target_include_directories(${PROJECT_NAME}
 )
 
 set_target_properties(${PROJECT_NAME}
-  PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    EXPORT_NAME ${PROJECT_NAME}
-    CXX_LINK_WHAT_YOU_USE TRUE
-    DEBUG_POSTFIX "-d"
+        PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME ${PROJECT_NAME}
+        CXX_LINK_WHAT_YOU_USE TRUE
+        DEBUG_POSTFIX "-d"
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
