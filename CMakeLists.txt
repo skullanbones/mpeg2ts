@@ -5,9 +5,6 @@ project(mpeg2ts
         DESCRIPTION "MPEG-2 Parsing of Video streams"
         LANGUAGES CXX)
 
-set(STATIC_LIB ${PROJECT_NAME}_static)
-set(SHARED_LIB ${PROJECT_NAME})
-
 #-------------------
 # global settings
 #-------------------
@@ -75,49 +72,6 @@ set(NLOHMANN_VERSION 3.5.0)
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
-#-------------------
-# static lib
-#-------------------
-add_library(${STATIC_LIB} STATIC)
-
-#-------------------
-# sources
-#-------------------
-target_sources(
-        ${STATIC_LIB}
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
-
-
-#-------------------
-# includes & sources
-#-------------------
-## project
-target_include_directories(${STATIC_LIB}
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-set_target_properties(${STATIC_LIB}
-    PROPERTIES
-        DEBUG_POSTFIX "-d"
-)
-
-target_compile_features(${STATIC_LIB} PRIVATE cxx_std_11)
-
-add_dependencies(${STATIC_LIB} plog)
-add_dependencies(${STATIC_LIB} json)
 
 #-------------------
 # tsparser executable
@@ -133,7 +87,7 @@ target_include_directories(tsparser
         ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
 )
 
-target_link_libraries(tsparser PRIVATE ${STATIC_LIB})
+target_link_libraries(tsparser PRIVATE ${PROJECT_NAME})
 
 set_target_properties(tsparser
     PROPERTIES
@@ -147,14 +101,17 @@ target_compile_features(tsparser PRIVATE cxx_std_11)
 
 
 #-------------------
-# shared lib
+# shared / static lib
+# use cmake -DBUILD_SHARED_LIBS=YES .. to build shared libs
 #-------------------
-add_library(${SHARED_LIB} SHARED)
+add_library(${PROJECT_NAME})
 # shared libraries need PIC
-set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
+if (BUILD_SHARED_LIBS)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+endif()
 
 message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
-target_include_directories(${SHARED_LIB}
+target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
         PRIVATE
@@ -164,7 +121,7 @@ target_include_directories(${SHARED_LIB}
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
 )
 
-set_target_properties(${SHARED_LIB}
+set_target_properties(${PROJECT_NAME}
   PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
@@ -173,14 +130,10 @@ set_target_properties(${SHARED_LIB}
     DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${SHARED_LIB} PRIVATE cxx_std_11)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(
-        ${SHARED_LIB}
-#        PUBLIC
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        ${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
@@ -202,8 +155,8 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
 
-add_dependencies(${SHARED_LIB} plog)
-add_dependencies(${SHARED_LIB} json)
+add_dependencies(${PROJECT_NAME} plog)
+add_dependencies(${PROJECT_NAME} json)
 
 #-------------------
 # add custom targets
@@ -219,7 +172,7 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
-install(TARGETS ${SHARED_LIB} ${STATIC_LIB} EXPORT ${PROJECT_NAME}Targets
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

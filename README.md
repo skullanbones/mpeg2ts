@@ -5,7 +5,7 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 Artifacts:
 ```
 Win32: mpeg2ts.dll mpeg2ts.lib
-Linux: libmpeg2ts.so libmpeg2ts_static.a
+Linux: libmpeg2ts.so libmpeg2ts.a
 Both: mpeg2ts.h
 ```
 Applications:
@@ -47,7 +47,7 @@ make
 You will get the following artifacts:
 ```Bash
 libmpeg2ts.so*
-libmpeg2ts_static.a
+libmpeg2ts.a
 tsparser*
 ```
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
