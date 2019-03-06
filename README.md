@@ -56,7 +56,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug|Release -DBUILD_SHARED_LIBS=YES ..
 which result in `libmpeg2ts.so*`.
 
 
-If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
+If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` instead of `make` in the 4th command above.
 
 ## Installation
 In order to install this library you can type:
@@ -76,7 +76,7 @@ This will generate a package
 ```Bash
 mpeg2ts-0.2.1-Linux.tar.gz
 ```
-for example.
+for example containing only shared libs.
 
 ## Usage
 To find this package using CMake simply use find_package:
