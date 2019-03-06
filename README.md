@@ -111,7 +111,7 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ./tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
-### Docker
+## Docker
 ![](images/docker.png)
 
 Some targets requires docker in order to run since you most likely will not have
@@ -119,20 +119,34 @@ all build dependencies in your native environment. To virtualize the Application
 build time dependencies they have been collected inside a docker image following
 docker best practises. You only need to remember to source the 
 ```
-source docker-commands.sh
+source docker/docker-commands.sh
 ```
-and you will be ready to run commands inside the docker container by:
+and you will be ready to run commands inside the docker container like 
+configuring CMake:
+```Bash
+cd build/
+docker-bash cmake ..
 ```
-docker-make unit-tests
+building
+```Bash
+docker-bash make -j $(nproc)
+```
+and testing:
+```Bash
+docker-bash unit-tests
 ```
 for example.
 If you want to run a custom bash command you can do it by:
-```
+```Bash
 docker-bash make help
 ```
 for instance. To get an interactive bash session type:
-```
+```Bash
 docker-interactive
+```
+which will give you a docker shell:
+```Bash
+docker@48fefc2ad3cf:/tmp/workspace/build
 ```
 
 ### Docker image
@@ -145,10 +159,12 @@ To build the image your self:
 make docker-image
 ```
 
-### How to test it
-In order to run all unit tests just type:
-```
-make test
+## Tests
+In order to run all tests just type:
+```Bash
+make component-tests
+make component-benchmark-tests
+make unit-tests
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
 
@@ -161,8 +177,6 @@ change to dynamic project. This is the VS2015 solution file:
 * mpeg2ts.sln
 
 ## Continuous integration (CI)
-![](images/circleci.png)
-
 For CI we use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
