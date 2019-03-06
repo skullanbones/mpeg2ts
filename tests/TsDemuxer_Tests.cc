@@ -317,3 +317,17 @@ TEST_F(TsDemuxerTest, test_get_pid_statistics)
         EXPECT_EQ(pts_histogram.size(), 0); // Not Sure why this is correct.
     });
 }
+
+TEST_F(TsDemuxerTest, test_getMpeg2tsVersion)
+{
+    std::string version = demuxer.getMpeg2tsLibVersion();
+    unsigned major = demuxer.getMpeg2tsLibVersionMajor();
+    unsigned minor = demuxer.getMpeg2tsLibVersionMinor();
+    unsigned patch = demuxer.getMpeg2tsLibVersionPatch();
+    
+    EXPECT_EQ(major, std::stoi(version.substr(0,1)));
+    EXPECT_EQ(".",  version.substr(1,1));
+    EXPECT_EQ(minor, std::stoi(version.substr(2,1)));
+    EXPECT_EQ(".", version.substr(3,1));
+    EXPECT_EQ(patch, std::stoi(version.substr(4,1)));
+}

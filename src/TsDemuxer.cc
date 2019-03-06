@@ -26,6 +26,7 @@
 #include "TsStatistics.h"       // for TsStatistics
 #include "Ts_IEC13818-1.h"      // for PSI_TABLE_ID_PAT, PSI_TABLE_ID_PMT
 #include "mpeg2ts.h"            // for TsDemuxer, TsPacketInfo, PsiCallBackFnc
+#include "mpeg2ts_version.h"    // for getMpeg2tsVersion()
 
 
 namespace mpeg2ts
@@ -129,6 +130,31 @@ PidStatisticsMap TsDemuxer::getPidStatistics() const
 TsCounters TsDemuxer::getTsCounters() const
 {
     return mParser->mStatistics.getTsCounters();
+}
+
+std::string TsDemuxer::getMpeg2tsLibVersion() const
+{
+    return getMpeg2tsVersion();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionMajor() const
+{
+    return getMpeg2tsVersionMajor();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionMinor() const
+{
+	return getMpeg2tsVersionMinor();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionPatch() const
+{
+	return getMpeg2tsVersionPatch();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionTweak() const
+{
+	return  getMpeg2tsVersionTweak();
 }
 
 } // mpeg2ts

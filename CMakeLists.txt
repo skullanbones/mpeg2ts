@@ -72,6 +72,10 @@ set(NLOHMANN_VERSION 3.5.0)
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
+#-------------------
+# CMake generated files
+#-------------------
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
 
 #-------------------
 # tsparser executable
@@ -89,6 +93,7 @@ target_include_directories(tsparser
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264
         ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
+        ${CMAKE_CURRENT_BINARY_DIR}/.  # For CMake generated files like mpeg2ts_version.h
 )
 
 target_link_libraries(tsparser PRIVATE ${PROJECT_NAME})
@@ -99,8 +104,6 @@ set_target_properties(tsparser
         DEBUG_POSTFIX "-d"
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
-target_include_directories(tsparser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_features(tsparser PRIVATE cxx_std_11)
 
 
@@ -115,11 +118,11 @@ if (BUILD_SHARED_LIBS)
         set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
 endif()
 
-message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
         PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For mpeg2ts_version.h (CMake generated files)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
