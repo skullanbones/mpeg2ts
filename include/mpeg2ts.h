@@ -341,6 +341,12 @@ public:
      */
     MPEG2TS_API TsCounters getTsCounters() const;
 
+    /*!
+     * Returns the version of this library.
+     * @return version (ex: "0.3.0")
+     */
+    MPEG2TS_API std::string getLibVersion() const;
+
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
     std::map<int, PesCallBackFnc> mPesCallbackMap;
