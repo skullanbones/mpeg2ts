@@ -46,10 +46,16 @@ make
 ```
 You will get the following artifacts:
 ```Bash
-libmpeg2ts.so*
 libmpeg2ts.a
 tsparser*
 ```
+To also build the shared libraries you need to tell CMake to build those:
+```Bash
+cmake -DCMAKE_BUILD_TYPE=Debug|Release -DBUILD_SHARED_LIBS=YES ..
+```
+which result in `libmpeg2ts.so*`.
+
+
 If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
 
 ## Installation
