@@ -132,9 +132,29 @@ TsCounters TsDemuxer::getTsCounters() const
     return mParser->mStatistics.getTsCounters();
 }
 
-std::string TsDemuxer::getLibVersion() const
+std::string TsDemuxer::getMpeg2tsLibVersion() const
 {
     return getMpeg2tsVersion();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionMajor() const
+{
+    return getMpeg2tsVersionMajor();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionMinor() const
+{
+	return getMpeg2tsVersionMinor();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionPatch() const
+{
+	return getMpeg2tsVersionPatch();
+}
+
+unsigned TsDemuxer::getMpeg2tsLibVersionTweak() const
+{
+	return  getMpeg2tsVersionTweak();
 }
 
 } // mpeg2ts

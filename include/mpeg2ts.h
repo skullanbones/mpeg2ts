@@ -345,7 +345,15 @@ public:
      * Returns the version of this library.
      * @return version (ex: "0.3.0")
      */
-    MPEG2TS_API std::string getLibVersion() const;
+    MPEG2TS_API std::string getMpeg2tsLibVersion() const;
+
+    MPEG2TS_API unsigned getMpeg2tsLibVersionMajor() const;
+
+    MPEG2TS_API unsigned getMpeg2tsLibVersionMinor() const;
+
+    MPEG2TS_API unsigned getMpeg2tsLibVersionPatch() const;
+
+    MPEG2TS_API unsigned getMpeg2tsLibVersionTweak() const;
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
