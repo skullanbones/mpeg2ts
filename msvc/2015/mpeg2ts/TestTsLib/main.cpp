@@ -1,8 +1,8 @@
 // TestTsLib.cpp : Defines the entry point for the console application.
 //
 
-#include "public/TsUtilities.h"
-#include "public/mpeg2ts.h"
+#include "TsUtilities.h"
+#include "mpeg2ts.h"
 
 #include <iostream>
 
