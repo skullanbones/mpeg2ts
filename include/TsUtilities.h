@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bits/stdint-uintn.h>  // for uint16_t, uint8_t                                                                                                          
+#include <cstdint>              // for uint16_t, uint8_t                                                                                                          
 #include <cstddef>              // for size_t            
 #include <map>                  // for map, _Rb_tree_const_iterator                                                                                             
 #include <memory>               // for unique_ptr                                                                                                                    
