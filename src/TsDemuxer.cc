@@ -13,7 +13,7 @@
  * permission from authors
  */
 
-#include <bits/stdint-uintn.h>  // for uint8_t
+#include <cstdint>              // for uint8_t
 #include <functional>           // for function
 #include <map>                  // for map, _Rb_tree_iterator, map<>::mapped...
 #include <memory>               // for unique_ptr
