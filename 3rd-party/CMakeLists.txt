@@ -18,6 +18,7 @@ ExternalProject_Add(
     INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/plog-${PLOG_VERSION}
     CMAKE_ARGS  -D CMAKE_BUILD_TYPE=Release
                 -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+                -D BUILD_SAMPLES=OFF
 )
 
 ############# nlohmann/json
