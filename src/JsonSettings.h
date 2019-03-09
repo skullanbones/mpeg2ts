@@ -5,7 +5,7 @@
  * runtime configurations...
  */
 
-#include <bits/exception.h>   // for exception
+#include <exception>   // for exception
 #include <string>             // for string
 
 /// 3rd-party

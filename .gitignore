@@ -59,6 +59,7 @@ Release/
 # 3rd-party
 3rd-party/nlohmann/*
 3rd-party/plog-1.1.4/*
+3rd-party/json-3.5.0/*
 3rd-party/.json_extracted
 3rd-party/.plog_extracted
 
