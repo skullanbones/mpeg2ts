@@ -25,12 +25,11 @@ if(MSVC)
 endif()
 if(ENABLE_TESTS)
 	add_subdirectory(tests)
-	add_subdirectory(bench)
-endif()
-add_subdirectory(3rd-party)
-if(UNIX)
+        add_subdirectory(bench)
         add_subdirectory(component_tests)
-endif(UNIX)
+endif()
+
+add_subdirectory(3rd-party)
 
 
 if(NOT CMAKE_INSTALL_BINDIR)
