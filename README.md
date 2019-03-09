@@ -160,7 +160,7 @@ make docker-image
 ```
 
 ## Tests
-In order to run all tests just type:
+In order to run all tests just type (currently only available under Linux):
 ```Bash
 make component-tests
 make component-benchmark-tests
@@ -169,6 +169,18 @@ make unit-tests
 This will spin up a docker container with gtest/gmock and execute all tests.
 
 ## Windows
+### CMake Visual Studio 2017
+To open the CMake project under Windows you need Visual Studio 2017 with CMake support. Open the root CMakeLists.txt
+project file and you are ready to build under Windows. 
+
+### CMake VS Code
+To open the CMake project by VS Code under Windows, just open the root folder. 
+Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify builds with predefined options. Existing kists are:
+```Bash
+ts-lib-Windows-VS2015-x64
+```
+
+### Solution files Visual Studio 2015
 Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
 There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
 mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application

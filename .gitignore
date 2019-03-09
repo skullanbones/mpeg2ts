@@ -64,7 +64,7 @@ Release/
 3rd-party/.plog_extracted
 
 
-.vscode/
+.vscode/c_cpp_properties.json
 .pytest_cache/
 *.PES
 component_tests/__pycache__/
