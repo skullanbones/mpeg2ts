@@ -1,0 +1,28 @@
+[
+    {
+        "name": "ts-lib-Windows-VS2017-x64",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "OFF",
+            "BUILD_SHARED_LIBS": "YES"
+        },
+        "visualStudio": "VisualStudio.15.0",
+        "visualStudioArchitecture": "amd64",
+        "preferredGenerator" : {
+            "name" : "Visual Studio 15 2017",
+            "platform": "x64"
+        }
+    },
+    {
+        "name": "ts-lib-Windows-VS2017-x86",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "OFF",
+            "BUILD_SHARED_LIBS": "YES"
+        },
+        "visualStudio": "VisualStudio.15.0",
+        "visualStudioArchitecture": "x86",
+        "preferredGenerator" : {
+            "name" : "Visual Studio 15 2017",
+            "platform": "x86"
+        }
+    }
+]

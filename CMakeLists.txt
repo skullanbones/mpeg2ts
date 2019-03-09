@@ -19,17 +19,25 @@ endif()
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory(tests)
-add_subdirectory(bench)
+option(ENABLE_TESTS "Build with tests" ON)
+if(MSVC)
+        set(ENABLE_TESTS OFF)
+endif()
+if(ENABLE_TESTS)
+        add_subdirectory(tests)
+        add_subdirectory(bench)
+        add_subdirectory(component_tests)
+endif()
+
 add_subdirectory(3rd-party)
-add_subdirectory(component_tests)
+
 
 if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
 endif()
 
 if (MSVC)
-    add_compile_options(/W4)
+        add_compile_options(/W4)
 else()    
     add_compile_options(-Wall
                         -Wextra # reasonable and standard
@@ -80,6 +88,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_vers
 #-------------------
 # tsparser executable
 #-------------------
+# only build tsparser on UNIX (getopt only exist in Linux)
+if (UNIX)
 add_executable(tsparser)
 
 target_sources(tsparser
@@ -105,7 +115,7 @@ set_target_properties(tsparser
 )
 
 target_compile_features(tsparser PRIVATE cxx_std_11)
-
+endif(UNIX)
 
 #-------------------
 # shared / static lib
