@@ -19,7 +19,10 @@ endif()
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-option(ENABLE_TESTS "Build with tests" OFF)
+option(ENABLE_TESTS "Build with tests" ON)
+if(MSVC)
+        set(ENABLE_TESTS OFF)
+endif()
 if(ENABLE_TESTS)
 	add_subdirectory(tests)
 	add_subdirectory(bench)
