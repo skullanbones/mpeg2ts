@@ -176,13 +176,17 @@ project file and you are ready to build under Windows.
 ### CMake VS Code
 To open the CMake project by VS Code under Windows, just open the root folder. 
 Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify builds with predefined options. Existing kits are:
-```Bash
-ts-lib-Windows-VS2017-x64
-ts-lib-Windows-VS2017-x86
-```
+| Kit name                         | Meaning                     |
+|----------------------------------|-----------------------------|
+| Windows-SharedLib-VS2017-x64     | 64 bits build DLL on Windows, no tests
+| Windows-SharedLib-VS2017-x86     | 32 bits build DLL on Windows, no tests
+| Windows-StaticLib-VS2017-x86     | 32 bits build static lib on Windows, unit tests (gtests)
+
+Currently there is a bug in gmock which only make it possible to link statically and not dynamically
+with gmock hence the reason for the  `Windows-StaticLib-VS2017-x86`.
 
 ### Solution files Visual Studio 2015
-Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
+[DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
 There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
 mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
 called TestTsLib that uses the dynamic mpeg2ts.dll library in the same solution. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
