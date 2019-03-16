@@ -1,6 +1,6 @@
 [
     {
-        "name": "ts-lib-Windows-VS2017-x64",
+        "name": "Windows-VS2017-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
             "BUILD_SHARED_LIBS": "YES"
@@ -13,7 +13,7 @@
         }
     },
     {
-        "name": "ts-lib-Windows-VS2017-x86",
+        "name": "Windows-VS2017-x86",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
             "BUILD_SHARED_LIBS": "YES"
