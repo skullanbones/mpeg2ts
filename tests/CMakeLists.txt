@@ -89,8 +89,16 @@ target_sources(${PROJECT_NAME}
   H264Parser_Tests.cc
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../include)
-target_include_directories(${PROJECT_NAME} PRIVATE ../src)
+message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR})
+
+target_include_directories(
+  ${PROJECT_NAME}
+  PRIVATE 
+  ../include
+  ../src
+  ${CMAKE_CURRENT_BINARY_DIR}/..
+)
+
 if(USE_DOCKER)
   target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)
