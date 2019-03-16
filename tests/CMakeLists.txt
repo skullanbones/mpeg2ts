@@ -42,9 +42,9 @@ endif(NOT USE_DOCKER)
 #-------------------------------------------------------------
 project(
   run_gtests
-    VERSION 1.0.0
-    DESCRIPTION "GTests for ts-lib"
-    LANGUAGES CXX
+  VERSION 1.0.0
+  DESCRIPTION "GTests for ts-lib"
+  LANGUAGES CXX
 )
 
 enable_testing()
@@ -71,6 +71,8 @@ endif(USE_DOCKER)
 # Now simply link against gtest, gmock, gtest_main or gmock_main as needed. Eg
 add_executable(${PROJECT_NAME})
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE MPEG2TS_DLL_EXPORTS)
+
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(${PROJECT_NAME}
@@ -84,7 +86,8 @@ target_sources(${PROJECT_NAME}
   TsParser_Tests.cc
   TsStatistics_Tests.cc
   TsUtilities_Tests.cc
-  H264Parser_Tests.cc)
+  H264Parser_Tests.cc
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ../include)
 target_include_directories(${PROJECT_NAME} PRIVATE ../src)

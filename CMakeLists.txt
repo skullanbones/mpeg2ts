@@ -20,12 +20,17 @@ endif()
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
 option(ENABLE_TESTS "Build with tests" ON)
-if(MSVC)
-        set(ENABLE_TESTS OFF)
-endif()
+option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+
 if(ENABLE_TESTS)
         add_subdirectory(tests)
         add_subdirectory(bench)
+endif()
+
+if(MSVC)
+        set(ENABLE_COMPONENT_TESTS OFF)
+endif()
+if(ENABLE_COMPONENT_TESTS)
         add_subdirectory(component_tests)
 endif()
 
