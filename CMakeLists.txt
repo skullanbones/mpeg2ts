@@ -41,6 +41,9 @@ if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
 endif()
 
+#-------------------
+# compiler settings
+#-------------------
 if (MSVC)
         add_compile_options(/W4)
 else()    
@@ -133,11 +136,15 @@ if (BUILD_SHARED_LIBS)
         set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
 endif()
 
+# Exporter for DLLs
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
         PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For mpeg2ts_version.h (CMake generated files)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
