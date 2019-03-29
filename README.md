@@ -176,6 +176,7 @@ project file and you are ready to build under Windows.
 ### CMake VS Code
 To open the CMake project by VS Code under Windows, just open the root folder. 
 Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify builds with predefined options. Existing kits are:
+
 | Kit name                         | Meaning                     |
 |----------------------------------|-----------------------------|
 | Windows-SharedLib-VS2017-x64     | 64 bits build DLL on Windows, no tests
