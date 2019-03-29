@@ -168,12 +168,12 @@ make unit-tests
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
 
-## Windows
-### CMake Visual Studio 2017
+## Windows (CMake)
+### Visual Studio 2017
 To open the CMake project under Windows you need Visual Studio 2017 with CMake support. Open the root CMakeLists.txt
 project file and you are ready to build under Windows. 
 
-### CMake VS Code
+### VS Code
 To open the CMake project by VS Code under Windows, just open the root folder. 
 Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify builds with predefined options. Existing kits are:
 
@@ -185,6 +185,9 @@ Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify b
 
 Currently there is a bug in gmock which only make it possible to link statically and not dynamically
 with gmock hence the reason for the  `Windows-StaticLib-VS2017-x86`.
+
+### Visual Studio prior 2017
+[TBD] Here will follow a description how to run .bat script to generate VS solution files for older versions of Visual Studio like 2013, 2015 etc...
 
 ### Solution files Visual Studio 2015
 [DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
