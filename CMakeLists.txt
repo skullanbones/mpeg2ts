@@ -20,12 +20,17 @@ endif()
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
 option(ENABLE_TESTS "Build with tests" ON)
-if(MSVC)
-        set(ENABLE_TESTS OFF)
-endif()
+option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+
 if(ENABLE_TESTS)
         add_subdirectory(tests)
         add_subdirectory(bench)
+endif()
+
+if(MSVC)
+        set(ENABLE_COMPONENT_TESTS OFF)
+endif()
+if(ENABLE_COMPONENT_TESTS)
         add_subdirectory(component_tests)
 endif()
 
@@ -36,6 +41,9 @@ if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
 endif()
 
+#-------------------
+# compiler settings
+#-------------------
 if (MSVC)
         add_compile_options(/W4)
 else()    
@@ -128,11 +136,15 @@ if (BUILD_SHARED_LIBS)
         set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
 endif()
 
+# Exporter for DLLs
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
         PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For mpeg2ts_version.h (CMake generated files)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>

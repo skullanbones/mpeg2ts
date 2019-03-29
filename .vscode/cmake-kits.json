@@ -1,9 +1,10 @@
 [
     {
-        "name": "ts-lib-Windows-VS2017-x64",
+        "name": "Windows-SharedLib-VS2017-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
-            "BUILD_SHARED_LIBS": "YES"
+            "BUILD_SHARED_LIBS": "YES",
+            "CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS": "TRUE"
         },
         "visualStudio": "VisualStudio.15.0",
         "visualStudioArchitecture": "amd64",
@@ -13,10 +14,24 @@
         }
     },
     {
-        "name": "ts-lib-Windows-VS2017-x86",
+        "name": "Windows-SharedLib-VS2017-x86",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
-            "BUILD_SHARED_LIBS": "YES"
+            "BUILD_SHARED_LIBS": "YES",
+            "CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS": "TRUE"
+        },
+        "visualStudio": "VisualStudio.15.0",
+        "visualStudioArchitecture": "x86",
+        "preferredGenerator" : {
+            "name" : "Visual Studio 15 2017",
+            "platform": "x86"
+        }
+    },
+    {
+        "name": "Windows-StaticLib-VS2017-x86",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "ON",
+            "BUILD_SHARED_LIBS": "NO"
         },
         "visualStudio": "VisualStudio.15.0",
         "visualStudioArchitecture": "x86",
