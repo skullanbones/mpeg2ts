@@ -89,8 +89,6 @@ target_sources(${PROJECT_NAME}
   H264Parser_Tests.cc
 )
 
-message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR})
-
 target_include_directories(
   ${PROJECT_NAME}
   PRIVATE 
