@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     if (argc != 2)
     {
         std::cerr << "Need asset argument! example: ./sample_tsutilities.exe myasset.ts" << '\n';
-        system("PAUSE");
+       // system("PAUSE");
         asset = "../../../assets/bbc_one.ts";
     }
     else {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     if (!success)
     {
         std::cerr << "Could not open file" << '\n';
-        system("PAUSE");
+//        system("PAUSE");
         return EXIT_FAILURE;
     }
 
@@ -104,6 +104,10 @@ int main(int argc, char *argv[])
 
     demuxer.demux(pat_packet_1);*/
 
-    system("PAUSE");
-    return 0;
+    int systemRet = system("PAUSE");
+    if (systemRet < 0)
+    {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
