@@ -8,7 +8,7 @@ Win32: mpeg2ts.dll mpeg2ts.lib
 Linux: libmpeg2ts.so libmpeg2ts.a
 Both: mpeg2ts.h
 ```
-Applications:
+Sample Applications:
 ```
 Win32: TestTsLib located under msvs/2015
 Linux: tsparser

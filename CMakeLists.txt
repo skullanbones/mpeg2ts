@@ -21,6 +21,7 @@ endif()
 set(BENCHMARK_ENABLE_TESTING OFF)
 option(ENABLE_TESTS "Build with tests" ON)
 option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+option(BUILD_SAMPLES "Build samples" ON)
 
 if(ENABLE_TESTS)
         add_subdirectory(tests)
@@ -41,12 +42,13 @@ if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
 endif()
 
+
 #-------------------
 # compiler settings
 #-------------------
 if (MSVC)
         add_compile_options(/W4)
-else()    
+else()
     add_compile_options(-Wall
                         -Wextra # reasonable and standard
                         -Wshadow # warn the user if a variable declaration shadows one from a
@@ -143,6 +145,8 @@ generate_export_header(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -214,6 +218,7 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
+        ${CMAKE_CURRENT_BINARY_DIR}/mpeg2ts_export.h
         DESTINATION include/${PROJECT_NAME}
 )
 
@@ -234,6 +239,13 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/mpeg2tsConfigVersion.cmake
         DESTINATION lib/cmake/${PROJECT_NAME}
 )
+
+#-------------------
+# samples
+#-------------------
+if(BUILD_SAMPLES)
+        add_subdirectory(samples/TsUtilities)
+endif(BUILD_SAMPLES)
 
 
 #-------------------
