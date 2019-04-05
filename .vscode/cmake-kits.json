@@ -3,8 +3,7 @@
         "name": "Windows-SharedLib-VS2017-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
-            "BUILD_SHARED_LIBS": "YES",
-            "CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS": "TRUE"
+            "BUILD_SHARED_LIBS": "YES"
         },
         "visualStudio": "VisualStudio.15.0",
         "visualStudioArchitecture": "amd64",
@@ -17,8 +16,7 @@
         "name": "Windows-SharedLib-VS2017-x86",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
-            "BUILD_SHARED_LIBS": "YES",
-            "CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS": "TRUE"
+            "BUILD_SHARED_LIBS": "YES"
         },
         "visualStudio": "VisualStudio.15.0",
         "visualStudioArchitecture": "x86",

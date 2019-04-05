@@ -121,11 +121,6 @@ public:
     //! \return True if parse was successful, false in all other cases
     MPEG2TS_EXPORT bool parseTransportStreamData(const uint8_t* data, std::size_t size);
 
-    //* callbacks *//
-    static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
-    static void PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
-    static void PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int pid, void* hdl);
-
     //* PAT *//
     //! \brief Returns the PAT table found in stream
     //! \return The PAT table
@@ -160,6 +155,11 @@ public:
     MPEG2TS_EXPORT std::string toString(VideoCodecType e) const;
 
 private:
+    //* callbacks *//
+    static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
+    static void PMTCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
+    static void PESCallback(const mpeg2ts::ByteVector& rawPes, const mpeg2ts::PesPacket& pes, int pid, void* hdl);
+
     void initLogging() const;
     void initParse();
     void registerPmtCallback();
