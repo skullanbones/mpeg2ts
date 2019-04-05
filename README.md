@@ -10,7 +10,9 @@ Both: mpeg2ts.h
 ```
 Sample Applications:
 ```
-Win32: TestTsLib located under msvs/2015
+Win32: TsUtilities located under samples
+(Note: You need copy it's dependency mpeg2ts.dll to where you
+installed/built the sample_tsutilities.exe)
 Linux: tsparser
 ```
 
