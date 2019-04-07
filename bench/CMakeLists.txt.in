@@ -8,6 +8,7 @@ ExternalProject_Add(benchmark
   GIT_TAG           master
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/benchmark-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/benchmark-build"
+  GIT_SHALLOW       1
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""

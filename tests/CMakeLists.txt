@@ -100,6 +100,15 @@ target_include_directories(
 if(USE_DOCKER)
   target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)
-  target_link_libraries(${PROJECT_NAME} PRIVATE gmock)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE
+      Threads::Threads 
+      gmock
+)
 endif(USE_DOCKER)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeg2ts)
+
+target_link_libraries(${PROJECT_NAME} 
+  PRIVATE 
+    mpeg2ts
+)

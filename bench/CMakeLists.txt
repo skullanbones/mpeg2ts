@@ -70,12 +70,13 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
   target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
 
    set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_BENCH_EXEC}) 
+   find_package(Threads REQUIRED)
    target_link_libraries(${TARGET_NAME}
    PRIVATE
-        mpeg2ts
-        benchmark
-        pthread
-     ${CMAKE_THREAD_LIBS_INIT})
+    Threads::Threads
+    mpeg2ts
+    benchmark
+    ${CMAKE_THREAD_LIBS_INIT})
 
    # If you want to run benchmarks with the "make test" command, uncomment me
    add_test(${TARGET_NAME} ${ONE_BENCH_EXEC})
