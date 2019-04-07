@@ -81,3 +81,5 @@ msvc/2015/TestTsLib/TestTsLib/settings.json
 
 # CPack
 CPackConfig.cmake
+
+3rd-party/googletest*
