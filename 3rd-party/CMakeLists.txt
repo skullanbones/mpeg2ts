@@ -41,11 +41,9 @@ ExternalProject_Add(
 
 if(NOT USE_DOCKER)
 message("NOT using Docker! Downloading & configuring google test...")
-message("CVA 3rd-party 3RD_PARTY_DIR:" ${3RD_PARTY_DIR})
-message("CMAKE_CURRENT_SOURCE_DIR" ${CMAKE_CURRENT_SOURCE_DIR})
 
   # Download and unpack googletest at configure time
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download )
