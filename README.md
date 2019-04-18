@@ -198,6 +198,7 @@ cmake -G "Visual Studio 14 2015" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_T
 ```
 
 Possible VS generators are:
+
 | Generators                       | Meaning                     |
 |----------------------------------|-----------------------------|
 | Visual Studio 15 2017 [arch]     | Generates Visual Studio 2017 project files.
