@@ -171,6 +171,8 @@ make unit-tests
 This will spin up a docker container with gtest/gmock and execute all tests.
 
 ## Windows (CMake)
+Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
+
 ### Visual Studio 2017
 To open the CMake project under Windows you need Visual Studio 2017 with CMake support. Open the root CMakeLists.txt
 project file and you are ready to build under Windows. 
@@ -183,13 +185,34 @@ Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify b
 |----------------------------------|-----------------------------|
 | Windows-SharedLib-VS2017-x64     | 64 bits build DLL on Windows, no tests
 | Windows-SharedLib-VS2017-x86     | 32 bits build DLL on Windows, no tests
-| Windows-StaticLib-VS2017-x86     | 32 bits build static lib on Windows, unit tests (gtests)
+| Windows-StaticLib-VS2017-x86     | 32 bits build static lib on Windows
+| Windows-Gtests-StaticLib-VS2017-x64 | 64 bits build gtests/benchmarch on Windows
 
 Currently there is a bug in gmock which only make it possible to link statically and not dynamically
 with gmock hence the reason for the  `Windows-StaticLib-VS2017-x86`.
 
 ### Visual Studio prior 2017
-[TBD] Here will follow a description how to run .bat script to generate VS solution files for older versions of Visual Studio like 2013, 2015 etc...
+To cross compile for older VS versions, use powershell and cmake command line with a generator, for example:
+```
+cmake -G "Visual Studio 14 2015" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF ..
+```
+Possible VS generators are:
+| Generators                       | Meaning                     |
+|----------------------------------|-----------------------------|
+| Visual Studio 15 2017 [arch]     | Generates Visual Studio 2017 project files.
+| Visual Studio 14 2015 [arch]     | Generates Visual Studio 2015 project files.
+| Visual Studio 12 2013 [arch]     | Generates Visual Studio 2013 project files.
+| Visual Studio 11 2012 [arch]     | Generates Visual Studio 2012 project files.
+| Visual Studio 10 2010 [arch]     | Generates Visual Studio 2010 project files.
+| Visual Studio 9 2008 [arch]      | Generates Visual Studio 2008 project files.
+
+where arch can be x86, Win64 or ARM. To build your new solution type:
+```
+cmake --build .
+or
+cmake --build . --target mpeg2ts
+```
+
 
 ### Solution files Visual Studio 2015
 [DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
