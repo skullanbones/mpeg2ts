@@ -82,4 +82,6 @@ msvc/2015/TestTsLib/TestTsLib/settings.json
 # CPack
 CPackConfig.cmake
 
+# Cached 3rd-party
 3rd-party/googletest*
+3rd-party/benchmark*
