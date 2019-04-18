@@ -185,17 +185,18 @@ Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify b
 |----------------------------------|-----------------------------|
 | Windows-SharedLib-VS2017-x64     | 64 bits build DLL on Windows, no tests
 | Windows-SharedLib-VS2017-x86     | 32 bits build DLL on Windows, no tests
-| Windows-StaticLib-VS2017-x86     | 32 bits build static lib on Windows
+| Windows-Gtests-StaticLib-VS2017-x86 | 32 bits build gtests/benchmarch on Windows
 | Windows-Gtests-StaticLib-VS2017-x64 | 64 bits build gtests/benchmarch on Windows
 
 Currently there is a bug in gmock which only make it possible to link statically and not dynamically
-with gmock hence the reason for the  `Windows-StaticLib-VS2017-x86`.
+with gmock hence the reason for the  `Windows-Gtests-StaticLib-VS2017-x86`.
 
 ### Visual Studio prior 2017
 To cross compile for older VS versions, use powershell and cmake command line with a generator, for example:
 ```
 cmake -G "Visual Studio 14 2015" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF ..
 ```
+
 Possible VS generators are:
 | Generators                       | Meaning                     |
 |----------------------------------|-----------------------------|

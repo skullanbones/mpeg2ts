@@ -13,19 +13,6 @@
         }
     },
     {
-        "name": "Windows-Gtests-StaticLib-VS2017-x64",
-        "cmakeSettings": {
-            "ENABLE_TESTS": "ON",
-            "BUILD_SHARED_LIBS": "NO"
-        },
-        "visualStudio": "VisualStudio.15.0",
-        "visualStudioArchitecture": "amd64",
-        "preferredGenerator" : {
-            "name" : "Visual Studio 15 2017",
-            "platform": "x64"
-        }
-    },
-    {
         "name": "Windows-SharedLib-VS2017-x86",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
@@ -39,7 +26,20 @@
         }
     },
     {
-        "name": "Windows-StaticLib-VS2017-x86",
+        "name": "Windows-Gtests-StaticLib-VS2017-x64",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "ON",
+            "BUILD_SHARED_LIBS": "NO"
+        },
+        "visualStudio": "VisualStudio.15.0",
+        "visualStudioArchitecture": "amd64",
+        "preferredGenerator" : {
+            "name" : "Visual Studio 15 2017",
+            "platform": "x64"
+        }
+    },
+    {
+        "name": "Windows-Gtests-StaticLib-VS2017-x86",
         "cmakeSettings": {
             "ENABLE_TESTS": "ON",
             "BUILD_SHARED_LIBS": "NO"
