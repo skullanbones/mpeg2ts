@@ -215,6 +215,13 @@ or
 cmake --build . --target mpeg2ts
 ```
 
+### Generate Release
+Run the
+```
+./gen_package.bat
+```
+to create a new release on Windows via CMake and CPack.
+
 
 ### Solution files Visual Studio 2015
 [DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
