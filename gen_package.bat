@@ -31,7 +31,7 @@ dir
 
 echo "2.a Configure CMake"
 echo Configuring for x86
-set CMAKE_CONFIGURE_CMD=cmake -G "Visual Studio 15 2017" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF ..
+set CMAKE_CONFIGURE_CMD=cmake -G "Visual Studio 15 2017" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON ..
 
 echo CMake configure command:
 echo %CMAKE_CONFIGURE_CMD%
