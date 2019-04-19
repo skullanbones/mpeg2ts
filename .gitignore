@@ -85,3 +85,6 @@ CPackConfig.cmake
 # Cached 3rd-party
 3rd-party/googletest*
 3rd-party/benchmark*
+
+# Windows CPack
+_CPack_Packages
