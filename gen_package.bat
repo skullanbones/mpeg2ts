@@ -51,4 +51,4 @@ echo include("Release/CPackConfig.cmake") > CPackConfig.cmake
 echo set(CPACK_INSTALL_CMAKE_PROJECTS "Release;mpeg2ts;ALL;/") >> CPackConfig.cmake
 
 echo "4. Generate package"
-cpack -G WIX --config CPackConfig.cmake
+cpack -G WIX --config CPackConfig.cmake -C Release
