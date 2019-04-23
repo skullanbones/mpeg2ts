@@ -1,29 +1,31 @@
 #!/bin/bash
 # Script to package both debug and release build with CPack
 
-echo "1. Create debug/ release/ folder"
+echo "1. Create debug/ release/ folders for shared libraries"
 
-mkdir debug
-mkdir release
+build_types=(Debug Release)
 
-echo "2 .Configure and build /debug"
-cd debug
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=install ..
-make -j $(nproc)
-cd ..
+for i in ${build_types[@]}; do
+    echo mkdir: $i
+    mkdir $i
+done
 
-echo "3. Configure and build /release"
-cd release
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install ..
-make -j $(nproc)
-cd ..
+echo "2. Configure CMake"
+for type in ${build_types[@]}; do
+    echo "Configure and build / $type shared lib"
+    cd $type
+    cmake -DCMAKE_BUILD_TYPE=$type -DBUILD_SHARED_LIBS=YES ..
+    make -j $(nproc)
+    cd ..
+done
 
-echo "4. Create CPackConfig.cmake"
-echo 'include("release/CPackConfig.cmake")
+
+echo "3. Create CPackConfig.cmake"
+echo 'include("Release/CPackConfig.cmake")
 set(CPACK_INSTALL_CMAKE_PROJECTS
-    "debug;mpeg2ts;ALL;/"
-    "release;mpeg2ts;ALL;/"
+    "Debug;mpeg2ts;ALL;/"
+    "Release;mpeg2ts;ALL;/"
 )' > CPackConfig.cmake
 
-echo "5. Generate package"
+echo "4. Generate package"
 cpack --config CPackConfig.cmake

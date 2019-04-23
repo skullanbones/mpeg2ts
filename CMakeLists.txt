@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(mpeg2ts
-        VERSION 0.3.0
+        VERSION 0.4.0
         DESCRIPTION "MPEG-2 Parsing of Video streams"
         LANGUAGES CXX)
-
-set(STATIC_LIB ${PROJECT_NAME}_static)
-set(SHARED_LIB ${PROJECT_NAME})
 
 #-------------------
 # global settings
@@ -22,18 +19,36 @@ endif()
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory(tests)
-add_subdirectory(bench)
+option(ENABLE_TESTS "Build with tests" ON)
+option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+option(BUILD_SAMPLES "Build samples" ON)
+
+if(ENABLE_TESTS)
+        add_subdirectory(tests)
+        add_subdirectory(bench)
+endif()
+
+if(MSVC)
+        set(ENABLE_COMPONENT_TESTS OFF)
+endif()
+if(ENABLE_COMPONENT_TESTS)
+        add_subdirectory(component_tests)
+endif()
+
 add_subdirectory(3rd-party)
-add_subdirectory(component_tests)
+
 
 if(NOT CMAKE_INSTALL_BINDIR)
     include(GNUInstallDirs)
 endif()
 
+
+#-------------------
+# compiler settings
+#-------------------
 if (MSVC)
-    add_compile_options(/W4)
-else()    
+        add_compile_options(/W4)
+else()
     add_compile_options(-Wall
                         -Wextra # reasonable and standard
                         -Wshadow # warn the user if a variable declaration shadows one from a
@@ -76,54 +91,21 @@ include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
 #-------------------
-# static lib
+# CMake generated files
 #-------------------
-add_library(${STATIC_LIB} STATIC)
-
-#-------------------
-# sources
-#-------------------
-target_sources(
-        ${STATIC_LIB}
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/JsonSettings.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/PesPacket.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/PsiTables.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsDemuxer.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsPacketInfo.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
-
-
-#-------------------
-# includes & sources
-#-------------------
-## project
-target_include_directories(${STATIC_LIB}
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-set_target_properties(${STATIC_LIB}
-    PROPERTIES
-        DEBUG_POSTFIX "-d"
-)
-
-target_compile_features(${STATIC_LIB} PRIVATE cxx_std_11)
-
-add_dependencies(${STATIC_LIB} plog)
-add_dependencies(${STATIC_LIB} json)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
 
 #-------------------
 # tsparser executable
 #-------------------
-add_executable(tsparser
-        src/main.cc)
+# only build tsparser on UNIX (getopt only exist in Linux)
+if (UNIX)
+add_executable(tsparser)
+
+target_sources(tsparser
+        PRIVATE
+        src/main.cc
+ )
 
 target_include_directories(tsparser
         PRIVATE
@@ -131,9 +113,10 @@ target_include_directories(tsparser
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264
         ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
+        ${CMAKE_CURRENT_BINARY_DIR}/.  # For CMake generated files like mpeg2ts_version.h
 )
 
-target_link_libraries(tsparser PRIVATE ${STATIC_LIB})
+target_link_libraries(tsparser PRIVATE ${PROJECT_NAME})
 
 set_target_properties(tsparser
     PROPERTIES
@@ -141,46 +124,50 @@ set_target_properties(tsparser
         DEBUG_POSTFIX "-d"
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
-target_include_directories(tsparser PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_features(tsparser PRIVATE cxx_std_11)
-
+endif(UNIX)
 
 #-------------------
-# shared lib
+# shared / static lib
+# use cmake -DBUILD_SHARED_LIBS=YES .. to build shared libs
 #-------------------
-add_library(${SHARED_LIB} SHARED)
+add_library(${PROJECT_NAME})
+
 # shared libraries need PIC
-set_property(TARGET ${SHARED_LIB} PROPERTY POSITION_INDEPENDENT_CODE 1)
+if (BUILD_SHARED_LIBS)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+endif()
 
-message("CMAKE_INSTALL_INCLUDEDIR" ${CMAKE_INSTALL_INCLUDEDIR})
-target_include_directories(${SHARED_LIB}
+# Exporter for DLLs
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
 )
 
-set_target_properties(${SHARED_LIB}
-  PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    EXPORT_NAME ${PROJECT_NAME}
-    CXX_LINK_WHAT_YOU_USE TRUE
-    DEBUG_POSTFIX "-d"
+set_target_properties(${PROJECT_NAME}
+        PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME ${PROJECT_NAME}
+        CXX_LINK_WHAT_YOU_USE TRUE
+        DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${SHARED_LIB} PRIVATE cxx_std_11)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(
-        ${SHARED_LIB}
-#        PUBLIC
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        ${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
@@ -202,8 +189,8 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
 
-add_dependencies(${SHARED_LIB} plog)
-add_dependencies(${SHARED_LIB} json)
+add_dependencies(${PROJECT_NAME} plog)
+add_dependencies(${PROJECT_NAME} json)
 
 #-------------------
 # add custom targets
@@ -219,7 +206,7 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
-install(TARGETS ${SHARED_LIB} ${STATIC_LIB} EXPORT ${PROJECT_NAME}Targets
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -231,6 +218,7 @@ install(FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
+        ${CMAKE_CURRENT_BINARY_DIR}/mpeg2ts_export.h
         DESTINATION include/${PROJECT_NAME}
 )
 
@@ -251,6 +239,13 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/mpeg2tsConfigVersion.cmake
         DESTINATION lib/cmake/${PROJECT_NAME}
 )
+
+#-------------------
+# samples
+#-------------------
+if(BUILD_SAMPLES)
+        add_subdirectory(samples/TsUtilities)
+endif(BUILD_SAMPLES)
 
 
 #-------------------

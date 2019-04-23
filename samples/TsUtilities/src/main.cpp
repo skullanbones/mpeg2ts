@@ -6,67 +6,39 @@
 
 #include <iostream>
 
-using namespace mpeg2ts;
 
-/*!
- * PID: 0
- * PAT packet
- *
- */
-const uint8_t pat_packet_1[] =
-{ 0x47, 0x40, 0x00, 0x18, 0x00, 0x00, 0xb0, 0x0d, 0x00, 0x01, 0xc1, 0x00, 0x00, 0x00, 0x01, 0xe2,
-  0x56, 0xf8, 0x03, 0xe7, 0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-
-// using namespace tslib;
-
-void PATCallback(PsiTable* table, uint16_t pid, void* hdl)
-{
-    std::cout << "came here PATCallback" << '\n';
-
-    PatTable* pat;
-    try
-    {
-        pat = dynamic_cast<PatTable*>(table);
-    }
-    catch (std::exception& ex)
-    {
-        std::cerr << "ERROR: dynamic_cast ex: " << ex.what();
-        return;
-    }
-
-    std::cout << "Got PAT callback with PMT PID: " << pat->programs.at(0).program_map_PID << '\n';
-}
-
-int main()
+int main(int argc, char *argv[])
 {
     // TsUtilities High level API
     tsutil::TsUtilities util;
-    // util.parseTransportStreamData(pat_packet_1, 188);
 
-    bool success = util.parseTransportFile("../../../../assets/bbc_one.ts");
+    std::string asset;
+
+    if (argc != 2)
+    {
+        std::cerr << "Need asset argument! example: ./sample_tsutilities.exe myasset.ts" << '\n';
+       // system("PAUSE");
+        asset = "../../../assets/bbc_one.ts";
+    }
+    else {
+        std::cout << "Using input asset: " << argv[1] << '\n';
+        asset = argv[1];
+    }
+
+    bool success = util.parseTransportFile("../../../assets/bbc_one.ts");
     if (!success)
     {
         std::cerr << "Could not open file" << '\n';
-        system("PAUSE");
+//        system("PAUSE");
         return EXIT_FAILURE;
     }
 
-    PatTable pat = util.getPatTable();
+    mpeg2ts::PatTable pat = util.getPatTable();
     std::cout << "Got PAT: " << pat << '\n';
 
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
-    std::map<int, PmtTable> pmtTables = util.getPmtTables();
+    std::map<int, mpeg2ts::PmtTable> pmtTables = util.getPmtTables();
 
     for (auto pid : pmtPids)
     {
@@ -89,7 +61,7 @@ int main()
         std::cout << "Found elementary stream with Pid: " << esPid << '\n';
     }
 
-    std::map<int, std::vector<PesPacket>> pesPackets = util.getPesPackets();
+    std::map<int, std::vector<mpeg2ts::PesPacket>> pesPackets = util.getPesPackets();
 
     std::cout << "Got number of PES packets: " << pesPackets.size() << '\n';
 
@@ -100,7 +72,7 @@ int main()
     }
 
     // typedef std::map<int, PidStatistic> PidStatisticsType;
-    PidStatisticsMap stat = util.getPidStatistics();
+    mpeg2ts::PidStatisticsMap stat = util.getPidStatistics();
 
     for (auto pid : stat)
     {
@@ -132,6 +104,10 @@ int main()
 
     demuxer.demux(pat_packet_1);*/
 
-    system("PAUSE");
-    return 0;
+    int systemRet = system("PAUSE");
+    if (systemRet < 0)
+    {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

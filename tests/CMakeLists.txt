@@ -1,50 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
-#-------------------------------------------------------------
-# Taken from https://github.com/google/googletest/tree/master/googletest#incorporating-into-an-existing-cmake-project
-#-------------------------------------------------------------
 
-if(NOT USE_DOCKER)
-message("NOT using Docker! Downloading & configuring google test...")
-
-  # Download and unpack googletest at configure time
-  configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-  endif()
-  execute_process(COMMAND ${CMAKE_COMMAND} --build .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "Build step for googletest failed: ${result}")
-  endif()
-
-  # Prevent overriding the parent project's compiler/linker
-  # settings on Windows
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-  # Add googletest directly to our build. This defines
-  # the gtest and gtest_main targets.
-  add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                   ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                   EXCLUDE_FROM_ALL)
-
-  # The gtest/gtest_main targets carry header search path
-  # dependencies automatically when using CMake 2.8.11 or
-  # later. Otherwise we have to add them here ourselves.
-  if (CMAKE_VERSION VERSION_LESS 2.8.11)
-    include_directories("${gtest_SOURCE_DIR}/include")
-  endif()
-endif(NOT USE_DOCKER)
-
-#-------------------------------------------------------------
 project(
   run_gtests
-    VERSION 1.0.0
-    DESCRIPTION "GTests for ts-lib"
-    LANGUAGES CXX
+  VERSION 1.0.0
+  DESCRIPTION "GTests for ts-lib"
+  LANGUAGES CXX
 )
 
 enable_testing()
@@ -71,6 +31,8 @@ endif(USE_DOCKER)
 # Now simply link against gtest, gmock, gtest_main or gmock_main as needed. Eg
 add_executable(${PROJECT_NAME})
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE MPEG2TS_DLL_EXPORTS)
+
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(${PROJECT_NAME}
@@ -84,13 +46,29 @@ target_sources(${PROJECT_NAME}
   TsParser_Tests.cc
   TsStatistics_Tests.cc
   TsUtilities_Tests.cc
-  H264Parser_Tests.cc)
+  H264Parser_Tests.cc
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../include)
-target_include_directories(${PROJECT_NAME} PRIVATE ../src)
+target_include_directories(
+  ${PROJECT_NAME}
+  PRIVATE 
+  ../include
+  ../src
+  ${CMAKE_CURRENT_BINARY_DIR}/..
+)
+
 if(USE_DOCKER)
   target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)
-  target_link_libraries(${PROJECT_NAME} PRIVATE gmock)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE
+      Threads::Threads 
+      gmock
+)
 endif(USE_DOCKER)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeg2ts_static)
+
+target_link_libraries(${PROJECT_NAME} 
+  PRIVATE 
+    mpeg2ts
+)

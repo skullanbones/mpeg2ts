@@ -4,18 +4,8 @@
  */
 
 #pragma once
-#ifdef _WIN32
 
-#ifdef MPEG2TS_DLL_EXPORTS
-#define MPEG2TS_API __declspec(dllexport)
-#else
-#define MPEG2TS_API __declspec(dllimport)
-#endif
-
-#elif __linux__
-#define MPEG2TS_API
-#endif
-
+#include "mpeg2ts_export.h"  // For __declspec(dllexport/dllimport)
 
 #include <cstdint>
 #include <functional>
@@ -72,7 +62,7 @@ struct PesPacket
 
     ByteVector mPesBuffer;
 
-    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs);
+    MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const PesPacket& rhs);
 };
 
 
@@ -107,12 +97,12 @@ public:
     uint8_t last_section_number;
     uint32_t CRC_32;
 
-    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs);
+    MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const PsiTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PsiTables
-    MPEG2TS_API bool operator==(const PsiTable& rhs) const;
+    MPEG2TS_EXPORT bool operator==(const PsiTable& rhs) const;
 
-    MPEG2TS_API bool operator!=(const PsiTable& rhs) const;
+    MPEG2TS_EXPORT bool operator!=(const PsiTable& rhs) const;
 };
 
 /*!
@@ -123,12 +113,12 @@ class PatTable : public PsiTable
 public:
     std::vector<Program> programs;
 
-    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs);
+    MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const PatTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PatTables
-    MPEG2TS_API bool operator==(const PatTable& rhs) const;
+    MPEG2TS_EXPORT bool operator==(const PatTable& rhs) const;
 
-    MPEG2TS_API bool operator!=(const PatTable& rhs) const;
+    MPEG2TS_EXPORT bool operator!=(const PatTable& rhs) const;
 };
 
 struct StreamTypeHeader
@@ -162,12 +152,12 @@ public:
     std::vector<StreamTypeHeader> streams;
 
 
-    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs);
+    MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const PmtTable& rhs);
 
     /// @brief Comparison operator for comparing 2 PmtTables
-    MPEG2TS_API bool operator==(const PmtTable& rhs) const;
+    MPEG2TS_EXPORT bool operator==(const PmtTable& rhs) const;
 
-    MPEG2TS_API bool operator!=(const PmtTable& rhs) const;
+    MPEG2TS_EXPORT bool operator!=(const PmtTable& rhs) const;
 };
 
 class CatTable : public PsiTable
@@ -236,7 +226,7 @@ public:
     bool isError; // If a parser error or TS not following standards.
 
 
-    MPEG2TS_API friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
+    MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
 };
 
 
@@ -290,9 +280,9 @@ typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, voi
 class TsDemuxer
 {
 public:
-    MPEG2TS_API explicit TsDemuxer();
+    MPEG2TS_EXPORT explicit TsDemuxer();
 
-    MPEG2TS_API ~TsDemuxer();
+    MPEG2TS_EXPORT ~TsDemuxer();
 
     // Make this object be non copyable because it holds a pointer
     TsDemuxer(const TsDemuxer&) = delete;
@@ -302,7 +292,7 @@ public:
      * Demuxes a transport stream packed based on its Packet ID.
      * @param tsPacket The TS packet to demux.
      */
-    MPEG2TS_API void demux(const uint8_t* tsPacket);
+    MPEG2TS_EXPORT void demux(const uint8_t* tsPacket);
 
     /*!
      * Outputs to callback function when found a PSI table with PID.
@@ -310,7 +300,7 @@ public:
      * @param cb Returns a complete PSI table to this callback function.
      * @param hdl Custom handler
      */
-    MPEG2TS_API void addPsiPid(int pid, PsiCallBackFnc cb, void* hdl);
+    MPEG2TS_EXPORT void addPsiPid(int pid, PsiCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete PES packet with PID.
@@ -318,7 +308,7 @@ public:
      * @param cb  Callback when found a complete PES packet.
      * @param hdl Custom handler
      */
-    MPEG2TS_API void addPesPid(int pid, PesCallBackFnc cb, void* hdl);
+    MPEG2TS_EXPORT void addPesPid(int pid, PesCallBackFnc cb, void* hdl);
 
     /*!
      * Returns a complete TS packet filtered on PID.
@@ -326,20 +316,34 @@ public:
      * @param cb Callback when found a TS packet.
      * @param hdl Custom handler
      */
-    MPEG2TS_API void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
+    MPEG2TS_EXPORT void addTsPid(int pid, TsCallBackFnc cb, void* hdl);
 
     /*!
      * Returns statistics on parsed transport stream packets.
      * @return PidStatisticsType containing collected statistics for each pid on all demuxed
      * packets.
      */
-    MPEG2TS_API PidStatisticsMap getPidStatistics() const;
+    MPEG2TS_EXPORT PidStatisticsMap getPidStatistics() const;
 
     /*!
      * Returns counter statistics on parsed transport stream packets.
      * @return TsCounters
      */
-    MPEG2TS_API TsCounters getTsCounters() const;
+    MPEG2TS_EXPORT TsCounters getTsCounters() const;
+
+    /*!
+     * Returns the version of this library.
+     * @return version (ex: "0.3.0")
+     */
+    MPEG2TS_EXPORT std::string getMpeg2tsLibVersion() const;
+
+    MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionMajor() const;
+
+    MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionMinor() const;
+
+    MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionPatch() const;
+
+    MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionTweak() const;
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;

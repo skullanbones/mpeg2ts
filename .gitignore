@@ -59,15 +59,17 @@ Release/
 # 3rd-party
 3rd-party/nlohmann/*
 3rd-party/plog-1.1.4/*
+3rd-party/json-3.5.0/*
 3rd-party/.json_extracted
 3rd-party/.plog_extracted
 
-
-.vscode/
+# VS Code
+.vscode/c_cpp_properties.json
 .pytest_cache/
 *.PES
 component_tests/__pycache__/
 env/
+.vscode/ipch/
 
 # TestTsLib
 msvc/2015/TestTsLib/TestTsLib/mpeg2ts.pdb
@@ -79,3 +81,10 @@ msvc/2015/TestTsLib/TestTsLib/settings.json
 
 # CPack
 CPackConfig.cmake
+
+# Cached 3rd-party
+3rd-party/googletest*
+3rd-party/benchmark*
+
+# Windows CPack
+_CPack_Packages

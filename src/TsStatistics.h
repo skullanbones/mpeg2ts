@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include <bits/stdint-intn.h>   // for int64_t
-#include <bits/stdint-uintn.h>  // for uint8_t
+#include <cstdint>              // for int64_t, for uint8_t
 
 #include "mpeg2ts.h"            // for TsCounters, PidStatisticsMap
 

@@ -5,12 +5,14 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 Artifacts:
 ```
 Win32: mpeg2ts.dll mpeg2ts.lib
-Linux: libmpeg2ts.so libmpeg2ts_static.a
+Linux: libmpeg2ts.so libmpeg2ts.a
 Both: mpeg2ts.h
 ```
-Applications:
+Sample Applications:
 ```
-Win32: TestTsLib located under msvs/2015
+Win32: TsUtilities located under samples
+(Note: You need copy it's dependency mpeg2ts.dll to where you
+installed/built the sample_tsutilities.exe)
 Linux: tsparser
 ```
 
@@ -36,84 +38,6 @@ NONE
 ```
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
-## Releases
-*V0.3.0*
-* [BUG-202] Fix TsUtilities crash when file not aligned to ts-packets
-* [BUG-191] Add CPack and package both debug/release build
-* [BUG-192] Add CMake finder for find_package
-* [BUG-193] Run include-what-you-use
-* [FEAT-181] Add include-what-you-use to CMake
-* [*] Update use Ubuntu 18.04 CircleCI
-* [FEAT-182] Improve Docker user
-* [FEAT-178] Port Make to CMake
-* [FEAT-174] Add cppcheck to CMake
-* [*] Port component-tests to CMake
-* [*] Port 3rd-party to CMake
-* [*] Add CMake install target
-* [*] Update CircleCI only use CMake
-* [*] Add version number from CMake to tsparser
-* [*] Add debug and release build
-* [FEAT-175, FEAT-177] Improve CMake considerable using modern CMake
-
-*V0.2.1*
-* [*]  Fix build Release version and build issues (hotfix-0.2.1)
-
-*V0.2*
-* [*] Compile on Windows fixes
-* [FEAT-163] Add codec parsers to TsUtilities
-* [BUG-157] Codec parsers missing API
-* [FEAT-166] Add micro google benchmark tests
-* [BUG-161] Add H264/H262 unit tests
-* [FEAT-158] Add benchmark tests
-* [*] Add component tests to H264 parsing
-* [*] Update README.
-* [*] Apply C++ best practises (Lefticus)
-* [*] Apply clang formating/analyze
-* [FEAT-117] Use move instead of copying
-* [FEAT-51/52] Add codec parsing (H264/H262)
-* [FEAT-54] Add basic descriptor parsing
-* [FEAT-128] Add CMake
-* [FEAT-132] Add better code coverage
-* [FEAT-126] Use Wextra and Wpedantic with GCC
-* [FEAT-130] Add docker commands via bash
-* [FEAT-32] Add code coverage
-* [*] Added gtests to Windows proj
-* [*] Merge TestTsLib.proj into mpeg2ts.sln
-* [FEAT-102] Fixed some TODOs
-
-*V0.1*
-
-* Added first version of API (mpeg2ts.h)
-* Added Windows support and build artifacts (mpeg2ts.lib/dll)
-* Added Linux build artifacts (libmpeg2ts.so/a)
-* Added high-level TsUtilities.h API for convinience
-* Added first version H.264 support
-* Added support for short version CLI for tsparser (Linux only)
-* Fixed bug not finding and printing out error for settings.json
-
-*V0.0.2.rc1*
-
-* Add logging libary: Plog
-* Fixed bug 68: Cannot parse Hbo Asset
-* Add component-tests to CircleCi
-* Fixed bug 66: Dolby asset caused crash
-* Support Multiple Program Transport Streams (MPTS)
-* Added file input --input option to CLI
-* Fixed bug 49: Could not skip more than 64 bits in parser.
-* Added non root user to Docker containers
-
-*V0.0.1*
-
-* build so lib
-* Added es write
-* fixed PCR bug
-* Added build folder
-* Added PES parsing
-* Added multi PES cli option
-* Added PMT parsing
-* Added PAT parsing
-* Added Demuxer
-
 ## Building
 To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```Bash
@@ -124,11 +48,17 @@ make
 ```
 You will get the following artifacts:
 ```Bash
-libmpeg2ts.so*
-libmpeg2ts_static.a
+libmpeg2ts.a
 tsparser*
 ```
-If you wanna speed up the build you can type `cmake --build . -- -j16` instead of `make` in the 4th command above.
+To also build the shared libraries you need to tell CMake to build those:
+```Bash
+cmake -DCMAKE_BUILD_TYPE=Debug|Release -DBUILD_SHARED_LIBS=YES ..
+```
+which result in `libmpeg2ts.so*`.
+
+
+If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` instead of `make` in the 4th command above.
 
 ## Installation
 In order to install this library you can type:
@@ -148,7 +78,7 @@ This will generate a package
 ```Bash
 mpeg2ts-0.2.1-Linux.tar.gz
 ```
-for example.
+for example containing only shared libs.
 
 ## Usage
 To find this package using CMake simply use find_package:
@@ -183,7 +113,7 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ./tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
-### Docker
+## Docker
 ![](images/docker.png)
 
 Some targets requires docker in order to run since you most likely will not have
@@ -191,20 +121,34 @@ all build dependencies in your native environment. To virtualize the Application
 build time dependencies they have been collected inside a docker image following
 docker best practises. You only need to remember to source the 
 ```
-source docker-commands.sh
+source docker/docker-commands.sh
 ```
-and you will be ready to run commands inside the docker container by:
+and you will be ready to run commands inside the docker container like 
+configuring CMake:
+```Bash
+cd build/
+docker-bash cmake ..
 ```
-docker-make unit-tests
+building
+```Bash
+docker-bash make -j $(nproc)
+```
+and testing:
+```Bash
+docker-bash unit-tests
 ```
 for example.
 If you want to run a custom bash command you can do it by:
-```
+```Bash
 docker-bash make help
 ```
 for instance. To get an interactive bash session type:
-```
+```Bash
 docker-interactive
+```
+which will give you a docker shell:
+```Bash
+docker@48fefc2ad3cf:/tmp/workspace/build
 ```
 
 ### Docker image
@@ -217,15 +161,70 @@ To build the image your self:
 make docker-image
 ```
 
-### How to test it
-In order to run all unit tests just type:
-```
-make test
+## Tests
+In order to run all tests just type (currently only available under Linux):
+```Bash
+make component-tests
+make component-benchmark-tests
+make unit-tests
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
 
-## Windows
-Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
+## Windows (CMake)
+Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
+
+### Visual Studio 2017
+To open the CMake project under Windows you need Visual Studio 2017 with CMake support. Open the root CMakeLists.txt
+project file and you are ready to build under Windows. 
+
+### VS Code
+To open the CMake project by VS Code under Windows, just open the root folder. 
+Select the supplied Kit (CMake & CMake Tools plugins are required) to simplify builds with predefined options. Existing kits are:
+
+| Kit name                         | Meaning                     |
+|----------------------------------|-----------------------------|
+| Windows-SharedLib-VS2017-x64     | 64 bits build DLL on Windows, no tests
+| Windows-SharedLib-VS2017-x86     | 32 bits build DLL on Windows, no tests
+| Windows-Gtests-StaticLib-VS2017-x86 | 32 bits build gtests/benchmarch on Windows
+| Windows-Gtests-StaticLib-VS2017-x64 | 64 bits build gtests/benchmarch on Windows
+
+Currently there is a bug in gmock which only make it possible to link statically and not dynamically
+with gmock hence the reason for the  `Windows-Gtests-StaticLib-VS2017-x86`.
+
+### Visual Studio prior 2017
+To cross compile for older VS versions, use powershell and cmake command line with a generator, for example:
+```
+cmake -G "Visual Studio 14 2015" --arch "x86" -DENABLE_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF ..
+```
+
+Possible VS generators are:
+
+| Generators                       | Meaning                     |
+|----------------------------------|-----------------------------|
+| Visual Studio 15 2017 [arch]     | Generates Visual Studio 2017 project files.
+| Visual Studio 14 2015 [arch]     | Generates Visual Studio 2015 project files.
+| Visual Studio 12 2013 [arch]     | Generates Visual Studio 2013 project files.
+| Visual Studio 11 2012 [arch]     | Generates Visual Studio 2012 project files.
+| Visual Studio 10 2010 [arch]     | Generates Visual Studio 2010 project files.
+| Visual Studio 9 2008 [arch]      | Generates Visual Studio 2008 project files.
+
+where arch can be x86, Win64 or ARM. To build your new solution type:
+```
+cmake --build .
+or
+cmake --build . --target mpeg2ts
+```
+
+### Generate Release
+Run the
+```
+./gen_package.bat
+```
+to create a new release on Windows via CMake and CPack.
+
+
+### Solution files Visual Studio 2015
+[DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
 There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
 mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
 called TestTsLib that uses the dynamic mpeg2ts.dll library in the same solution. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
@@ -233,8 +232,6 @@ change to dynamic project. This is the VS2015 solution file:
 * mpeg2ts.sln
 
 ## Continuous integration (CI)
-![](images/circleci.png)
-
 For CI we use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:

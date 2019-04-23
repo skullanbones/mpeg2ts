@@ -10,10 +10,10 @@ jobs:
           command: lsb_release -a
       - run:
           name: Build CMake Debug
-          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j36
+          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j$(nproc)
       - run:
           name: Build CMake Release
-          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j36
+          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j$(nproc)
       - run:
           name: Component Tests
           command: cd build && make component-tests

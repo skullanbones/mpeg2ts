@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bits/stdint-uintn.h>  // for uint8_t, uint64_t                                                                                                                                                                                                      
+#include <cstdint>  // for uint8_t, uint64_t                                                                                                                                                                                                      
 #include <iosfwd>               // for size_t                                                                        
 #include <stdexcept>            // for runtime_error                                                            
 #include <string>               // for string   
