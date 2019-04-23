@@ -1,4 +1,18 @@
 # Releases
+
+*V0.4.0*
+* [BUG-208] Build static and shared lib and package
+* [BUG-200] Add version info
+* [FEAT-195] Fix docker CMake
+* [x] Correct IWYU mistakes
+* [x] Fix Windows solution
+* [BUG-214] Turn of build plog samples
+* [BUG-207] Port Windows proj to CMake
+* [BUG-207] Update Windows support
+* [x] Add samples
+* [x] Fix gtest and benchmark build as 3rd-party
+* [BUG-220] Create Windows release script generator
+
 *V0.3.0*
 * [BUG-202] Fix TsUtilities crash when file not aligned to ts-packets
 * [BUG-191] Add CPack and package both debug/release build
