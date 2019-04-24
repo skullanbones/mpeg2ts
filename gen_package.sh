@@ -14,7 +14,7 @@ echo "2. Configure CMake"
 for type in ${build_types[@]}; do
     echo "Configure and build / $type shared lib"
     cd $type
-    cmake -DCMAKE_BUILD_TYPE=$type -DBUILD_SHARED_LIBS=YES ..
+    cmake -DCMAKE_BUILD_TYPE=$type -DBUILD_SHARED_LIBS=YES -DENABLE_TESTS=OFF ..
     make -j $(nproc)
     cd ..
 done
