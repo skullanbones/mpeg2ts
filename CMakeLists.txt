@@ -239,6 +239,9 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
 )
 
+add_dependencies(mpeg2codec plog)
+add_dependencies(mpeg2codec json)
+
 #-------------------
 # h264 codec lib
 #-------------------
@@ -280,6 +283,8 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
 )
 
+add_dependencies(h264codec plog)
+add_dependencies(h264codec json)
 
 #-------------------
 # add custom targets
