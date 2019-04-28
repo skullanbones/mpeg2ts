@@ -28,7 +28,7 @@ if(ENABLE_TESTS)
         add_subdirectory(bench)
 endif()
 
-if(MSVC)
+if(MSVC OR APPLE)
         set(ENABLE_COMPONENT_TESTS OFF)
 endif()
 if(ENABLE_COMPONENT_TESTS)
@@ -46,6 +46,12 @@ endif()
 #-------------------
 # compiler settings
 #-------------------
+if (UNIX AND NOT APPLE)
+        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
+                            -Werror # Make the specified warning into an error.
+        )
+endif()
+
 if (MSVC)
         add_compile_options(/W4)
 else()
@@ -71,12 +77,10 @@ else()
 #                        -Wlogical-op # warn about logical operations being used where bitwise were
                                      # probably wanted
 #                        -Wnull-dereference # warn if a null dereference is detected
-                        -Wuseless-cast # warn if you perform a cast to the same type
                         -Wdouble-promotion # warn if float is implicit promoted to double
                         -Wformat=2 # warn on security issues around functions that format output
                                    # (ie printf)
 #                        -Winline # Warn if a function that is declared as inline cannot be inlined.
-                        -Werror # Make the specified warning into an error.
         )
 endif()
 
