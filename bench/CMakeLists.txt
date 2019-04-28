@@ -28,6 +28,8 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
     Threads::Threads
     mpeg2ts
     benchmark
+    mpeg2codec
+    h264codec
     ${CMAKE_THREAD_LIBS_INIT})
 
    # If you want to run benchmarks with the "make test" command, uncomment me

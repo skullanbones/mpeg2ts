@@ -71,4 +71,7 @@ endif(USE_DOCKER)
 target_link_libraries(${PROJECT_NAME} 
   PRIVATE 
     mpeg2ts
+    mpeg2codec
+    h264codec
 )
+

@@ -120,7 +120,12 @@ target_include_directories(tsparser
         ${CMAKE_CURRENT_BINARY_DIR}/.  # For CMake generated files like mpeg2ts_version.h
 )
 
-target_link_libraries(tsparser PRIVATE ${PROJECT_NAME})
+target_link_libraries(tsparser 
+                        PRIVATE 
+                        ${PROJECT_NAME}
+                        mpeg2codec
+                        h264codec
+)
 
 set_target_properties(tsparser
     PROPERTIES
@@ -173,10 +178,6 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 target_sources(
         ${PROJECT_NAME}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/EsParser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
@@ -191,10 +192,94 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsParser.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TsStatistics.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TsUtilities.cc
+)
 
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)
+
+#-------------------
+# mpeg2 codec lib
+#-------------------
+add_library(mpeg2codec)
+
+# shared libraries need PIC
+if (BUILD_SHARED_LIBS)
+        set_property(mpeg2codec ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+endif()
+
+target_include_directories(mpeg2codec
+        PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
+)
+
+set_target_properties(mpeg2codec
+        PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME ${PROJECT_NAME}
+        CXX_LINK_WHAT_YOU_USE TRUE
+        DEBUG_POSTFIX "-d"
+)
+
+target_compile_features(mpeg2codec PRIVATE cxx_std_11)
+
+target_sources(
+        mpeg2codec
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+)
+
+#-------------------
+# h264 codec lib
+#-------------------
+add_library(h264codec)
+
+# shared libraries need PIC
+if (BUILD_SHARED_LIBS)
+        set_property(h264codec ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+endif()
+
+target_include_directories(h264codec
+        PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
+)
+
+set_target_properties(h264codec
+        PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME ${PROJECT_NAME}
+        CXX_LINK_WHAT_YOU_USE TRUE
+        DEBUG_POSTFIX "-d"
+)
+
+target_compile_features(h264codec PRIVATE cxx_std_11)
+
+target_sources(
+        h264codec
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+)
+
 
 #-------------------
 # add custom targets

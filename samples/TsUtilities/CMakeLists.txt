@@ -22,4 +22,10 @@ target_sources(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE mpeg2ts)
+target_link_libraries(${PROJECT_NAME} 
+                        PRIVATE 
+                        mpeg2ts
+                        mpeg2codec
+                        h264codec
+)
+
