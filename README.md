@@ -1,12 +1,19 @@
 # MPEG-2 Transport Stream utility library
 A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
-international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS.
+international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS. The library is platform independent only using
+C++11. Mpeg2ts has been tested on the following operating systems:
+* Linux (Ubuntu 18.04 LTS)
+* Windows (Windows 10)
+* Mac OS X (Sierra)
 
-Artifacts:
+To simplify the build process on all these operating systems, CMake is being used.
+
+Cross platform Artifacts:
 ```
 Win32: mpeg2ts.dll mpeg2ts.lib
 Linux: libmpeg2ts.so libmpeg2ts.a
-Both: mpeg2ts.h
+Apple: libmpeg2ts.dylib libmpeg2ts.a
+All OS: mpeg2ts.h
 ```
 Sample Applications:
 ```
@@ -17,7 +24,7 @@ Linux: tsparser
 ```
 
 ## Requirements / example usage
-C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X, Ubuntu 16.04/18.04, Windows 10.
+C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
 
 ## SW Architecture
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
@@ -38,7 +45,7 @@ NONE
 ```
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
-## Building
+## Building (CMake)
 To simplify the crosscompile process we use CMake. Under Linux just do this:
 ```Bash
 mkdir build
@@ -55,7 +62,7 @@ To also build the shared libraries you need to tell CMake to build those:
 ```Bash
 cmake -DCMAKE_BUILD_TYPE=Debug|Release -DBUILD_SHARED_LIBS=YES ..
 ```
-which result in `libmpeg2ts.so*`.
+which result in `libmpeg2ts.so*` on Linux, `libmpeg2ts.dylib*` on Mac and `libmpeg2ts.dll*` on Windows.
 
 
 If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` instead of `make` in the 4th command above.
@@ -63,20 +70,26 @@ If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` ins
 ## Installation
 In order to install this library you can type:
 ```Bash
-cmake -DCMAKE_INSTALL_PREFIX=../_install ..
+cmake -DCMAKE_INSTALL_PREFIX=../install ..
 make -j 8
 make install
 ```
-and now you will find the installed libraries and headers in `_install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
+and now you will find the installed libraries and headers in `install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
 
 ## Packaging
-To generate a package with both debug and release build type:
+To generate a package with both debug and release build type (Mac & Linux):
 ```Bash
 ./gen_package.sh
 ```
+or on Windows
+```Bash
+./gen_package.bat
+```
 This will generate a package
 ```Bash
-mpeg2ts-0.2.1-Linux.tar.gz
+mpeg2ts-0.4.0-Linux.tar.gz   (Linux)
+mpeg2ts-0.4.0-Darwin.tar.gz  (Apple)
+mpeg2ts-0.4.0-win32.zip      (Windows)
 ```
 for example containing only shared libs.
 
