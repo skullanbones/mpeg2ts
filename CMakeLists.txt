@@ -205,7 +205,7 @@ add_library(mpeg2codec)
 
 # shared libraries need PIC
 if (BUILD_SHARED_LIBS)
-        set_property(mpeg2codec ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+        set_property(TARGET mpeg2codec PROPERTY POSITION_INDEPENDENT_CODE 1)
 endif()
 
 target_include_directories(mpeg2codec
@@ -246,7 +246,7 @@ add_library(h264codec)
 
 # shared libraries need PIC
 if (BUILD_SHARED_LIBS)
-        set_property(h264codec ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+        set_property(TARGET h264codec PROPERTY POSITION_INDEPENDENT_CODE 1)
 endif()
 
 target_include_directories(h264codec
