@@ -8,7 +8,7 @@
 #include "plog/Record.h"  // for Record
 
 /// Project files
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "Mpeg2VideoParser.h"
 
 namespace mpeg2
 {

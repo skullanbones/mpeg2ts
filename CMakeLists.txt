@@ -210,14 +210,11 @@ endif()
 
 target_include_directories(mpeg2codec
         PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mpeg2codec>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
 )
 
@@ -225,7 +222,7 @@ set_target_properties(mpeg2codec
         PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
-        EXPORT_NAME ${PROJECT_NAME}
+        EXPORT_NAME mpeg2codec
         CXX_LINK_WHAT_YOU_USE TRUE
         DEBUG_POSTFIX "-d"
 )
@@ -254,22 +251,19 @@ endif()
 
 target_include_directories(h264codec
         PUBLIC
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/h264>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
 )
 
 set_target_properties(h264codec
         PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
-        EXPORT_NAME ${PROJECT_NAME}
+        EXPORT_NAME h264codec
         CXX_LINK_WHAT_YOU_USE TRUE
         DEBUG_POSTFIX "-d"
 )
