@@ -43,8 +43,6 @@ TsUtilities::TsUtilities()
     , mPmts{}
     , mEsPids{}
     , mAddedPmts{ false }
-    , m_Mpeg2Parser{ std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser()) }
-    , m_H264Parser{ std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser()) }
 {
 }
 
@@ -408,13 +406,15 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                         std::vector<uint8_t>::const_iterator last = a_rawPes.end();
                         std::vector<uint8_t> newVec(first, last);
 
-                        std::vector<mpeg2::EsInfoMpeg2> ret = instance->m_Mpeg2Parser->parse(newVec);
+                        mpeg2::Mpeg2VideoEsParser mpeg2Parser;
+                        std::vector<mpeg2::EsInfoMpeg2> ret = mpeg2Parser.parse(newVec);
 
                         for (const mpeg2::EsInfoMpeg2& info : ret)
                         {
                             // LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
                             if (info.type == mpeg2::Mpeg2Type::SliceCode)
                             {
+                                instance->mVideoMediaInfo.picType = info.slice.picType;
                                 // LOGD << "mpeg2 picture type: " << info.slice.picType << " " <<
                                 // info.msg;
                             }
@@ -423,9 +423,9 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                                 instance->mVideoMediaInfo.width = info.sequence.width;
                                 instance->mVideoMediaInfo.height = info.sequence.height;
                                 instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-                                // LOGD << info.sequence.width << " x " << info.sequence.height <<
-                                // ", aspect: " << info.sequence.aspect
-                                //     << ", frame rate: " << info.sequence.framerate;
+
+                                instance->mVideoMediaInfo.aspect = info.sequence.aspect;
+                                instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                             }
                         }
                     } // STREAMTYPE_VIDEO_MPEG2
@@ -439,7 +439,8 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                         std::vector<uint8_t>::const_iterator last = a_rawPes.end();
                         std::vector<uint8_t> newVec(first, last);
 
-                        std::vector<h264::EsInfoH264> ret = instance->m_H264Parser->parse(newVec);
+                        h264::H264EsParser h264Parser;
+                        std::vector<h264::EsInfoH264> ret = h264Parser.parse(newVec);
 
                         for (const h264::EsInfoH264& info : ret)
                         {
@@ -463,6 +464,10 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                             {
                                 instance->mVideoMediaInfo.width = info.sps.width;
                                 instance->mVideoMediaInfo.height = info.sps.height;
+                                instance->mVideoMediaInfo.lumaBits = info.sps.lumaBits;
+                                instance->mVideoMediaInfo.chromaBits = info.sps.chromaBits;
+                                instance->mVideoMediaInfo.numRefPics = info.sps.numRefPics;
+
                                 // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                                 // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " <<
                                 // info.sps.lumaBits
