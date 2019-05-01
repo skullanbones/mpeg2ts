@@ -39,12 +39,6 @@ PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
 bool addedPmts{ false };
 
-// Codec parsers
-std::unique_ptr<mpeg2::Mpeg2VideoEsParser> g_Mpeg2Parser =
-std::unique_ptr<mpeg2::Mpeg2VideoEsParser>(new mpeg2::Mpeg2VideoEsParser());
-std::unique_ptr<h264::H264EsParser> g_H264Parser =
-std::unique_ptr<h264::H264EsParser>(new h264::H264EsParser());
-
 const char LOGFILE_NAME[]{ "tsparser.csv" };
 int LOGFILE_MAXSIZE{ 100 * 1024 };
 int LOGFILE_MAXNUMBEROF{ 10 };
@@ -302,7 +296,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            std::vector<mpeg2::EsInfoMpeg2> infos = g_Mpeg2Parser->parse(newVec);
+                            mpeg2::Mpeg2VideoEsParser mpeg2Parser;
+                            std::vector<mpeg2::EsInfoMpeg2> infos = mpeg2Parser.parse(newVec);
 
                             for (auto info : infos)
                             {
@@ -317,7 +312,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                 }
                                 else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                                 {
-                                    LOGD << info.sequence.width << " x " << info.sequence.height
+                                    LOGD << "size: " << info.sequence.width << " x " << info.sequence.height
                                          << ", aspect: " << info.sequence.aspect
                                          << ", frame rate: " << info.sequence.framerate;
                                 }
@@ -330,7 +325,8 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             std::vector<uint8_t>::const_iterator last = rawPes.end();
                             std::vector<uint8_t> newVec(first, last);
 
-                            std::vector<h264::EsInfoH264> infos = g_H264Parser->parse(newVec);
+                            h264::H264EsParser h264Parser;
+                            std::vector<h264::EsInfoH264> infos = h264Parser.parse(newVec);
 
                             for (auto info : infos)
                             {
@@ -355,7 +351,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                     LOGD << "sps id: " << info.pps.spsId
                                          << ", luma bits: " << info.sps.lumaBits
                                          << ", chroma bits: " << info.sps.chromaBits
-                                         << ", width: " << info.sps.width << " x "
+                                         << ", size: " << info.sps.width << " x "
                                          << info.sps.height << ", ref pic: " << info.sps.numRefPics;
                                 }
                                 else if (info.type == h264::H264InfoType::PictureParameterSet)

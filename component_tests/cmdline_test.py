@@ -355,7 +355,7 @@ def test_parse_mpeg2_eurosport(parser, asset_eurosport):
     log.debug(out[1])
     print(out[1])
     assert "sequence_header_code" in out[1]
-    assert "704 x 576, aspect: 3x4, frame rate: 25" in out[1]
+    assert "size: 704 x 576, aspect: 3x4, frame rate: 25" in out[1]
 
 
 def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
@@ -374,7 +374,7 @@ def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
     print(out[1])
     assert "nal: Access_unit_delimiter Access unit delimiter" in out[1]
     assert "nal: Sequence_parameter_set Sequence parameter set: profile: High level: 4.1" in out[1]
-    assert "sps id: 0, luma bits: 8, chroma bits: 8, width: 1920 x 1088, ref pic: 4" in out[1]
+    assert "sps id: 0, luma bits: 8, chroma bits: 8, size: 1920 x 1088, ref pic: 4" in out[1]
     assert "nal: Picture_parameter_set Picture parameter set: entropy: CAVLC" in out[1]
     assert "sps id: 0pps id: 0" in out[1]
 
