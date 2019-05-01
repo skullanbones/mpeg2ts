@@ -35,6 +35,9 @@ if(ENABLE_COMPONENT_TESTS)
         add_subdirectory(component_tests)
 endif()
 
+#-------------------
+# third-party
+#-------------------
 add_subdirectory(3rd-party)
 
 

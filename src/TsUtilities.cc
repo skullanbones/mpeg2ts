@@ -423,9 +423,7 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                                 instance->mVideoMediaInfo.width = info.sequence.width;
                                 instance->mVideoMediaInfo.height = info.sequence.height;
                                 instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
-
                                 instance->mVideoMediaInfo.aspect = info.sequence.aspect;
-                                instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                             }
                         }
                     } // STREAMTYPE_VIDEO_MPEG2
@@ -468,7 +466,6 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                                 instance->mVideoMediaInfo.chromaBits = info.sps.chromaBits;
                                 instance->mVideoMediaInfo.numRefPics = info.sps.numRefPics;
 
-                                // instance->mVideoMediaInfo.frameRate = info.sequence.framerate;
                                 // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " <<
                                 // info.sps.lumaBits
                                 //      << ", chroma bits: " << info.sps.chromaBits << ", width: "
