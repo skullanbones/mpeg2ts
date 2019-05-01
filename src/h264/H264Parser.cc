@@ -8,7 +8,7 @@
 #include "plog/Record.h"  // for Record
 
 /// Project files
-#include "h264/H264Parser.h"
+#include "H264Parser.h"
 
 
 namespace h264

@@ -9,37 +9,10 @@
 /// Project files
 #include "EsParser.h"           // for EsParser
 #include "GetBits.h"            // for GetBits
+#include "Mpeg2Codec.h"
 
 namespace mpeg2
 {
-
-enum class Mpeg2Type
-{
-    Info,
-    SliceCode,
-    SequenceHeader
-};
-
-struct EsInfoMpeg2PictureSliceCode
-{
-    uint64_t picType{ 0 }; // I, B, P
-};
-
-struct EsInfoMpeg2SequenceHeader
-{
-    int width{ 0 }, height{ 0 };
-    std::string aspect{ "" };
-    std::string framerate{ "" };
-};
-
-struct EsInfoMpeg2
-{
-    Mpeg2Type type;
-    int picture{ 0 }; // slice
-    std::string msg{ "" };
-    EsInfoMpeg2PictureSliceCode slice;
-    EsInfoMpeg2SequenceHeader sequence;
-};
 
 
 class Mpeg2VideoEsParser : public GetBits, public EsParser

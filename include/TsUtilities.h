@@ -11,9 +11,6 @@
 #include "mpeg2ts.h"            // for MPEG2TS_API, ByteVector, PesPacket (p...
 #include "mpeg2ts_export.h"     // for exporting as DLL
 
-namespace h264 { class H264EsParser; }
-namespace mpeg2 { class Mpeg2VideoEsParser; }
-
 /*
  * High level API on mpeg2ts library
  * Utilities functionality to simplify usage of mpeg2ts library
@@ -81,13 +78,25 @@ enum class VideoCodecType
 
 struct VideoMediaInfo
 {
+    // Common to codecs
     MediaType mediaType{ MediaType::Unknown };
     int PID{ -1 };
     VideoCodecType codec;
     int width;
     int height;
     std::string frameRate;
+
+    // Mpeg2
+    uint64_t picType;
+    std::string aspect;
+
+    // H264
+    int lumaBits;
+    int chromaBits;
+    int numRefPics;
 };
+
+typedef std::function<void(const std::vector<uint8_t>& frame, int streamType)> VideoCallBackFnc;
 
 class TsUtilities
 {
@@ -154,6 +163,8 @@ public:
 
     MPEG2TS_EXPORT std::string toString(VideoCodecType e) const;
 
+    MPEG2TS_EXPORT void addVideoCallback(VideoCallBackFnc cb);
+
 private:
     //* callbacks *//
     static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
@@ -181,8 +192,8 @@ private:
     VideoMediaInfo mVideoMediaInfo;
 
     std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
-    std::unique_ptr<mpeg2::Mpeg2VideoEsParser> m_Mpeg2Parser;
-    std::unique_ptr<h264::H264EsParser> m_H264Parser;
+
+    VideoCallBackFnc mVideoCallback;
 };
 
 inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const
