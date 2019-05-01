@@ -96,6 +96,8 @@ struct VideoMediaInfo
     int numRefPics;
 };
 
+typedef std::function<void(const std::vector<uint8_t>& frame, int streamType)> VideoCallBackFnc;
+
 class TsUtilities
 {
 public:
@@ -161,6 +163,8 @@ public:
 
     MPEG2TS_EXPORT std::string toString(VideoCodecType e) const;
 
+    MPEG2TS_EXPORT void addVideoCallback(VideoCallBackFnc cb);
+
 private:
     //* callbacks *//
     static void PATCallback(const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int pid, void* hdl);
@@ -188,6 +192,8 @@ private:
     VideoMediaInfo mVideoMediaInfo;
 
     std::map<int, std::vector<mpeg2ts::PesPacket>> mPesPackets;
+
+    VideoCallBackFnc mVideoCallback;
 };
 
 inline VideoMediaInfo TsUtilities::getVideoMediaInfo() const

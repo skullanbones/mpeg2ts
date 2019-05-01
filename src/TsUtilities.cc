@@ -409,6 +409,8 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
                         mpeg2::Mpeg2VideoEsParser mpeg2Parser;
                         std::vector<mpeg2::EsInfoMpeg2> ret = mpeg2Parser.parse(newVec);
 
+                        instance->mVideoCallback(newVec, it->stream_type);
+
                         for (const mpeg2::EsInfoMpeg2& info : ret)
                         {
                             // LOGD << "mpeg2 picture: " << info.picture << " " << info.msg;
@@ -439,6 +441,8 @@ void TsUtilities::PESCallback(const mpeg2ts::ByteVector& a_rawPes, const mpeg2ts
 
                         h264::H264EsParser h264Parser;
                         std::vector<h264::EsInfoH264> ret = h264Parser.parse(newVec);
+
+                        instance->mVideoCallback(newVec, it->stream_type);
 
                         for (const h264::EsInfoH264& info : ret)
                         {
@@ -499,6 +503,11 @@ std::map<int, std::vector<mpeg2ts::PesPacket>> TsUtilities::getPesPackets() cons
 mpeg2ts::PidStatisticsMap TsUtilities::getPidStatistics() const
 {
     return mDemuxer.getPidStatistics();
+}
+
+void TsUtilities::addVideoCallback(VideoCallBackFnc cb)
+{
+    mVideoCallback = cb;
 }
 
 

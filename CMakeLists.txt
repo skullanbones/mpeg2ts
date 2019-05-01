@@ -58,7 +58,7 @@ endif()
 if (MSVC)
         add_compile_options(/W4)
 else()
-    add_compile_options(-Wall
+        add_compile_options(-Wall
                         -Wextra # reasonable and standard
                         -Wshadow # warn the user if a variable declaration shadows one from a
                                  # parent context
@@ -215,6 +215,7 @@ target_include_directories(mpeg2codec
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mpeg2codec>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid>
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -234,9 +235,12 @@ target_compile_features(mpeg2codec PRIVATE cxx_std_11)
 
 target_sources(
         mpeg2codec
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2Codec.h
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid/Mpeg2VideoParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2VideoParser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2vid/Mpeg2Codec.cc
 )
 
 add_dependencies(mpeg2codec plog)
@@ -256,6 +260,7 @@ target_include_directories(h264codec
         PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/h264>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/h264>
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>           # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -275,9 +280,12 @@ target_compile_features(h264codec PRIVATE cxx_std_11)
 
 target_sources(
         h264codec
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Codec.h
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264/H264Parser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Parser.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/h264/H264Codec.cc
 )
 
 add_dependencies(h264codec plog)
