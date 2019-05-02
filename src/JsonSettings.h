@@ -8,7 +8,7 @@
 #include <exception>   // for exception
 #include <string>             // for string
 
-/// 3rd-party
+// 3rd-party
 #include "nlohmann/json.hpp"  // for json
 
 

@@ -3,11 +3,11 @@
 #include <new>            // for bad_alloc
 #include <sstream>        // for operator<<, ostringstream, basic_ostream
 
-/// 3rd-party
+// 3rd-party
 #include <plog/Log.h>     // for LOGE
 #include "plog/Record.h"  // for Record
 
-/// Project files
+// Project files
 #include "Mpeg2VideoParser.h"
 
 namespace mpeg2

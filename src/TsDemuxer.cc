@@ -18,7 +18,7 @@
 #include <map>                  // for map, _Rb_tree_iterator, map<>::mapped...
 #include <memory>               // for unique_ptr
 
-/// 3rd-party
+// 3rd-party
 #include "plog/Log.h"           // for LOGE_
 
 #include "Logging.h"            // for FileLog

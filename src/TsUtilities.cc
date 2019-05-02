@@ -8,7 +8,7 @@
 #include <fstream>                               // for basic_ostream::opera...                                                                                                                                             
 #include <stdexcept>                             // for out_of_range                                                                         
 
-/// 3rd-party
+// 3rd-party
 #include "plog/Appenders/ConsoleAppender.h"      // for ConsoleAppender                                                                                   
 #include "plog/Log.h"                            // for LOGD, LOGE, LOGE_
 #include "plog/Appenders/RollingFileAppender.h"  // for RollingFileAppender
@@ -19,7 +19,7 @@
 #include "plog/Record.h"                         // for Record
 #include "plog/Severity.h"                       // for Severity, debug, error
 
-/// Project files
+// Project files
 #include "TsUtilities.h"
 #include "JsonSettings.h"                        // for LoadException, Settings                   
 #include "Logging.h"                             // for FileLog

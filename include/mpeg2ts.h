@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-/// project files
+// project files
 #include "Ts_IEC13818-1.h" // For TsHeader  Program
 
 
@@ -276,7 +276,10 @@ typedef std::function<void(const ByteVector& rawTable, PsiTable* table, int pid,
 typedef std::function<void(const ByteVector& rawPes, const PesPacket& pes, int pid, void* hdl)> PesCallBackFnc;
 typedef std::function<void(const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl)> TsCallBackFnc;
 
-/// @brief Demux ts packets into PSI and PES (plus TS pass through)
+/*!
+ * @brief mpeg2ts API
+ * @brief Demux ts packets into PSI and PES (plus TS pass through)
+ */
 class TsDemuxer
 {
 public:

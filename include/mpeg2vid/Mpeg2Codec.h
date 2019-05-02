@@ -36,6 +36,10 @@ struct EsInfoMpeg2
 };
 
 class Mpeg2VideoEsParser; // forward declaration
+
+/*!
+ * @brief Mpeg2 codec parser API
+ */
 class Mpeg2Codec
 {
 public:
