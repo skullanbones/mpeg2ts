@@ -11,7 +11,7 @@ if(NOT DOXYGEN_FOUND)
 else()
     doxygen_add_docs(
         doxygen
-        ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/samples
+        ${PROJECT_SOURCE_DIR}/README.md ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/samples
         COMMENT "Generate doxygen pages"
     )
 endif()
