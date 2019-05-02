@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(sample_tsutilities
+project(
+    sample_tsutilities
     VERSION 0.0.1
     DESCRIPTION "Sample TsUtilities"
     LANGUAGES CXX
