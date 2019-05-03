@@ -46,14 +46,23 @@ public:
     Mpeg2Codec();
     ~Mpeg2Codec();
 
-    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
-    /// let the specialization analyze the results.
-    /// @param buf The binary data to parse
+    /*!
+     * @brief Parses a binary buffer containing codec MPEG2 data and
+     * let the specialization analyze the results.
+     * @param buf The binary data to parse
+     * @return Codec parsed meta-data
+     */
     std::vector<EsInfoMpeg2> parse(const std::vector<uint8_t>& buf);
 
-    /// @brief Analyze the content on data after startcodes.
+    /*!
+     * @brief Analyze the content on data after startcodes.
+     */
     std::vector<EsInfoMpeg2> analyze();
 
+    /*!
+     * @brief Convert Mpeg2Type to string
+     * @return Mpeg2Type string
+     */
     std::string toString(Mpeg2Type e);
 
 private:

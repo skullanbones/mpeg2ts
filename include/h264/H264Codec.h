@@ -83,15 +83,29 @@ public:
     H264Codec();
     ~H264Codec();
 
-    /// @brief Parses a binary buffer containing codec data like H262 or H264 and
-    /// let the specialization analyze the results.
-    /// @param buf The binary data to parse
+    /*!
+     * @brief Parses a binary buffer containing H264 codec data and
+     * let the specialization analyze the results.
+     * @param buf The binary data to parse
+     * @return H264 parsed metadata
+     */
     std::vector<EsInfoH264> parse(const std::vector<uint8_t>& buf);
 
-    /// @brief Analyze the content on data after startcodes.
+    /*!
+     * @brief Analyze the content on data after startcodes.
+     */
     std::vector<EsInfoH264> analyze();
 
+    /*!
+     * @brief Convert H264InfoType to string
+     * @return H264InfoType string
+     */
     std::string toString(H264InfoType e);
+
+    /*!
+     * @brief Convert NalUnitType to string
+     * @return NalUnitType string
+     */
     std::string toString(NalUnitType e);
 private:
     // Non copyable
