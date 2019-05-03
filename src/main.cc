@@ -73,7 +73,7 @@ bool hasPids(std::string param, std::vector<uint16_t> pids)
 
 void display_usage()
 {
-    printf("Ts-lib simple command-line:\n");
+    printf("Mpeg2ts lib simple command-line:\n");
 
     printf(
     "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]\n");

@@ -16,7 +16,7 @@ def parser():
 def test_help_message(parser):
     """Verify that help option is displayed"""
     out = parser.start(extra_args=['--help'])
-    assert "Ts-lib simple command-line:" in out[1], "No help text in output"
+    assert "Mpeg2ts lib simple command-line:" in out[1], "No help text in output"
     assert "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" \
            in out[1], "Wrong help output"
 

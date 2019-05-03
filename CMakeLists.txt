@@ -297,7 +297,7 @@ add_dependencies(h264codec json)
 # add custom targets
 #-------------------
 add_custom_target(unit-tests
-    COMMAND ./tests/run_gtests
+    COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
 )
 
 add_custom_target(benchmark-tests
