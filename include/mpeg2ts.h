@@ -30,8 +30,8 @@ typedef std::map<int, PidStatistic> PidStatisticsMap;
 
 
 /*!
- * @class PES-Packet prototype containing buffer
- *
+ * @brief PES-Packet prototype containing buffer
+ * @ref ISO/IEC 13818-1 (Table 2-21 – PES packet)
  */
 struct PesPacket
 {
@@ -106,7 +106,8 @@ public:
 };
 
 /*!
- * PAT table
+ * @brief PAT Table – Program association section
+ * @ref ISO/IEC 13818-1 (Table 2-30)
  */
 class PatTable : public PsiTable
 {
@@ -121,6 +122,10 @@ public:
     MPEG2TS_EXPORT bool operator!=(const PatTable& rhs) const;
 };
 
+/*!
+ * @brief Part of PMT Table
+ * @ref ISO/IEC 13818-1 (Table 2-33)
+ */
 struct StreamTypeHeader
 {
     StreamType stream_type;
@@ -135,7 +140,8 @@ struct StreamTypeHeader
 };
 
 /*!
- * PMT Table.
+ * @brief PMT Table – Transport stream program map section 
+ * @ref ISO/IEC 13818-1 (Table 2-33)
  */
 class PmtTable : public PsiTable
 {
@@ -160,13 +166,20 @@ public:
     MPEG2TS_EXPORT bool operator!=(const PmtTable& rhs) const;
 };
 
+/*!
+ * @brief Conditional access table
+ * @ref Table 2-32 – Conditional access section
+ * @todo Not implemented
+ */
 class CatTable : public PsiTable
 {
 public:
     std::vector<CatDescriptor> descriptors;
 };
 
-
+/*!
+ * @brief Parsed meta data for 1 TS packet
+ */
 class TsPacketInfo
 {
 public:
@@ -229,7 +242,10 @@ public:
     MPEG2TS_EXPORT friend std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs);
 };
 
-
+/*!
+ * @brief Statistics per PID with time-stamp variations (DTS, PTS, PCR) and 
+ * continuity counters.
+ */
 struct PidStatistic
 {
     static constexpr const uint8_t INVALID_CC{ 16 };
@@ -264,6 +280,9 @@ struct PidStatistic
     uint64_t numberOfMissingDts;
 };
 
+/*!
+ * @brief Count TS packets statistics
+ */
 struct TsCounters
 {
     uint64_t mTsPacketCounter{ 0 };
