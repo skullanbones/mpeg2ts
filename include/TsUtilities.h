@@ -18,6 +18,9 @@
 namespace tsutil
 {
 
+/*!
+ * @brief IP address to use for input of TS stream
+ */
 class IpAddress
 {
 public:
@@ -34,6 +37,9 @@ private:
     std::string mIpAddress;
 };
 
+/*!
+ * @brief IP port to use for input of TS stream
+ */
 class Port
 {
 public:
