@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(
     run_gtests
     VERSION 1.0.0
-    DESCRIPTION "GTests for ts-lib"
+    DESCRIPTION "GTests for mpeg2ts lib"
     LANGUAGES CXX
 )
 
