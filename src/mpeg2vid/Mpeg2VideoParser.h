@@ -6,7 +6,7 @@
 #include <utility>              // for pair
 #include <vector>               // for vector
 
-/// Project files
+// Project files
 #include "EsParser.h"           // for EsParser
 #include "GetBits.h"            // for GetBits
 #include "Mpeg2Codec.h"
@@ -14,7 +14,9 @@
 namespace mpeg2
 {
 
-
+/*!
+ * @brief Mpeg2 codec parser implementation
+ */
 class Mpeg2VideoEsParser : public GetBits, public EsParser
 {
 public:

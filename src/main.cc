@@ -15,11 +15,11 @@
 #include <type_traits>
 #include <unistd.h>
 
-/// 3rd-party
+// 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Log.h>
 
-/// Project files
+// Project files
 #include "Logging.h"
 #include "TsParser.h"
 #include "Ts_IEC13818-1.h"

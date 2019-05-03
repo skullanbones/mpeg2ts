@@ -1,5 +1,5 @@
 # MPEG-2 Transport Stream utility library
-A fast, modern C++ SDK for all your MPEG-2 transport stream media format needs following
+A fast, cross-platform and modern C++ SDK for all your MPEG-2 transport stream media format needs following
 international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS. The library is platform independent only using
 C++11. Mpeg2ts has been tested on the following operating systems:
 * Linux (Ubuntu 18.04 LTS)
@@ -127,9 +127,7 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
 
 ## Docker
-![](images/docker.png)
-
-Some targets requires docker in order to run since you most likely will not have
+[DEPRECATED!] Some targets requires docker in order to run since you most likely will not have
 all build dependencies in your native environment. To virtualize the Application
 build time dependencies they have been collected inside a docker image following
 docker best practises. You only need to remember to source the 
@@ -245,7 +243,7 @@ change to dynamic project. This is the VS2015 solution file:
 * mpeg2ts.sln
 
 ## Continuous integration (CI)
-For CI we use CircleCI which will automatically run all unit tests after a commit either
+For CI mpeg2ts use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/ts-lib)

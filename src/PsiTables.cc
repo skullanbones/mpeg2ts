@@ -5,7 +5,7 @@
 #include <string>           // for string, char_traits, operator<<
 #include <vector>           // for vector
 
-/// 3rd-party
+// 3rd-party
 #include "plog/Log.h"       // for LOGD_
 #include "plog/Record.h"    // for Record
 

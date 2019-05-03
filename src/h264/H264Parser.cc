@@ -3,11 +3,11 @@
 #include <iterator>       // for end, begin
 #include <new>            // for bad_alloc
 
-/// 3rd-party
+// 3rd-party
 #include "plog/Log.h"    // for LOGD, LOGE
 #include "plog/Record.h"  // for Record
 
-/// Project files
+// Project files
 #include "H264Parser.h"
 
 
