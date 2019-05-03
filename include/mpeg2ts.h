@@ -40,7 +40,6 @@ struct PesPacket
     uint16_t PES_packet_length;
 
     // Extended packet
-    // TODO move out by inheritance?
     bool PES_scrambling_control;
     bool PES_priority;
     bool data_alignment_indicator;
