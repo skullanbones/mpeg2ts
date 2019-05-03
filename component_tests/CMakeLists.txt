@@ -12,6 +12,7 @@ find_package(PythonInterp 2.7 REQUIRED)
 find_program(VIRTUALENV virtualenv)
 if(NOT VIRTUALENV)
     message(FATAL_ERROR "Could not find `virtualenv` in PATH. You may need install by sudo apt-get install virtualenv.")
+    return()
 endif()
 
 set(VIRTUALENV ${VIRTUALENV} -p python${PYTHON_VERSION})
@@ -34,7 +35,9 @@ set(PYTEST
     ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/py.test
 )
 
-add_custom_target(Tests ALL
+add_custom_target(
+    Tests
+    ALL
     DEPENDS venv.stamp
     SOURCES requirements.txt
 )
@@ -49,14 +52,17 @@ add_test (NAME python-tests
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-add_custom_target(component-tests
+add_custom_target(
+    component-tests
     COMMAND ${PYTEST} --benchmark-skip  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(component-benchmark-tests
+add_custom_target(
+    component-benchmark-tests
     COMMAND ${PYTEST} --benchmark-enable --benchmark-only  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(version
-     COMMAND ${PYTEST} --version
+add_custom_target(
+    version
+    COMMAND ${PYTEST} --version
 )
