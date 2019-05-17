@@ -365,6 +365,9 @@ public:
     MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionPatch() const;
 
     MPEG2TS_EXPORT unsigned getMpeg2tsLibVersionTweak() const;
+    
+    MPEG2TS_EXPORT void setOrigin(int64_t origin);
+    MPEG2TS_EXPORT int64_t getOrigin(int pid);
 
 protected:
     std::map<int, PsiCallBackFnc> mPsiCallbackMap;
@@ -374,6 +377,8 @@ protected:
 
 private:
     std::unique_ptr<TsParser> mParser;
+
+    int64_t mOrigin = 0;
 };
 
 

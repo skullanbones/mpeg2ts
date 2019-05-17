@@ -66,7 +66,7 @@ void TsDemuxer::demux(const uint8_t* a_tsPacket)
     {
         // Check what table
         int table_id;
-        mParser->collectTable(a_tsPacket, tsPacketInfo, table_id);
+        mParser->collectTable(a_tsPacket, tsPacketInfo, table_id, mOrigin);
 
         if (table_id == PSI_TABLE_ID_PAT)
         {
@@ -94,7 +94,7 @@ void TsDemuxer::demux(const uint8_t* a_tsPacket)
     if (mPesCallbackMap.find(tsPacketInfo.pid) != mPesCallbackMap.end())
     {
         PesPacket pes;
-        if (mParser->collectPes(a_tsPacket, tsPacketInfo, pes))
+        if (mParser->collectPes(a_tsPacket, tsPacketInfo, pes, mOrigin))
         {
             mPesCallbackMap[tsPacketInfo.pid](pes.mPesBuffer, pes, tsPacketInfo.pid,
                                               mHandlers[tsPacketInfo.pid]);
@@ -155,6 +155,16 @@ unsigned TsDemuxer::getMpeg2tsLibVersionPatch() const
 unsigned TsDemuxer::getMpeg2tsLibVersionTweak() const
 {
 	return  getMpeg2tsVersionTweak();
+}
+
+void TsDemuxer::setOrigin(int64_t origin)
+{
+    mOrigin = origin;
+}
+
+int64_t TsDemuxer::getOrigin(int pid)
+{
+    return mParser->getOrigin(pid);
 }
 
 } // mpeg2ts
