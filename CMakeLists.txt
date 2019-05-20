@@ -18,12 +18,39 @@ else()
 endif()
 
 #-------------------
+# modules
+#-------------------
+if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+endif()
+
+include(clang_format)
+include(cppcheck)
+include(iwyu)
+include(doxygen)
+
+
+#-------------------
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
 option(ENABLE_TESTS "Build with tests" ON)
 option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
 option(BUILD_SAMPLES "Build samples" ON)
+option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
+
+#-------------------
+# gcov code coverage
+#-------------------
+if(UNIX AND ${ENABLE_COVERAGE} AND CMAKE_BUILD_TYPE MATCHES Debug)
+message("CVA ENable coverage")
+    include(CodeCoverage)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+    SETUP_TARGET_FOR_COVERAGE_LCOV(
+        NAME coverage
+        EXECUTABLE ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+    )
+endif()
 
 if(ENABLE_TESTS)
     add_subdirectory(tests)
@@ -349,17 +376,6 @@ if(BUILD_SAMPLES)
 endif(BUILD_SAMPLES)
 
 
-#-------------------
-# modules
-#-------------------
-if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-endif()
-
-include(clang_format)
-include(cppcheck)
-include(iwyu)
-include(doxygen)
 
 
 #-------------------
