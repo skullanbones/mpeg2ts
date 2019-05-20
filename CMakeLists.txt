@@ -43,7 +43,6 @@ option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
 # gcov code coverage
 #-------------------
 if(UNIX AND ${ENABLE_COVERAGE} AND CMAKE_BUILD_TYPE MATCHES Debug)
-message("CVA ENable coverage")
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
     SETUP_TARGET_FOR_COVERAGE_LCOV(
