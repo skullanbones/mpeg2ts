@@ -79,17 +79,17 @@ void display_statistics(mpeg2ts::PidStatisticsMap statistics)
 {
     for (auto& pidStat : statistics)
     {
-        if (std::count(g_Options["pid"].begin(), g_Options["pid"].end(), pidStat.first) == 0)
-        {
-            continue;
-        }
         LOGD << "Pid: " << pidStat.first << '\n';
         LOGD << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << '\n';
         LOGD << " CC error: " << pidStat.second.numberOfCCErrors << '\n';
         LOGD << " Pts differences histogram:\n";
+        auto& histArray = g_BigJson["stream"]["DtsHist" + std::to_string(pidStat.first)] = nlohmann::json::array({});
         for (auto& ent : pidStat.second.ptsHistogram)
         {
-            LOGD << "  diff: " << ent.first << " quantity " << ent.second << '\n';
+            nlohmann::json jsonHist;
+            jsonHist["d"] = ent.first;
+            jsonHist["n"] = ent.second;
+            histArray.push_back(jsonHist);
         }
         LOGD << " Pts missing: " << pidStat.second.numberOfMissingPts << '\n';
 

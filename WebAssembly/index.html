@@ -26,7 +26,10 @@
     <div class="slider_end">
     <input type="range" min="0" max="100" value="0" class="slider" onchange="new_end(this.value)" id="slider_end">
     </div>
-    
+    <div style="width:100%;">
+	    <canvas id="canvas_2"></canvas>
+	</div>
+   
     <script src="./a.out.js"></script>
     <script>
         var start_offset = 0;
@@ -149,6 +152,10 @@
 			var ctx = document.getElementById('canvas').getContext('2d');
 			window.myLine = new Chart(ctx, config);
             update_data();
+
+			var ctx2 = document.getElementById('canvas_2').getContext('2d');
+            window.histogram = new Chart(ctx2, config_2);
+            update_hist();
         }
         
         function update_data() 
@@ -161,7 +168,7 @@
                     continue;
                 }
                 config.data.datasets[data_set].data = [];
-                //config.data.datasets[data_set].pointBackgroundColor = [];
+                config.data.datasets[data_set].pointBackgroundColor = [];
                 for (let i = 0; i < mpeg2ts_data["stream"][pid].length; i++)
                 {
                     if (mpeg2ts_data["stream"][pid][i]["ofs"] < start_offset ||
@@ -188,7 +195,36 @@
             }
             window.myLine.update();
         };
-        
+        function update_hist() 
+        {
+            let data_set = 0;
+            for (let pid in mpeg2ts_data["stream"])
+            {
+                if (!pid.startsWith("DtsHist"))
+                {
+                    continue;
+                }
+                config_2['data']['datasets'].push({
+				                                    label: pid,
+                                                    pointBorderColor: [],
+					                                data: [],
+                                                    fill: false,
+                                                    pointRadius: 3,
+                                                  })
+                config_2.data.datasets[data_set].data = [];
+                for (let i = 0; i < mpeg2ts_data["stream"][pid].length; i++)
+                {
+                    config_2.data.datasets[data_set].data.push({ 
+                                                                 x: mpeg2ts_data["stream"][pid][i]["d"],
+                                                                 y: parseInt(mpeg2ts_data["stream"][pid][i]["n"])
+                                                               });
+                }
+
+                ++data_set;
+            }
+            window.histogram.update();
+        };
+       
 		var config = {
 			type: 'scatter',
 			data:
@@ -273,6 +309,47 @@
 						scaleLabel: {
 							display: true,
 							labelString: 'Pid'
+						}
+					}]
+				}
+			}
+		};
+        var config_2 = {
+			type: 'scatter',
+			data:
+            {
+				labels: [],
+				datasets: [],
+			},
+			options:
+            {
+				responsive: true,
+				title:
+                {
+					display: true,
+				},
+				tooltips:
+                {
+					mode: 'point',
+					intersect: false
+				},
+                hover: {
+					mode: 'point',
+					intersect: false
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'timestamp diff'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'quantity'
 						}
 					}]
 				}
