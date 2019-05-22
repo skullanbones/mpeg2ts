@@ -19,6 +19,7 @@
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Log.h>
 #include <nlohmann/json.hpp>
+#include "emscripten.h"
 
 // Project files
 #include "Logging.h"
@@ -501,7 +502,15 @@ struct option longOpts[] = { { "write", 1, nullptr, 'w' },   { "wrmode", 1, null
                              { "pid", 1, nullptr, 'p' },     { "help", 0, nullptr, 'h' },
                              { "help", 0, nullptr, '?' }, { "version", 0, nullptr, 'v' },
                              { "auto", 0, nullptr, 'a' }, { nullptr, 0, nullptr, 0 } };
-
+bool testv = 44;
+std::vector<uint8_t> okurwa(100*1000000);
+extern "C"
+{
+EMSCRIPTEN_KEEPALIVE uint64_t webAsmEntryPoint(uint8_t *buf, uint64_t bufSize)
+{
+    return bufSize + okurwa.size();
+}
+}
 int main(int argc, char** argv)
 {
     // Initialize the logger
