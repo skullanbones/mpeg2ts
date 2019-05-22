@@ -73,7 +73,7 @@
             let result = Module.ccall("webAsmEntryPoint", "number", ["number", "number", "number"], [tsData, file_content_as_typed_array.length, jsonData])
             var json_result_array = new Uint8Array(Module.HEAPU8.buffer, jsonData, result); // extract data to another JS array
 	
-            //console.log("real result" + JSON.parse(fromUTF8Array(json_result_array)));
+            console.log("real result" + fromUTF8Array(json_result_array));
             json_loaded(fromUTF8Array(json_result_array))
         };
 
@@ -97,9 +97,7 @@
                     return function(e)
                     {
                         let bufView = new Uint8Array(e.target.result);
-                        alert("loaded file size " + bufView.length);
                         parse_ts(bufView);
-                        //bufView.toString();
                     };
                 })(f);
 
@@ -223,8 +221,22 @@
                                             for (let str in pmt_streams)
                                             {
                                                 label += '(' + pmt_streams[str]['pid'] + ', ' + pmt_streams[str]['type'] + ') '
-                                            };
+                                            }
                                             break;
+                                        }
+                                        let dts = mpeg2ts_data["stream"][label][item]["dts"];
+                                        let pts = mpeg2ts_data["stream"][label][item]["pts"];
+                                        if (dts || pts)
+                                        {
+                                            if (dts)
+                                            {
+                                                label += ', dts: ' + dts;
+                                            }
+                                            if (pts)
+                                            {
+                                                label += ', pts: ' + pts;
+                                            }
+                                            break
                                         }
                                     }
                                 }

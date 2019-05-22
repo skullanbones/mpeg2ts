@@ -326,12 +326,28 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
             auto& pesArray = g_BigJson["stream"].at("Pid" + std::to_string(pid));
             nlohmann::json jsonPes;
             jsonPes["ofs"] = g_tsDemux.getOrigin(pid);
+            if (pes.dts >= 0)
+            {
+                jsonPes["dts"] = pes.dts;
+            }
+            if (pes.pts >= 0)
+            {
+                jsonPes["pts"] = pes.pts;
+            }
             pesArray.push_back(jsonPes);
         }
         catch(...)
         {
             nlohmann::json jsonPes;
             jsonPes["ofs"] = g_tsDemux.getOrigin(pid);
+            if (pes.dts >= 0)
+            {
+                jsonPes["dts"] = pes.dts;
+            }
+            if (pes.pts >= 0)
+            {
+                jsonPes["pts"] = pes.pts;
+            }
             g_BigJson["stream"]["Pid" + std::to_string(pid)] = nlohmann::json::array({jsonPes});
         }
     }    
