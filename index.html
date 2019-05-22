@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Tslib - wasm powered</title>
+    <script src="http://www.chartjs.org/dist/2.7.2/Chart.bundle.js"></script>
+    <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+    <style>
+	    canvas{
+		    -moz-user-select: none;
+    		-webkit-user-select: none;
+	    	-ms-user-select: none;
+	    }
+	</style>
+</head>
+
+<body>
+    <input type="file" name="myFile" id="ts_file">
+    <div style="width:100%;">
+	    <canvas id="canvas"></canvas>
+	</div>
+	
+    <div class="slider_start">
+    <input type="range" min="0" max=100" value="0" class="slider" onchange="new_start(this.value)" id="slider_start">
+    </div>
+    <div class="slider_end">
+    <input type="range" min="0" max="100" value="0" class="slider" onchange="new_end(this.value)" id="slider_end">
+    </div>
+    
+    <script src="./a.out.js"></script>
+    <script>
+        var start_offset = 0;
+        var end_offset = 0;
+        var mpeg2ts_data = JSON.parse("{}");
+        
+        function parse_ts(data)
+        {
+            console.log("parsing starts");
+            let buffer = Module._malloc(data.length * data.BYTES_PER_ELEMENT);
+            console.log("allocated");
+            Module.HEAPU8.set(data, buffer)
+            console.log("copied");
+            let result = Module.ccall("webAsmEntryPoint", null, ["number", "number"], [buffer, data.length])
+
+            console.log("real result" + result);
+        };
+
+        function handleFileProgress(evt)
+        {
+            console.log(evt.loaded)
+        }
+        function handleFileSelect(evt) 
+        {
+            var files = evt.target.files; // FileList object
+
+            // Loop through the FileList and render image files as thumbnails.
+            for (var i = 0, f; f = files[i]; i++)
+            {
+                var reader = new FileReader();
+                reader.addEventListener('progress', handleFileProgress);
+
+                // Closure to capture the file information.
+                reader.onload = (function(theFile)
+                {
+                    return function(e)
+                    {
+                        let bufView = new Uint8Array(e.target.result);
+                        alert("loaded file size " + bufView.length);
+                        parse_ts(bufView);
+                        //bufView.toString();
+                    };
+                })(f);
+
+                reader.readAsArrayBuffer(f);
+            }
+        }
+        document.getElementById('ts_file').addEventListener('change', handleFileSelect, false);
+        function new_start(newVal)
+        {
+            start_offset = newVal;
+            update_data();
+        }
+
+        function new_end(newVal)
+        {
+            end_offset = newVal;
+            update_data();
+        }
+
+        function json_loaded() 
+        {
+            mpeg2ts_data = JSON.parse(this.responseText);
+            let max_ofs = 0;
+            for (let pid in mpeg2ts_data["stream"])
+            {
+                if (!pid.startsWith("Pid"))
+                {
+                    continue;
+                }
+                if (mpeg2ts_data["stream"][pid][mpeg2ts_data["stream"][pid].length - 1]["ofs"] > max_ofs)
+                {
+                    max_ofs = mpeg2ts_data["stream"][pid][mpeg2ts_data["stream"][pid].length - 1]["ofs"];
+                }
+                config['data']['datasets'].push({
+				                                    label: pid,
+					                                backgroundColor: window.chartColors.red,
+                                                    borderColor: window.chartColors.red,
+					                                data: [],
+                                                    fill: false,
+                                                    pointRadius: 3,
+                                                })
+            }
+            
+            document.getElementById("slider_start").max = max_ofs;
+            document.getElementById("slider_end").max = max_ofs;
+            document.getElementById("slider_end").value = 1000000;
+            end_offset = document.getElementById("slider_end").value;
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+            update_data();
+        }
+        
+        function update_data() 
+        {
+            let data_set = 0;
+            for (let pid in mpeg2ts_data["stream"])
+            {
+                if (!pid.startsWith("Pid"))
+                {
+                    continue;
+                }
+                config.data.datasets[data_set].data = [];
+                for (let i = 0; i < mpeg2ts_data["stream"][pid].length; i++)
+                {
+                    if (mpeg2ts_data["stream"][pid][i]["ofs"] < start_offset ||
+                        mpeg2ts_data["stream"][pid][i]["ofs"] > end_offset)
+                    {
+                        continue;
+                    }
+                    config.data.datasets[data_set].data.push({ 
+                                                                 x: mpeg2ts_data["stream"][pid][i]["ofs"],
+                                                                 y: parseInt(pid.substring(3))
+                                                             });
+                }
+
+                ++data_set;
+            }
+            window.myLine.update();
+        };
+        
+		var config = {
+			type: 'scatter',
+			data:
+            {
+				labels: [],
+				datasets: []
+			},
+			options:
+            {
+				responsive: true,
+				title:
+                {
+					display: true,
+				},
+				tooltips:
+                {
+					mode: 'point',
+					intersect: false,
+                    callbacks:
+                    {
+                        label: function(tooltipItem, data)
+                        {
+                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            if (label)
+                            {
+                                for (let item in mpeg2ts_data["stream"][label])
+                                {
+                                    if (mpeg2ts_data["stream"][label][item]['ofs'] == tooltipItem.xLabel)
+                                    {
+                                        let pmt_pids = mpeg2ts_data["stream"][label][item]["pmtPids"];
+                                        if (pmt_pids)
+                                        {
+                                            label = 'PAT with PMT pids ' + pmt_pids.toString();
+                                            break;
+                                        }
+                                        let pmt_streams = mpeg2ts_data["stream"][label][item]["streams"];
+                                        if (pmt_streams)
+                                        {
+                                            label = 'PMT with streams ';
+                                            for (let str in pmt_streams)
+                                            {
+                                                label += '(' + pmt_streams[str]['pid'] + ', ' + pmt_streams[str]['type'] + ') '
+                                            };
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            label += ' at ' + tooltipItem.xLabel;//Math.round(tooltipItem.yLabel * 100) / 100;
+                            return label;
+                        }
+                    }
+                },
+				hover: {
+					mode: 'point',
+					intersect: false
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Byte offset'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Pid'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function()
+        {
+            var load_json = new XMLHttpRequest();
+            load_json.onload = json_loaded;
+            load_json.open("get", "h264.json", true);
+            load_json.send();
+		};
+        /*Module['arguments'].push('-i');
+        Module['arguments'].push('/home/darek/Downloads/GoT-HBO.ts');
+        Module['arguments'].push('-a');
+        Module['arguments'].push('-l');
+        Module['arguments'].push('ERROR');
+        Module['print'] = function(text) { alert('stdout: ' + text) };*/
+        Module.onRuntimeInitialized = async _ => {
+            let arrayDataToPass = [1,2,3,4,5,6,7,8,9,5];
+            const typedArray = new Uint8Array(arrayDataToPass.length)
+            for (let i=0; i<arrayDataToPass.length; ++i)
+            {
+                typedArray[i] = arrayDataToPass[i];
+            }
+            let buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT);
+            Module.HEAPU8.set(typedArray, buffer)
+            /*const api = {
+                version: Module.cwrap('version', 'number', []),
+            };*/
+            console.log("kurwa");
+            //console.log(api.version());
+            let result = Module.ccall("webAsmEntryPoint", null, ["number", "number"], [buffer, arrayDataToPass.length])
+
+            console.log("mac" + result);
+        };
+    </script>
+</body>
+</html>
+
+
