@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Tslib - wasm powered</title>
+    <script src="http://www.chartjs.org/dist/2.7.2/Chart.bundle.js"></script>
+    <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+    <style>
+	    canvas{
+		    -moz-user-select: none;
+    		-webkit-user-select: none;
+	    	-ms-user-select: none;
+	    }
+	</style>
+</head>
+
+<body>
+    <input type="file" name="myFile" id="ts_file">
+    <div style="width:100%;">
+	    <canvas id="canvas"></canvas>
+	</div>
+	
+    <div class="slider_start">
+    <input type="range" min="0" max=100" value="0" class="slider" onchange="new_start(this.value)" id="slider_start">
+    </div>
+    <div class="slider_end">
+    <input type="range" min="0" max="100" value="0" class="slider" onchange="new_end(this.value)" id="slider_end">
+    </div>
+    
+    <script src="./a.out.js"></script>
+    <script>
+        var start_offset = 0;
+        var end_offset = 0;
+        var mpeg2ts_data = JSON.parse("{}");
+        
+        function fromUTF8Array(data)
+        { // array of bytes
+            var str = '', i;
+
+            for (i = 0; i < data.length; i++)
+            {
+                var value = data[i];
+                if (value < 0x80)
+                {
+                    str += String.fromCharCode(value);
+                } else if (value > 0xBF && value < 0xE0)
+                {
+                    str += String.fromCharCode((value & 0x1F) << 6 | data[i + 1] & 0x3F);
+                    i += 1;
+                } else if (value > 0xDF && value < 0xF0)
+                {
+                    str += String.fromCharCode((value & 0x0F) << 12 | (data[i + 1] & 0x3F) << 6 | data[i + 2] & 0x3F);
+                    i += 2;
+                } else
+                {
+                    // surrogate pair
+                    var charCode = ((value & 0x07) << 18 | (data[i + 1] & 0x3F) << 12 | (data[i + 2] & 0x3F) << 6 | data[i + 3] & 0x3F) - 0x010000;
+
+                    str += String.fromCharCode(charCode >> 10 | 0xD800, charCode & 0x03FF | 0xDC00); 
+                    i += 3;
+                }
+            }
+
+            return str;
+        }  
+        function parse_ts(file_content_as_typed_array)
+        {
+            let tsData = Module._malloc(file_content_as_typed_array.length * file_content_as_typed_array.BYTES_PER_ELEMENT);
+            Module.HEAPU8.set(file_content_as_typed_array, tsData); //copy from 1st arg to heap at offset tsData
+            
+            let jsonData = Module._malloc(1000000);
+            
+            let result = Module.ccall("webAsmEntryPoint", "number", ["number", "number", "number"], [tsData, file_content_as_typed_array.length, jsonData])
+            var json_result_array = new Uint8Array(Module.HEAPU8.buffer, jsonData, result); // extract data to another JS array
+	
+            //console.log("real result" + JSON.parse(fromUTF8Array(json_result_array)));
+            json_loaded(fromUTF8Array(json_result_array))
+        };
+
+        function handleFileProgress(evt)
+        {
+            console.log(evt.loaded)
+        }
+        function handleFileSelect(evt) 
+        {
+            var files = evt.target.files; // FileList object
+
+            // Loop through the FileList and render image files as thumbnails.
+            for (var i = 0, f; f = files[i]; i++)
+            {
+                var reader = new FileReader();
+                reader.addEventListener('progress', handleFileProgress);
+
+                // Closure to capture the file information.
+                reader.onload = (function(theFile)
+                {
+                    return function(e)
+                    {
+                        let bufView = new Uint8Array(e.target.result);
+                        alert("loaded file size " + bufView.length);
+                        parse_ts(bufView);
+                        //bufView.toString();
+                    };
+                })(f);
+
+                reader.readAsArrayBuffer(f);
+            }
+        }
+        document.getElementById('ts_file').addEventListener('change', handleFileSelect, false);
+        function new_start(newVal)
+        {
+            start_offset = newVal;
+            update_data();
+        }
+
+        function new_end(newVal)
+        {
+            end_offset = newVal;
+            update_data();
+        }
+
+        function json_loaded(json_as_string) 
+        {
+            mpeg2ts_data = JSON.parse(json_as_string);
+            let max_ofs = 0;
+            for (let pid in mpeg2ts_data["stream"])
+            {
+                if (!pid.startsWith("Pid"))
+                {
+                    continue;
+                }
+                if (mpeg2ts_data["stream"][pid][mpeg2ts_data["stream"][pid].length - 1]["ofs"] > max_ofs)
+                {
+                    max_ofs = mpeg2ts_data["stream"][pid][mpeg2ts_data["stream"][pid].length - 1]["ofs"];
+                }
+                config['data']['datasets'].push({
+				                                    label: pid,
+					                                backgroundColor: window.chartColors.red,
+                                                    borderColor: window.chartColors.red,
+					                                data: [],
+                                                    fill: false,
+                                                    pointRadius: 3,
+                                                })
+            }
+            
+            document.getElementById("slider_start").max = max_ofs;
+            document.getElementById("slider_end").max = max_ofs;
+            document.getElementById("slider_end").value = 1000000;
+            end_offset = document.getElementById("slider_end").value;
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+            update_data();
+        }
+        
+        function update_data() 
+        {
+            let data_set = 0;
+            for (let pid in mpeg2ts_data["stream"])
+            {
+                if (!pid.startsWith("Pid"))
+                {
+                    continue;
+                }
+                config.data.datasets[data_set].data = [];
+                for (let i = 0; i < mpeg2ts_data["stream"][pid].length; i++)
+                {
+                    if (mpeg2ts_data["stream"][pid][i]["ofs"] < start_offset ||
+                        mpeg2ts_data["stream"][pid][i]["ofs"] > end_offset)
+                    {
+                        continue;
+                    }
+                    config.data.datasets[data_set].data.push({ 
+                                                                 x: mpeg2ts_data["stream"][pid][i]["ofs"],
+                                                                 y: parseInt(pid.substring(3))
+                                                             });
+                }
+
+                ++data_set;
+            }
+            window.myLine.update();
+        };
+        
+		var config = {
+			type: 'scatter',
+			data:
+            {
+				labels: [],
+				datasets: []
+			},
+			options:
+            {
+				responsive: true,
+				title:
+                {
+					display: true,
+				},
+				tooltips:
+                {
+					mode: 'point',
+					intersect: false,
+                    callbacks:
+                    {
+                        label: function(tooltipItem, data)
+                        {
+                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            if (label)
+                            {
+                                for (let item in mpeg2ts_data["stream"][label])
+                                {
+                                    if (mpeg2ts_data["stream"][label][item]['ofs'] == tooltipItem.xLabel)
+                                    {
+                                        let pmt_pids = mpeg2ts_data["stream"][label][item]["pmtPids"];
+                                        if (pmt_pids)
+                                        {
+                                            label = 'PAT with PMT pids ' + pmt_pids.toString();
+                                            break;
+                                        }
+                                        let pmt_streams = mpeg2ts_data["stream"][label][item]["streams"];
+                                        if (pmt_streams)
+                                        {
+                                            label = 'PMT with streams ';
+                                            for (let str in pmt_streams)
+                                            {
+                                                label += '(' + pmt_streams[str]['pid'] + ', ' + pmt_streams[str]['type'] + ') '
+                                            };
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            label += ' at ' + tooltipItem.xLabel;//Math.round(tooltipItem.yLabel * 100) / 100;
+                            return label;
+                        }
+                    }
+                },
+				hover: {
+					mode: 'point',
+					intersect: false
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Byte offset'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Pid'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function()
+        {
+		};
+    </script>
+</body>
+</html>
+
+
