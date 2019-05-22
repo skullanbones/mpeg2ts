@@ -41,13 +41,14 @@ PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
 bool g_Auto = false;
 nlohmann::json g_BigJson;
+std::stringstream g_BigJsonString;
 bool addedPmts{ false };
 
 const char LOGFILE_NAME[]{ "tsparser.csv" };
 int LOGFILE_MAXSIZE{ 100 * 1024 };
 int LOGFILE_MAXNUMBEROF{ 10 };
 
-const plog::Severity DEFAULT_LOG_LEVEL = plog::debug;
+const plog::Severity DEFAULT_LOG_LEVEL = plog::error;
 
 enum class OptionWriteMode
 {
@@ -58,7 +59,6 @@ enum class OptionWriteMode
 
 std::map<std::string, std::vector<int>> g_Options;
 std::list<OptionWriteMode> g_WriteMode;
-std::string g_InputFile;
 
 bool hasPid(std::string param, int pid)
 {
@@ -73,26 +73,6 @@ bool hasPids(std::string param, std::vector<uint16_t> pids)
         ret += std::count(g_Options[param].begin(), g_Options[param].end(), pid);
     }
     return ret;
-}
-
-void display_usage()
-{
-    printf("Mpeg2ts lib simple command-line:\n");
-
-    printf(
-    "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]\n");
-
-    printf("Option Arguments:\n"
-           "        -h [ --help ]        Print help messages\n"
-           "        -v [ --version ]     Print library version\n"
-           "        -p [ --pid PID]      Print PSI tables info with PID\n"
-           "        -w [ --write PID]    Writes PES packets with PID to file\n"
-           "        -m [ --wrmode type]  Choose what type of data is written[ts|pes|es]\n"
-           "        -l [ --log-level NONE|FATAL|ERROR|WARNING|INFO|DEBUG|VERBOSE] Choose "
-           "what logs are filtered, both file and stdout, default: %s\n"
-           "        -i [ --input FILE]   Use input file for parsing\n"
-           "        -a [ --auto ]   Output all as json\n",
-           plog::severityToString(DEFAULT_LOG_LEVEL));
 }
 
 void display_statistics(mpeg2ts::PidStatisticsMap statistics)
@@ -495,34 +475,12 @@ extern void printTsPacket(const uint8_t* packet)
     printf("\n");
 }
 
-static const char* optString = "m:w:i:l:p:h?va";
-
-struct option longOpts[] = { { "write", 1, nullptr, 'w' },   { "wrmode", 1, nullptr, 'm' },
-                             { "input", 1, nullptr, 'i' },   { "log-level", 1, nullptr, 'l' },
-                             { "pid", 1, nullptr, 'p' },     { "help", 0, nullptr, 'h' },
-                             { "help", 0, nullptr, '?' }, { "version", 0, nullptr, 'v' },
-                             { "auto", 0, nullptr, 'a' }, { nullptr, 0, nullptr, 0 } };
-bool testv = 44;
-std::vector<uint8_t> okurwa(100*1000000);
 extern "C"
 {
-EMSCRIPTEN_KEEPALIVE uint64_t webAsmEntryPoint(uint8_t *buf, uint64_t bufSize)
+EMSCRIPTEN_KEEPALIVE uint32_t webAsmEntryPoint(uint8_t* tsData,
+                                               uint32_t tsDataLen,
+                                               uint8_t* jsonString)
 {
-    return bufSize + okurwa.size();
-}
-}
-int main(int argc, char** argv)
-{
-    // Initialize the logger
-    /// Short macros list
-    /// LOGV << "verbose";
-    /// LOGD << "debug";
-    /// LOGI << "info";
-    /// LOGW << "warning";
-    /// LOGE << "error";
-    /// LOGF << "fatal";
-    /// LOGN << "none";
-
     static plog::RollingFileAppender<plog::CsvFormatter> fileAppender(LOGFILE_NAME, LOGFILE_MAXSIZE, LOGFILE_MAXNUMBEROF); // Create the 1st appender.
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender; // Create the 2nd appender.
     plog::init(DEFAULT_LOG_LEVEL, &fileAppender).addAppender(&consoleAppender); // Initialize the
@@ -532,132 +490,8 @@ int main(int argc, char** argv)
 
     LOGD << "Starting parser of file";
 
-    for (;;)
-    {
-        int opt;
-        int optInd = -1;
-        opt = getopt_long(argc, argv, optString, longOpts, &optInd);
-        if (optInd == -1)
-        {
-            for (optInd = 0; longOpts[optInd].name; ++optInd)
-            {
-                if (longOpts[optInd].val == opt)
-                {
-                    LOGD << "optInd: " << optInd;
-                    break;
-                }
-            }
-            if (longOpts[optInd].name == NULL)
-            {
-                // the short option was not found; do something
-                LOGE << optInd << " the short option was not found; do something"; // TODO
-            }
-        }
-
-        if (opt < 0)
-            break;
-        switch (opt)
-        {
-        case 'h': /* fall-through is intentional */
-        case '?':
-        {
-            display_usage();
-            exit(EXIT_SUCCESS);
-        }
-        case 'v':
-        {
-            printf("version: %s\n", getMpeg2tsVersion().c_str());
-            exit(EXIT_SUCCESS);
-        }
-        case 'w':
-        case 'p':
-            LOGD << "Got pid listener pid:" << std::atoi(optarg);
-            g_Options[longOpts[optInd].name].push_back(std::atoi(optarg));
-            break;
-        case 'l':
-        {
-            LOGD << "Use Default log-level: " << plog::severityToString(DEFAULT_LOG_LEVEL);
-            std::string logLevel = std::string(optarg);
-            LOGD << "Got input log-level setting: " << logLevel;
-            for (auto& c : logLevel)
-            {
-                c = static_cast<char>(toupper(c));
-            }
-            plog::Severity severity = plog::severityFromString(logLevel.c_str());
-            plog::get()->setMaxSeverity(severity);
-            LOGD << "Use log-level: " << plog::severityToString(severity) << ", (" << severity << ")";
-            break;
-        }
-        case 'm':
-        {
-            OptionWriteMode writeMode = OptionWriteMode::PES;
-            if (std::string(optarg) == "ts")
-            {
-                writeMode = OptionWriteMode::TS;
-            }
-            else if (std::string(optarg) == "pes")
-            {
-                writeMode = OptionWriteMode::PES;
-            }
-            else if (std::string(optarg) == "es")
-            {
-                writeMode = OptionWriteMode::ES;
-            }
-            else
-            {
-                std::cerr << "Allowed values for write mode are: ts, pes, es";
-                display_usage();
-                exit(EXIT_FAILURE);
-            }
-            g_WriteMode.push_back(writeMode);
-            break;
-        }
-        case 'i':
-        {
-            LOGD << "Got file input: " << std::string(optarg);
-            g_InputFile = std::string(optarg);
-            break;
-        }
-        case 'a':
-        {
-            LOGD << "Got auto request";
-            g_Auto = true;
-            break;
-        }
-        default:
-            /* You won't actually get here. */
-            break;
-        }
-    } // for
-
-    if (g_WriteMode.empty())
-    {
-        g_WriteMode.push_back(OptionWriteMode::PES);
-    }
-
-    if (g_WriteMode.front() == OptionWriteMode::TS)
-    {
-        for (auto pid : g_Options["write"])
-        {
-            auto f = [](const uint8_t* packet, TsPacketInfo tsPacketInfo, void* hdl) {
-                (void)hdl;
-                TsCallback(packet, tsPacketInfo);
-            };
-            g_tsDemux.addTsPid(pid, f, nullptr);
-        }
-    }
-
-    uint64_t count;
-
-    // FILE
-    FILE* fptr = NULL;
-    fptr = fopen(g_InputFile.c_str(), "rb");
-
-    if (fptr == NULL)
-    {
-        LOGE << "ERROR: Invalid file! Exiting...";
-        exit(EXIT_FAILURE);
-    }
+    g_Auto = true;
+    g_WriteMode.push_back(OptionWriteMode::PES);
 
     auto f1 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl) {
         (void)hdl;
@@ -666,69 +500,25 @@ int main(int argc, char** argv)
     g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, f1, nullptr); // Find PAT
 
     g_BigJson["stream"] = nlohmann::json::object();
-    g_BigJson["stream"]["name"] = g_InputFile;
+    g_BigJson["stream"]["name"] = "wasm";
     g_BigJson["stream"]["Pid0"] = nlohmann::json::array();
-
-    for (count = 0;; ++count)
+    for (size_t tsDataInx = 0; tsDataInx + 188 < tsDataLen; tsDataInx += 188)
     {
-        unsigned char packet[TS_PACKET_SIZE + 1];
-        // SYNC
-        // Check for the sync byte. When found start a new ts-packet parser...
-        char b;
-
-        b = static_cast<char>(fgetc(fptr));
-        while (b != TS_PACKET_SYNC_BYTE)
+        if (tsData[tsDataInx] != TS_PACKET_SYNC_BYTE || 
+            tsData[tsDataInx + 188] != TS_PACKET_SYNC_BYTE)
         {
-            // printf("ERROR: Sync error!!!\n");
-            b = static_cast<char>(fgetc(fptr));
-            int eof = feof(fptr);
-            if (eof != 0)
-            {
-                LOGD << "End Of File..." << '\n';
-                LOGD << "Found " << count << " ts-packets." << '\n';
-                LOGD << "Found Adaptation Field packets:" << countAdaptPacket << " ts-packets." << '\n';
-
-                LOGD << "Statistics\n";
-                display_statistics(g_tsDemux.getPidStatistics());
-                fclose(fptr);
-                
-                LOGE << g_BigJson.dump();
-                
-                return EXIT_SUCCESS;
-            }
+            ++tsDataInx;
+            continue;
         }
-
-        // TS Packet start
-        packet[0] = b;
-
-        auto dataOrigin = ftell(fptr) - 1;
-
-        // Read TS Packet from file
-        std::size_t res =
-        fread(packet + 1, 1, TS_PACKET_SIZE, fptr); // Copy only packet size + next sync byte
-        if (res != TS_PACKET_SIZE)
-        {
-            LOGE_(FileLog) << "ERROR: Could not read a complete TS-Packet, read: "
-                           << res; // May be last packet end of file.
-        }
-        // printTsPacket(packet);
-        // TODO fix this. We are almost always in here where we dont have 2 consecutive synced
-        // packets...
-        if (packet[TS_PACKET_SIZE] != TS_PACKET_SYNC_BYTE)
-        {
-            LOGE << "ERROR: Ts-packet Sync error. Next packet sync: ";
-            // (int)packet[TS_PACKET_SIZE] << '\n';  fseek(fptr, -TS_PACKET_SIZE, SEEK_CUR);
-            // continue; // Skip this packet since it's not synced.
-        }
-        fseek(fptr, -1, SEEK_CUR); // reset file pointer and skip sync after packet
+        auto dataOrigin = tsDataInx;
 
         TsPacketInfo info;
         TsParser parser;
         try
         {
-            parser.parseTsPacketInfo(packet, info);
+            parser.parseTsPacketInfo(&tsData[tsDataInx], info);
             g_tsDemux.setOrigin(dataOrigin);
-            g_tsDemux.demux(packet);
+            g_tsDemux.demux(&tsData[tsDataInx]);
         }
         catch (GetBitsException& e)
         {
@@ -763,4 +553,20 @@ int main(int argc, char** argv)
         g_ESPIDS.clear();
 
     } // for loop
+    
+    display_statistics(g_tsDemux.getPidStatistics());
+
+    auto ret = g_BigJson.dump();
+    for (size_t i = 0u; i < ret.size(); ++i)
+    {
+        jsonString[i] = ret[i];
+    }
+    return ret.size();
+
+}
+}
+
+int main(int argc, char** argv)
+{
+    return 1;
 }

@@ -33,16 +33,48 @@
         var end_offset = 0;
         var mpeg2ts_data = JSON.parse("{}");
         
-        function parse_ts(data)
-        {
-            console.log("parsing starts");
-            let buffer = Module._malloc(data.length * data.BYTES_PER_ELEMENT);
-            console.log("allocated");
-            Module.HEAPU8.set(data, buffer)
-            console.log("copied");
-            let result = Module.ccall("webAsmEntryPoint", null, ["number", "number"], [buffer, data.length])
+        function fromUTF8Array(data)
+        { // array of bytes
+            var str = '', i;
 
-            console.log("real result" + result);
+            for (i = 0; i < data.length; i++)
+            {
+                var value = data[i];
+                if (value < 0x80)
+                {
+                    str += String.fromCharCode(value);
+                } else if (value > 0xBF && value < 0xE0)
+                {
+                    str += String.fromCharCode((value & 0x1F) << 6 | data[i + 1] & 0x3F);
+                    i += 1;
+                } else if (value > 0xDF && value < 0xF0)
+                {
+                    str += String.fromCharCode((value & 0x0F) << 12 | (data[i + 1] & 0x3F) << 6 | data[i + 2] & 0x3F);
+                    i += 2;
+                } else
+                {
+                    // surrogate pair
+                    var charCode = ((value & 0x07) << 18 | (data[i + 1] & 0x3F) << 12 | (data[i + 2] & 0x3F) << 6 | data[i + 3] & 0x3F) - 0x010000;
+
+                    str += String.fromCharCode(charCode >> 10 | 0xD800, charCode & 0x03FF | 0xDC00); 
+                    i += 3;
+                }
+            }
+
+            return str;
+        }  
+        function parse_ts(file_content_as_typed_array)
+        {
+            let tsData = Module._malloc(file_content_as_typed_array.length * file_content_as_typed_array.BYTES_PER_ELEMENT);
+            Module.HEAPU8.set(file_content_as_typed_array, tsData); //copy from 1st arg to heap at offset tsData
+            
+            let jsonData = Module._malloc(1000000);
+            
+            let result = Module.ccall("webAsmEntryPoint", "number", ["number", "number", "number"], [tsData, file_content_as_typed_array.length, jsonData])
+            var json_result_array = new Uint8Array(Module.HEAPU8.buffer, jsonData, result); // extract data to another JS array
+	
+            //console.log("real result" + JSON.parse(fromUTF8Array(json_result_array)));
+            json_loaded(fromUTF8Array(json_result_array))
         };
 
         function handleFileProgress(evt)
@@ -87,9 +119,9 @@
             update_data();
         }
 
-        function json_loaded() 
+        function json_loaded(json_as_string) 
         {
-            mpeg2ts_data = JSON.parse(this.responseText);
+            mpeg2ts_data = JSON.parse(json_as_string);
             let max_ofs = 0;
             for (let pid in mpeg2ts_data["stream"])
             {
@@ -227,35 +259,7 @@
 
 		window.onload = function()
         {
-            var load_json = new XMLHttpRequest();
-            load_json.onload = json_loaded;
-            load_json.open("get", "h264.json", true);
-            load_json.send();
 		};
-        /*Module['arguments'].push('-i');
-        Module['arguments'].push('/home/darek/Downloads/GoT-HBO.ts');
-        Module['arguments'].push('-a');
-        Module['arguments'].push('-l');
-        Module['arguments'].push('ERROR');
-        Module['print'] = function(text) { alert('stdout: ' + text) };*/
-        Module.onRuntimeInitialized = async _ => {
-            let arrayDataToPass = [1,2,3,4,5,6,7,8,9,5];
-            const typedArray = new Uint8Array(arrayDataToPass.length)
-            for (let i=0; i<arrayDataToPass.length; ++i)
-            {
-                typedArray[i] = arrayDataToPass[i];
-            }
-            let buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT);
-            Module.HEAPU8.set(typedArray, buffer)
-            /*const api = {
-                version: Module.cwrap('version', 'number', []),
-            };*/
-            console.log("kurwa");
-            //console.log(api.version());
-            let result = Module.ccall("webAsmEntryPoint", null, ["number", "number"], [buffer, arrayDataToPass.length])
-
-            console.log("mac" + result);
-        };
     </script>
 </body>
 </html>
