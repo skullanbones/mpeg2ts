@@ -296,7 +296,7 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
         {
             nlohmann::json pmtEntry;
             pmtEntry["pid"] = stream.elementary_PID;
-            pmtEntry["type"] = stream.stream_type;
+            pmtEntry["type"] = StreamTypeToString[stream.stream_type];
             g_BigJson["stream"]["Pid" + std::to_string(pid)].back()["streams"].push_back(pmtEntry);
         }
     }

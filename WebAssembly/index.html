@@ -3,7 +3,7 @@
 
 <head>
 	<title>Tslib - wasm powered</title>
-    <script src="http://www.chartjs.org/dist/2.7.2/Chart.bundle.js"></script>
+    <script src="http://www.chartjs.org/dist/2.7.0/Chart.bundle.js"></script>
     <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
     <style>
 	    canvas{
@@ -133,8 +133,8 @@
                 }
                 config['data']['datasets'].push({
 				                                    label: pid,
-					                                backgroundColor: window.chartColors.red,
-                                                    borderColor: window.chartColors.red,
+                                                    pointBackgroundColor: [],
+                                                    pointBorderColor: [],
 					                                data: [],
                                                     fill: false,
                                                     pointRadius: 3,
@@ -161,6 +161,7 @@
                     continue;
                 }
                 config.data.datasets[data_set].data = [];
+                //config.data.datasets[data_set].pointBackgroundColor = [];
                 for (let i = 0; i < mpeg2ts_data["stream"][pid].length; i++)
                 {
                     if (mpeg2ts_data["stream"][pid][i]["ofs"] < start_offset ||
@@ -172,6 +173,15 @@
                                                                  x: mpeg2ts_data["stream"][pid][i]["ofs"],
                                                                  y: parseInt(pid.substring(3))
                                                              });
+
+                    if (mpeg2ts_data["stream"][pid][i]["pmtPids"] || mpeg2ts_data["stream"][pid][i]["streams"])
+                    {
+                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(0, 255, 0, 0.5)');
+                    }
+                    else
+                    {
+                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(100, 100, 100, 0.5)');
+                    }
                 }
 
                 ++data_set;
@@ -184,7 +194,7 @@
 			data:
             {
 				labels: [],
-				datasets: []
+				datasets: [],
 			},
 			options:
             {
