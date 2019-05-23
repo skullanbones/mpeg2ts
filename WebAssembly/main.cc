@@ -77,33 +77,35 @@ bool hasPids(std::string param, std::vector<uint16_t> pids)
 
 void display_statistics(mpeg2ts::PidStatisticsMap statistics)
 {
+    g_BigJson["stream"]["stats"] = nlohmann::json::object();
     for (auto& pidStat : statistics)
     {
-        LOGD << "Pid: " << pidStat.first << '\n';
-        LOGD << " Transport Stream Discontinuity: " << pidStat.second.numberOfTsDiscontinuities << '\n';
-        LOGD << " CC error: " << pidStat.second.numberOfCCErrors << '\n';
-        LOGD << " Pts differences histogram:\n";
-        auto& histArray = g_BigJson["stream"]["DtsHist" + std::to_string(pidStat.first)] = nlohmann::json::array({});
+        auto& pidStatistic = g_BigJson["stream"]["stats"]["Pid" + std::to_string(pidStat.first)];
+        pidStatistic["discontinuity"] = pidStat.second.numberOfTsDiscontinuities;
+        pidStatistic["ccError"] = pidStat.second.numberOfCCErrors;
+        pidStatistic["PtsHist"] = nlohmann::json::array({});
+        pidStatistic["Ptsmissing"] = pidStat.second.numberOfMissingPts;
         for (auto& ent : pidStat.second.ptsHistogram)
         {
             nlohmann::json jsonHist;
             jsonHist["d"] = ent.first;
             jsonHist["n"] = ent.second;
-            histArray.push_back(jsonHist);
+            pidStatistic["PtsHist"].push_back(jsonHist);
         }
-        LOGD << " Pts missing: " << pidStat.second.numberOfMissingPts << '\n';
-
-        LOGD << " Dts differences histogram:\n";
+        
+        pidStatistic["DtsHist"] = nlohmann::json::array({});
+        pidStatistic["Dtsmissing"] = pidStat.second.numberOfMissingDts;
         for (auto& ent : pidStat.second.dtsHistogram)
         {
-            LOGD << "  diff: " << ent.first << " quantity " << ent.second << '\n';
+            nlohmann::json jsonHist;
+            jsonHist["d"] = ent.first;
+            jsonHist["n"] = ent.second;
+            pidStatistic["DtsHist"].push_back(jsonHist);
         }
-        LOGD << " Dts missing: " << pidStat.second.numberOfMissingDts << '\n';
-        LOGD << " Pcr differences histogram:\n";
-        for (auto& ent : pidStat.second.pcrHistogram)
+        /*for (auto& ent : pidStat.second.pcrHistogram)
         {
             LOGD << "  diff: " << ent.first << " quantity " << ent.second << '\n';
-        }
+        }*/
     }
 }
 
