@@ -8,20 +8,8 @@
 #  cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchains/generic/Emscripten-wasm.cmake
 #
 
-set(CMAKE_SYSTEM_NAME Emscripten)
-
-message("ENV EMSCRIPTEN" $ENV{EMSCRIPTEN})
-
-if(NOT EMSCRIPTEN_PREFIX)
-    if(DEFINED ENV{EMSCRIPTEN})
-        file(TO_CMAKE_PATH "$ENV{EMSCRIPTEN}" EMSCRIPTEN_PREFIX)
-        set(EMSCRIPTEN_PREFIX $ENV{EMSCRIPTEN})
-    else()
-        set(EMSCRIPTEN_PREFIX "/usr/lib/emscripten")
-    endif()
-endif()
-
-message("Using EMSCRIPTEN_PREFIX: " ${EMSCRIPTEN_PREFIX})
+#set(CMAKE_SYSTEM_NAME Emscripten)
+set(CMAKE_SYSTEM_NAME Generic) # To avoid warning "System is unknown to CMake..."
 
 set(EMSCRIPTEN_TOOLCHAIN_PATH "${EMSCRIPTEN_PREFIX}/system")
 

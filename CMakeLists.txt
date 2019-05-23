@@ -28,6 +28,7 @@ include(clang_format)
 include(cppcheck)
 include(iwyu)
 include(doxygen)
+include(emscripten)
 
 
 #-------------------
