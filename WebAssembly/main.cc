@@ -36,7 +36,7 @@ using namespace mpeg2ts;
 uint64_t countAdaptPacket = 0;
 std::vector<uint16_t> g_PMTPIDS;
 std::vector<uint16_t> g_ESPIDS;
-mpeg2ts::TsDemuxer g_tsDemux;
+std::unique_ptr<mpeg2ts::TsDemuxer> g_tsDemux;
 PatTable g_prevPat;
 std::map<int, PmtTable> g_prevPmts;
 bool g_Auto = false;
@@ -145,7 +145,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
     if (g_Auto)
     {
         nlohmann::json jsonPat;
-        jsonPat["ofs"] = g_tsDemux.getOrigin(pid);
+        jsonPat["ofs"] = g_tsDemux->getOrigin(pid);
         g_BigJson["stream"]["Pid0"].push_back(jsonPat);
     }
     
@@ -176,7 +176,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
 
     if (hasPid("pid", TS_PACKET_PID_PAT))
     {
-        LOGN << "PAT at Ts packet: " << g_tsDemux.getTsCounters().mTsPacketCounter << '\n';
+        LOGN << "PAT at Ts packet: " << g_tsDemux->getTsCounters().mTsPacketCounter << '\n';
         LOGN << *pat << '\n';
     }
     
@@ -186,7 +186,7 @@ void PATCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
     }
 
     // new PAT clear everything
-    //TODO: clear pids from g_tsDemux. currently no API
+    //TODO: clear pids from g_tsDemux-> currently no API
     g_PMTPIDS.clear();
     addedPmts = false;
 
@@ -237,13 +237,13 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
         {
             auto& pmtArray = g_BigJson["stream"].at("Pid" + std::to_string(pid));
             nlohmann::json jsonPmt;
-            jsonPmt["ofs"] = g_tsDemux.getOrigin(pid);
+            jsonPmt["ofs"] = g_tsDemux->getOrigin(pid);
             pmtArray.push_back(jsonPmt);
         }
         catch(...)
         {
             nlohmann::json jsonPmt;
-            jsonPmt["ofs"] = g_tsDemux.getOrigin(pid);
+            jsonPmt["ofs"] = g_tsDemux->getOrigin(pid);
             g_BigJson["stream"]["Pid" + std::to_string(pid)] = nlohmann::json::array({jsonPmt});
         }
     }
@@ -276,7 +276,7 @@ void PMTCallback(const ByteVector& /* rawPes*/, PsiTable* table, int pid)
 
     if (hasPids("pid", g_PMTPIDS))
     {
-        LOGN << "PMT at Ts packet: " << g_tsDemux.getTsCounters().mTsPacketCounter;
+        LOGN << "PMT at Ts packet: " << g_tsDemux->getTsCounters().mTsPacketCounter;
         LOGN << *pmt;
     }
     
@@ -317,7 +317,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
 {
     if (hasPid("pid", pid))
     {
-        LOGN << "PES ENDING at Ts packet " << g_tsDemux.getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
+        LOGN << "PES ENDING at Ts packet " << g_tsDemux->getTsCounters().mTsPacketCounter << " (" << pid << ")\n";
         LOGN << pes << '\n';
     }
     
@@ -327,7 +327,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
         {
             auto& pesArray = g_BigJson["stream"].at("Pid" + std::to_string(pid));
             nlohmann::json jsonPes;
-            jsonPes["ofs"] = g_tsDemux.getOrigin(pid);
+            jsonPes["ofs"] = g_tsDemux->getOrigin(pid);
             if (pes.dts >= 0)
             {
                 jsonPes["dts"] = pes.dts;
@@ -341,7 +341,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
         catch(...)
         {
             nlohmann::json jsonPes;
-            jsonPes["ofs"] = g_tsDemux.getOrigin(pid);
+            jsonPes["ofs"] = g_tsDemux->getOrigin(pid);
             if (pes.dts >= 0)
             {
                 jsonPes["dts"] = pes.dts;
@@ -507,15 +507,25 @@ EMSCRIPTEN_KEEPALIVE uint32_t webAsmEntryPoint(uint8_t* tsData,
     plog::init<FileLog>(DEFAULT_LOG_LEVEL, &fileAppender); // Initialize the 2nd logger instance.
 
     LOGD << "Starting parser of file";
-
+    countAdaptPacket = 0;
+    g_PMTPIDS.clear();
+    g_ESPIDS.clear();
+    g_tsDemux = std::unique_ptr<mpeg2ts::TsDemuxer>(new mpeg2ts::TsDemuxer());
+    PatTable g_prevPat;
+    g_prevPmts.clear();
     g_Auto = true;
+    g_BigJson.clear();
+    g_BigJsonString.clear();
+    addedPmts = false;
+    g_WriteMode.clear();
+
     g_WriteMode.push_back(OptionWriteMode::PES);
 
     auto f1 = [](const mpeg2ts::ByteVector& rawTable, mpeg2ts::PsiTable* table, int aPid, void* hdl) {
         (void)hdl;
         PATCallback(rawTable, table, aPid);
     };
-    g_tsDemux.addPsiPid(TS_PACKET_PID_PAT, f1, nullptr); // Find PAT
+    g_tsDemux->addPsiPid(TS_PACKET_PID_PAT, f1, nullptr); // Find PAT
 
     g_BigJson["stream"] = nlohmann::json::object();
     g_BigJson["stream"]["name"] = "wasm";
@@ -535,8 +545,8 @@ EMSCRIPTEN_KEEPALIVE uint32_t webAsmEntryPoint(uint8_t* tsData,
         try
         {
             parser.parseTsPacketInfo(&tsData[tsDataInx], info);
-            g_tsDemux.setOrigin(dataOrigin);
-            g_tsDemux.demux(&tsData[tsDataInx]);
+            g_tsDemux->setOrigin(dataOrigin);
+            g_tsDemux->demux(&tsData[tsDataInx]);
         }
         catch (GetBitsException& e)
         {
@@ -554,7 +564,7 @@ EMSCRIPTEN_KEEPALIVE uint32_t webAsmEntryPoint(uint8_t* tsData,
                     (void)hdl;
                     PMTCallback(rawTable, table, aPid);
                 };
-                g_tsDemux.addPsiPid(pid, f2, nullptr);
+                g_tsDemux->addPsiPid(pid, f2, nullptr);
             }
             addedPmts = true;
         }
@@ -566,13 +576,13 @@ EMSCRIPTEN_KEEPALIVE uint32_t webAsmEntryPoint(uint8_t* tsData,
                 (void)hdl;
                 PESCallback(rawPes, pes, aPid);
             };
-            g_tsDemux.addPesPid(pid, f3, nullptr);
+            g_tsDemux->addPesPid(pid, f3, nullptr);
         }
         g_ESPIDS.clear();
 
     } // for loop
     
-    display_statistics(g_tsDemux.getPidStatistics());
+    display_statistics(g_tsDemux->getPidStatistics());
 
     auto ret = g_BigJson.dump();
     for (size_t i = 0u; i < ret.size(); ++i)
