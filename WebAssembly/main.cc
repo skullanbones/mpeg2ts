@@ -408,7 +408,7 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                             for (auto info : infos)
                             {
                                 nlohmann::json jsonh264Nal;
-                                jsonh264Nal["type"] = h264::H264EsParser::toString(info.type);
+                                jsonh264Nal["type"] = info.nalUnitType;
                                 g_BigJson["stream"]["Pid" + std::to_string(pid)].back()["nals"].push_back(jsonh264Nal);
                                 LOGD << "----------------------------------------------";
                                 LOGD << "h264 nal type: " << h264::H264EsParser::toString(info.type);

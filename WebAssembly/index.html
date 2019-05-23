@@ -2,36 +2,69 @@
 <html>
 
 <head>
-	<title>Tslib - wasm powered</title>
+	<title>MPEG-2 transport stream analyzer</title>
     <script src="http://www.chartjs.org/dist/2.7.3/Chart.bundle.js"></script>
     <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
     <style>
-	    canvas{
-		    -moz-user-select: none;
-    		-webkit-user-select: none;
-	    	-ms-user-select: none;
-	    }
 	</style>
 </head>
 
 <body>
-    <input type="file" name="myFile" id="ts_file">
-    <div style="width:100%;">
-	    <canvas id="canvas"></canvas>
-	</div>
-	
-    <div class="slider_start">
-    <input type="range" min="0" max=100" value="0" class="slider" onchange="new_start(this.value)" id="slider_start">
-    </div>
-    <div class="slider_end">
-    <input type="range" min="0" max="100" value="0" class="slider" onchange="new_end(this.value)" id="slider_end">
-    </div>
-    <div style="width:100%;">
-	    <canvas id="dts_histogram_canvas"></canvas>
-	</div>
-    <div style="width:100%;">
-	    <canvas id="pts_histogram_canvas"></canvas>
-	</div>
+    <table style="width:100%">
+        <tr>
+            <td>
+                <div title="MPEG-2 transport stream analyzer"><h2 align="center">MPEG-2 transport stream analyzer</h2></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="https://github.com/skullanbones/ts-lib">Powered by<img src="sb.jpeg" width="82" height="86" title="Powered by"></a>
+            </td>
+            <td>
+                <a href="https://webassembly.org/">Powered by<img src="220px-Web_Assembly_Logo.svg.png" width="82" height="86" title="Powered by"></a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <div> Select MPEG-2 transport stream file<input type="file" id="ts_file">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+	            <canvas id="canvas"></canvas>
+            </td>
+        </tr>
+	    <tr>
+            <td>
+                <div>
+                    Start offset<input type="range" min="0" max=100" value="0" onchange="new_start(this.value)" id="slider_start">
+                </div>
+            </td>
+            <td>
+                <div>
+                    End offset <input type="range" min="0" max="100" value="0" onchange="new_end(this.value)" id="slider_end">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+	            <canvas id="dts_histogram_canvas"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <td>
+	            <canvas id="pts_histogram_canvas"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <table border="1" id="pid_stats">
+            <th>Pid</th><th>discontinuity errors</th><th>continuity counter errors</th><th>PTS missing</th><th>DTS missing</th>
+            </table>
+        </tr>
+    </table>
+    
     <script src="./a.out.js"></script>
     <script>
         var start_offset = 0;
@@ -161,6 +194,7 @@
             window.pts_histogram = new Chart(ctx3, pts_histogram_config);
             
             update_hist();
+            update_stats();
         }
         
         function update_data() 
@@ -186,9 +220,28 @@
                                                                  y: parseInt(pid.substring(3))
                                                              });
 
+                    let atten = false;
+                    if (mpeg2ts_data["stream"][pid][i]["nals"])
+                    {
+                        for (let nal in mpeg2ts_data["stream"][pid][i]["nals"])
+                        {
+                            if (mpeg2ts_data["stream"][pid][i]["nals"][nal]["type"] == 5 ||
+                                mpeg2ts_data["stream"][pid][i]["nals"][nal]["type"] == 7 ||
+                                mpeg2ts_data["stream"][pid][i]["nals"][nal]["type"] == 8)
+                            {
+                            console.log("kurwa")
+                                atten = true;
+                            }
+                        }
+                    
+                    }
                     if (mpeg2ts_data["stream"][pid][i]["pmtPids"] || mpeg2ts_data["stream"][pid][i]["streams"])
                     {
                         config.data.datasets[data_set].pointBackgroundColor.push('rgba(0, 255, 0, 0.5)');
+                    }
+                    else if (atten)
+                    {
+                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(0, 0, 255, 0.5)');
                     }
                     else
                     {
@@ -208,7 +261,6 @@
             {
                 if (!pid.startsWith("Pid"))
                 {
-                    //pts missing,...
                     continue;
                 }
                 dts_histogram_config['data']['datasets'].push({
@@ -244,7 +296,31 @@
             window.dts_histogram.update();
             window.pts_histogram.update();
         };
-       
+
+        function update_stats() 
+        {
+            for (let pid in mpeg2ts_data["stream"]["stats"])
+            {
+                if (!pid.startsWith("Pid"))
+                {
+                    continue;
+                }
+                let table = document.getElementById("pid_stats");
+                let row = table.insertRow(table.rows.length);
+                let cell1 = row.insertCell(0);
+                cell1.innerHTML = pid.substring(3);
+                let cell2 = row.insertCell(1);
+                cell2.innerHTML = mpeg2ts_data["stream"]["stats"][pid]['discontinuity'];
+                let cell3 = row.insertCell(2);
+                cell3.innerHTML = mpeg2ts_data["stream"]["stats"][pid]['ccError'];
+                let cell4 = row.insertCell(3);
+                cell4.innerHTML = mpeg2ts_data["stream"]["stats"][pid]['Ptsmissing'];
+                let cell5 = row.insertCell(4);
+                cell5.innerHTML = mpeg2ts_data["stream"]["stats"][pid]['Dtsmissing'];
+                
+            }
+        };
+
 		var config = {
 			type: 'scatter',
 			data:
@@ -275,12 +351,15 @@
                                     if (mpeg2ts_data["stream"][label][item]['ofs'] == tooltipItem.xLabel)
                                     {
                                         let pmt_pids = mpeg2ts_data["stream"][label][item]["pmtPids"];
+                                        let pmt_streams = mpeg2ts_data["stream"][label][item]["streams"];
+                                        let dts = mpeg2ts_data["stream"][label][item]["dts"];
+                                        let pts = mpeg2ts_data["stream"][label][item]["pts"];
+                                        let nals = mpeg2ts_data["stream"][label][item]["nals"];
+
                                         if (pmt_pids)
                                         {
                                             label = 'PAT with PMT pids ' + pmt_pids.toString();
-                                            break;
                                         }
-                                        let pmt_streams = mpeg2ts_data["stream"][label][item]["streams"];
                                         if (pmt_streams)
                                         {
                                             label = 'PMT with streams ';
@@ -288,10 +367,7 @@
                                             {
                                                 label += '(' + pmt_streams[str]['pid'] + ', ' + pmt_streams[str]['type'] + ') '
                                             }
-                                            break;
                                         }
-                                        let dts = mpeg2ts_data["stream"][label][item]["dts"];
-                                        let pts = mpeg2ts_data["stream"][label][item]["pts"];
                                         if (dts || pts)
                                         {
                                             if (dts)
@@ -302,8 +378,17 @@
                                             {
                                                 label += ', pts: ' + pts;
                                             }
-                                            break
                                         }
+                                        if (nals)
+                                        {
+                                            label += ', nal[';
+                                            for (let nal in nals)
+                                            {
+                                                label +=  nals[nal]["type"] + ', ';
+                                            }
+                                            label += ']';
+                                        }
+                                        break;
                                     }
                                 }
                             }
