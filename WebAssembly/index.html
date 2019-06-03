@@ -18,17 +18,21 @@
         </tr>
         <tr>
             <td>
+                <div> Select MPEG-2 transport stream file<input type="file" id="ts_file">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table border="1" id="pid_stats">
+                <th>Pid</th><th>discontinuity errors</th><th>continuity counter errors</th><th>PTS missing</th><th>DTS missing</th>
+                </table>
+            </td>
+            <td>
                 <a href="https://github.com/skullanbones/ts-lib">Powered by<img src="sb.jpeg" width="82" height="86" title="Powered by"></a>
             </td>
             <td>
                 <a href="https://webassembly.org/">Powered by<img src="220px-Web_Assembly_Logo.svg.png" width="82" height="86" title="Powered by"></a>
-            </td>
-        </tr>
-        
-        <tr>
-            <td>
-                <div> Select MPEG-2 transport stream file<input type="file" id="ts_file">
-                </div>
             </td>
         </tr>
         <tr>
@@ -58,11 +62,6 @@
 	            <canvas id="pts_histogram_canvas"></canvas>
             </td>
         </tr>
-        <tr>
-            <table border="1" id="pid_stats">
-            <th>Pid</th><th>discontinuity errors</th><th>continuity counter errors</th><th>PTS missing</th><th>DTS missing</th>
-            </table>
-        </tr>
     </table>
     
     <script src="./a.out.js"></script>
@@ -70,7 +69,16 @@
         var start_offset = 0;
         var end_offset = 0;
         var mpeg2ts_data = JSON.parse("{}");
-        
+        chartColors = [
+            'rgb(0, 255, 0)',
+            'rgb(0, 0, 255)',
+            'rgb(200, 200, 200)',
+            'rgb(0, 255, 255)',
+            'rgb(0, 128, 128)',
+            'rgb(0, 255, 128)',
+            'rgb(128, 255, 7)',
+            'rgb(200, 255, 128)'
+        ];
         function fromUTF8Array(data)
         { // array of bytes
             var str = '', i;
@@ -173,7 +181,7 @@
                 config['data']['datasets'].push({
 				                                    label: pid,
                                                     pointBackgroundColor: [],
-                                                    pointBorderColor: [],
+                                                    borderColor : chartColors[config['data']['datasets'].length % 8],
 					                                data: [],
                                                     fill: false,
                                                     pointRadius: 3,
@@ -236,17 +244,13 @@
                         }
                     
                     }
-                    if (mpeg2ts_data["stream"][pid][i]["pmtPids"] || mpeg2ts_data["stream"][pid][i]["streams"])
+                    if (mpeg2ts_data["stream"][pid][i]["pmtPids"] || mpeg2ts_data["stream"][pid][i]["streams"] || atten)
                     {
-                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(0, 255, 0, 0.5)');
-                    }
-                    else if (atten)
-                    {
-                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(0, 0, 255, 0.5)');
+                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(255, 0, 0, 1)');
                     }
                     else
                     {
-                        config.data.datasets[data_set].pointBackgroundColor.push('rgba(100, 100, 100, 0.5)');
+                        config.data.datasets[data_set].pointBackgroundColor.push(chartColors[data_set % 8]);
                     }
                 }
 
@@ -266,12 +270,14 @@
                 }
                 dts_histogram_config['data']['datasets'].push({
 				                                    label: pid,
+                                                    borderColor : chartColors[dts_histogram_config['data']['datasets'].length % 8],
 					                                data: [],
                                                     fill: false,
                                                     pointRadius: 3,
                                                   })
                 pts_histogram_config['data']['datasets'].push({
 				                                    label: pid,
+                                                    borderColor : chartColors[pts_histogram_config['data']['datasets'].length % 8],
 					                                data: [],
                                                     fill: false,
                                                     pointRadius: 3,
