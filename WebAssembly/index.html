@@ -238,11 +238,14 @@
                                 mpeg2ts_data["stream"][pid][i]["nals"][nal]["type"] == 7 ||
                                 mpeg2ts_data["stream"][pid][i]["nals"][nal]["type"] == 8)
                             {
-                            console.log("kurwa")
                                 atten = true;
                             }
                         }
                     
+                    }
+                    if (mpeg2ts_data["stream"][pid][i]["extra"])
+                    {
+                        atten = true;
                     }
                     if (mpeg2ts_data["stream"][pid][i]["pmtPids"] || mpeg2ts_data["stream"][pid][i]["streams"] || atten)
                     {
@@ -367,6 +370,7 @@
                                         let dts = mpeg2ts_data["stream"][label][item]["dts"];
                                         let pts = mpeg2ts_data["stream"][label][item]["pts"];
                                         let nals = mpeg2ts_data["stream"][label][item]["nals"];
+                                        let extra = mpeg2ts_data["stream"][label][item]["extra"];
 
                                         if (pmt_pids)
                                         {
@@ -399,6 +403,10 @@
                                                 label +=  nals[nal]["type"] + ', ';
                                             }
                                             label += ']';
+                                        }
+                                        if (extra)
+                                        {
+                                            label += extra;
                                         }
                                         break;
                                     }

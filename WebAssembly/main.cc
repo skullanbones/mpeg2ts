@@ -386,12 +386,19 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                 {
                                     LOGD << "mpeg2 picture type: " << info.slice.picType << " "
                                          << info.msg;
+                                    if (info.slice.picType == 1) // I pic
+                                    {
+                                        g_BigJson["stream"]["Pid" + std::to_string(pid)].back()["extra"] += "I frame";
+                                    }
                                 }
                                 else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                                 {
                                     LOGD << "size: " << info.sequence.width << " x " << info.sequence.height
                                          << ", aspect: " << info.sequence.aspect
                                          << ", frame rate: " << info.sequence.framerate;
+                                    std::stringstream tmp;
+                                    tmp << "size: " << info.sequence.width << " x " << info.sequence.height;
+                                    g_BigJson["stream"]["Pid" + std::to_string(pid)].back()["extra"] += tmp.str();
                                 }
                             }
                         } // STREAMTYPE_VIDEO_MPEG2
@@ -433,6 +440,12 @@ void PESCallback(const ByteVector& rawPes, const PesPacket& pes, int pid)
                                          << ", chroma bits: " << info.sps.chromaBits
                                          << ", size: " << info.sps.width << " x "
                                          << info.sps.height << ", ref pic: " << info.sps.numRefPics;
+                                    std::stringstream tmp;
+                                    tmp << ", luma bits: " << info.sps.lumaBits
+                                        << ", chroma bits: " << info.sps.chromaBits
+                                        << ", size: " << info.sps.width << " x "
+                                        << info.sps.height << " " << info.msg;
+                                    g_BigJson["stream"]["Pid" + std::to_string(pid)].back()["extra"] = tmp.str();
                                 }
                                 else if (info.type == h264::H264InfoType::PictureParameterSet)
                                 {
