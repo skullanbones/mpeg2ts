@@ -3,7 +3,8 @@ em++ -std=c++11 -O3 -s WASM=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0 -s
 "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap', 'ccall']" \
 -I include/mpeg2vid/ \
 -I include/h264 \
--I src -I build \
+-I src \
+-I build \
 -I include \
 -I 3rd-party/plog-1.1.4/include \
 -I 3rd-party/json-3.5.0/include \

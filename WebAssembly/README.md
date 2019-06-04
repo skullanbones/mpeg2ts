@@ -4,6 +4,7 @@ With binary code directly executed by a browser as a plugin with embedded ABI fr
 ```Bash
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=install -DCMAKE_TOOLCHAIN_FILE:FILEPATH=<your repo path>/cmake/toolchains/emscripten-wasm.cmake -DEMSCRIPTEN_PREFIX=<path> ..
 ```
+where `DEMSCRIPTEN_PREFIX` points to your installation of em++, please check below how to install it.
 
 Using the emsdk cmake will also work:
 ```Bash
