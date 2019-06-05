@@ -130,7 +130,9 @@ include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 #-------------------
 # subdirectories
 #-------------------
-add_subdirectory(WebAssembly)
+if(ENABLE_WEBASSEMBLY)
+    add_subdirectory(WebAssembly)
+endif()
 
 #-------------------
 # CMake generated files
