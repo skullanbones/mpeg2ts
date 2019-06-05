@@ -8,7 +8,7 @@ where `DEMSCRIPTEN_PREFIX` points to your installation of em++, please check bel
 
 Using the emsdk cmake will also work:
 ```Bash
-emcmake cmake -DCMAKE_CXX_STANDARD=11 ..
+emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON ..
 ```
 but it requires you to first run the environment scipt:
 ```Bash
