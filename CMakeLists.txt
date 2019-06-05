@@ -78,10 +78,12 @@ endif()
 #-------------------
 # compiler settings
 #-------------------
-if (UNIX AND NOT APPLE)
-    add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
-                        -Werror # Make the specified warning into an error.
-    )
+if(NOT ENABLE_WEBASSEMBLY)
+    if (UNIX AND NOT APPLE)
+        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
+                            -Werror # Make the specified warning into an error.
+        )
+    endif()
 endif()
 
 if (MSVC)
@@ -130,55 +132,14 @@ include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 #-------------------
 # subdirectories
 #-------------------
-if(ENABLE_WEBASSEMBLY)
-    add_subdirectory(WebAssembly)
-endif()
+add_subdirectory(apps)
 
 #-------------------
 # CMake generated files
 #-------------------
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/mpeg2ts_version.h.in mpeg2ts_version.h @ONLY)
 
-#-------------------
-# tsparser executable
-#-------------------
-# only build tsparser on UNIX (getopt only exist in Linux)
-if (UNIX)
-add_executable(tsparser)
 
-target_sources(
-    tsparser
-    PRIVATE
-        src/main.cc
- )
-
-target_include_directories(
-    tsparser
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/h264
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2vid
-        ${CMAKE_CURRENT_BINARY_DIR}/.  # For CMake generated files like mpeg2ts_version.h
-)
-
-target_link_libraries(
-    tsparser 
-    PRIVATE 
-        ${PROJECT_NAME}
-        mpeg2codec
-        h264codec
-)
-
-set_target_properties(
-    tsparser
-    PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    DEBUG_POSTFIX "-d"
-)
-
-target_compile_features(tsparser PRIVATE cxx_std_11)
-endif(UNIX)
 
 #-------------------
 # shared / static lib

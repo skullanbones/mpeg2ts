@@ -38,8 +38,7 @@ ExternalProject_Add(
 #-------------------------------------------------------------
 # Taken from https://github.com/google/googletest/tree/master/googletest#incorporating-into-an-existing-cmake-project
 #-------------------------------------------------------------
-
-if(NOT USE_DOCKER)
+if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     message("NOT using Docker! Downloading & configuring google test...")
 
     # Download and unpack googletest at configure time
@@ -80,7 +79,7 @@ endif(NOT USE_DOCKER)
 ############ google benchmark
 
 
-if(NOT USE_DOCKER)
+if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     message("NOT using Docker! Downloading & configuring google benchmark...")
 
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable GTest")
