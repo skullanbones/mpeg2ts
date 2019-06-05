@@ -39,6 +39,7 @@ option(ENABLE_TESTS "Build with tests" ON)
 option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
 option(BUILD_SAMPLES "Build samples" ON)
 option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
+option(ENABLE_WEBASSEMBLY "Enable Web assembly code" OFF)
 
 #-------------------
 # gcov code coverage
