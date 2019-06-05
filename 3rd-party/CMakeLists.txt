@@ -73,7 +73,7 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     if (CMAKE_VERSION VERSION_LESS 2.8.11)
         include_directories("${gtest_SOURCE_DIR}/include")
     endif()
-endif(NOT USE_DOCKER)
+endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
 
 
 ############ google benchmark
@@ -121,4 +121,4 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     if (CMAKE_VERSION VERSION_LESS 2.8.11)
         include_directories("${gtest_SOURCE_DIR}/include")
     endif()
-endif(NOT USE_DOCKER)
+endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
