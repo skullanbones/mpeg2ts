@@ -32,7 +32,7 @@ target_include_directories(
 target_sources(
     ${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
 )
 
 target_link_libraries(${PROJECT_NAME} 
