@@ -126,6 +126,12 @@ set(NLOHMANN_VERSION 3.5.0)
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
+
+#-------------------
+# subdirectories
+#-------------------
+add_subdirectory(WebAssembly)
+
 #-------------------
 # CMake generated files
 #-------------------
