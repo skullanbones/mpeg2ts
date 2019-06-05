@@ -90,7 +90,7 @@ public:
      * @param tsPacketInfo Input packet inforamtion
      * @param table_id Collected table id
      */
-    void collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, int& table_id);
+    void collectTable(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, int& table_id, int64_t origin = -1);
     /*!
      * Parses PSI table
      * @param packet
@@ -124,7 +124,7 @@ public:
      * @param pesPacket collected PES but only ready/complete/collected when true
      * @return True if collected a complete PES-Packet false in all other cases
      */
-    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket);
+    bool collectPes(const uint8_t* tsPacket, const TsPacketInfo& tsPacketInfo, PesPacket& pesPacket, int64_t origin = -1);
 
     /*!
      * Parses the start of a new PES-Packet. This is typically done before collecting
@@ -137,6 +137,11 @@ public:
      * Return raw bytes of table at pid
      */
     ByteVector& getRawTable(int pid);
+
+    int64_t getOrigin(int pid)
+    {
+        return mOrigins[pid];
+    }
     TsStatistics mStatistics;
 
 private:
@@ -146,6 +151,7 @@ private:
     std::map<int, int> mTableId;
     std::map<int, int> mReadSectionLength;
     std::map<int, PesPacket> mPesPacket;
+    std::map<int, int64_t> mOrigins;
 };
 
 } // namespace mpeg2ts

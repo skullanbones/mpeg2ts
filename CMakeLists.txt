@@ -28,6 +28,7 @@ include(clang_format)
 include(cppcheck)
 include(iwyu)
 include(doxygen)
+include(emscripten)
 
 
 #-------------------
@@ -124,6 +125,14 @@ set(NLOHMANN_VERSION 3.5.0)
 
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
+
+
+#-------------------
+# subdirectories
+#-------------------
+if(ENABLE_WEBASSEMBLY)
+    add_subdirectory(WebAssembly)
+endif()
 
 #-------------------
 # CMake generated files

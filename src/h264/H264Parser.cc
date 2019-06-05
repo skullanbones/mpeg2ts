@@ -404,7 +404,9 @@ void H264EsParser::seq_parameter_set_rbsp(NalUnitType nal_unit_type, EsInfoH264&
     // auto reserved_zero_5bits = getBits(5);
     //(void)reserved_zero_5bits;
     skipBits(1);
-    LOGD << "constraint_set4_flag " << getBits(1);
+    auto constraint_set4_flag = getBits(1);
+    (void) constraint_set4_flag;
+    LOGD << "constraint_set4_flag " << constraint_set4_flag;
     skipBits(3);
     auto level_idc = getBits(8);
     info.sps.levelIdc = static_cast<int>(level_idc);

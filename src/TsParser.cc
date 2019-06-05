@@ -199,7 +199,7 @@ uint64_t TsParser::parsePcr()
 }
 
 
-void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, int& a_table_id)
+void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, int& a_table_id, int64_t origin)
 {
     // NOTE!! this is not as easy as one might think. There maybe be alternating PSI long tables and
     // it has been confirmed by assets that some long PMT can be mixed with PAT tables in between.
@@ -218,6 +218,7 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
     {
         mSectionBuffer[PID].clear();
         mReadSectionLength[PID] = 0;
+        mOrigins[PID] = origin;
 
         uint16_t pointer_field = a_tsPacket[pointerOffset];
 
@@ -245,7 +246,7 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
 }
 
 
-bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, PesPacket& a_pesPacket)
+bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPacketInfo, PesPacket& a_pesPacket, int64_t origin)
 {
     bool ret = false;
     const uint8_t pointerOffset = a_tsPacketInfo.payloadStartOffset;
@@ -278,6 +279,8 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
                 ret = true;
             }
         }
+        
+        mOrigins[pid] = origin;
 
         // Create new PES
         mPesPacket[pid] = PesPacket();
