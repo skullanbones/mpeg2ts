@@ -15,12 +15,9 @@ jobs:
           name: Build CMake Release
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j$(nproc)
       - run:
-          name: Setup WebAssembly environment
-          command: cd /tmp/emsdk && ./emsdk activate sdk-tag-1.38.31-64bit && ./emsdk_env.sh && export PATH=$PATH:/tmp/emsdk/emscripten/tag-1.38.31 && em++ --version
-                   #cd /tmp/workspace && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
-      - run:
           name: Build CMake WebAssembly
-          command: em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
+          command: pwd && cd /tmp/emsdk && ./emsdk activate sdk-tag-1.38.31-64bit && ./emsdk_env.sh && export PATH=$PATH:/tmp/emsdk/emscripten/tag-1.38.31 && em++ --version &&
+                   cd - && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
       - run:
           name: Component Tests
           command: cd build && make component-tests
