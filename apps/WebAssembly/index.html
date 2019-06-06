@@ -2,11 +2,11 @@
 <html>
 
 <head>
-	<title>MPEG-2 transport stream analyzer</title>
+	<title id="title">MPEG-2 transport stream analyzer</title>
     <script src="http://www.chartjs.org/dist/2.7.3/Chart.bundle.js"></script>
     <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
-    <style>
-	</style>
+    <link rel="stylesheet" href="styles.css">
+    <style></style>
 </head>
 
 <body>
@@ -18,14 +18,14 @@
         </tr>
         <tr>
             <td>
-                <div> Select MPEG-2 transport stream file<input type="file" id="ts_file">
+                <div class="select_text">Select MPEG-2 transport stream file<input type="file" id="ts_file">
                 </div>
             </td>
         </tr>
         <tr>
             <td>
                 <table border="1" id="pid_stats">
-                <th>Pid</th><th>discontinuity errors</th><th>continuity counter errors</th><th>PTS missing</th><th>DTS missing</th>
+                <th>PID</th><th>discontinuity errors</th><th>continuity counter errors</th><th>PTS missing</th><th>DTS missing</th>
                 </table>
             </td>
             <td>
@@ -42,12 +42,12 @@
         </tr>
 	    <tr>
             <td>
-                <div>
+                <div class="select_text">
                     Start offset<input type="range" min="0" max=100" value="0" onchange="new_start(this.value)" id="slider_start">
                 </div>
             </td>
             <td>
-                <div>
+                <div class="select_text">
                     End offset <input type="range" min="0" max="100" value="0" onchange="new_end(this.value)" id="slider_end">
                 </div>
             </td>
