@@ -26,7 +26,7 @@
 #include "H264Parser.h"
 #include "mpeg2ts.h"
 #include "mpeg2ts_version.h" // Returns current version of mpeg2ts library
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "Mpeg2VideoParser.h"
 
 using namespace mpeg2ts;
 
