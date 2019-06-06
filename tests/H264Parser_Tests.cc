@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 /// Project files CUT (Class Under Test)
-#include "h264/H264Parser.h"
+#include "H264Parser.h"
 
 #include "CodecTestData.h"
 
