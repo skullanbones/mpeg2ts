@@ -26,13 +26,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-std=c++11 -O3 -s W
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_sources(
     ${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
 )
 
 target_link_libraries(${PROJECT_NAME} 

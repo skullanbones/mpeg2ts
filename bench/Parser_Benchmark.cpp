@@ -3,8 +3,8 @@
 
 #include "CodecTestData.h"
 #include "EsParser.h"
-#include "h264/H264Parser.h"
-#include "mpeg2vid/Mpeg2VideoParser.h"
+#include "H264Parser.h"
+#include "Mpeg2VideoParser.h"
 
 /// DUMMY tests
 

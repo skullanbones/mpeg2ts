@@ -14,6 +14,9 @@ jobs:
       - run:
           name: Build CMake Release
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j$(nproc)
+#      - run:
+#          name: Build CMake WebAssembly
+#          command: rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
       - run:
           name: Component Tests
           command: cd build && make component-tests

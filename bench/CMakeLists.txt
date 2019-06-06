@@ -14,8 +14,6 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
 
     add_executable(${TARGET_NAME} ${ONE_BENCH_CPP})
 
-    target_include_directories(${TARGET_NAME} PRIVATE ../include)
-    target_include_directories(${TARGET_NAME} PRIVATE ../src)
     target_include_directories(${TARGET_NAME} PRIVATE ../tests)
 
     target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
