@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: heliconwave/circleci:latest
+      - image: heliconwave/circleci:v16
     steps:
       - checkout
       - run:
