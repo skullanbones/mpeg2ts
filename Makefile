@@ -46,6 +46,9 @@ lint: flake
 flake:
 	flake8 component_tests
 
+fix_style:
+	autopep8 --in-place --aggressive component_tests/*.py
+
 clang-tidy:
 	clang-tidy-6.0 src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 

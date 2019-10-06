@@ -1,4 +1,6 @@
 # MPEG-2 Transport Stream utility library
+[![CircleCI](https://circleci.com/gh/skullanbones/ts-lib.svg?style=svg&circle-token=c9a0da5cd64c4fdf1069557c1d51df93d81226aa)](https://circleci.com/gh/skullanbones/ts-lib)
+
 A fast, cross-platform and modern C++ SDK for all your MPEG-2 transport stream media format needs following
 international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS. The library is platform independent only using
 C++11. Mpeg2ts has been tested on the following operating systems:
