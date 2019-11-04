@@ -60,7 +60,7 @@ run: $(BUILDDIR)/tsparser
 # Build docker image
 docker-image:
 	docker build \
-		--file=$(DOCKER_DIR)/Dockerfile.$(DOCKER_IMAGE_BASE) \
+		--file=$(DOCKER_DIR)/$(DOCKER_IMAGE_BASE)/Dockerfile \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
 		--tag=$(DOCKER_IMAGE_NAME):latest $(DOCKER_DIR)
 
