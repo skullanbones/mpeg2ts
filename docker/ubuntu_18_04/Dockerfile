@@ -45,6 +45,7 @@ apt-get install --yes --no-install-recommends libclang-$CLANG_VERSION-dev
 
 # python support
 RUN apt-get install --yes --no-install-recommends \
+  virtualenv \
   python3-setuptools \
   python3-pip \
   python3-dev \
