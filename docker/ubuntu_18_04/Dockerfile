@@ -1,8 +1,6 @@
 #
 # Simple Dockerfile for building and debugging ts-lib with necessary tools.
 #
-# Copyright © 2018 All rights reserved for skullanbones™
-#
 
 FROM ubuntu:18.04 as base
 
