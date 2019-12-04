@@ -114,8 +114,8 @@ RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /
 
 # Install as docker user (after entrypoint)
 # Install Emscripten SDK/toolchain
-ENV EMSDK_VERSION=1.38
-ENV EMSDK_BUILD_VERSION=31
+ENV EMSDK_VERSION=1.39
+ENV EMSDK_BUILD_VERSION=4
 RUN git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk && \
 cd /tmp/emsdk && ./emsdk install sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && \
 cd /tmp/emsdk && ./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && \
