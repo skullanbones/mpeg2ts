@@ -1,61 +1,63 @@
 #
 # Simple Dockerfile for building and debugging ts-lib with necessary tools.
 #
-# Copyright © 2018 All rights reserved for skullanbones™
-#
 
 FROM ubuntu:18.04 as base
 
-### Create user account ###
-FROM base as user
-RUN apt-get update && apt-get -y --no-install-recommends install \
+
+RUN apt-get update && apt-get --yes --no-install-recommends install \
     ca-certificates \
     curl \
     gnupg2 \
-    gosu
+    gosu \
+    apt-utils \
+    software-properties-common \
+    build-essential \
+    tstools \
+    gdb \
+    gdbserver \
+    wget \
+    lcov \
+    sudo \
+    zip \
+    unzip \
+    doxygen \
+    graphviz && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ### Builder image ###
-FROM user as build
-
-RUN apt-get update && apt-get install --yes --no-install-recommends
-RUN apt-get install --yes --no-install-recommends apt-utils
-RUN apt-get install --yes --no-install-recommends software-properties-common
-RUN apt-get install --yes --no-install-recommends build-essential
-RUN apt-get install --yes --no-install-recommends tstools
-RUN apt-get install --yes --no-install-recommends gdb
-RUN apt-get install --yes --no-install-recommends gdbserver
-RUN apt-get install --yes --no-install-recommends wget
-RUN apt-get install --yes --no-install-recommends lcov
-RUN apt-get install --yes --no-install-recommends sudo
-RUN apt-get install --yes --no-install-recommends zip
-RUN apt-get install --yes --no-install-recommends unzip
-RUN apt-get install --yes --no-install-recommends doxygen
-RUN apt-get install --yes --no-install-recommends graphviz
+FROM base as build
 
 # LLVM Clang
 ENV CLANG_VERSION=7
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-RUN apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main"
-RUN apt-get update
-RUN apt-get install --yes --no-install-recommends clang-$CLANG_VERSION
-RUN apt-get install --yes --no-install-recommends clang-tidy-$CLANG_VERSION
-RUN apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION
-RUN apt-get install --yes --no-install-recommends llvm-$CLANG_VERSION-dev
-RUN apt-get install --yes --no-install-recommends libclang-$CLANG_VERSION-dev
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main" && \
+apt-get update && \
+apt-get install --yes --no-install-recommends clang-$CLANG_VERSION && \
+apt-get install --yes --no-install-recommends clang-tidy-$CLANG_VERSION && \
+apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION && \
+apt-get install --yes --no-install-recommends llvm-$CLANG_VERSION-dev && \
+apt-get install --yes --no-install-recommends libclang-$CLANG_VERSION-dev
 
 
 # python support
-RUN apt-get install --yes --no-install-recommends python3-setuptools
-RUN apt-get install --yes --no-install-recommends virtualenv
-RUN apt-get install --yes --no-install-recommends python3-pip
-RUN apt-get install --yes --no-install-recommends python3-dev
-RUN apt-get install --yes --no-install-recommends python3-virtualenv
-RUN apt-get install --yes --no-install-recommends python3-pip
+RUN apt-get install --yes --no-install-recommends \
+  virtualenv \
+  python3-setuptools \
+  python3-pip \
+  python3-dev \
+  python3-virtualenv \
+  python3-pip && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 
 #python packages
-RUN pip3 install flake8
-RUN pip3 install autopep8
+RUN pip3 install \
+  flake8 \
+  autopep8 \
+  virtualenv
 
 # Install latest git
 RUN apt-add-repository ppa:git-core/ppa \
@@ -65,11 +67,17 @@ RUN apt-add-repository ppa:git-core/ppa \
   && rm -rf /var/lib/apt/lists/*
 
 # Install latest cmake
-RUN curl -o /cmake-3.13.1-Linux-x86_64.sh -SL "https://cmake.org/files/v3.13/cmake-3.13.1-Linux-x86_64.sh"
-RUN mkdir /opt/cmake
-RUN sh /cmake-3.13.1-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
-RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
-RUN cmake --version
+ENV CMAKE_VERSION=3.16
+ENV CMAKE_BUILD_VERSION=0
+RUN mkdir /opt/cmake && cd /opt/cmake && \
+wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION.tar.gz && \
+tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION.tar.gz && \
+cd cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION/ && \
+./bootstrap -- -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_USE_OPENSSL=OFF && \
+make -j$(nproc) && \
+make install && \
+cmake --version && \
+rm -rf /opt/cmake
 
 # Install latest cppcheck
 RUN git clone https://github.com/danmar/cppcheck.git /cppcheck \
@@ -106,11 +114,15 @@ RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /
 
 # Install as docker user (after entrypoint)
 # Install Emscripten SDK/toolchain
-RUN git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk
-RUN cd /tmp/emsdk && ./emsdk install sdk-tag-1.38.31-64bit
-RUN cd /tmp/emsdk && ./emsdk activate sdk-tag-1.38.31-64bit
-RUN cd /tmp/emsdk && ./emsdk_env.sh
-RUN export PATH=$PATH:/tmp/emsdk/emscripten/tag-1.38.31
+ENV EMSDK_VERSION=1.38
+ENV EMSDK_BUILD_VERSION=31
+RUN git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk && \
+cd /tmp/emsdk && \
+./emsdk install sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && \
+./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit
+ENV PATH="${PATH}:/tmp/emsdk/emscripten/tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION"
+RUN echo "PATH: " $PATH
+RUN em++ --version
 
 # entrypoint
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
