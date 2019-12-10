@@ -27,7 +27,7 @@ jobs:
       - image: heliconwave/circleci:latest
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: /root/project
       - run:
           name: Run CTest
           command: cd build && make unit-tests
