@@ -25,26 +25,27 @@ jobs:
   test-unit:
     docker:
       - image: heliconwave/circleci:latest
+    working_directory: ~/project
     steps:
       - attach_workspace:
           at: /root/project
       - run:
           name: Run CTest
-          command: cd build && make unit-tests
-  test-component:
-    docker:
-      - image: heliconwave/circleci:latest
-    steps:
-      - run:
-          name: Component Tests
-          command: cd build && make component-tests
-  test-benchmark:
-    docker:
-      - image: heliconwave/circleci:latest
-    steps:
-      - run:
-          name: Run micro benchmark
-          command: cd build && make benchmark-tests
+          command: pwd && ls -ltrha && cd build && make unit-tests
+#   test-component:
+#     docker:
+#       - image: heliconwave/circleci:latest
+#     steps:
+#       - run:
+#           name: Component Tests
+#           command: cd build && make component-tests
+#   test-benchmark:
+#     docker:
+#       - image: heliconwave/circleci:latest
+#     steps:
+#       - run:
+#           name: Run micro benchmark
+#           command: cd build && make benchmark-tests
 workflows:
   version: 2
   build-test-and-deploy:
@@ -53,9 +54,9 @@ workflows:
       - test-unit:
           requires:
             - build
-      - test-component:
-          requires:
-            - build
-      - test-benchmark:
-          requires:
-            - build
+    #   - test-component:
+    #       requires:
+    #         - build
+    #   - test-benchmark:
+    #       requires:
+    #         - build
