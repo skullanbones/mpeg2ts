@@ -18,12 +18,38 @@ jobs:
       - run:
           name: Build CMake Release
           command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j$(nproc)
-      - run:
-          name: Component Tests
-          command: cd build && make component-tests
+  test-unit:
+    docker:
+      - image: heliconwave/circleci:latest
+    steps:
       - run:
           name: Run CTest
           command: cd build && make unit-tests
+  test-component:
+    docker:
+      - image: heliconwave/circleci:latest
+    steps:
+      - run:
+          name: Component Tests
+          command: cd build && make component-tests
+  test-benchmark:
+    docker:
+      - image: heliconwave/circleci:latest
+    steps:
       - run:
           name: Run micro benchmark
           command: cd build && make benchmark-tests
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build
+      - test-unit:
+          requires:
+            - build
+      - test-component:
+          requires:
+            - build
+      - test-benchmark:
+          requires:
+            - build
