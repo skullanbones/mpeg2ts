@@ -66,6 +66,7 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build
+      - build-webassembly
       - test-unit:
           requires:
             - build
@@ -75,4 +76,3 @@ workflows:
       - test-benchmark:
           requires:
             - build
-      - build-webassembly
