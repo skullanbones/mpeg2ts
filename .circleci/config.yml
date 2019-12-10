@@ -5,6 +5,8 @@ jobs:
       - image: heliconwave/circleci:latest
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Print Container Metadata
           command: lsb_release -a
