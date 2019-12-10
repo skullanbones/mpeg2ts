@@ -49,6 +49,8 @@ jobs:
       - image: heliconwave/circleci:latest
     steps:
       - checkout
+      - attach_workspace:
+          at: /root/project
       - run:
           name: Run micro benchmark
           command: cd build && make benchmark-tests
