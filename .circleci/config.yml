@@ -27,6 +27,7 @@ jobs:
       - image: heliconwave/circleci:latest
     working_directory: ~/project
     steps:
+      - checkout
       - attach_workspace:
           at: /root/project
       - run:
