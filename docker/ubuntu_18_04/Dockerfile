@@ -13,9 +13,6 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
     apt-utils \
     software-properties-common \
     build-essential \
-    tstools \
-    gdb \
-    gdbserver \
     wget \
     lcov \
     sudo \
@@ -34,15 +31,18 @@ ENV CLANG_VERSION=7
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
 apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main" && \
 apt-get update && \
-apt-get install --yes --no-install-recommends clang-$CLANG_VERSION && \
-apt-get install --yes --no-install-recommends clang-tidy-$CLANG_VERSION && \
-apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION && \
-apt-get install --yes --no-install-recommends llvm-$CLANG_VERSION-dev && \
-apt-get install --yes --no-install-recommends libclang-$CLANG_VERSION-dev
+apt-get install --yes --no-install-recommends clang-$CLANG_VERSION \
+  clang-tidy-$CLANG_VERSION \
+  clang-format-$CLANG_VERSION \
+  llvm-$CLANG_VERSION-dev \
+  libclang-$CLANG_VERSION-dev && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 
 # python support
-RUN apt-get install --yes --no-install-recommends \
+RUN apt-get update && \
+  apt-get install --yes --no-install-recommends \
   virtualenv \
   python3-setuptools \
   python3-pip \
@@ -92,7 +92,7 @@ RUN git clone -q https://github.com/google/googletest.git /googletest \
   && git checkout tags/release-1.8.1 \
   && mkdir -p /googletest/build \
   && cd /googletest/build \
-  && cmake .. && make && make install \
+  && cmake .. && make -j $(nproc) && make install \
   && cd / && rm -rf /googletest
 
 # Install benchmark
@@ -101,7 +101,7 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && git checkout tags/v1.4.0 \
   && mkdir -p /benchmark/build \
   && cd /benchmark/build \
-  && cmake -DCMAKE_BUILD_TYPE=Release .. && make && make install \
+  && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc) && make install \
   && cd / && rm -rf /benchmark
 
 # Install latest iwyu
@@ -109,7 +109,7 @@ RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /
   && mkdir /iwyu/build \
   && cd /iwyu && git checkout clang_$CLANG_VERSION.0 \
   && cd /iwyu/build \
-  && cmake .. && cmake --build . -- -j16 && make install \
+  && cmake .. && cmake --build . -- -j$(nproc) && make install \
   && cd / && rm -rf /iwyu
 
 # Install as docker user (after entrypoint)
