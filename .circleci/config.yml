@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: heliconwave/circleci:latest
+      - image: heliconwave/cplusplus:latest
     steps:
       - checkout
       - setup_remote_docker:
@@ -20,18 +20,18 @@ jobs:
           root: /root/project
           paths:
             - build
-  build-webassembly:
-    docker:
-      - image: heliconwave/circleci:latest
-    steps:
-      - checkout
-      - run:
-          name: Build CMake WebAssembly
-          command: pwd && cd /tmp/emsdk && ./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && . emsdk_env.sh && export PATH=$PATH:/tmp/emsdk/emscripten/tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION && em++ --version &&
-                   cd /root/project && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
+  # build-webassembly:
+  #   docker:
+  #     - image: heliconwave/circleci:latest
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Build CMake WebAssembly
+  #         command: pwd && cd /tmp/emsdk && ./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && . emsdk_env.sh && export PATH=$PATH:/tmp/emsdk/emscripten/tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION && em++ --version &&
+  #                  cd /root/project && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
   test-unit:
     docker:
-      - image: heliconwave/circleci:latest
+      - image: heliconwave/cplusplus:latest
     working_directory: ~/project
     steps:
       - checkout
@@ -42,7 +42,7 @@ jobs:
           command: pwd && ls -ltrha && cd build && make unit-tests
   test-component:
     docker:
-      - image: heliconwave/circleci:latest
+      - image: heliconwave/cplusplus:latest
     working_directory: ~/project
     steps:
       - checkout
@@ -53,7 +53,7 @@ jobs:
           command: cd build && make component-tests
   test-benchmark:
     docker:
-      - image: heliconwave/circleci:latest
+      - image: heliconwave/cplusplus:latest
     steps:
       - checkout
       - attach_workspace:
@@ -66,7 +66,7 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build
-      - build-webassembly
+      # - build-webassembly
       - test-unit:
           requires:
             - build
