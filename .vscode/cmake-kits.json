@@ -1,5 +1,16 @@
 [
     {
+        "name": "Linux-Ubuntu-GCC-7.3.0-x64",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "ON",
+            "BUILD_SHARED_LIBS": "YES"
+        },
+        "compilers" : {
+            "CC": "/usr/bin/gcc-7",
+            "CXX": "/usr/bin/g++-7"
+        }
+    },
+    {
         "name": "Windows-SharedLib-VS2017-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",
