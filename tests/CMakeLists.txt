@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 enable_testing()
+include(CTest)
 include(GoogleTest)
 
 
@@ -77,3 +78,19 @@ target_link_libraries(${PROJECT_NAME}
         mpeg2codec
         h264codec
 )
+
+
+if(GTEST_HAVE_DISCOVERY)
+  gtest_discover_tests(${PROJECT_NAME} TEST_PREFIX ${exportname}. TEST_LIST
+                       ${PROJECT_NAME}_targets)
+else()
+  gtest_add_tests(
+    TARGET
+    ${PROJECT_NAME}
+    SOURCES
+    ${TARGET_SOURCES}
+    TEST_PREFIX
+    ${exportname}.
+    TEST_LIST
+    ${PROJECT_NAME}_targets)
+endif()
