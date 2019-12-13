@@ -3,7 +3,7 @@
         "name": "Linux-Ubuntu-GCC-7.3.0-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "ON",
-            "BUILD_SHARED_LIBS": "YES"
+            "BUILD_SHARED_LIBS": "OFF"
         },
         "compilers" : {
             "CC": "/usr/bin/gcc-7",
