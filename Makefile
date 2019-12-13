@@ -1,13 +1,11 @@
 #
-# Simple makefile for ts-lib project
+# Simple makefile for mpeg2ts project
 #
-# Copyright © 2018 All rights reserved for skullanbones™
+# Copyright © 2018 All rights reserved
 #
-# Strictly Confidential - Do not duplicate or distribute without written
-# permission from skullanbones™ and authors
+# Do not duplicate or distribute without written
+# permission from and authors
 
-# Get variables
-include Makefile.variables
 
 ## Project
 COMPONENT_NAME ?= mpeg2ts
@@ -15,7 +13,6 @@ export PROJ_ROOT := $(CURDIR)
 SUBDIRS = tests
 SRCDIR = $(PROJ_ROOT)/src
 BUILDDIR = $(PROJ_ROOT)/build
-DOCKER_DIR = $(PROJ_ROOT)/docker
 
 
 ## Machine
@@ -33,7 +30,6 @@ help:
 	@echo '  flake                 - run flake8 on python files.'
 	@echo '  clang-tidy            - run clang-tidy on c++ files.'
 	@echo '  run                   - run tsparser for bbc_one.ts asset and write elementary streams.'
-	@echo '  docker-image          - builds new docker image with name:tag in Makefile.'
 	@echo '  coverage              - run code coverage on unit-tests.'
 	@echo '  clean                 - deletes build content.'
 	@echo '  clean-all             - deletes build content + downloaded 3rd-party.'
@@ -56,13 +52,6 @@ run: $(BUILDDIR)/tsparser
 	$(BUILDDIR)/tsparser --input $(PROJ_ROOT)/assets/bbc_one.ts --pid 258 --write 2304 --write 2305 --write 2306 --write 2342
 
 ### docker stuff
-
-# Build docker image
-docker-image:
-	docker build \
-		--file=$(DOCKER_DIR)/$(DOCKER_IMAGE_BASE)/Dockerfile \
-		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
-		--tag=$(DOCKER_IMAGE_NAME):latest $(DOCKER_DIR)
 
 ### coverage	
 
