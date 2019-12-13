@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
+
+enable_testing()
+include(GoogleTest)
+
 
 project(
     run_gtests
@@ -7,24 +11,22 @@ project(
     LANGUAGES CXX
 )
 
-enable_testing()
-
-
 #-------------------
-if(USE_DOCKER)
-    # Locate GTest
-    find_package(GTest REQUIRED)
+# Locate GTest
+find_package(GTest MODULE)
+find_library(GMOCK_LIBRARY
+             NAMES gmock 
+                   libgmock 
+                   libgmock.a 
+             PATHS "${GTEST_DIR}"
+             PATH_SUFFIXES lib
+)
 
-    find_library(GMOCK_LIBRARY
-                 NAMES gmock 
-                       libgmock 
-                       libgmock.a 
-                 PATHS "${GTEST_DIR}"
-                 PATH_SUFFIXES lib
-    )
+include_directories(${GTEST_INCLUDE_DIRS})
 
-    include_directories(${GTEST_INCLUDE_DIRS})
-endif(USE_DOCKER)
+if (NOT GTest_FOUND)
+    message(STATUS "Could NOT Find GTest")
+endif()
 
 #-------------------
 # tests
@@ -66,7 +68,7 @@ else(USE_DOCKER)
         PRIVATE
             Threads::Threads 
             gmock
-)
+    )
 endif(USE_DOCKER)
 
 target_link_libraries(${PROJECT_NAME} 
