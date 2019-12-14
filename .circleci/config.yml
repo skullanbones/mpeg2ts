@@ -28,8 +28,8 @@ jobs:
             cat CPackConfig.cmake &&
             cpack --config CPackConfig.cmake
       - store_artifacts:
-          path: /root/project/mpeg2ts-0.4.0-Linux.tar.gz
-          destination: mpeg2ts-0.4.0-Linux.tar.gz
+          path: /root/project/mpeg2ts-*-Linux.tar.gz
+          destination: mpeg2ts-$CIRCLE_BUILD_NUM-Linux.tar.gz
       - persist_to_workspace:
           root: /root/project
           paths:
