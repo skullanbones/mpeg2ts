@@ -19,8 +19,8 @@ jobs:
       - run:
           name: Creating Artifacts
           command:
-            cpack --version && \
-            echo "include(\"Release/CPackConfig.cmake\")" > CPackConfig.cmake && \
+            cpack --version &&
+            echo "include(\"Release/CPackConfig.cmake\")" > CPackConfig.cmake &&
             cat CPackConfig.cmake
             # echo "set(CPACK_INSTALL_CMAKE_PROJECTS" >> CPackConfig.cmake
             # echo "  \"Debug;mpeg2ts;ALL;/\"" >> CPackConfig.cmake 
