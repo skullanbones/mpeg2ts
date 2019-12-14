@@ -18,7 +18,7 @@ get_sub_dir() {
 docker_run() {
     REPO_ROOT=$(get_repo_root)
     echo "Using REPO_ROOT: " "$REPO_ROOT"
-    source $REPO_ROOT/Makefile.variables
+    source $REPO_ROOT/docker/Makefile.variables
 
     SUB_DIR=$(get_sub_dir)
     echo "SUB_DIR: " "$SUB_DIR"
@@ -44,7 +44,7 @@ docker_run() {
 docker-interactive() {
     REPO_ROOT=$(get_repo_root)
     echo "Using REPO_ROOT: " "$REPO_ROOT"
-    source $REPO_ROOT/Makefile.variables
+    source $REPO_ROOT/docker/Makefile.variables
 
     SUB_DIR=$(get_sub_dir)
     echo "SUB_DIR: " "$SUB_DIR"

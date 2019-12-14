@@ -7,6 +7,8 @@ project(
     LANGUAGES CXX
 )
 
+include(CTest)
+
 #-------------------
 # global settings
 #-------------------
@@ -29,6 +31,7 @@ include(cppcheck)
 include(iwyu)
 include(doxygen)
 include(emscripten)
+include(valgrind)
 
 
 #-------------------
@@ -192,9 +195,6 @@ install(FILES
 if(BUILD_SAMPLES)
     add_subdirectory(samples/TsUtilities)
 endif(BUILD_SAMPLES)
-
-
-
 
 #-------------------
 # CPack

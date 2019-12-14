@@ -61,6 +61,16 @@ jobs:
       - run:
           name: Run micro benchmark
           command: cd build && make benchmark-tests
+  test-memcheck:
+    docker:
+      - image: heliconwave/cplusplus:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /root/project
+      - run:
+          name: Run micro benchmark
+          command: cd build && ctest -T memcheck
 workflows:
   version: 2
   build-test-and-deploy:
@@ -74,5 +84,8 @@ workflows:
           requires:
             - build
       - test-benchmark:
+          requires:
+            - build
+      - test-memcheck:
           requires:
             - build

@@ -5,9 +5,7 @@
 #
 # Do not duplicate or distribute without written permission from authors
 
-DOCKER_IMAGE_BASE=ubuntu_18_04
-DOCKER_IMAGE_NAME=heliconwave/circleci
-DOCKER_IMAGE_VER=v19
+include Makefile.variables
 
 
 ## Project
