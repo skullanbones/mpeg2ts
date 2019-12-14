@@ -16,6 +16,18 @@ jobs:
       - run:
           name: Build CMake Release
           command: mkdir Release && cd Release/ && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DENABLE_TESTS=OFF .. && cmake --build . -- -j$(nproc)
+      - run:
+          name: Creating Artifacts
+          command:
+            echo 'include("Release/CPackConfig.cmake")
+            set(CPACK_INSTALL_CMAKE_PROJECTS
+                "Debug;mpeg2ts;ALL;/"
+                "Release;mpeg2ts;ALL;/"
+                )' > CPackConfig.cmake && \
+            cpack --config CPackConfig.cmake
+      - store_artifacts:
+          path: /root/project/Release/mpeg2ts-0.4.0-Linux.tar.gz
+          destination: mpeg2ts-0.4.0-Linux.tar.gz
       - persist_to_workspace:
           root: /root/project
           paths:
