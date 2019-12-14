@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.12)
 
 project(CmakeVirtualenv)
 
@@ -42,15 +42,15 @@ add_custom_target(
     SOURCES requirements.txt
 )
 
-add_test(NAME run_tests
-    COMMAND ${PYTEST} --benchmark-skip ${CMAKE_CURRENT_SOURCE_DIR}/cmdline_test.py
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+# add_test(NAME run_tests
+#     COMMAND ${PYTEST} --benchmark-skip ${CMAKE_CURRENT_SOURCE_DIR}/cmdline_test.py
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+# )
 
-add_test (NAME python-tests
-  COMMAND ${PYTHON_EXECUTABLE} -m pytest ${CMAKE_CURRENT_SOURCE_DIR}
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
+# add_test (NAME python-tests
+#   COMMAND ${PYTHON_EXECUTABLE} -m pytest ${CMAKE_CURRENT_SOURCE_DIR}
+#   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+# )
 
 add_custom_target(
     component-tests
