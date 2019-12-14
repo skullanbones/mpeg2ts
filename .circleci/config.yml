@@ -21,11 +21,12 @@ jobs:
           command:
             cpack --version && \
             echo "include(\"Release/CPackConfig.cmake\")" > CPackConfig.cmake && \
+            cat CPackConfig.cmake
             # echo "set(CPACK_INSTALL_CMAKE_PROJECTS" >> CPackConfig.cmake
             # echo "  \"Debug;mpeg2ts;ALL;/\"" >> CPackConfig.cmake 
             # echo "  \"Release;mpeg2ts;ALL;/\"" >> CPackConfig.cmake
             # echo "  )" >> CPackConfig.cmake && \
-            cat CPackConfig.cmake
+            # cat CPackConfig.cmake
             # cpack --config CPackConfig.cmake
       - store_artifacts:
           path: /root/project/Release/mpeg2ts-0.4.0-Linux.tar.gz
