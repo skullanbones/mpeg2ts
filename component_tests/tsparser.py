@@ -3,6 +3,7 @@ import time
 import sys
 import git
 import subprocess
+import fnmatch
 
 
 def git_root(path):
@@ -14,10 +15,19 @@ def git_root(path):
 def project_root():
     return "%s" % git_root("./")
 
+def find(pattern, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+    return result
 
 class TsParser(object):
     """This object reflects TsParser executable."""
-    parser = os.path.join(project_root(), 'build/apps/tsparser/tsparser')
+    parser = find('tsparser-d', project_root())
+    parser = parser[0]
+    print("Using tsparser exe: {}".format(parser))
 
     def __init__(self, logger):
         self.proc = None

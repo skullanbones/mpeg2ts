@@ -12,14 +12,28 @@ jobs:
           command: lsb_release -a
       - run:
           name: Build CMake Debug
-          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j$(nproc)
+          command: mkdir Debug && cd Debug/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j$(nproc)
       - run:
           name: Build CMake Release
-          command: rm -rf build/ && mkdir build && cd build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . -- -j$(nproc)
+          command: mkdir Release && cd Release/ && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DENABLE_TESTS=OFF .. && cmake --build . -- -j$(nproc)
+      - run:
+          name: Creating Artifacts
+          command:
+            cpack --version &&
+            echo "include(\"Release/CPackConfig.cmake\")" > CPackConfig.cmake &&
+            echo "set(CPACK_INSTALL_CMAKE_PROJECTS" >> CPackConfig.cmake &&
+            echo "  \"Debug;mpeg2ts;ALL;/\"" >> CPackConfig.cmake &&
+            echo "  \"Release;mpeg2ts;ALL;/\"" >> CPackConfig.cmake &&
+            echo "  )" >> CPackConfig.cmake &&
+            cat CPackConfig.cmake &&
+            cpack --config CPackConfig.cmake
+      - store_artifacts:
+          path: /root/project/mpeg2ts-0.4.0-Linux.tar.gz
       - persist_to_workspace:
           root: /root/project
           paths:
-            - build
+            - Debug
+            - Release
   # build-webassembly:
   #   docker:
   #     - image: heliconwave/circleci:latest
@@ -39,7 +53,7 @@ jobs:
           at: /root/project
       - run:
           name: Run CTest
-          command: pwd && ls -ltrha && cd build && make unit-tests
+          command: pwd && ls -ltrha && cd Debug/ && make unit-tests
   test-component:
     docker:
       - image: heliconwave/cplusplus:latest
@@ -50,7 +64,7 @@ jobs:
           at: /root/project
       - run:
           name: Component Tests
-          command: cd build && make component-tests
+          command: cd Debug/ && make component-tests
   test-benchmark:
     docker:
       - image: heliconwave/cplusplus:latest
@@ -60,7 +74,7 @@ jobs:
           at: /root/project
       - run:
           name: Run micro benchmark
-          command: cd build && make benchmark-tests
+          command: cd Debug/ && make benchmark-tests
   test-memcheck:
     docker:
       - image: heliconwave/cplusplus:latest
@@ -70,7 +84,7 @@ jobs:
           at: /root/project
       - run:
           name: Run micro benchmark
-          command: cd build && ctest -T memcheck
+          command: cd Debug/ && ctest -T memcheck
 workflows:
   version: 2
   build-test-and-deploy:
