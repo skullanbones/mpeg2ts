@@ -4,6 +4,9 @@ option(USE_VALGRIND "Use Valgrind for dynamic profiling / memcheck analysis" ON)
 
 if(${USE_VALGRIND})
     find_program(MEMORYCHECK_COMMAND NAMES valgrind)
+    set(MEMORYCHECK_COMMAND valgrind)
+    set(CTEST_MEMORYCHECK_COMMAND valgrind )
+    set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--tool=callgrind -v" ) 
     set(CTEST_MEMORYCHECK_TYPE "Valgrind")
     set(MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full")
     set(MEMORYCHECK_SUPPRESSIONS_FILE
