@@ -9,9 +9,11 @@ endif()
 
 message(STATUS "Using cppcheck")
 
+set(CLANG_VERSION 7)
+
 find_program(
     CLANG_TIDY_EXE 
-    NAMES "clang-tidy-7"
+    NAMES "clang-tidy-${CLANG_VERSION}"
 )
 
 if(NOT CLANG_TIDY_EXE)
@@ -43,11 +45,11 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 # src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
 add_custom_target(
-        clang-tidy
-        COMMAND ${CLANG_TIDY_EXE}
-        ${ALL_SOURCE_FILES}
-        -checks=*
-        -- -std=c++11
-        -I/usr/include/c++/7 -I./include
-        }
+    clang-tidy
+    COMMAND ${CLANG_TIDY_EXE}
+    ${ALL_SOURCE_FILES}
+    -checks=*
+    -- -std=c++11
+    -I/usr/include/c++/7 -I./include
+    }
 )
