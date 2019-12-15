@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 
+option(USE_CLANG_FORMAT "Use clang-format for formatting c++ files" ON)
+
+if(NOT USE_CLANG_FORMAT)
+    message(STATUS "Not using clang-tidy!")
+    return()
+endif()
+
 message(STATUS "Using clang-format")
 
 set(CLANG_VERSION 7)
@@ -27,9 +34,9 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 
 add_custom_target(
-        clang-format
-        COMMAND ${CLANG_FORMAT_EXE}
-        -style=file
-        -i
-        ${ALL_SOURCE_FILES}
+    clang-format
+    COMMAND ${CLANG_FORMAT_EXE}
+    -style=file
+    -i
+    ${ALL_SOURCE_FILES}
 )

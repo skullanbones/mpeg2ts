@@ -32,6 +32,7 @@ include(iwyu)
 include(doxygen)
 include(emscripten)
 include(valgrind)
+include(clang_tidy)
 
 
 #-------------------

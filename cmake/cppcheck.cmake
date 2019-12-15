@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 
+option(USE_CPPCHECK "Use cppcheck for static code analysis" ON)
+
+if(NOT USE_CPPCHECK)
+    message(STATUS "Not using cppcheck!")
+    return()
+endif()
+
 message(STATUS "Using cppcheck")
 
 find_program(
@@ -24,11 +31,11 @@ list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
 
 add_custom_target(
-        cppcheck
-        COMMAND ${CPPCHECK_EXE}
-        --enable=all
-        --std=c++11
-        --verbose
-        --quiet
-        ${ALL_SOURCE_FILES}
+    cppcheck
+    COMMAND ${CPPCHECK_EXE}
+    --enable=all
+    --std=c++11
+    --verbose
+    --quiet
+    ${ALL_SOURCE_FILES}
 )
