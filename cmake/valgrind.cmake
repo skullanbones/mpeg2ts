@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 option(USE_VALGRIND "Use Valgrind for dynamic profiling / memcheck analysis" ON)
 
 if(NOT USE_VALGRIND)
-    message(STATUS "Not using Valgrind!")
+    message(STATUS "    Not using Valgrind!")
     return()
 endif()
 
@@ -19,10 +19,10 @@ set(MEMORYCHECK_SUPPRESSIONS_FILE
     "${PROJECT_SOURCE_DIR}/tests/valgrind_suppress.txt")
 message(
         STATUS
-        "MemCheck will use ${MEMORYCHECK_COMMAND} ${MEMORYCHECK_COMMAND_OPTIONS} ${MEMORYCHECK_SUPPRESSIONS_FILE}"
+        "   MemCheck will use ${MEMORYCHECK_COMMAND} ${MEMORYCHECK_COMMAND_OPTIONS} ${MEMORYCHECK_SUPPRESSIONS_FILE}"
 )
 message(
         STATUS
-        "Read the Documentation for the meaning of these flags: http://valgrind.org/docs/manual/mc-manual.html"
+        "   Read the Documentation for the meaning of these flags: http://valgrind.org/docs/manual/mc-manual.html"
 )
 set(USE_MEM_CHECK ON)

@@ -8,7 +8,7 @@ if (USE_IWYU)
   if(NOT iwyu_path)
     message(FATAL_ERROR "Could not find the program include-what-you-use")
   else()
-    message(STATUS "Using include-what-you-use include analysis.")
+    message(STATUS "  Using include-what-you-use include analysis.")
   endif()
 
   set_property(TARGET mpeg2ts PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
