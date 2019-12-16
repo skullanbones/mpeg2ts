@@ -41,6 +41,8 @@ file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h *.cc)
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
 list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Release")
+list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Debug")
 
 # src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 
