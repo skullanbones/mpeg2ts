@@ -7,7 +7,7 @@ if(NOT USE_CLANG_TIDY)
     return()
 endif()
 
-message(STATUS "Using cppcheck")
+message(STATUS "Using clang-tidy")
 
 set(CLANG_VERSION 7)
 
@@ -17,22 +17,22 @@ find_program(
 )
 
 if(NOT CLANG_TIDY_EXE)
-    message(WARNING "clang-tidy not found bailing out...")
+    message(WARNING "   clang-tidy not found bailing out...")
     return()
 else()
-    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    message(STATUS "    clang-tidy found: ${CLANG_TIDY_EXE}")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-message(STATUS "clang-tidy    : ON")
-message(STATUS "Program exe   : ${CLANG_TIDY_EXE}")
-message(STATUS "Extra flags   : ${CXX_CLANG_TIDY_EXTRA_FLAGS}")
+message(STATUS "    clang-tidy    : ON")
+message(STATUS "    Program exe   : ${CLANG_TIDY_EXE}")
+message(STATUS "    Extra flags   : ${CXX_CLANG_TIDY_EXTRA_FLAGS}")
 if(NOT CXX_CLANG_TIDY_EXTRA_FLAGS)
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}")
 else()
   set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "${CXX_CLANG_TIDY_EXTRA_FLAGS}")
 endif()
-message(STATUS "Command         : ${DO_CLANG_TIDY}")
+message(STATUS "    Command         : ${DO_CLANG_TIDY}")
 
 
 # get all project files

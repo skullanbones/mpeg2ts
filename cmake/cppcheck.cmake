@@ -19,7 +19,7 @@ if(NOT CPPCHECK_EXE)
     message(WARNING "cppcheck not found on your system. Bailing out...")
     return()
 else()
-    message(STATUS "cppcheck found: ${CPPCHECK_EXE}")
+    message(STATUS "    cppcheck found: ${CPPCHECK_EXE}")
 endif()
 
 
