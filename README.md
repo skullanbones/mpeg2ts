@@ -187,8 +187,7 @@ This will spin up a docker container with gtest/gmock and execute all tests.
 Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
 
 ### Visual Studio 2017
-To open the CMake project under Windows you need Visual Studio 2017 with CMake support. Open the root CMakeLists.txt
-project file and you are ready to build under Windows. 
+To open the CMake project under Windows you need at least Visual Studio 2017 with CMake support (make sure you installed CMake support). Open the root CMakeLists.txt project file and you are ready to build under Windows.
 
 ### VS Code
 To open the CMake project by VS Code under Windows, just open the root folder. 
@@ -234,15 +233,6 @@ Run the
 ./gen_package.bat
 ```
 to create a new release on Windows via CMake and CPack.
-
-
-### Solution files Visual Studio 2015
-[DEPRECATED] Currently only WIN32 (x86) is supported with VS2015/VC14 compiler which has a fairly large C++11 support. 
-There is a VS2015 solution file under msvc/2015 for this project. Unit tests (google test) is in same solution as 
-mpeg2ts solution and needs the lib to be build in static mode to access all internal classes/symbols. There is a main application
-called TestTsLib that uses the dynamic mpeg2ts.dll library in the same solution. To build mpeg2ts.dll project open msvc/2015/mpegts2ts.sln and
-change to dynamic project. This is the VS2015 solution file:
-* mpeg2ts.sln
 
 ## Continuous integration (CI)
 For CI mpeg2ts use CircleCI which will automatically run all unit tests after a commit either
