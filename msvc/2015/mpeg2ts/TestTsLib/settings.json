@@ -1,8 +1,0 @@
-{
-    "settings": {
-        "logLevel": "DEBUG",
-        "logFileName": "testtslib_log.csv",
-        "logFileMaxSize": 102400,
-        "logFileMaxNumberOf": 10
-    }
-}
