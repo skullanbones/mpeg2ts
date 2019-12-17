@@ -156,6 +156,7 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
+if(NOT WIN32)
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -177,6 +178,7 @@ install(EXPORT ${PROJECT_NAME}Targets
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION lib/cmake/${PROJECT_NAME}
 )
+endif()
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
