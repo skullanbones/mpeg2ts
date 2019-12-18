@@ -105,9 +105,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
 
 If you want to use ts-lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where ts-lib is being installed if it wasn't installed under your system.
 
-### Linux Make
-[Deprecated] This is the traditionall way of building using GNU Make. This is left for legacy purpose and before all targets been ported to CMake. The recommended way of building this library is CMake.
-
 ## Tsparser
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
