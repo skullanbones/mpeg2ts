@@ -126,50 +126,11 @@ Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
 
 ## Docker
-[DEPRECATED!] Some targets requires docker in order to run since you most likely will not have
-all build dependencies in your native environment. To virtualize the Application
-build time dependencies they have been collected inside a docker image following
-docker best practises. You only need to remember to source the 
-```
-source docker/docker-commands.sh
-```
-and you will be ready to run commands inside the docker container like 
-configuring CMake:
-```Bash
-cd build/
-docker-bash cmake ..
-```
-building
-```Bash
-docker-bash make -j $(nproc)
-```
-and testing:
-```Bash
-docker-bash unit-tests
-```
-for example.
-If you want to run a custom bash command you can do it by:
-```Bash
-docker-bash make help
-```
-for instance. To get an interactive bash session type:
-```Bash
-docker-interactive
-```
-which will give you a docker shell:
-```Bash
-docker@48fefc2ad3cf:/tmp/workspace/build
-```
+To simplify building mpeg2ts, building dependencies and tools have been bundled into a docker container. This image can be build locally or downloaded from docker hub. To start using docker commands, simplest is to source the tool
 
-### Docker image
-To just use the latest image just pull from our private registry/repository @ DockerHub:
-```
-docker pull heliconwave/circleci:v1
-```
-To build the image your self:
-```
-make docker-image
-```
+    source docker/docker-commands.sh
+
+Check `docker/` README for more information.
 
 ## Tests
 In order to run all tests just type (currently only available under Linux):
