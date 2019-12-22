@@ -109,20 +109,22 @@ If you want to use ts-lib installation with your project you need to set the `CM
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
+cd build/
 make all
-./tsparser --input assets/test1.ts
+cd ..
+./build/apps/tsparser/tsparser --input assets/test1.ts
 ```
 Check help in command line (CLI):
 ```
-./tsparser --help --input assets/test1.ts
+./build/apps/tsparser/tsparser --help
 ```
 Add option --write with the PES PID for writing PES packets to file.
 ```
-./tsparser --write 2504 --input assets/bbc_one.ts
+./build/apps/tsparser/tsparser --write 2504 --input assets/bbc_one.ts
 ```
 Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
-./tsparser --pid 258 --input assets/bbc_one.ts
+./build/apps/tsparser/tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
 ## Docker
