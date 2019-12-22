@@ -4,7 +4,7 @@
 A fast, cross-platform and modern C++ SDK for all your MPEG-2 transport stream media format needs following
 international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS. The library is platform independent only using
 C++11. Mpeg2ts has been tested on the following operating systems:
-* Linux (Ubuntu 18.04 LTS)
+* Linux (Ubuntu 18.04 LTS and 16.04 LTS)
 * Windows (Windows 10)
 * Mac OS X (Sierra)
 
@@ -25,7 +25,7 @@ installed/built the sample_tsutilities.exe)
 Linux: tsparser
 ```
 
-## Requirements / example usage
+## Requirements
 C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
 
 ## SW Architecture
@@ -47,8 +47,8 @@ NONE
 ```
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
-## Building (CMake)
-To simplify the crosscompile process we use CMake. Under Linux just do this:
+## Building
+To simplify the crosscompile process we use CMake. Under Linux, Mac and Windows just do this:
 ```Bash
 mkdir build
 cd build/
@@ -73,7 +73,7 @@ If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` ins
 In order to install this library you can type:
 ```Bash
 cmake -DCMAKE_INSTALL_PREFIX=../install ..
-make -j 8
+make -j $(nproc)
 make install
 ```
 and now you will find the installed libraries and headers in `install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
@@ -95,7 +95,7 @@ mpeg2ts-0.4.0-win32.zip      (Windows)
 ```
 for example containing only shared libs.
 
-## Usage
+## Usage in other CMake projects
 To find this package using CMake simply use find_package:
 ```Bash
 find_package(mpeg2ts REQUIRED)
@@ -103,26 +103,28 @@ find_package(mpeg2ts REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
 ```
 
-If you want to use ts-lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where ts-lib is being installed if it wasn't installed under your system.
+If you want to use mpeg2ts lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where mpeg2ts-lib is being installed if it wasn't installed host under your system (`/usr/local`).
 
 ## Tsparser
 ### How to run it
 Type `make help` to see all make targets. To start runing the lib:
 ```
+cd build/
 make all
-./tsparser --input assets/test1.ts
+cd ..
+./build/apps/tsparser/tsparser --input assets/test1.ts
 ```
 Check help in command line (CLI):
 ```
-./tsparser --help --input assets/test1.ts
+./build/apps/tsparser/tsparser --help
 ```
 Add option --write with the PES PID for writing PES packets to file.
 ```
-./tsparser --write 2504 --input assets/bbc_one.ts
+./build/apps/tsparser/tsparser --write 2504 --input assets/bbc_one.ts
 ```
 Just print PSI tables / PES header can be done by --pid option and the PID.
 ```
-./tsparser --pid 258 --input assets/bbc_one.ts
+./build/apps/tsparser/tsparser --pid 258 --input assets/bbc_one.ts
 ```
 
 ## Docker
@@ -139,9 +141,9 @@ make component-tests
 make component-benchmark-tests
 make unit-tests
 ```
-This will spin up a docker container with gtest/gmock and execute all tests.
+This will run component tests, benchmark and unit-tests. Component tests are developed via `pytest` while the unit tests are via google tests/mocks (`gtest`). The different layers like API, and tsutilities are tested as a component (the whole library as such) while class functions are tested as a unit.
 
-## Windows (CMake)
+## Windows
 Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
 
 ### Visual Studio 2017
@@ -196,10 +198,14 @@ to create a new release on Windows via CMake and CPack.
 For CI mpeg2ts use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
-[CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
+[CircleCI](https://circleci.com/gh/skullanbones/mpeg2ts/tree/develop)
 
 ## Static code analysis
-Right now there is no online tool. Use `docker-make cppcheck` and `docker-make clang-tidy`.
+Use `make cppcheck` and `make clang-tidy`. This however requires one to have installed either `cppcheck` or `clang-tidy` on you host machine. If that is not the case, then we recommend using docker interactive via:
+
+    source docker/docker-commands.sh
+    docker-interactive
+    docker@1ca...: make cppcheck
 
 ## Acronyms
 | Abbreviation  | Meaning                             |
@@ -222,8 +228,8 @@ Right now there is no online tool. Use `docker-make cppcheck` and `docker-make c
 ## Technologies / Open Source Software (OSS)
 | Technology    | Version minimal requirement         |
 |---------------|-------------------------------------|
-| C++           | C++11                               | 
-| Docker        | 17.x                                | 
+| C++           | C++11                               |
+| Docker        | 17.x                                |
 | CMake         | 3.11                                |
 | GNU Make      | Ubuntu 16.04                        |
 | GCC           | Ubuntu 16.04 (5.4)                  |
