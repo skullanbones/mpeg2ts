@@ -201,7 +201,11 @@ branch by the portal:
 [CircleCI](https://circleci.com/gh/skullanbones/mpeg2ts/tree/develop)
 
 ## Static code analysis
-Right now there is no online tool. Use `docker-make cppcheck` and `docker-make clang-tidy`.
+Use `make cppcheck` and `make clang-tidy`. This however requires one to have installed either `cppcheck` or `clang-tidy` on you host machine. If that is not the case, then we recommend using docker interactive via:
+
+    source docker/docker-commands.sh
+    docker-interactive
+    docker@1ca...: make cppcheck
 
 ## Acronyms
 | Abbreviation  | Meaning                             |
