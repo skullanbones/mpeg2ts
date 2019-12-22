@@ -4,7 +4,7 @@
 A fast, cross-platform and modern C++ SDK for all your MPEG-2 transport stream media format needs following
 international specification ISO/IEC 13818-1. The standard is also called H.222 including both TS and PS. The library is platform independent only using
 C++11. Mpeg2ts has been tested on the following operating systems:
-* Linux (Ubuntu 18.04 LTS)
+* Linux (Ubuntu 18.04 LTS and 16.04 LTS)
 * Windows (Windows 10)
 * Mac OS X (Sierra)
 
