@@ -47,8 +47,8 @@ NONE
 ```
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
-## Building (CMake)
-To simplify the crosscompile process we use CMake. Under Linux just do this:
+## Building
+To simplify the crosscompile process we use CMake. Under Linux, Mac and Windows just do this:
 ```Bash
 mkdir build
 cd build/
@@ -141,7 +141,7 @@ make unit-tests
 ```
 This will spin up a docker container with gtest/gmock and execute all tests.
 
-## Windows (CMake)
+## Windows
 Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
 
 ### Visual Studio 2017
