@@ -25,7 +25,7 @@ installed/built the sample_tsutilities.exe)
 Linux: tsparser
 ```
 
-## Requirements / example usage
+## Requirements
 C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
 
 ## SW Architecture
@@ -73,7 +73,7 @@ If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` ins
 In order to install this library you can type:
 ```Bash
 cmake -DCMAKE_INSTALL_PREFIX=../install ..
-make -j 8
+make -j $(nproc)
 make install
 ```
 and now you will find the installed libraries and headers in `install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
@@ -95,7 +95,7 @@ mpeg2ts-0.4.0-win32.zip      (Windows)
 ```
 for example containing only shared libs.
 
-## Usage
+## Usage in other CMake projects
 To find this package using CMake simply use find_package:
 ```Bash
 find_package(mpeg2ts REQUIRED)
@@ -103,7 +103,7 @@ find_package(mpeg2ts REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
 ```
 
-If you want to use ts-lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where ts-lib is being installed if it wasn't installed under your system.
+If you want to use mpeg2ts lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where mpeg2ts-lib is being installed if it wasn't installed host under your system (`/usr/local`).
 
 ## Tsparser
 ### How to run it
