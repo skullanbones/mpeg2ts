@@ -196,7 +196,7 @@ to create a new release on Windows via CMake and CPack.
 For CI mpeg2ts use CircleCI which will automatically run all unit tests after a commit either
 in a branch, pull-request or integration to master. You can check the status tests in any
 branch by the portal:
-[CircleCI](https://circleci.com/gh/skullanbones/ts-lib)
+[CircleCI](https://circleci.com/gh/skullanbones/mpeg2ts/tree/develop)
 
 ## Static code analysis
 Right now there is no online tool. Use `docker-make cppcheck` and `docker-make clang-tidy`.
