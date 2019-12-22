@@ -141,7 +141,7 @@ make component-tests
 make component-benchmark-tests
 make unit-tests
 ```
-This will spin up a docker container with gtest/gmock and execute all tests.
+This will run component tests, benchmark and unit-tests. Component tests are developed via `pytest` while the unit tests are via google tests/mocks (`gtest`). The different layers like API, and tsutilities are tested as a component (the whole library as such) while class functions are tested as a unit.
 
 ## Windows
 Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.
