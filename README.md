@@ -224,8 +224,8 @@ Right now there is no online tool. Use `docker-make cppcheck` and `docker-make c
 ## Technologies / Open Source Software (OSS)
 | Technology    | Version minimal requirement         |
 |---------------|-------------------------------------|
-| C++           | C++11                               | 
-| Docker        | 17.x                                | 
+| C++           | C++11                               |
+| Docker        | 17.x                                |
 | CMake         | 3.11                                |
 | GNU Make      | Ubuntu 16.04                        |
 | GCC           | Ubuntu 16.04 (5.4)                  |
