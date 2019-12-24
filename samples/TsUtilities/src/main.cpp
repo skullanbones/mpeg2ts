@@ -9,6 +9,9 @@
 
 #include <iostream>
 
+// 3rd-party
+#include "plog/Log.h"
+
 namespace tsutil {
 
 void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
@@ -32,8 +35,7 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
                 if (info.type == mpeg2::Mpeg2Type::SliceCode)
                 {
                     videoInfo.picType = info.slice.picType;
-                    // LOGD << "mpeg2 picture type: " << info.slice.picType << " " <<
-                    // info.msg;
+                    // LOGD << "mpeg2 picture type: " << info.slice.picType << " " << info.msg;
                 }
                 else if (info.type == mpeg2::Mpeg2Type::SequenceHeader)
                 {
@@ -56,20 +58,17 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 
             for (const h264::EsInfoH264& info : ret)
             {
-                // LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) <<
-                // " " << info.msg;
+                // LOGD << "nal: " << h264::H264EsParser::toString(info.nalUnitType) << " " << info.msg;
                 if (info.type == h264::H264InfoType::SliceHeader)
                 {
-                    // LOGD << info.slice.sliceTypeStr << ", pps id: " <<
-                    // info.slice.ppsId;
+                    LOGD << info.slice.sliceTypeStr << ", pps id: " << info.slice.ppsId;
                     if (info.slice.field)
                     {
-                        // LOGD << "field encoded: " << (info.slice.top ? " top" : "
-                        // bottom");
+                        LOGD << "field encoded: " << (info.slice.top ? " top" : "bottom");
                     }
                     else
                     {
-                        // LOGD << "frame encoded";
+                        LOGD << "frame encoded";
                     }
                 }
                 else if (info.type == h264::H264InfoType::SequenceParameterSet)
@@ -80,30 +79,30 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
                     videoInfo.chromaBits = info.sps.chromaBits;
                     videoInfo.numRefPics = info.sps.numRefPics;
 
-                    // LOGD << "sps id: " << info.sps.spsId << ", luma bits: " <<
-                    // info.sps.lumaBits
-                    //      << ", chroma bits: " << info.sps.chromaBits << ", width: "
-                    //      << info.sps.width
-                    //      << " x " << info.sps.height << ", ref pic: " <<
-                    //      info.sps.numRefPics;
+                    LOGD << "sps id: " << info.sps.spsId << ", luma bits: " <<
+                    info.sps.lumaBits
+                         << ", chroma bits: " << info.sps.chromaBits << ", width: "
+                         << info.sps.width
+                         << " x " << info.sps.height << ", ref pic: " <<
+                         info.sps.numRefPics;
                 }
                 else if (info.type == h264::H264InfoType::PictureParameterSet)
                 {
-                    // LOGD << "sps id: " << info.pps.spsId << "pps id: " <<
-                    // info.pps.ppsId;
+                    LOGD << "sps id: " << info.pps.spsId << "pps id: " <<
+                    info.pps.ppsId;
                 }
             }
             break;
         } // STREAMTYPE_VIDEO_H264
         default:
         {
-            std::cout << "Unknown codec!" << '\n';
+            LOGD << "Unknown codec!";
         }
         }
     }
     catch (const std::out_of_range&)
     {
-        std::cerr << "No parser for stream type " << mpeg2ts::StreamTypeToString[streamType];
+        LOGE << "No parser for stream type " << mpeg2ts::StreamTypeToString[streamType];
     }
 }
 
@@ -133,14 +132,15 @@ int main(int argc, char *argv[])
     }
 
     bool success = util.parseTransportFile(argv[1]);
+    LOGD << "Starting parser of file";
     if (!success)
     {
-        std::cerr << "Could not open file" << '\n';
+        LOGE << "Could not open file";
         return EXIT_FAILURE;
     }
 
     mpeg2ts::PatTable pat = util.getPatTable();
-    std::cout << "Got PAT: " << pat << '\n';
+    LOGD << "Got PAT: " << pat;
 
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
@@ -148,43 +148,43 @@ int main(int argc, char *argv[])
 
     for (auto pid : pmtPids)
     {
-        std::cout << "Got PMT pid: " << pid << '\n';
+        std::cout << "Got PMT pid: " << pid;
         for (auto stream : pmtTables[pid].streams)
         {
-            std::cout << "Found elementary stream in PMT :" << stream.elementary_PID << '\n';
+            LOGD << "Found elementary stream in PMT :" << stream.elementary_PID;
         }
     }
 
     for (auto table : pmtTables)
     {
-        std::cout << "PMT PID: " << table.first << '\n';
-        std::cout << table.second << '\n';
+        LOGD << "PMT PID: " << table.first;
+        LOGD << table.second;
     }
 
     std::vector<uint16_t> mEsPids = util.getEsPids();
     for (auto esPid : mEsPids)
     {
-        std::cout << "Found elementary stream with Pid: " << esPid << '\n';
+        LOGD << "Found elementary stream with Pid: " << esPid;
     }
 
     std::map<int, std::vector<mpeg2ts::PesPacket>> pesPackets = util.getPesPackets();
 
-    std::cout << "Got number of PES packets: " << pesPackets.size() << '\n';
+    LOGD << "Got number of PES packets: " << pesPackets.size();
 
     for (auto& pes : pesPackets)
     {
-        std::cout << "Got PES with PID: " << pes.first << '\n';
-        std::cout << "Size of PES packets: " << pes.second.size() << '\n';
+        LOGD << "Got PES with PID: " << pes.first;
+        LOGD << "Size of PES packets: " << pes.second.size();
     }
 
     mpeg2ts::PidStatisticsMap stat = util.getPidStatistics();
 
     for (auto pid : stat)
     {
-        std::cout << "PID: " << pid.first << '\n';
-        std::cout << "numberOfCCErrors: " << pid.second.numberOfCCErrors << '\n';
-        std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << '\n';
-        std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << '\n';
+        LOGD << "PID: " << pid.first;
+        LOGD << "numberOfCCErrors: " << pid.second.numberOfCCErrors;
+        LOGD << "numberOfMissingDts: " << pid.second.numberOfMissingDts;
+        LOGD << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities;
     }
 
     return EXIT_SUCCESS;
