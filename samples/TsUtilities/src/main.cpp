@@ -20,8 +20,6 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
         {
             videoInfo.codec = VideoCodecType::MPEG2;
             videoInfo.mediaType = MediaType::Video;
-            // videoInfo.PID = a_pid;
-
 
             mpeg2::Mpeg2Codec mpeg2Parser;
             std::vector<mpeg2::EsInfoMpeg2> ret = mpeg2Parser.parse(data);
@@ -105,8 +103,7 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 
 int main(int argc, char *argv[])
 {
-    // TsUtilities High level API
-    tsutil::TsUtilities util;
+    tsutil::TsUtilities util; // TsUtilities High level API
 
     util.addVideoCallback(
         [&](const std::vector<uint8_t>& a_data, int a_streamType) {
@@ -121,7 +118,6 @@ int main(int argc, char *argv[])
     if (argc != 2)
     {
         std::cerr << "Need asset argument! example: ./sample_tsutilities.exe myasset.ts" << '\n';
-       // system("PAUSE");
         asset = "../../../assets/bbc_one.ts";
     }
     else {
@@ -133,7 +129,6 @@ int main(int argc, char *argv[])
     if (!success)
     {
         std::cerr << "Could not open file" << '\n';
-//        system("PAUSE");
         return EXIT_FAILURE;
     }
 
@@ -175,7 +170,6 @@ int main(int argc, char *argv[])
         std::cout << "Size of PES packets: " << pes.second.size() << '\n';
     }
 
-    // typedef std::map<int, PidStatistic> PidStatisticsType;
     mpeg2ts::PidStatisticsMap stat = util.getPidStatistics();
 
     for (auto pid : stat)
@@ -185,33 +179,6 @@ int main(int argc, char *argv[])
         std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << '\n';
         std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << '\n';
     }
-
-
-    /* Demonstrates non-orthogonality between APIs...
-    try
-    {
-        std::cout << "Size of pmtTables: " << pmtTables.size() << '\n';
-        std::cout << "Got PMT with first stream PID: " <<
-    pmtTables[pmtPids.at(0)].streams.at(0).elementary_PID << '\n';
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "Got exception..." << e.what() << '\n';
-    }*/
-
-    // Low level API
-    /*
-    mpeg2ts::TsDemuxer demuxer;
-
-    demuxer.addPsiPid(0, std::bind(&PATCallback, std::placeholders::_1, std::placeholders::_2,
-    std::placeholders::_3), nullptr);
-
-    demuxer.demux(pat_packet_1);*/
-
-    //int systemRet = system("PAUSE");
-    // if (systemRet < 0)
-    // {
-    //     return EXIT_FAILURE;
-    // }
+    
     return EXIT_SUCCESS;
 }
