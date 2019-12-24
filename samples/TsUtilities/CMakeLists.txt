@@ -29,3 +29,6 @@ target_link_libraries(${PROJECT_NAME}
         mpeg2codec
         h264codec
 )
+
+set(LOGFILE_LEVEL "DEBUG")
+configure_file(settings.json.in settings.json)
