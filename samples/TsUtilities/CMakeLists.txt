@@ -29,3 +29,5 @@ target_link_libraries(${PROJECT_NAME}
         mpeg2codec
         h264codec
 )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/mpeg2ts/include/settings.json DESTINATION ${CMAKE_BINARY_DIR})
