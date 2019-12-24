@@ -34,14 +34,14 @@ jobs:
           paths:
             - Debug
             - Release
-  build-webassembly:
-    docker:
-      - image: heliconwave/emscripten:latest
-    steps:
-      - checkout
-      - run:
-          name: Build CMake WebAssembly
-          command: cd /root/project && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
+  # build-webassembly:
+  #   docker:
+  #     - image: heliconwave/emscripten:latest
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Build CMake WebAssembly
+  #         command: cd /root/project && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
   test-unit:
     docker:
       - image: heliconwave/cplusplus:latest
@@ -89,7 +89,7 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build
-      - build-webassembly
+      # - build-webassembly
       - test-unit:
           requires:
             - build
