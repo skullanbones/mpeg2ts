@@ -32,7 +32,6 @@ source ./emsdk_env.sh
 
 Building a certain version:
 ```Bash
-./emsdk install sdk-tag-1.37.9-64bit
-./emsdk activate sdk-tag-1.37.9-64bit
+./emsdk install 1.39.5
 source ./emsdk_env.sh
 ```
