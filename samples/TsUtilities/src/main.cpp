@@ -111,6 +111,17 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 
 int main(int argc, char *argv[])
 {
+    std::string asset;
+    if (argc != 2)
+    {
+        std::cerr << "Need asset argument! example: ./sample_tsutilities.exe myasset.ts" << '\n';
+        return EXIT_FAILURE;
+    }
+    else {
+        std::cout << "Using input asset: " << argv[1] << '\n';
+        asset = argv[1];
+    }
+
     tsutil::TsUtilities util; // TsUtilities High level API
 
     util.addVideoCallback(
@@ -118,18 +129,6 @@ int main(int argc, char *argv[])
             tsutil::handleVideoCallback(a_data, a_streamType);
         }
     );
-
-    std::string asset;
-
-    if (argc != 2)
-    {
-        std::cerr << "Need asset argument! example: ./sample_tsutilities.exe myasset.ts" << '\n';
-        asset = "../../../assets/bbc_one.ts";
-    }
-    else {
-        std::cout << "Using input asset: " << argv[1] << '\n';
-        asset = argv[1];
-    }
 
     bool success = util.parseTransportFile(argv[1]);
     LOGD << "Starting parser of file";
