@@ -16,7 +16,9 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
     try
     {
         tsutil::VideoMediaInfo videoInfo;
-        if (streamType == mpeg2ts::STREAMTYPE_VIDEO_MPEG2)
+        switch (streamType)
+        {
+        case mpeg2ts::STREAMTYPE_VIDEO_MPEG2:
         {
             videoInfo.codec = VideoCodecType::MPEG2;
             videoInfo.mediaType = MediaType::Video;
@@ -41,9 +43,9 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
                     videoInfo.aspect = info.sequence.aspect;
                 }
             }
+            break;
         } // STREAMTYPE_VIDEO_MPEG2
-
-        if (streamType == mpeg2ts::STREAMTYPE_VIDEO_H264)
+        case mpeg2ts::STREAMTYPE_VIDEO_H264:
         {
             videoInfo.codec = VideoCodecType::H264;
             videoInfo.mediaType = MediaType::Video;
@@ -91,7 +93,13 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
                     // info.pps.ppsId;
                 }
             }
+            break;
         } // STREAMTYPE_VIDEO_H264
+        default:
+        {
+            std::cout << "Unknown codec!" << '\n';
+        }
+        }
     }
     catch (const std::out_of_range&)
     {
@@ -99,7 +107,8 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
     }
 }
 
-}
+
+} // namespace tsutil
 
 int main(int argc, char *argv[])
 {
@@ -107,8 +116,6 @@ int main(int argc, char *argv[])
 
     util.addVideoCallback(
         [&](const std::vector<uint8_t>& a_data, int a_streamType) {
-            printf("Came to ballback... %d\n", a_streamType);
-
             tsutil::handleVideoCallback(a_data, a_streamType);
         }
     );
@@ -179,6 +186,6 @@ int main(int argc, char *argv[])
         std::cout << "numberOfMissingDts: " << pid.second.numberOfMissingDts << '\n';
         std::cout << "numberOfTsDiscontinuities: " << pid.second.numberOfTsDiscontinuities << '\n';
     }
-    
+
     return EXIT_SUCCESS;
 }
