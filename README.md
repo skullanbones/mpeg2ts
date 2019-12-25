@@ -30,6 +30,7 @@ C++11 is the minimal requirement. The library is written as platform independent
 
 ## Libs
 In order to parse mpeg2 and h264 codecs, 2 extra libs are supplied. In total there are the 3 following libs:
+
 | Lib name              | Meaning                     |
 |----------------------------------|-----------------------------|
 | libmpeg2ts.so         | mpeg2 transport stream parser
