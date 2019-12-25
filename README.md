@@ -28,6 +28,14 @@ Linux: tsparser
 ## Requirements
 C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
 
+## Libs
+In order to parse mpeg2 and h264 codecs, 2 extra libs are supplied. In total there are the 3 following libs:
+| Lib name              | Meaning                     |
+|----------------------------------|-----------------------------|
+| libmpeg2ts.so         | mpeg2 transport stream parser
+| libmpeg2codec.so      | mpeg2 codec parser
+| libh264codec.so       | h264 codec parser
+
 ## SW Architecture
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
