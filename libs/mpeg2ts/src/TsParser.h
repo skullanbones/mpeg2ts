@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _TSPARSER_H
+#define _TSPARSER_H
 
 #include <cstdint>              // for uint8_t, uint64_t
 #include <map>                  // for map
@@ -167,3 +168,5 @@ private:
 };
 
 } // namespace mpeg2ts
+
+#endif /* _TSPARSER_H */

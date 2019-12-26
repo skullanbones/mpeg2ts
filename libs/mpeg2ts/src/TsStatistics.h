@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _TSSTATISTICS_H
+#define _TSSTATISTICS_H
 
 #include <cstdint>              // for int64_t, for uint8_t
 
@@ -114,3 +115,5 @@ inline void TsStatistics::addTsPacketCounter()
 }
 
 } // namespace mpeg2ts
+
+#endif /* _TSSTATISTICS_H */

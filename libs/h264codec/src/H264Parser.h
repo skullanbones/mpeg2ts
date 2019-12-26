@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _H264PARSER_H
+#define _H264PARSER_H
 
 #include <cstdint>              // for uint8_t
 #include <iosfwd>               // for size_t
@@ -120,3 +121,5 @@ inline std::string H264EsParser::toString(NalUnitType e)
     return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 }
+
+#endif /* _H264PARSER_H */

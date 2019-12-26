@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _MPEG2VIDEOPARSER_H
+#define _MPEG2VIDEOPARSER_H
                                                                                                                                                                                                   
 #include <cstdint>              // for uint8_t, uint64_t
 #include <map>                  // for map, _Rb_tree_const_iterator
@@ -82,3 +83,5 @@ inline std::string Mpeg2VideoEsParser::toString(Mpeg2Type e)
     return it == MyEnumStrings.end() ? "Out of range" : it->second;
 }
 }
+
+#endif /* _MPEG2VIDEOPARSER_H */

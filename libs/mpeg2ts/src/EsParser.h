@@ -25,7 +25,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _ESPARSER_H
+#define _ESPARSER_H
 
 #include <algorithm>
 #include <cstdint>
@@ -71,3 +72,5 @@ inline std::vector<std::size_t> EsParser::findStartCodes(const std::vector<uint8
     }
     return indexes;
 }
+
+#endif /* _ESPARSER_H */
