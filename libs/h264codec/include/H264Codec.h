@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _H264CODEC_H
+#define _H264CODEC_H
 
 
 #include <memory>
@@ -147,3 +148,5 @@ private:
 
 
 } // namespace h264
+
+#endif /* _H264CODEC_H */

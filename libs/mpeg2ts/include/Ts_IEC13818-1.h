@@ -35,8 +35,8 @@
  *
  * All references here after reference to this document.
  */
-
-#pragma once
+#ifndef _TS_IEC13818_1_H
+#define _TS_IEC13818_1_H
 
 #include <iostream>
 #include <map>
@@ -391,3 +391,5 @@ struct Metadata_pointer_descriptor : public Descriptor
 };
 
 } // namespace mpeg2ts
+
+#endif /* _TS_IEC13818_1_H */

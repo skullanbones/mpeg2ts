@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _MPEG2TS_H
+#define _MPEG2TS_H
 
 #include "mpeg2ts_export.h"  // For __declspec(dllexport/dllimport)
 
@@ -404,3 +405,5 @@ private:
 
 
 } // namespace mpeg2ts
+
+#endif /* _MPEG2TS_H */
