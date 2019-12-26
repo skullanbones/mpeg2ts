@@ -24,9 +24,12 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _LOGGING_H
+#define _LOGGING_H
 
 enum // Define log instances. Default is 0 and is omitted from this enum.
 {
     FileLog = 1
 };
+
+#endif /* _LOGGING_H */

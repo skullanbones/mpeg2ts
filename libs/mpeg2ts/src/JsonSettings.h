@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _JSONSETTINGS_H
+#define _JSONSETTINGS_H
 
 /*!
  * This file loads the settings json file which contains
@@ -71,3 +72,5 @@ public:
         return m_message.c_str();
     }
 };
+
+#endif /* _JSONSETTINGS_H */

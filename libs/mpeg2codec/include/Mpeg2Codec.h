@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _MPEG2CODEC_H
+#define _MPEG2CODEC_H
 
 #include <cstdint>
 #include <string>
@@ -104,3 +105,5 @@ private:
 
 
 } // namespace mpeg2
+
+#endif /* _MPEG2CODEC_H */

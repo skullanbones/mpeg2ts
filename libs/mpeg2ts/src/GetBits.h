@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _GETBITS_H
+#define _GETBITS_H
 
 #include <cstdint>  // for uint8_t, uint64_t                                                                                                                                                                                                      
 #include <iosfwd>               // for size_t                                                                        
@@ -99,3 +100,5 @@ public:
 
     virtual ~GetBitsException() = default;
 };
+
+#endif /* _GETBITS_H */

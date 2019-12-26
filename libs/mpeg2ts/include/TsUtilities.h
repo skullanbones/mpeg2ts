@@ -24,7 +24,8 @@
 *    02111-1307, USA.
 *
 ********************************************************************/
-#pragma once
+#ifndef _TS_UTILITIES_H
+#define _TS_UTILITIES_H
 
 #include <cstdint>              // for uint16_t, uint8_t                                                                                                          
 #include <cstddef>              // for size_t            
@@ -303,3 +304,5 @@ inline std::string TsUtilities::toString(VideoCodecType e) const
 }
 
 } // namespace tsutil
+
+#endif /* _TS_UTILITIES_H */
