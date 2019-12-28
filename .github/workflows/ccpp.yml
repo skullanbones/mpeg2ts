@@ -1,0 +1,20 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+    name: building
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-latest]
+    #ubuntu-latest, windows-latest,
+    steps:
+    - uses: actions/checkout@v1
+    - name: check versions
+      run: cmake --version
+    - name: cmake
+      run: mkdir build && cd build && cmake -DENABLE_COMPONENT_TESTS=OFF ..
+    - name: make
+      run: cd build/ && ls && pwd && make -j $(nproc)
