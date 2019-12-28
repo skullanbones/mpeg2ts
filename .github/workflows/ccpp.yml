@@ -9,12 +9,11 @@ jobs:
     strategy:
       matrix:
         os: [macOS-latest, windows-latest]
-    #ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: check versions
       run: cmake --version
-    - name: cmake
+    - name: cmake configure
       run : mkdir build; cd build; cmake -DENABLE_COMPONENT_TESTS=OFF ..
-    - name: make
+    - name: cmake build
       run: cd build/; ls; pwd; cmake --build .
