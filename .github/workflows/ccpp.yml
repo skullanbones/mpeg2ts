@@ -17,4 +17,4 @@ jobs:
     - name: cmake
       run : mkdir build; cd build; cmake -DENABLE_COMPONENT_TESTS=OFF ..
     - name: make
-      run: cd build/; ls; pwd; cmake --build . -- -j$(nproc)
+      run: cd build/; ls; pwd; cmake --build . -- -j3
