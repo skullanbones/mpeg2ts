@@ -15,7 +15,7 @@ jobs:
     - name: check versions
       run: cmake --version
     - name: cmake
-      run : dir
+      run : ls
 #      run: mkdir build && cd build && cmake -DENABLE_COMPONENT_TESTS=OFF ..
 #    - name: make
 #      run: cd build/ && ls && pwd && make -j $(nproc)
