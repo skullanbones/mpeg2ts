@@ -39,6 +39,8 @@ C++11 is the minimal requirement. The library is written as platform independent
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
 * TsUtilities.h High level API to simplify usage
+* Samples in `samples/` shows how to use the tsutil API
+
 ![](images/Ts-lib_SW_Architecture.png)
 
 ## Building
