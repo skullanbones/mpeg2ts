@@ -6,7 +6,7 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 C++11. Mpeg2ts has been tested on the following operating systems:
 * Linux (Ubuntu 18.04 LTS and 16.04 LTS)
 * Windows (Windows 10)
-* Mac OS X (Sierra)
+* Mac OS X (Sierra, Catalina)
 
 To simplify the build process on all these operating systems, CMake is being used.
 
@@ -24,11 +24,6 @@ Win32: TsUtilities located under samples
 installed/built the sample_tsutilities.exe)
 Linux: tsparser
 ```
-
-## Requirements
-C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
-
-## Libs
 In order to parse mpeg2 and h264 codecs, 2 extra libs are supplied. In total there are the 3 following libs:
 
 | Lib name              | Meaning                     |
@@ -37,24 +32,16 @@ In order to parse mpeg2 and h264 codecs, 2 extra libs are supplied. In total the
 | libmpeg2codec.so      | mpeg2 codec parser
 | libh264codec.so       | h264 codec parser
 
+## Requirements
+C++11 is the minimal requirement. The library is written as platform independent code and tested on Mac OS X (Sierra), Ubuntu 16.04/18.04, Windows 10.
+
 ## SW Architecture
 There are 2 sets of APIs, the core API called mpeg2ts under the same namespace and a utility API to facilitate the usage of the API for more convinient usage (namespace tsutil). These are the APIs:
 * mpeg2ts.h    The core and fundamental API for all mpeg2ts usage
 * TsUtilities.h High level API to simplify usage
-![](images/Ts-lib_SW_Architecture.png)
+* Samples in `samples/` shows how to use the tsutil API
 
-## Settings
-Edit the `settings.json` file to change log level, log file name and other properties. These are global settings for the mpeg2ts set of libraries. Log levels are:
-```
-VERBOSE
-DEBUG
-INFO
-WARNING
-ERROR
-FATAL
-NONE
-```
-where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
+![](images/Ts-lib_SW_Architecture.png)
 
 ## Building
 To simplify the crosscompile process we use CMake. Under Linux, Mac and Windows just do this:
@@ -113,6 +100,19 @@ target_link_libraries(${PROJECT_NAME} PUBLIC mpeg2ts::mpeg2ts)
 ```
 
 If you want to use mpeg2ts lib installation with your project you need to set the `CMAKE_PREFIX_PATH` to where mpeg2ts-lib is being installed if it wasn't installed host under your system (`/usr/local`).
+
+## Settings
+Edit the `settings.json` file to change log level, log file name and other properties. These are global settings for the mpeg2ts set of libraries. Log levels are:
+```
+VERBOSE
+DEBUG
+INFO
+WARNING
+ERROR
+FATAL
+NONE
+```
+where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
 ## Tsparser
 ### How to run it
@@ -215,33 +215,3 @@ Use `make cppcheck` and `make clang-tidy`. This however requires one to have ins
     source docker/docker-commands.sh
     docker-interactive
     docker@1ca...: make cppcheck
-
-## Acronyms
-| Abbreviation  | Meaning                             |
-|---------------|-------------------------------------|
-| API           | Application Program Interface       |
-| CI            | Continuous Integration              |
-| DVCS          | Distributed Version Control System  |
-| IEC           | International Electrotechnical Commission  |
-| ISO           | International Organization for Standardization  |
-| MC            | Multicast                           |
-| MPEG          | Moving Picture Experts Group        |
-| OSS           | Open Source Software                |
-| PS            | Program Stream                      |
-| SDK           | Software Development Kit            |
-| SW            | Software                            |
-| TS            | Transport Stream                    |
-| VCS           | Version Control System              |
-
-
-## Technologies / Open Source Software (OSS)
-| Technology    | Version minimal requirement         |
-|---------------|-------------------------------------|
-| C++           | C++11                               |
-| Docker        | 17.x                                |
-| CMake         | 3.11                                |
-| GNU Make      | Ubuntu 16.04                        |
-| GCC           | Ubuntu 16.04 (5.4)                  |
-| Python        | Python 3.x                          |
-| Git           | 2.x                                 |
-| Google test   | 1.8.x                               |
