@@ -30,7 +30,7 @@ include(GoogleTest)
 
 project(
     run_gtests
-    VERSION 1.0.0
+    VERSION 0.5.0
     DESCRIPTION "GTests for mpeg2ts lib"
     LANGUAGES CXX
 )

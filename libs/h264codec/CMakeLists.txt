@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(
     h264codec
-    VERSION 0.0.1
+    VERSION 0.5.0
     DESCRIPTION "H264 Codec parser lib"
     LANGUAGES CXX
 )
