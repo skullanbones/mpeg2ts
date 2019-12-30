@@ -49,7 +49,7 @@ To simplify the crosscompile process we use CMake. Under Linux, Mac and Windows 
 mkdir build
 cd build/
 cmake -DCMAKE_BUILD_TYPE=Debug|Release ..
-make
+cmake --build .
 ```
 You will get the following artifacts:
 ```Bash
@@ -63,14 +63,14 @@ cmake -DCMAKE_BUILD_TYPE=Debug|Release -DBUILD_SHARED_LIBS=YES ..
 which result in `libmpeg2ts.so*` on Linux, `libmpeg2ts.dylib*` on Mac and `libmpeg2ts.dll*` on Windows.
 
 
-If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` instead of `make` in the 4th command above.
+If you wanna speed up the build you can type `cmake --build . -- -j$(nproc)` in the 4th command above (Works only on Mac/Linux).
 
 ## Installation
 In order to install this library you can type:
 ```Bash
 cmake -DCMAKE_INSTALL_PREFIX=../install ..
-make -j $(nproc)
-make install
+cmake --build .
+cmake --build . --target install
 ```
 and now you will find the installed libraries and headers in `install` directory. Omit `CMAKE_INSTALL_PREFIX` to install in system default `/usr/local/lib`.
 
