@@ -85,9 +85,9 @@ or on Windows
 ```
 This will generate a package
 ```Bash
-mpeg2ts-0.4.0-Linux.tar.gz   (Linux)
-mpeg2ts-0.4.0-Darwin.tar.gz  (Apple)
-mpeg2ts-0.4.0-win32.zip      (Windows)
+mpeg2ts-0.5.0-Linux.tar.gz   (Linux)
+mpeg2ts-0.5.0-Darwin.tar.gz  (Apple)
+mpeg2ts-0.5.0-win32.zip      (Windows)
 ```
 for example containing only shared libs.
 

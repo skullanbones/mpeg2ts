@@ -1,5 +1,25 @@
 # Releases
 
+*V0.5.0*
+* [x] Add github workflow: Crosscompilation Mac, Windows
+* [x] Cleanup Sample
+* [x] Added License
+* [x] Cleanup old Makefiles
+* [x] Added Contributing.md 
+* [x] Remove msvc project files
+* [x] Added clang-tidy to CMake
+* [x] Added Valgrind memcheck
+* [x] Refactor CircleCi build using workflow
+* [x] Shrink Docker image size
+* [x] Add CircleCI badge
+* [x] Add CSS style to web page
+* [x] Refactor CMake structure
+* [x] Add compilation with Emscripten (webassembly)
+* [x] Add Doxygen and some comments
+* [x] Format CMake files
+* [x] Separate codec libs from parser lib
+* [x] Issue-233 Mac, fix issue with LLVM 9.0
+
 *V0.4.0*
 * [BUG-208] Build static and shared lib and package
 * [BUG-200] Add version info
