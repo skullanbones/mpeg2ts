@@ -1,8 +1,35 @@
+#*****************************************************************
+#
+#    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+#
+#    mpeg2ts - mpeg2ts tsparser.py
+#
+#    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
+#
+#    Unless you have obtained mpeg2ts under a different license,
+#    this version of mpeg2ts is mpeg2ts|GPL.
+#    Mpeg2ts|GPL is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU General Public License as
+#    published by the Free Software Foundation; either version 2,
+#    or (at your option) any later version.
+#
+#    Mpeg2ts|GPL is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with mpeg2ts|GPL; see the file COPYING. If not, write to
+#    the Free Software Foundation, 59 Temple Place - Suite 330,
+#    Boston, MA 02111-1307, USA.
+#
+#******************************************************************/
 import os
 import time
 import sys
 import git
 import subprocess
+import fnmatch
 
 
 def git_root(path):
@@ -14,10 +41,19 @@ def git_root(path):
 def project_root():
     return "%s" % git_root("./")
 
+def find(pattern, path):
+    result = []
+    for root, dirs, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+    return result
 
 class TsParser(object):
     """This object reflects TsParser executable."""
-    parser = os.path.join(project_root(), 'build/tsparser')
+    parser = find('tsparser-d', project_root())
+    parser = parser[0]
+    print("Using tsparser exe: {}".format(parser))
 
     def __init__(self, logger):
         self.proc = None

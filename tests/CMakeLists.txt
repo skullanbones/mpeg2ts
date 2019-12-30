@@ -1,29 +1,56 @@
-cmake_minimum_required(VERSION 3.0)
+#*****************************************************************
+#
+#    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+#
+#    mpeg2ts - mpeg2ts tests
+#
+#    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
+#
+#    Unless you have obtained mpeg2ts under a different license,
+#    this version of mpeg2ts is mpeg2ts|GPL.
+#    Mpeg2ts|GPL is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU General Public License as
+#    published by the Free Software Foundation; either version 2,
+#    or (at your option) any later version.
+#
+#    Mpeg2ts|GPL is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with mpeg2ts|GPL; see the file COPYING. If not, write to
+#    the Free Software Foundation, 59 Temple Place - Suite 330,
+#    Boston, MA 02111-1307, USA.
+#
+#*******************************************************************/
+cmake_minimum_required(VERSION 3.12)
+
+include(GoogleTest)
 
 project(
-  run_gtests
-  VERSION 1.0.0
-  DESCRIPTION "GTests for ts-lib"
-  LANGUAGES CXX
+    run_gtests
+    VERSION 0.5.0
+    DESCRIPTION "GTests for mpeg2ts lib"
+    LANGUAGES CXX
 )
 
-enable_testing()
-
-
 #-------------------
-if(USE_DOCKER)
-  # Locate GTest
-  find_package(GTest REQUIRED)
+# Locate GTest
+find_package(GTest MODULE)
+find_library(GMOCK_LIBRARY
+             NAMES gmock 
+                   libgmock 
+                   libgmock.a 
+             PATHS "${GTEST_DIR}"
+             PATH_SUFFIXES lib
+)
 
-  find_library(GMOCK_LIBRARY
-                  NAMES gmock 
-                        libgmock 
-                        libgmock.a 
-                  PATHS "${GTEST_DIR}"
-                  PATH_SUFFIXES lib)
+include_directories(${GTEST_INCLUDE_DIRS})
 
-  include_directories(${GTEST_INCLUDE_DIRS})
-endif(USE_DOCKER)
+if (NOT GTest_FOUND)
+    message(STATUS "Could NOT Find GTest")
+endif()
 
 #-------------------
 # tests
@@ -36,39 +63,57 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE MPEG2TS_DLL_EXPORTS)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(${PROJECT_NAME}
-  PRIVATE
-  gtest_main.cc
-  GetBits_Tests.cc
-  Mpeg2VideoParser_Tests.cc
-  PsiTables_Tests.cc
-  TsDemuxer_Tests.cc
-  TsPacketTestData.h
-  TsParser_Tests.cc
-  TsStatistics_Tests.cc
-  TsUtilities_Tests.cc
-  H264Parser_Tests.cc
+    PRIVATE
+        gtest_main.cc
+        GetBits_Tests.cc
+        Mpeg2VideoParser_Tests.cc
+        PsiTables_Tests.cc
+        TsDemuxer_Tests.cc
+        TsPacketTestData.h
+        TsParser_Tests.cc
+        TsStatistics_Tests.cc
+        TsUtilities_Tests.cc
+        H264Parser_Tests.cc
 )
 
 target_include_directories(
-  ${PROJECT_NAME}
-  PRIVATE 
-  ../include
-  ../src
-  ${CMAKE_CURRENT_BINARY_DIR}/..
+    ${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/.
+        ${CMAKE_CURRENT_BINARY_DIR}/..
 )
 
 if(USE_DOCKER)
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${GMOCK_LIBRARY} ${GTEST_LIBRARY} pthread)
 else(USE_DOCKER)
-find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE
-      Threads::Threads 
-      gmock
-)
+    find_package(Threads REQUIRED)
+    target_link_libraries(
+        ${PROJECT_NAME} 
+        PRIVATE
+            Threads::Threads 
+            gmock
+    )
 endif(USE_DOCKER)
 
 target_link_libraries(${PROJECT_NAME} 
-  PRIVATE 
-    mpeg2ts
+    PRIVATE 
+        mpeg2ts
+        mpeg2codec
+        h264codec
 )
+
+
+if(GTEST_HAVE_DISCOVERY)
+  gtest_discover_tests(${PROJECT_NAME} TEST_PREFIX ${exportname}. TEST_LIST
+                       ${PROJECT_NAME}_targets)
+else()
+  gtest_add_tests(
+    TARGET
+    ${PROJECT_NAME}
+    SOURCES
+    ${TARGET_SOURCES}
+    TEST_PREFIX
+    ${exportname}.
+    TEST_LIST
+    ${PROJECT_NAME}_targets)
+endif()

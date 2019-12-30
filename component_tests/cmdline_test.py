@@ -1,3 +1,29 @@
+#*****************************************************************
+#
+#    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+#
+#    mpeg2ts - mpeg2ts cmdline_test.py
+#
+#    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
+#
+#    Unless you have obtained mpeg2ts under a different license,
+#    this version of mpeg2ts is mpeg2ts|GPL.
+#    Mpeg2ts|GPL is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU General Public License as
+#    published by the Free Software Foundation; either version 2,
+#    or (at your option) any later version.
+#
+#    Mpeg2ts|GPL is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with mpeg2ts|GPL; see the file COPYING. If not, write to
+#    the Free Software Foundation, 59 Temple Place - Suite 330,
+#    Boston, MA 02111-1307, USA.
+#
+#******************************************************************/
 import pytest
 import logging
 
@@ -16,7 +42,7 @@ def parser():
 def test_help_message(parser):
     """Verify that help option is displayed"""
     out = parser.start(extra_args=['--help'])
-    assert "Ts-lib simple command-line:" in out[1], "No help text in output"
+    assert "Mpeg2ts lib simple command-line:" in out[1], "No help text in output"
     assert "USAGE: ./tsparser [-h] [-v] [-p PID] [-w PID] [-m ts|pes|es] [-l log-level] [-i file]" \
            in out[1], "Wrong help output"
 
@@ -355,7 +381,7 @@ def test_parse_mpeg2_eurosport(parser, asset_eurosport):
     log.debug(out[1])
     print(out[1])
     assert "sequence_header_code" in out[1]
-    assert "704 x 576, aspect: 3x4, frame rate: 25" in out[1]
+    assert "size: 704 x 576, aspect: 3x4, frame rate: 25" in out[1]
 
 
 def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
@@ -374,7 +400,7 @@ def test_parse_h264_dolby(parser, asset_h264_dolby_atmos):
     print(out[1])
     assert "nal: Access_unit_delimiter Access unit delimiter" in out[1]
     assert "nal: Sequence_parameter_set Sequence parameter set: profile: High level: 4.1" in out[1]
-    assert "sps id: 0, luma bits: 8, chroma bits: 8, width: 1920 x 1088, ref pic: 4" in out[1]
+    assert "sps id: 0, luma bits: 8, chroma bits: 8, size: 1920 x 1088, ref pic: 4" in out[1]
     assert "nal: Picture_parameter_set Picture parameter set: entropy: CAVLC" in out[1]
     assert "sps id: 0pps id: 0" in out[1]
 

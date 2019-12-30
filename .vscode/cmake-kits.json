@@ -1,5 +1,26 @@
 [
     {
+        "name": "Linux-GCC-7.3.0-GTest",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "ON",
+            "BUILD_SHARED_LIBS": "OFF"
+        },
+        "compilers" : {
+            "CXX": "/usr/bin/g++-7"
+        }
+    },
+    {
+        "name": "Linux-GCC-7.3.0-Release",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "OFF",
+            "BUILD_SHARED_LIBS": "ON",
+            "DCMAKE_BUILD_TYPE": "Release"
+        },
+        "compilers" : {
+            "CXX": "/usr/bin/g++-7"
+        }
+    },
+    {
         "name": "Windows-SharedLib-VS2017-x64",
         "cmakeSettings": {
             "ENABLE_TESTS": "OFF",

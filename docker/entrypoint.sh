@@ -18,4 +18,4 @@ echo "root":$UPWD | chpasswd
 echo "$USER:$UPWD" | chpasswd
 export HOME=/home/$USER
 
-exec /usr/local/bin/gosu "$USER" "$@"
+exec gosu "$USER" "$@"

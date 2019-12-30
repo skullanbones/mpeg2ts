@@ -1,0 +1,8 @@
+{
+    "settings": {
+        "logLevel": "@LOGFILE_LEVEL@",
+        "logFileName": "${PROJECT_NAME}.csv",
+        "logFileMaxSize": 102400,
+        "logFileMaxNumberOf": 10
+    }
+}

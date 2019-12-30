@@ -1,3 +1,29 @@
+#*****************************************************************
+#
+#    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+#
+#    mpeg2ts - mpeg2ts bench
+#
+#    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
+#
+#    Unless you have obtained mpeg2ts under a different license,
+#    this version of mpeg2ts is mpeg2ts|GPL.
+#    Mpeg2ts|GPL is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU General Public License as
+#    published by the Free Software Foundation; either version 2,
+#    or (at your option) any later version.
+#
+#    Mpeg2ts|GPL is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with mpeg2ts|GPL; see the file COPYING. If not, write to
+#    the Free Software Foundation, 59 Temple Place - Suite 330,
+#    Boston, MA 02111-1307, USA.
+#
+#******************************************************************/
 cmake_minimum_required(VERSION 3.10)
 
 #-------------------
@@ -7,28 +33,28 @@ cmake_minimum_required(VERSION 3.10)
 file(GLOB_RECURSE ALL_BENCH_CPP *.cpp)
 
 foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
+    get_filename_component(ONE_BENCH_EXEC ${ONE_BENCH_CPP} NAME_WE)
 
-   get_filename_component(ONE_BENCH_EXEC ${ONE_BENCH_CPP} NAME_WE)
+    # Avoid name collision 
+    set(TARGET_NAME Bench_${ONE_BENCH_EXEC})
 
-   # Avoid name collision 
-   set(TARGET_NAME Bench_${ONE_BENCH_EXEC})
+    add_executable(${TARGET_NAME} ${ONE_BENCH_CPP})
 
-   add_executable(${TARGET_NAME} ${ONE_BENCH_CPP})
+    target_include_directories(${TARGET_NAME} PRIVATE ../tests)
 
-   target_include_directories(${TARGET_NAME} PRIVATE ../include)
-  target_include_directories(${TARGET_NAME} PRIVATE ../src)
-  target_include_directories(${TARGET_NAME} PRIVATE ../tests)
+    target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
 
-  target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
-
-   set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_BENCH_EXEC}) 
-   find_package(Threads REQUIRED)
-   target_link_libraries(${TARGET_NAME}
-   PRIVATE
-    Threads::Threads
-    mpeg2ts
-    benchmark
-    ${CMAKE_THREAD_LIBS_INIT})
+    set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_BENCH_EXEC}) 
+    find_package(Threads REQUIRED)
+    target_link_libraries(${TARGET_NAME}
+        PRIVATE
+            Threads::Threads
+            mpeg2ts
+            benchmark
+            mpeg2codec
+            h264codec
+            ${CMAKE_THREAD_LIBS_INIT}
+   )
 
    # If you want to run benchmarks with the "make test" command, uncomment me
    #add_test(${TARGET_NAME} ${ONE_BENCH_EXEC})

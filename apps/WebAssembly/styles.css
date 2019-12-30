@@ -1,0 +1,47 @@
+#pid_stats {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#pid_stats td, #pid_stats th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#pid_stats tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#pid_stats tr:hover {
+    background-color: #ddd;
+}
+
+#pid_stats th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #358eb1;
+    color: white;
+}
+
+body {
+    background-color: #eaebed;
+}
+
+h2 {
+    color: #358eb1;
+    font-size: 48px;
+    font-family: 'Signika', sans-serif;
+    padding-bottom: 10px;
+}
+
+a {
+    color: red;
+    font-family: 'Signika', sans-serif;
+}
+
+.select_text {
+    font-size: 18px;
+    font-family: 'Signika', sans-serif
+}
