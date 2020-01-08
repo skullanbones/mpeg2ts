@@ -147,6 +147,8 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 * This program takes a transport stream as argument. Example:
 * ./sample_tsutilities my_transport_stream.ts
 */
+// Parse ts file. Find PAT, PMT, PES packets and print statisticks.
+// Use high level API(tsutil::TsUtilities) which is not very practical/efficient but simple.
 int main(int argc, char *argv[])
 {
     std::string asset;
@@ -175,11 +177,11 @@ int main(int argc, char *argv[])
         }
     );
 
+    LOGD << "Starting parser of file";
     /*
     * This API will parse the entire transport stream file.
     */
     bool success = util.parseTransportFile(argv[1]);
-    LOGD << "Starting parser of file";
     if (!success)
     {
         LOGE << "Could not open file";
