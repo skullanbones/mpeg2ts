@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 project(
     mpeg2ts
@@ -182,7 +182,7 @@ add_custom_target(benchmark-tests
 #-------------------
 # installation
 #-------------------
-if(NOT WIN32)
+if(False)
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

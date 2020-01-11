@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 project(
     tsparser
@@ -33,13 +33,10 @@ project(
     LANGUAGES CXX
 )
 
-add_executable(${PROJECT_NAME})
-
-target_sources(
+add_executable(
     ${PROJECT_NAME}
-    PRIVATE
-        src/main.cc
- )
+    src/main.cc
+)
 
 target_include_directories(
     ${PROJECT_NAME}
