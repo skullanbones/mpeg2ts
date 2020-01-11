@@ -38,7 +38,8 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
     build-essential \
     wget \
     cmake \
-    git && \
+    git \
+    valgrind && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
