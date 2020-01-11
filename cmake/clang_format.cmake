@@ -44,7 +44,7 @@ find_program(
 )
 
 if(NOT CLANG_FORMAT_EXE)
-    message(WARNING "clang-format not found on your system. Bailing out...")
+    message(STATUS "    clang-format not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "    clang-format found: ${CLANG_FORMAT_EXE}")

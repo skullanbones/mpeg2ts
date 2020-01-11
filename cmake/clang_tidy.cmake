@@ -43,7 +43,7 @@ find_program(
 )
 
 if(NOT CLANG_TIDY_EXE)
-    message(WARNING "   clang-tidy not found bailing out...")
+    message(STATUS "    clang-tidy not found bailing out...")
     return()
 else()
     message(STATUS "    clang-tidy found: ${CLANG_TIDY_EXE}")

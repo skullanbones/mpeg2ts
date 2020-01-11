@@ -42,7 +42,7 @@ find_program(
 )
 
 if(NOT CPPCHECK_EXE)
-    message(WARNING "cppcheck not found on your system. Bailing out...")
+    message(STATUS "    cppcheck not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "    cppcheck found: ${CPPCHECK_EXE}")
