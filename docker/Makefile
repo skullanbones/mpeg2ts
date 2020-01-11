@@ -54,7 +54,6 @@ docker-image-ubuntu-16.04:
 		--tag=heliconwave/mpeg2ts-u16.04:v2 \
 		--tag=heliconwave/mpeg2ts-u16.04:latest ./
 
-
 docker-bash-ubuntu-16.04:
 	docker run \
 		--rm \
@@ -62,6 +61,6 @@ docker-bash-ubuntu-16.04:
 		--tty=true \
 		--env LOCAL_USER_ID=`id -u ${USER}` \
 		--env "TERM=xterm-256color" \
-		--volume=$$(pwd)/workspace:/home/docker/workspace \
+		--volume=$$(pwd)/..:/home/docker/workspace \
 		--workdir=/home/docker/workspace \
 		heliconwave/mpeg2ts-u16.04:latest /bin/bash
