@@ -29,22 +29,22 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 option(USE_IWYU "Use include-what-you-use for static include analysis" OFF)
 
 if (NOT USE_IWYU)
-  message(STATUS "Note include-what-you-use is NOT enabled. Enable it by append -DUSE_IWYU=ON.")
-  return()
+    message(STATUS "    Not using include-what-you-use! To enable it,  append -DUSE_IWYU=ON")
+    return()
 endif()
 
-message(STATUS "Using include-what-you-use")
+message(STATUS "    Using include-what-you-use")
 
 find_program(
-  iwyu_exe
-  NAMES include-what-you-use iwyu
+    iwyu_exe
+    NAMES include-what-you-use iwyu
 )
 
 if(NOT iwyu_exe)
-  message(STATUS "  Could not find the program include-what-you-use, baling out...")
-  return()
+    message(WARNING "    Could not find the program include-what-you-use, baling out...")
+    return()
 else()
-  message(STATUS "  Using include-what-you-use include analysis.")
+    message(STATUS "    Using include-what-you-use include analysis.")
 endif()
 
 set_property(TARGET mpeg2ts PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_exe})

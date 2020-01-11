@@ -26,14 +26,14 @@
 #*******************************************************************/
 cmake_minimum_required(VERSION 3.10)
 
-option(USE_CPPCHECK "Use cppcheck for static code analysis" ON)
+option(USE_CPPCHECK "Use cppcheck for static code analysis" OFF)
 
 if(NOT USE_CPPCHECK)
-    message(STATUS "Not using cppcheck!")
+    message(STATUS "    Not using cppcheck!")
     return()
 endif()
 
-message(STATUS "Using cppcheck")
+message(STATUS "    Using cppcheck")
 
 find_program(
     CPPCHECK_EXE
@@ -42,7 +42,7 @@ find_program(
 )
 
 if(NOT CPPCHECK_EXE)
-    message(STATUS "    cppcheck not found on your system. Bailing out...")
+    message(WARNING "    cppcheck not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "    cppcheck found: ${CPPCHECK_EXE}")
