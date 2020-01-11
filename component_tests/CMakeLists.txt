@@ -34,7 +34,7 @@ set(PYTHON_VERSION 3)
 
 # Find Python and Virtualenv. We don't actually use the output of the
 # find_package, but it'll give nicer errors.
-find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonInterp)
 find_program(VIRTUALENV virtualenv)
 if(NOT VIRTUALENV)
     message(FATAL_ERROR "Could not find `virtualenv` in PATH. You may need install by sudo apt-get install virtualenv.")
