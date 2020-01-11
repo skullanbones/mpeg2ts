@@ -42,7 +42,9 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
     zip \
     unzip \
     doxygen \
-    graphviz && \
+    graphviz \
+    cmake \
+    git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -82,26 +84,6 @@ RUN pip3 install \
   autopep8 \
   virtualenv
 
-# Install latest git
-RUN apt-add-repository ppa:git-core/ppa \
-  && apt-get update \
-  && apt-get install --yes --no-install-recommends git \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-
-# Install latest cmake
-ENV CMAKE_VERSION=3.16
-ENV CMAKE_BUILD_VERSION=0
-RUN mkdir /opt/cmake && cd /opt/cmake && \
-wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION.tar.gz && \
-tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION.tar.gz && \
-cd cmake-$CMAKE_VERSION.$CMAKE_BUILD_VERSION/ && \
-./bootstrap -- -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_USE_OPENSSL=OFF && \
-make -j$(nproc) && \
-make install && \
-cmake --version && \
-rm -rf /opt/cmake
-
 # Install latest cppcheck
 RUN git clone https://github.com/danmar/cppcheck.git /cppcheck \
   && mkdir /cppcheck/build \
@@ -137,15 +119,15 @@ RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /
 
 # Install as docker user (after entrypoint)
 # Install Emscripten SDK/toolchain
-ENV EMSDK_VERSION=1.38
-ENV EMSDK_BUILD_VERSION=31
-RUN git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk && \
-cd /tmp/emsdk && \
-./emsdk install sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && \
-./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit
-ENV PATH="${PATH}:/tmp/emsdk/emscripten/tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION"
-RUN echo "PATH: " $PATH
-RUN em++ --version
+# ENV EMSDK_VERSION=1.38
+# ENV EMSDK_BUILD_VERSION=31
+# RUN git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk && \
+# cd /tmp/emsdk && \
+# ./emsdk install sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit && \
+# ./emsdk activate sdk-tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION-64bit
+# ENV PATH="${PATH}:/tmp/emsdk/emscripten/tag-$EMSDK_VERSION.$EMSDK_BUILD_VERSION"
+# RUN echo "PATH: " $PATH
+# RUN em++ --version
 
 # entrypoint
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
