@@ -81,6 +81,9 @@ target_include_directories(
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/.
         ${CMAKE_CURRENT_BINARY_DIR}/..
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># Testing private src/headers
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># Testing private src/headers
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># Testing private src/headers
 )
 
 if(USE_DOCKER)

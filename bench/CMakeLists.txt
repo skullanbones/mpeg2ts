@@ -40,7 +40,13 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
 
     add_executable(${TARGET_NAME} ${ONE_BENCH_CPP})
 
-    target_include_directories(${TARGET_NAME} PRIVATE ../tests)
+    target_include_directories(${TARGET_NAME} 
+        PRIVATE 
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tests># For CodecTestData.h
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For EsParser.h
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># For H264Parser.h
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
+    )
 
     target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
 
