@@ -51,7 +51,7 @@ docker-image:
 docker-image-ubuntu-16.04:
 	docker build \
 		--file=ubuntu_16_04/Dockerfile \
-		--tag=heliconwave/mpeg2ts-u16.04:v1 \
+		--tag=heliconwave/mpeg2ts-u16.04:v2 \
 		--tag=heliconwave/mpeg2ts-u16.04:latest ./
 
 

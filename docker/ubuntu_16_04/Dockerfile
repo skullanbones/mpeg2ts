@@ -56,6 +56,8 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
   zip \
   unzip \
   doxygen \
+  cmake \
+  git \
   graphviz && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
@@ -84,20 +86,6 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
 
 #python packages
 RUN pip3 install flake8
-
-# Install latest git
-RUN apt-add-repository ppa:git-core/ppa \
-  && apt-get update \
-  && apt-get install --yes --no-install-recommends git \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-
-# Install latest cmake
-RUN curl -o /cmake-3.13.1-Linux-x86_64.sh -SL "https://cmake.org/files/v3.13/cmake-3.13.1-Linux-x86_64.sh"
-RUN mkdir /opt/cmake
-RUN sh /cmake-3.13.1-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
-RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
-RUN cmake --version
 
 # Install latest cppcheck
 RUN git clone https://github.com/danmar/cppcheck.git /cppcheck \
