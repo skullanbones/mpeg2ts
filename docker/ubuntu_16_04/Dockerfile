@@ -43,20 +43,22 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
 ### Builder image ###
 FROM user as build
 
-RUN apt-get update && apt-get install --yes --no-install-recommends
-RUN apt-get install --yes --no-install-recommends apt-utils
-RUN apt-get install --yes --no-install-recommends software-properties-common
-RUN apt-get install --yes --no-install-recommends build-essential=12.1ubuntu2
-RUN apt-get install --yes --no-install-recommends tstools=1.11-1ubuntu1
-RUN apt-get install --yes --no-install-recommends gdb=7.11.1-0ubuntu1~16.5
-RUN apt-get install --yes --no-install-recommends gdbserver=7.11.1-0ubuntu1~16.5
-RUN apt-get install --yes --no-install-recommends wget=1.17.1-1ubuntu1.4
-RUN apt-get install --yes --no-install-recommends lcov=1.12-2
-RUN apt-get install --yes --no-install-recommends sudo=1.8.16-0ubuntu1.5
-RUN apt-get install --yes --no-install-recommends zip=3.0-11
-RUN apt-get install --yes --no-install-recommends unzip=6.0-20ubuntu1
-RUN apt-get install --yes --no-install-recommends doxygen
-RUN apt-get install --yes --no-install-recommends graphviz
+RUN apt-get update && apt-get --yes --no-install-recommends install \
+  apt-utils \
+  software-properties-common \
+  build-essential \
+  tstools \
+  gdb \
+  gdbserver \
+  wget \
+  lcov \
+  sudo \
+  zip \
+  unzip \
+  doxygen \
+  graphviz && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 # LLVM Clang
 ENV CLANG_VERSION=7
@@ -69,12 +71,15 @@ RUN apt-get install --yes --no-install-recommends clang-format-$CLANG_VERSION
 
 
 # python support
-RUN apt-get install --yes --no-install-recommends python3-setuptools=20.7.0-1
-RUN apt-get install --yes --no-install-recommends virtualenv=15.0.1+ds-3ubuntu1
-RUN apt-get install --yes --no-install-recommends python3-pip=8.1.1-2ubuntu0.4
-RUN apt-get install --yes --no-install-recommends python3-dev=3.5.1-3
-RUN apt-get install --yes --no-install-recommends python3-virtualenv=15.0.1+ds-3ubuntu1
-RUN apt-get install --yes --no-install-recommends python3-pip
+RUN apt-get update && apt-get --yes --no-install-recommends install \
+  python3-setuptools=20.7.0-1 \
+  virtualenv=15.0.1+ds-3ubuntu1 \
+  python3-pip=8.1.1-2ubuntu0.4 \
+  python3-dev=3.5.1-3 \
+  python3-virtualenv=15.0.1+ds-3ubuntu1 \
+  python3-pip && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 
 #python packages
