@@ -82,7 +82,7 @@ jobs:
       - attach_workspace:
           at: /root/project
       - run:
-          name: Run micro benchmark
+          name: Run memcheck unit tests
           command: cd Debug/ && ctest -T memcheck
 workflows:
   version: 2
