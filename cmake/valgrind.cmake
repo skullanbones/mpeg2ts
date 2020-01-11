@@ -26,16 +26,28 @@
 #*******************************************************************/
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-option(USE_VALGRIND "Use Valgrind for dynamic profiling / memcheck analysis" ON)
+option(USE_VALGRIND "Use Valgrind for dynamic profiling / memcheck analysis" OFF)
 
 if(NOT USE_VALGRIND)
     message(STATUS "    Not using Valgrind!")
     return()
 endif()
 
-message(STATUS "Using Valgrind")
+message(STATUS "    Using Valgrind")
 
-find_program(MEMORYCHECK_COMMAND NAMES valgrind)
+find_program(
+    MEMORYCHECK_COMMAND
+    NAMES valgrind
+)
+
+if(NOT MEMORYCHECK_COMMAND)
+    message(WARNING "    valgrind not found on your system. Bailing out...")
+    return()
+else()
+    message(STATUS "    valgrind found: ${MEMORYCHECK_COMMAND}")
+endif()
+
+
 set(MEMORYCHECK_COMMAND valgrind)
 set(CTEST_MEMORYCHECK_COMMAND valgrind )
 set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--tool=callgrind -v" ) 

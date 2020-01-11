@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 project(
     mpeg2ts
@@ -52,15 +52,6 @@ if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 endif()
 
-include(clang_format)
-include(cppcheck)
-include(iwyu)
-include(doxygen)
-include(emscripten)
-include(valgrind)
-include(clang_tidy)
-
-
 #-------------------
 # sub modules
 #-------------------
@@ -70,6 +61,18 @@ option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
 option(BUILD_SAMPLES "Build samples" ON)
 option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
 option(ENABLE_WEBASSEMBLY "Enable Web assembly code" OFF)
+
+#-------------------
+# cmake code
+#-------------------
+include(clang_format)
+include(cppcheck)
+include(iwyu)
+include(doxygen)
+include(valgrind)
+include(clang_tidy)
+include(emscripten)
+
 
 #-------------------
 # gcov code coverage
@@ -178,33 +181,6 @@ add_custom_target(unit-tests
 add_custom_target(benchmark-tests
     COMMAND ./bench/Parser_Benchmark
 )
-
-#-------------------
-# installation
-#-------------------
-if(NOT WIN32)
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(FILES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/mpeg2ts.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/Ts_IEC13818-1.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/TsUtilities.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/settings.json
-        ${CMAKE_CURRENT_BINARY_DIR}/libs/mpeg2ts/mpeg2ts_export.h
-        DESTINATION include/${PROJECT_NAME}
-)
-
-install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        NAMESPACE ${PROJECT_NAME}::
-        DESTINATION lib/cmake/${PROJECT_NAME}
-)
-endif()
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("mpeg2tsConfigVersion.cmake"

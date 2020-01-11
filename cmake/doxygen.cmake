@@ -24,16 +24,16 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
-option(USE_DOXYGEN "Use Doxygen for inline documentation." ON)
+option(USE_DOXYGEN "Use Doxygen for inline documentation." OFF)
 
 if(NOT USE_DOXYGEN)
     message(STATUS "    Not using Doxygen!")
     return()
 endif()
 
-message(STATUS "Using Doxygen")
+message(STATUS "    Using Doxygen")
 
 # Require dot, treat the other components as optional
 find_package(
@@ -42,7 +42,7 @@ find_package(
 )
 
 if(NOT DOXYGEN_FOUND)
-    message(WARNING "Doxygen not found on your system. Bailing out...")
+    message(WARNING "    Doxygen not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "    doxygen found: ${DOXYGEN_EXECUTABLE}")

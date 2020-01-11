@@ -37,33 +37,14 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
     software-properties-common \
     build-essential \
     wget \
-    lcov \
-    sudo \
-    zip \
-    unzip \
-    doxygen \
-    graphviz \
     cmake \
-    git && \
+    git \
+    valgrind && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 ### Builder image ###
 FROM base as build
-
-# LLVM Clang
-ENV CLANG_VERSION=7
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$CLANG_VERSION main" && \
-apt-get update && \
-apt-get install --yes --no-install-recommends clang-$CLANG_VERSION \
-  clang-tidy-$CLANG_VERSION \
-  clang-format-$CLANG_VERSION \
-  llvm-$CLANG_VERSION-dev \
-  libclang-$CLANG_VERSION-dev && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
-
 
 # python support
 RUN apt-get update && \
@@ -84,12 +65,6 @@ RUN pip3 install \
   autopep8 \
   virtualenv
 
-# Install latest cppcheck
-RUN git clone https://github.com/danmar/cppcheck.git /cppcheck \
-  && mkdir /cppcheck/build \
-  && cd /cppcheck/build \
-  && cmake .. && cmake --build . -- -j16 && make install \
-  && cd / && rm -rf /cppcheck
 
 # Install gtest/gmock
 RUN git clone -q https://github.com/google/googletest.git /googletest \
@@ -109,13 +84,6 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
   && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc) && make install \
   && cd / && rm -rf /benchmark
 
-# Install latest iwyu
-RUN git clone https://github.com/include-what-you-use/include-what-you-use.git /iwyu \
-  && mkdir /iwyu/build \
-  && cd /iwyu && git checkout clang_$CLANG_VERSION.0 \
-  && cd /iwyu/build \
-  && cmake .. && cmake --build . -- -j$(nproc) && make install \
-  && cd / && rm -rf /iwyu
 
 # Install as docker user (after entrypoint)
 # Install Emscripten SDK/toolchain

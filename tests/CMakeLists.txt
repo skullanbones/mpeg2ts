@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 include(GoogleTest)
 
@@ -56,7 +56,10 @@ endif()
 # tests
 #-------------------
 # Now simply link against gtest, gmock, gtest_main or gmock_main as needed. Eg
-add_executable(${PROJECT_NAME})
+add_executable(
+    ${PROJECT_NAME}
+    gtest_main.cc
+)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MPEG2TS_DLL_EXPORTS)
 
@@ -64,7 +67,6 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        gtest_main.cc
         GetBits_Tests.cc
         Mpeg2VideoParser_Tests.cc
         PsiTables_Tests.cc
@@ -81,6 +83,9 @@ target_include_directories(
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/.
         ${CMAKE_CURRENT_BINARY_DIR}/..
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># Testing private src/headers
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># Testing private src/headers
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># Testing private src/headers
 )
 
 if(USE_DOCKER)

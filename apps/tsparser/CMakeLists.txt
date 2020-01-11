@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 project(
     tsparser
@@ -33,18 +33,18 @@ project(
     LANGUAGES CXX
 )
 
-add_executable(tsparser)
-
-target_sources(
+add_executable(
     ${PROJECT_NAME}
-    PRIVATE
-        src/main.cc
- )
+    src/main.cc
+)
 
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For TsParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># For H264Parser.h
 )
 
 target_link_libraries(

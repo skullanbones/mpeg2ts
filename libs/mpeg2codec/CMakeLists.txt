@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
 project(
     mpeg2codec
@@ -43,9 +43,10 @@ endif()
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.>  # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For EsParser.h
 )
 
 set_target_properties(
@@ -70,10 +71,6 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Mpeg2Codec.cc
 )
 
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
-        mpeg2ts # only for EsParser.h include
-)
 
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)

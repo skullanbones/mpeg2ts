@@ -24,16 +24,16 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 
-option(USE_CLANG_TIDY "Use clang-tidy for static code analysis" ON)
+option(USE_CLANG_TIDY "Use clang-tidy for static code analysis" OFF)
 
 if(NOT USE_CLANG_TIDY)
-    message(STATUS "Not using clang-tidy!")
+    message(STATUS "    Not using clang-tidy!")
     return()
 endif()
 
-message(STATUS "Using clang-tidy")
+message(STATUS "    Using clang-tidy")
 
 set(CLANG_VERSION 7)
 
@@ -43,7 +43,7 @@ find_program(
 )
 
 if(NOT CLANG_TIDY_EXE)
-    message(WARNING "   clang-tidy not found bailing out...")
+    message(WARNING "    clang-tidy not found bailing out...")
     return()
 else()
     message(STATUS "    clang-tidy found: ${CLANG_TIDY_EXE}")
