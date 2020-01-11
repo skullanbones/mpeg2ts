@@ -96,3 +96,28 @@ target_sources(
 
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)
+
+#-------------------
+# installation
+#-------------------
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/mpeg2ts.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Ts_IEC13818-1.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/TsUtilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/settings.json
+        ${CMAKE_CURRENT_BINARY_DIR}/mpeg2ts_export.h
+        DESTINATION include/${PROJECT_NAME}
+)
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION lib/cmake/${PROJECT_NAME}
+)
