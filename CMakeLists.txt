@@ -52,15 +52,6 @@ if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 endif()
 
-include(clang_format)
-include(cppcheck)
-include(iwyu)
-include(doxygen)
-include(emscripten)
-include(valgrind)
-include(clang_tidy)
-
-
 #-------------------
 # sub modules
 #-------------------
@@ -70,6 +61,18 @@ option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
 option(BUILD_SAMPLES "Build samples" ON)
 option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
 option(ENABLE_WEBASSEMBLY "Enable Web assembly code" OFF)
+
+#-------------------
+# cmake code
+#-------------------
+include(clang_format)
+include(cppcheck)
+include(iwyu)
+include(doxygen)
+include(valgrind)
+include(clang_tidy)
+include(emscripten)
+
 
 #-------------------
 # gcov code coverage
