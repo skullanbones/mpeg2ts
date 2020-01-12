@@ -46,7 +46,7 @@ endif()
 #-------------------
 # Locate GTest
 enable_testing()
-find_package(GTest REQUIRED)
+find_package(GTest MODULE)
 find_library(GMOCK_LIBRARY
              NAMES gmock
                    libgmock

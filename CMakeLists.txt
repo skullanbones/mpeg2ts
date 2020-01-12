@@ -90,6 +90,11 @@ include(valgrind)
 include(clang_tidy)
 include(emscripten)
 
+#-------------------
+# third-party
+#-------------------
+add_subdirectory(3rd-party)
+
 
 #-------------------
 # gcov code coverage
@@ -114,11 +119,6 @@ endif()
 if(ENABLE_COMPONENT_TESTS)
     add_subdirectory(component_tests)
 endif()
-
-#-------------------
-# third-party
-#-------------------
-add_subdirectory(3rd-party)
 
 
 if(NOT CMAKE_INSTALL_BINDIR)
