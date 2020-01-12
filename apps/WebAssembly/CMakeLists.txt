@@ -9,7 +9,10 @@ project(
 
 add_definitions(-std=c++11 -O3)
 
-add_executable(${PROJECT_NAME})
+add_executable(
+    ${PROJECT_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
+)
 
 #if(JS_ONLY)
 #    message(STATUS "Setting compilation target to native JavaScript")
@@ -27,12 +30,9 @@ target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-target_sources(
-    ${PROJECT_NAME}
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For TsParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># For H264Parser.h
 )
 
 target_link_libraries(${PROJECT_NAME} 
