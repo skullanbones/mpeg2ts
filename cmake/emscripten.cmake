@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
 if(NOT ENABLE_WEBASSEMBLY)
     message(STATUS "    Not using emscripten!")

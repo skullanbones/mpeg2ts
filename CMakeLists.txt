@@ -24,14 +24,31 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2ts
     VERSION 0.5.0
     DESCRIPTION "Main project for MPEG-2 Parsing of transport streams"
     LANGUAGES CXX
 )
+else()
+project(
+    mpeg2ts
+    VERSION 0.5.0
+    LANGUAGES CXX
+)
+endif()
+
+# Set Language Standard
+# Require C++11 and disable extensions for all targets
+if(CMAKE_MINOR_VERSION LESS 8)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
 
 include(CTest)
 

@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
 option(USE_CPPCHECK "Use cppcheck for static code analysis" OFF)
 
@@ -52,9 +52,11 @@ endif()
 # get all project files
 file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h *.cc)
 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+if(CMAKE_MINOR_VERSION GREATER 5)
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+endif()
 
 add_custom_target(
     cppcheck

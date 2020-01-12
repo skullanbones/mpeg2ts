@@ -24,24 +24,33 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
-include(GoogleTest)
-
+if(CMAKE_MINOR_VERSION GREATER 9)
+include(GoogleTest) # Introduced in CMake 3.10
 project(
     run_gtests
     VERSION 0.5.0
     DESCRIPTION "GTests for mpeg2ts lib"
     LANGUAGES CXX
 )
+else()
+project(
+    run_gtests
+    VERSION 0.5.0
+    LANGUAGES CXX
+)
+endif()
+
 
 #-------------------
 # Locate GTest
-find_package(GTest MODULE)
+enable_testing()
+find_package(GTest REQUIRED)
 find_library(GMOCK_LIBRARY
-             NAMES gmock 
-                   libgmock 
-                   libgmock.a 
+             NAMES gmock
+                   libgmock
+                   libgmock.a
              PATHS "${GTEST_DIR}"
              PATH_SUFFIXES lib
 )
@@ -49,7 +58,7 @@ find_library(GMOCK_LIBRARY
 include_directories(${GTEST_INCLUDE_DIRS})
 
 if (NOT GTest_FOUND)
-    message(STATUS "Could NOT Find GTest")
+    message(WARNING "    Could NOT Find GTest")
 endif()
 
 #-------------------
@@ -63,7 +72,9 @@ add_executable(
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MPEG2TS_DLL_EXPORTS)
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+endif()
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -93,15 +104,15 @@ if(USE_DOCKER)
 else(USE_DOCKER)
     find_package(Threads REQUIRED)
     target_link_libraries(
-        ${PROJECT_NAME} 
+        ${PROJECT_NAME}
         PRIVATE
-            Threads::Threads 
+            Threads::Threads
             gmock
     )
 endif(USE_DOCKER)
 
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
         mpeg2ts
         mpeg2codec
         h264codec
@@ -112,13 +123,17 @@ if(GTEST_HAVE_DISCOVERY)
   gtest_discover_tests(${PROJECT_NAME} TEST_PREFIX ${exportname}. TEST_LIST
                        ${PROJECT_NAME}_targets)
 else()
-  gtest_add_tests(
-    TARGET
-    ${PROJECT_NAME}
-    SOURCES
-    ${TARGET_SOURCES}
-    TEST_PREFIX
-    ${exportname}.
-    TEST_LIST
-    ${PROJECT_NAME}_targets)
+    if(CMAKE_MINOR_VERSION GREATER 8)
+    # For CMake 3.9 onwards
+        gtest_add_tests(
+            TARGET
+            ${PROJECT_NAME}
+            SOURCES
+            ${TARGET_SOURCES}
+            TEST_PREFIX
+            ${exportname}.
+            TEST_LIST
+            ${PROJECT_NAME}_targets
+        )
+    endif()
 endif()
