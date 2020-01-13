@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest, ubuntu-16.04]
+        os: [macOS-latest, windows-latest]
     steps:
     - uses: actions/checkout@v1
     - name: check versions
