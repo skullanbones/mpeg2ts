@@ -24,7 +24,7 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
 #-------------------
 # tests
@@ -48,7 +48,9 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
     )
 
-    target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
+    if(CMAKE_MINOR_VERSION GREATER 7)
+        target_compile_features(${TARGET_NAME} PRIVATE cxx_std_11)
+    endif()
 
     set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_BENCH_EXEC}) 
     find_package(Threads REQUIRED)

@@ -24,14 +24,22 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2codec
     VERSION 0.5.0
     DESCRIPTION "MPEG2 Codec parser lib"
     LANGUAGES CXX
 )
+else()
+project(
+    mpeg2codec
+    VERSION 0.5.0
+    LANGUAGES CXX
+)
+endif()
 
 add_library(${PROJECT_NAME})
 
@@ -59,7 +67,9 @@ set_target_properties(
     DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+endif()
 
 target_sources(
     ${PROJECT_NAME}

@@ -24,14 +24,22 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     tsparser
     VERSION 0.5.0
     DESCRIPTION "MPEG-2 CLI Parsing of transport streams"
     LANGUAGES CXX
 )
+else()
+project(
+    tsparser
+    VERSION 0.5.0
+    LANGUAGES CXX
+)
+endif()
 
 add_executable(
     ${PROJECT_NAME}
@@ -62,4 +70,6 @@ set_target_properties(
     DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11) # Available in CMake 3.8
+endif()

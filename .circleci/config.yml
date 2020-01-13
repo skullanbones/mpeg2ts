@@ -34,6 +34,40 @@ jobs:
           paths:
             - Debug
             - Release
+  build-16.04:
+    docker:
+      - image: heliconwave/circleci-ubuntu-16.04:latest
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Print Container Metadata
+          command: lsb_release -a
+      - run:
+          name: Build CMake Debug
+          command: mkdir Debug && cd Debug/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j$(nproc)
+      - run:
+          name: Build CMake Release
+          command: mkdir Release && cd Release/ && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DENABLE_TESTS=OFF .. && cmake --build . -- -j$(nproc)
+      - run:
+          name: Creating Artifacts
+          command:
+            cpack --version &&
+            echo "include(\"Release/CPackConfig.cmake\")" > CPackConfig.cmake &&
+            echo "set(CPACK_INSTALL_CMAKE_PROJECTS" >> CPackConfig.cmake &&
+            echo "  \"Debug;mpeg2ts;ALL;/\"" >> CPackConfig.cmake &&
+            echo "  \"Release;mpeg2ts;ALL;/\"" >> CPackConfig.cmake &&
+            echo "  )" >> CPackConfig.cmake &&
+            cat CPackConfig.cmake &&
+            cpack --config CPackConfig.cmake
+      - store_artifacts:
+          path: /root/project/mpeg2ts-0.5.0-Linux.tar.gz
+      - persist_to_workspace:
+          root: /root/project
+          paths:
+            - Debug
+            - Release
   # build-webassembly:
   #   docker:
   #     - image: heliconwave/emscripten:latest
@@ -45,6 +79,17 @@ jobs:
   test-unit:
     docker:
       - image: heliconwave/circleci-ubuntu-18.04:latest
+    working_directory: ~/project
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /root/project
+      - run:
+          name: Run CTest
+          command: pwd && ls -ltrha && cd Debug/ && make unit-tests
+  test-unit-16.04:
+    docker:
+      - image: heliconwave/circleci-ubuntu-16.04:latest
     working_directory: ~/project
     steps:
       - checkout
@@ -89,10 +134,14 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build
+      - build-16.04
       # - build-webassembly
       - test-unit:
           requires:
             - build
+      - test-unit-16.04:
+          requires:
+            - build-16.04
       - test-component:
           requires:
             - build
