@@ -17,5 +17,3 @@ jobs:
       run : mkdir build; cd build; cmake -DENABLE_COMPONENT_TESTS=OFF ..
     - name: cmake build
       run: cd build/; ls; pwd; cmake --build .
-    - name: run unit-tests
-      run: cd build/; ls; pwd; cmake --build . --target unit-tests
