@@ -87,6 +87,17 @@ jobs:
       - run:
           name: Run CTest
           command: pwd && ls -ltrha && cd Debug/ && make unit-tests
+  test-unit-16.04:
+    docker:
+      - image: heliconwave/circleci-ubuntu-16.04:latest
+    working_directory: ~/project
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /root/project
+      - run:
+          name: Run CTest
+          command: pwd && ls -ltrha && cd Debug/ && make unit-tests
   test-component:
     docker:
       - image: heliconwave/circleci-ubuntu-18.04:latest
