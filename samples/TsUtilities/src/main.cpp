@@ -38,6 +38,10 @@
 
 namespace tsutil {
 
+/*
+* This is the callback for each video package containing codec data.
+* Note this is only of interest if we would like parse the codec data.
+*/
 void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 {
     try
@@ -133,6 +137,10 @@ void handleVideoCallback(const std::vector<uint8_t>& data, int streamType)
 
 } // namespace tsutil
 
+/*
+* This program takes a transport stream as argument. Example:
+* ./sample_tsutilities my_transport_stream.ts
+*/
 int main(int argc, char *argv[])
 {
     std::string asset;
@@ -146,14 +154,24 @@ int main(int argc, char *argv[])
         asset = argv[1];
     }
 
+    /*
+    * This is the TsUitilities API that we use to parse the transport stream file.
+    */
     tsutil::TsUtilities util; // TsUtilities High level API
 
+    /*
+    * We only need to register a video callback if we would like to parse the video codec.
+    * This is not always the case, so this step can be skipped.
+    */
     util.addVideoCallback(
         [&](const std::vector<uint8_t>& a_data, int a_streamType) {
             tsutil::handleVideoCallback(a_data, a_streamType);
         }
     );
 
+    /*
+    * This API will parse the entire transport stream file.
+    */
     bool success = util.parseTransportFile(argv[1]);
     LOGD << "Starting parser of file";
     if (!success)
@@ -162,13 +180,27 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    /*
+    * Returns the PAT table for this stream if existing.
+    */
     mpeg2ts::PatTable pat = util.getPatTable();
     LOGD << "Got PAT: " << pat;
 
+    /*
+    * All programs can be found in the Program Map Table (PMT)
+    * which this API returns. We can have MPTS or SPTS.
+    */
     std::vector<uint16_t> pmtPids = util.getPmtPids();
 
+    /*
+    * The PMTs themselves caries PMT specific data, for more info check
+    * https://en.wikipedia.org/wiki/Program-specific_information#PMT_(Program_map_specific_data)
+    */
     std::map<int, mpeg2ts::PmtTable> pmtTables = util.getPmtTables();
 
+    /*
+    * PMTs also contains Elementary stream specific data 
+    */
     for (auto pid : pmtPids)
     {
         std::cout << "Got PMT pid: " << pid;
@@ -178,18 +210,28 @@ int main(int argc, char *argv[])
         }
     }
 
+    /*
+    * Log the PMTs
+    */
     for (auto table : pmtTables)
     {
         LOGD << "PMT PID: " << table.first;
         LOGD << table.second;
     }
 
+    /*
+    * This are the streams for the program. It can also be found in the PMT,
+    * but this API can also be used.
+    */
     std::vector<uint16_t> mEsPids = util.getEsPids();
     for (auto esPid : mEsPids)
     {
         LOGD << "Found elementary stream with Pid: " << esPid;
     }
 
+    /*
+    * These are the streams packed in PES. They are sorted per PID.
+    */
     std::map<int, std::vector<mpeg2ts::PesPacket>> pesPackets = util.getPesPackets();
 
     LOGD << "Got number of PES packets: " << pesPackets.size();
@@ -200,6 +242,9 @@ int main(int argc, char *argv[])
         LOGD << "Size of PES packets: " << pes.second.size();
     }
 
+    /*
+    * getPidStatistics returns statistics for the transport stream file.
+    */
     mpeg2ts::PidStatisticsMap stat = util.getPidStatistics();
 
     for (auto pid : stat)
