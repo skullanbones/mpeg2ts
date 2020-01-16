@@ -25,6 +25,12 @@
 *
 ********************************************************************/
 
+// This sample parses a ts file using TsUtilties hight level API.
+// It finds PAT, PMT, PES packets and print statistics.
+// Use of this high level API(tsutil::TsUtilities) is not very
+// practical/efficient but simple. To achieve efficieny, mpeg2ts API
+// is recommended.
+
 #include "TsUtilities.h"
 #include "mpeg2ts.h"
 
