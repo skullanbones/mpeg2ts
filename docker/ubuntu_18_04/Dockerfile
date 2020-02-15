@@ -133,4 +133,5 @@ RUN em++ --version
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-WORKDIR /tmp/workspace
+# WORKDIR /tmp/workspace
+RUN adduser docker

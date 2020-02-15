@@ -5,29 +5,46 @@
 	"image": "heliconwave/mpeg2ts-ubuntu-18.04:latest",
 	// The optional 'runArgs' property can be used to specify additional runtime arguments.
 	"runArgs": [
-		// "--env LOCAL_USER_ID=1000",
+		// "--env LOCAL_USER_ID=${localEnv:UID}"
 		// Uncomment the line if you will use a ptrace-based debugger like C++, Go, and Rust.
 		// "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined",
 
 		// Uncomment the next line to use a non-root user. See https://aka.ms/vscode-remote/containers/non-root-user.
-		// "-u", "1000"
+		// "-u", "docker"
 	],
 
+	// Runs in the end after image setup
+	// "postCreateCommand": "/bin/bash /usr/local/bin/entrypoint.sh",
+
+	// Container user VS Code should use when connecting
+	"remoteUser": "docker",
+
+	// Uncomment the next line if you want to publish any ports for example
+	// for remote debugging
+	// "appPort": [1234],
+
+	// "containerEnv": {
+	// 	"LOCAL_USER_ID": "${localEnv:UID}"
+	// },
+
+	// Set environment variables for VS Code and sub-processes
+	// "remoteEnv": {
+	// 	"LOCAL_USER_ID": "${localEnv:UID}"
+	// },
+
+	// Any *default* container specific VS Code settings
 	// Terminal shell
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash"
 	},
 
-	// Container user
-	"remoteUser": "docker",
-
-	// Uncomment the next line if you want to publish any ports.
-	// "appPort": [],
-
-	// Uncomment the next line if you want to add in default container specific settings.json values
-	// "settings":  { "workbench.colorTheme": "Quiet Light" },
-
-
-	// Add the IDs of any extensions you want installed in the array below.
-	"extensions": []
+	// An array of extension IDs that specify the extensions to
+  	// install inside the container when you first attach to it.
+	"extensions": [
+		"ms-vscode.cmake-tools", 
+		"twxs.cmake", 
+		"ms-vscode.cpptools",
+		"cheshirekow.cmake-format",
+		"austin.code-gnu-global"
+	]
 }
