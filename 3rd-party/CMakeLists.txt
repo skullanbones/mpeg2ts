@@ -66,6 +66,10 @@ ExternalProject_Add(
 #-------------------------------------------------------------
 if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     message("NOT using Docker! Downloading & configuring google test...")
+    if (APPLE)
+        set(CMAKE_CXX_STANDARD 11)
+        message("Setting CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+    endif(APPLE)
 
     # Download and unpack googletest at configure time
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
