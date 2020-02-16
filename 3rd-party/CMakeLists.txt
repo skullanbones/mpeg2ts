@@ -65,7 +65,11 @@ ExternalProject_Add(
 # Taken from https://github.com/google/googletest/tree/master/googletest#incorporating-into-an-existing-cmake-project
 #-------------------------------------------------------------
 if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
-    message(STATUS "NOT using Docker! Downloading & configuring google test...")
+    message("NOT using Docker! Downloading & configuring google test...")
+    if (APPLE)
+        message("Setting CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+        set(CMAKE_CXX_STANDARD 11)
+    endif(APPLE)
 
     # Download and unpack googletest at configure time
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
