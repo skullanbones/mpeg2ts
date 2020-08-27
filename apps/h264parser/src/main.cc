@@ -25,6 +25,8 @@
 *
 ******************************************************************/
 #include <getopt.h>
+#include <vector>
+#include <string>
 
 // 3rd-party
 #include <plog/Appenders/ConsoleAppender.h>
