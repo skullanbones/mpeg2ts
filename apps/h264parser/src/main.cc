@@ -163,15 +163,22 @@ int main(int argc, char** argv)
     } // for
 
 
-    std::ifstream file(g_InputFile);
-    std::vector<uint8_t> newVec;
+    std::ifstream file(g_InputFile, std::ifstream::binary);
+    std::vector<uint8_t> dataVec;
     uint8_t byte;
-    while(file >> byte){
-        newVec.push_back(byte);
+    if (file.is_open()) {
+        while(file >> byte){
+            dataVec.push_back(byte);
+        }
+    }
+    else {
+        LOGE << "Unable to open file!";
+        file.close();
+        exit(EXIT_SUCCESS);
     }
 
     h264::H264EsParser h264Parser;
-    std::vector<h264::EsInfoH264> infos = h264Parser.parse(newVec);
+    std::vector<h264::EsInfoH264> infos = h264Parser.parse(dataVec);
 
     for (auto info : infos)
     {
@@ -201,4 +208,6 @@ int main(int argc, char** argv)
             LOGD << "sps id: " << info.pps.spsId << "pps id: " << info.pps.ppsId;
         }
     }
+
+    file.close();
 }
