@@ -2,7 +2,7 @@
 #
 #    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
 #
-#    mpeg2ts - mpeg2 apps
+#    mpeg2ts - mpeg2ts tsparser
 #
 #    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
 #
@@ -24,12 +24,51 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-if(ENABLE_WEBASSEMBLY)
-    add_subdirectory(WebAssembly)
+cmake_minimum_required(VERSION 3.5)
+
+if(CMAKE_MINOR_VERSION GREATER 9)
+project(
+    h264parser
+    VERSION 0.5.0
+    DESCRIPTION "CLI Parsing of h264 stream"
+    LANGUAGES CXX
+)
+else()
+project(
+    h264parser
+    VERSION 0.5.0
+    LANGUAGES CXX
+)
 endif()
 
-# only build tsparser on UNIX (getopt only exist in Linux)
-if (UNIX)
-    add_subdirectory(tsparser)
-    add_subdirectory(h264parser)
-endif(UNIX)
+add_executable(
+    ${PROJECT_NAME}
+    src/main.cc
+)
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For TsParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># For H264Parser.h
+)
+
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PRIVATE 
+        h264codec
+        mpeg2ts # For GetBits() Should actually be moved out to its own lib
+)
+
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    DEBUG_POSTFIX "-d"
+)
+
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11) # Available in CMake 3.8
+endif()

@@ -114,34 +114,15 @@ NONE
 ```
 where VERBOSE is the maximum log output as compared to NONE which generates no output. The default log output file is `mpeg2ts_log.csv` in csv style for easier use.
 
-## Tsparser
-### How to run it
-Type `make help` to see all make targets. To start runing the lib:
-```
-cd build/
-make all
-cd ..
-./build/apps/tsparser/tsparser --input assets/test1.ts
-```
-Check help in command line (CLI):
-```
-./build/apps/tsparser/tsparser --help
-```
-Add option --write with the PES PID for writing PES packets to file.
-```
-./build/apps/tsparser/tsparser --write 2504 --input assets/bbc_one.ts
-```
-Just print PSI tables / PES header can be done by --pid option and the PID.
-```
-./build/apps/tsparser/tsparser --pid 258 --input assets/bbc_one.ts
-```
+## Apps
+For more info on how to use the apps like `tsparser` or `h264parser` please check [README](apps/README.md).
 
 ## Docker
 To simplify building mpeg2ts, building dependencies and tools have been bundled into a docker container. This image can be build locally or downloaded from docker hub. To start using docker commands, simplest is to source the tool
 
     source docker/docker-commands.sh
 
-Check `docker/` README for more information.
+Check [README](docker/README.md) for more information.
 
 ## Tests
 In order to run all tests just type (currently only available under Linux):
