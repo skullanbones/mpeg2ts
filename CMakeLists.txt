@@ -191,13 +191,15 @@ add_subdirectory(libs)
 #-------------------
 # add custom targets
 #-------------------
-add_custom_target(unit-tests
-    COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
-)
+if (ENABLE_TESTS)
+    add_custom_target(unit-tests
+        COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+    )
 
-add_custom_target(benchmark-tests
-    COMMAND ./bench/Parser_Benchmark
-)
+    add_custom_target(benchmark-tests
+        COMMAND ./bench/Parser_Benchmark
+    )
+endif(ENABLE_TESTS)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
