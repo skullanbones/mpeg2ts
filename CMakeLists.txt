@@ -73,8 +73,8 @@ endif()
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-option(ENABLE_TESTS "Build with tests" ON)
-option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+option(ENABLE_TESTS "Build with tests" OFF)
+option(ENABLE_COMPONENT_TESTS "Build with component tests" OFF)
 option(BUILD_SAMPLES "Build samples" ON)
 option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
 option(ENABLE_WEBASSEMBLY "Enable Web assembly code" OFF)
@@ -191,13 +191,15 @@ add_subdirectory(libs)
 #-------------------
 # add custom targets
 #-------------------
-add_custom_target(unit-tests
-    COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
-)
+if (ENABLE_TESTS)
+    add_custom_target(unit-tests
+        COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+    )
 
-add_custom_target(benchmark-tests
-    COMMAND ./bench/Parser_Benchmark
-)
+    add_custom_target(benchmark-tests
+        COMMAND ./bench/Parser_Benchmark
+    )
+endif(ENABLE_TESTS)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("mpeg2tsConfigVersion.cmake"
