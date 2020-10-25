@@ -12,7 +12,7 @@ jobs:
           command: lsb_release -a
       - run:
           name: Build CMake Debug
-          command: mkdir Debug && cd Debug/ && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j$(nproc)
+          command: mkdir Debug && cd Debug/ && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS=ON -DENABLE_COMPONENT_TESTS=ON .. && cmake --build . -- -j$(nproc)
       - run:
           name: Build CMake Release
           command: mkdir Release && cd Release/ && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DENABLE_TESTS=OFF .. && cmake --build . -- -j$(nproc)
