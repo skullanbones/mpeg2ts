@@ -126,11 +126,15 @@ Check [README](docker/README.md) for more information.
 
 ## Tests
 In order to run all tests just type (currently only available under Linux):
-```Bash
-make component-tests
-make component-benchmark-tests
-make unit-tests
-```
+
+    cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS=ON -DENABLE_COMPONENT_TESTS=ON ..
+
+Building:
+
+    make component-tests
+    make component-benchmark-tests
+    make unit-tests
+
 This will run component tests, benchmark and unit-tests. Component tests are developed via `pytest` while the unit tests are via google tests/mocks (`gtest`). The different layers like API, and tsutilities are tested as a component (the whole library as such) while class functions are tested as a unit.
 
 ## Windows
