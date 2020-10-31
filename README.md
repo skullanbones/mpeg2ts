@@ -131,6 +131,7 @@ In order to run all tests just type (currently only available under Linux):
 
 Building:
 
+    make -j $(nproc)
     make component-tests
     make component-benchmark-tests
     make unit-tests
