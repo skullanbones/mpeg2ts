@@ -93,6 +93,8 @@ include(emscripten)
 #-------------------
 # third-party
 #-------------------
+set(PLOG_VERSION 1.1.5)
+set(NLOHMANN_VERSION 3.9.1)
 add_subdirectory(3rd-party)
 
 
@@ -173,9 +175,6 @@ endif()
 #-------------------
 # 3rd-party
 #-------------------
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
-
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 

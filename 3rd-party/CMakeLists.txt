@@ -26,8 +26,6 @@
 #*******************************************************************/
 cmake_minimum_required(VERSION 3.0)
 project(3rd-party)
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
 
 
 # Must use GNUInstallDirs to install libraries into correct
