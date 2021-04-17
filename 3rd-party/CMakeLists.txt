@@ -26,8 +26,6 @@
 #*******************************************************************/
 cmake_minimum_required(VERSION 3.0)
 project(3rd-party)
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
 
 
 # Must use GNUInstallDirs to install libraries into correct
@@ -44,7 +42,7 @@ ExternalProject_Add(
     INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/plog-${PLOG_VERSION}
     CMAKE_ARGS  -D CMAKE_BUILD_TYPE=Release
                 -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-                -D BUILD_SAMPLES=OFF
+                -D PLOG_BUILD_SAMPLES=OFF
 )
 
 ############# nlohmann/json
