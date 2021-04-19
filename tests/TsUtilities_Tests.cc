@@ -179,7 +179,7 @@ TEST_F(TsUtilitiesTest, test_parseTransportFile_success)
 {
     try
     {
-        EXPECT_TRUE(m_tsUtil.parseTransportFile(asset_file));
+        EXPECT_TRUE(m_tsUtil.parseTransportFile(asset_file)) << "failed to parse file " << asset_file;
         mpeg2ts::PatTable pat;
         pat = m_tsUtil.getPatTable();
         std::vector<uint16_t> pmtPids;
@@ -254,7 +254,7 @@ TEST_F(TsUtilitiesTest, test_VideoMediaInfo)
 {
     try
     {
-        EXPECT_TRUE(m_tsUtil.parseTransportFile(asset_file));
+        EXPECT_TRUE(m_tsUtil.parseTransportFile(asset_file)) << "failed to parse file " << asset_file;
         VideoMediaInfo mediaInfo = m_tsUtil.getVideoMediaInfo();
         EXPECT_EQ(mediaInfo.PID, 2304);
         EXPECT_EQ(mediaInfo.mediaType, MediaType::Video);
