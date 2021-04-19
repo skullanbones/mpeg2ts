@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     h264codec
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "H264 Codec parser lib"
     LANGUAGES CXX
 )
 else()
 project(
     h264codec
-    VERSION 0.5.0
+    VERSION 0.6.0
     LANGUAGES CXX
 )
 endif()
