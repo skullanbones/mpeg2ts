@@ -24,16 +24,16 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
-option(USE_CLANG_TIDY "Use clang-tidy for static code analysis" ON)
+option(USE_CLANG_TIDY "Use clang-tidy for static code analysis" OFF)
 
 if(NOT USE_CLANG_TIDY)
-    message(STATUS "Not using clang-tidy!")
+    message(STATUS "    Not using clang-tidy!")
     return()
 endif()
 
-message(STATUS "Using clang-tidy")
+message(STATUS "    Using clang-tidy")
 
 set(CLANG_VERSION 7)
 
@@ -43,7 +43,7 @@ find_program(
 )
 
 if(NOT CLANG_TIDY_EXE)
-    message(WARNING "   clang-tidy not found bailing out...")
+    message(WARNING "    clang-tidy not found bailing out...")
     return()
 else()
     message(STATUS "    clang-tidy found: ${CLANG_TIDY_EXE}")
@@ -64,11 +64,13 @@ message(STATUS "    Command         : ${DO_CLANG_TIDY}")
 # get all project files
 file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h *.cc)
 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Release")
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Debug")
+if(CMAKE_MINOR_VERSION GREATER 5)
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Release")
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "Debug")
+endif()
 
 # src/*.cc -checks=* -- -std=c++11 -I/usr/include/c++/5/ -I./include
 

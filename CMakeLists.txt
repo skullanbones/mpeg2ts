@@ -24,14 +24,31 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2ts
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "Main project for MPEG-2 Parsing of transport streams"
     LANGUAGES CXX
 )
+else()
+project(
+    mpeg2ts
+    VERSION 0.6.0
+    LANGUAGES CXX
+)
+endif()
+
+# Set Language Standard
+# Require C++11 and disable extensions for all targets
+if(CMAKE_MINOR_VERSION LESS 8)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
 
 include(CTest)
 
@@ -52,24 +69,34 @@ if(NOT "${CMAKE_CURRENT_LIST_DIR}/cmake" IN_LIST CMAKE_MODULE_PATH)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 endif()
 
-include(clang_format)
-include(cppcheck)
-include(iwyu)
-include(doxygen)
-include(emscripten)
-include(valgrind)
-include(clang_tidy)
-
-
 #-------------------
 # sub modules
 #-------------------
 set(BENCHMARK_ENABLE_TESTING OFF)
-option(ENABLE_TESTS "Build with tests" ON)
-option(ENABLE_COMPONENT_TESTS "Build with component tests" ON)
+option(ENABLE_TESTS "Build with tests" OFF)
+option(ENABLE_COMPONENT_TESTS "Build with component tests" OFF)
 option(BUILD_SAMPLES "Build samples" ON)
 option(ENABLE_COVERAGE "Enable GCOV code coverage" OFF)
 option(ENABLE_WEBASSEMBLY "Enable Web assembly code" OFF)
+
+#-------------------
+# cmake code
+#-------------------
+include(clang_format)
+include(cppcheck)
+include(iwyu)
+include(doxygen)
+include(valgrind)
+include(clang_tidy)
+include(emscripten)
+
+#-------------------
+# third-party
+#-------------------
+set(PLOG_VERSION 1.1.5)
+set(NLOHMANN_VERSION 3.9.1)
+add_subdirectory(3rd-party)
+
 
 #-------------------
 # gcov code coverage
@@ -94,11 +121,6 @@ endif()
 if(ENABLE_COMPONENT_TESTS)
     add_subdirectory(component_tests)
 endif()
-
-#-------------------
-# third-party
-#-------------------
-add_subdirectory(3rd-party)
 
 
 if(NOT CMAKE_INSTALL_BINDIR)
@@ -153,9 +175,6 @@ endif()
 #-------------------
 # 3rd-party
 #-------------------
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
-
 include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
 include_directories(3rd-party/plog-${PLOG_VERSION}/include)
 
@@ -171,40 +190,21 @@ add_subdirectory(libs)
 #-------------------
 # add custom targets
 #-------------------
-add_custom_target(unit-tests
-    COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
-)
+if (ENABLE_TESTS)
+    if (MSVC)
+        add_custom_target(unit-tests
+            COMMAND ./tests/${CMAKE_BUILD_TYPE}/run_gtests.exe "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+        )
+    else()
+        add_custom_target(unit-tests
+            COMMAND ./tests/run_gtests "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+        )
+    endif(MSVC)
 
-add_custom_target(benchmark-tests
-    COMMAND ./bench/Parser_Benchmark
-)
-
-#-------------------
-# installation
-#-------------------
-if(NOT WIN32)
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(FILES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/mpeg2ts.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/Ts_IEC13818-1.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/TsUtilities.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs/mpeg2ts/include/settings.json
-        ${CMAKE_CURRENT_BINARY_DIR}/libs/mpeg2ts/mpeg2ts_export.h
-        DESTINATION include/${PROJECT_NAME}
-)
-
-install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        NAMESPACE ${PROJECT_NAME}::
-        DESTINATION lib/cmake/${PROJECT_NAME}
-)
-endif()
+    add_custom_target(benchmark-tests
+        COMMAND ./bench/Parser_Benchmark
+    )
+endif(ENABLE_TESTS)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("mpeg2tsConfigVersion.cmake"

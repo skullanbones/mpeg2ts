@@ -26,8 +26,6 @@
 #*******************************************************************/
 cmake_minimum_required(VERSION 3.0)
 project(3rd-party)
-set(PLOG_VERSION 1.1.4)
-set(NLOHMANN_VERSION 3.5.0)
 
 
 # Must use GNUInstallDirs to install libraries into correct
@@ -44,7 +42,7 @@ ExternalProject_Add(
     INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/plog-${PLOG_VERSION}
     CMAKE_ARGS  -D CMAKE_BUILD_TYPE=Release
                 -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-                -D BUILD_SAMPLES=OFF
+                -D PLOG_BUILD_SAMPLES=OFF
 )
 
 ############# nlohmann/json
@@ -64,8 +62,12 @@ ExternalProject_Add(
 #-------------------------------------------------------------
 # Taken from https://github.com/google/googletest/tree/master/googletest#incorporating-into-an-existing-cmake-project
 #-------------------------------------------------------------
-if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
+if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
     message("NOT using Docker! Downloading & configuring google test...")
+    if (APPLE)
+        set(CMAKE_CXX_STANDARD 11)
+        message("Setting CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+    endif(APPLE)
 
     # Download and unpack googletest at configure time
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
@@ -99,13 +101,13 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     if (CMAKE_VERSION VERSION_LESS 2.8.11)
         include_directories("${gtest_SOURCE_DIR}/include")
     endif()
-endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
+endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
 
 
 ############ google benchmark
 
 
-if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
+if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
     message("NOT using Docker! Downloading & configuring google benchmark...")
 
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable GTest")
@@ -147,4 +149,4 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
     if (CMAKE_VERSION VERSION_LESS 2.8.11)
         include_directories("${gtest_SOURCE_DIR}/include")
     endif()
-endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY)
+endif(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)

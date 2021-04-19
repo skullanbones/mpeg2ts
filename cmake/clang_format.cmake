@@ -24,16 +24,16 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
-option(USE_CLANG_FORMAT "Use clang-format for formatting c++ files" ON)
+option(USE_CLANG_FORMAT "Use clang-format for formatting c++ files" OFF)
 
 if(NOT USE_CLANG_FORMAT)
-    message(STATUS "Not using clang-tidy!")
+    message(STATUS "    Not using clang-tidy!")
     return()
 endif()
 
-message(STATUS "Using clang-format")
+message(STATUS "    Using clang-format")
 
 set(CLANG_VERSION 7)
 
@@ -44,7 +44,7 @@ find_program(
 )
 
 if(NOT CLANG_FORMAT_EXE)
-    message(WARNING "clang-format not found on your system. Bailing out...")
+    message(WARNING "    clang-format not found on your system. Bailing out...")
     return()
 else()
     message(STATUS "    clang-format found: ${CLANG_FORMAT_EXE}")
@@ -55,9 +55,13 @@ endif()
 # get all project files
 file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h *.cc)
 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
-list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+if(CMAKE_MINOR_VERSION GREATER 5)
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "3rd-party") 
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "gtest")
+    list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX "build")
+else()
+
+endif()
 
 add_custom_target(
     clang-format

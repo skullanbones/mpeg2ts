@@ -47,3 +47,55 @@ docker-image:
 		--file=$(DOCKER_IMAGE_BASE)/Dockerfile \
 		--tag=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VER) \
 		--tag=$(DOCKER_IMAGE_NAME):latest ./
+
+docker-image-circleci:
+	docker build \
+		--file=$(DOCKER_IMAGE_BASE)/circleci/Dockerfile \
+		--tag=heliconwave/circleci-ubuntu-18.04:v1 \
+		--tag=heliconwave/circleci-ubuntu-18.04:latest ./
+
+docker-image-ubuntu-16.04:
+	docker build \
+		--file=ubuntu_16_04/Dockerfile \
+		--tag=heliconwave/mpeg2ts-ubuntu-16.04:v2 \
+		--tag=heliconwave/mpeg2ts-ubuntu-16.04:latest ./
+
+docker-image-circleci-ubuntu-16.04:
+	docker build \
+		--file=ubuntu_16_04/circleci/Dockerfile \
+		--tag=heliconwave/circleci-ubuntu-16.04:v1 \
+		--tag=heliconwave/circleci-ubuntu-16.04:latest ./
+
+docker-bash-ubuntu-16.04:
+	docker run \
+		--rm \
+		--interactive \
+		--tty=true \
+		--env LOCAL_USER_ID=`id -u ${USER}` \
+		--env "TERM=xterm-256color" \
+		--volume=$$(pwd)/..:/home/docker/workspace \
+		--workdir=/home/docker/workspace \
+		heliconwave/mpeg2ts-ubuntu-16.04:latest /bin/bash
+
+docker-bash-circleci-ubuntu-16.04:
+	docker run \
+		--rm \
+		--interactive \
+		--tty=true \
+		--env LOCAL_USER_ID=`id -u ${USER}` \
+		--env "TERM=xterm-256color" \
+		--volume=$$(pwd)/..:/home/docker/workspace \
+		--workdir=/home/docker/workspace \
+		heliconwave/circleci-ubuntu-16.04:latest /bin/bash
+
+
+docker-bash-circleci-ubuntu-18.04:
+	docker run \
+		--rm \
+		--interactive \
+		--tty=true \
+		--env LOCAL_USER_ID=`id -u ${USER}` \
+		--env "TERM=xterm-256color" \
+		--volume=$$(pwd)/..:/home/docker/workspace \
+		--workdir=/home/docker/workspace \
+		heliconwave/circleci-ubuntu-18.04:latest /bin/bash

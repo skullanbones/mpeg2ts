@@ -8,12 +8,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest]
+        os: [macos-10.15, windows-latest]
     steps:
     - uses: actions/checkout@v1
     - name: check versions
       run: cmake --version
     - name: cmake configure
-      run : mkdir build; cd build; cmake -DENABLE_COMPONENT_TESTS=OFF ..
+      run : mkdir build; cd build; cmake -DENABLE_TESTS=ON -DENABLE_COMPONENT_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug ..
     - name: cmake build
-      run: cd build/; ls; pwd; cmake --build .
+      run: cd build/; pwd; cmake --build .
+    - name: cmake run unit tests
+      run: cd build/; cmake --build . --target unit-tests

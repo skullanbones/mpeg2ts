@@ -1,5 +1,16 @@
 # Releases
 
+*V0.6.0*
+* [x] Add broader support
+* [x] Fix emscripten with CMake
+* [x] Add support Ubuntu 16.04
+* [x] Better comments in samples
+* [x] Add remote container development environment
+* [x] Fix some suggestions
+* [x] Add H264 parser application
+* [x] Update third-party libs Plog and Json to latest version
+* [x] Enable CI testing for Windows and Mac   
+
 *V0.5.0*
 * [x] Add github workflow: Crosscompilation Mac, Windows
 * [x] Cleanup Sample

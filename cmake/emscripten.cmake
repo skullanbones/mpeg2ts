@@ -24,16 +24,22 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
+if(NOT ENABLE_WEBASSEMBLY)
+    message(STATUS "    Not using emscripten!")
+    return()
+endif()
+
+message(STATUS "    Using emscripten")
 
 if(NOT EMSCRIPTEN_PREFIX)
-    message("EMSCRIPTEN_PREFIX not defined!")
+    message(STATUS "    EMSCRIPTEN_PREFIX not defined!")
     if(DEFINED ENV{EMSCRIPTEN})
         file(TO_CMAKE_PATH "$ENV{EMSCRIPTEN}" EMSCRIPTEN_PREFIX)
         set(EMSCRIPTEN_PREFIX $ENV{EMSCRIPTEN})
     else()
         set(EMSCRIPTEN_PREFIX "/usr/lib/emscripten")
-        message(WARNING "Could not find Emscripten toolchain, using /usr/lib/emscripten instead!")
+        message(WARNING "    Could not find Emscripten toolchain, using /usr/lib/emscripten instead!")
     endif()
 endif()

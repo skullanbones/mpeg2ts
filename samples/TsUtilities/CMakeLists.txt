@@ -24,18 +24,31 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     sample_tsutilities
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "Sample TsUtilities"
     LANGUAGES CXX
 )
+else()
+project(
+    sample_tsutilities
+    VERSION 0.6.0
+    LANGUAGES CXX
+)
+endif()
 
-add_executable(${PROJECT_NAME})
+add_executable(
+    ${PROJECT_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp    
+)
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+endif()
 
 target_include_directories(
     ${PROJECT_NAME}
@@ -43,14 +56,8 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_sources(
-    ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-)
-
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
         mpeg2ts
         mpeg2codec
         h264codec

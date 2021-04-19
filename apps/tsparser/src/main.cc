@@ -42,13 +42,20 @@
 #include <plog/Log.h>
 
 // Project files
-#include "Logging.h"
-#include "TsParser.h"
 #include "Ts_IEC13818-1.h"
-#include "H264Parser.h"
 #include "mpeg2ts.h"
 #include "mpeg2ts_version.h" // Returns current version of mpeg2ts library
+
+// Private project files
 #include "Mpeg2VideoParser.h"
+#include "H264Parser.h"
+#include "TsParser.h"
+
+
+enum // Define log instances. Default is 0 and is omitted from this enum.
+{
+    FileLog = 1
+};
 
 using namespace mpeg2ts;
 

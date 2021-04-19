@@ -24,27 +24,35 @@
 #    Boston, MA 02111-1307, USA.
 #
 #******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     tsparser
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "MPEG-2 CLI Parsing of transport streams"
     LANGUAGES CXX
 )
+else()
+project(
+    tsparser
+    VERSION 0.6.0
+    LANGUAGES CXX
+)
+endif()
 
-add_executable(tsparser)
-
-target_sources(
+add_executable(
     ${PROJECT_NAME}
-    PRIVATE
-        src/main.cc
- )
+    src/main.cc
+)
 
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For TsParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2codec/src># For Mpeg2VideoParser.h
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/h264codec/src># For H264Parser.h
 )
 
 target_link_libraries(
@@ -62,4 +70,6 @@ set_target_properties(
     DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11) # Available in CMake 3.8
+endif()

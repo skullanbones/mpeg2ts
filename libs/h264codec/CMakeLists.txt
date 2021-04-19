@@ -24,14 +24,22 @@
 #    Boston, MA 02111-1307, USA.
 #
 #*******************************************************************/
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.5)
 
+if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     h264codec
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "H264 Codec parser lib"
     LANGUAGES CXX
 )
+else()
+project(
+    h264codec
+    VERSION 0.6.0
+    LANGUAGES CXX
+)
+endif()
 
 add_library(${PROJECT_NAME})
 
@@ -43,9 +51,10 @@ endif()
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/.> # For CMake generated files: mpeg2ts_version.h , mpeg2ts_export.h
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/libs/mpeg2ts/src># For EsParser.h
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -57,7 +66,9 @@ set_target_properties(${PROJECT_NAME}
     DEBUG_POSTFIX "-d"
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+if(CMAKE_MINOR_VERSION GREATER 7)
+    target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+endif()
 
 target_sources(
     ${PROJECT_NAME}
@@ -69,10 +80,6 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/H264Codec.cc
 )
 
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
-        mpeg2ts # only for EsParser.h include
-)
 
 add_dependencies(h264codec plog)
 add_dependencies(h264codec json)

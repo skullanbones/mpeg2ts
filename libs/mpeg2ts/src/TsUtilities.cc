@@ -208,7 +208,7 @@ bool TsUtilities::parseTransportFile(const std::string& a_file)
         int pos = 0;
         if (no == 0)
         {
-            while (packet[pos] != mpeg2ts::TS_PACKET_SYNC_BYTE)
+            while (packet[pos] != mpeg2ts::TS_PACKET_SYNC_BYTE)//check out of bound read
             {
                 LOGV << "need to sync...";
                 ++pos;
