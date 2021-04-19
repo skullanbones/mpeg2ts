@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     a.out
-    VERSION 0.5.0
+    VERSION 0.6.0
     DESCRIPTION "Webassembly main"
     LANGUAGES CXX
 )
 else()
 project(
     a.out
-    VERSION 0.5.0
+    VERSION 0.6.0
     LANGUAGES CXX
 )
 endif()
