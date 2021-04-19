@@ -14,7 +14,7 @@ jobs:
     - name: check versions
       run: cmake --version
     - name: cmake configure
-      run : mkdir build; cd build; cmake -DENABLE_TESTS=ON -DENABLE_COMPONENT_TESTS=OFF ..
+      run : mkdir build; cd build; cmake -DENABLE_TESTS=ON -DENABLE_COMPONENT_TESTS=OFF -DCMAKE_BUILD_TYPE=Debug ..
     - name: cmake build
       run: cd build/; pwd; cmake --build .
     - name: cmake run unit tests
