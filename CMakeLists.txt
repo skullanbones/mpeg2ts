@@ -193,7 +193,7 @@ add_subdirectory(libs)
 if (ENABLE_TESTS)
     if (MSVC)
         add_custom_target(unit-tests
-            COMMAND ./tests/${CMAKE_BUILD_TYPE}/run_gtests.exe " ${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
+            COMMAND ./tests/${CMAKE_BUILD_TYPE}/run_gtests.exe "${CMAKE_CURRENT_LIST_DIR}/assets/bbc_one.ts"
         )
     else()
         add_custom_target(unit-tests
