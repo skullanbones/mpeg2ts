@@ -52,4 +52,4 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
 )
 
-# install(TARGETS ${PROJECT_NAME} EXPORT mpeg2tsTargets)
+install(TARGETS ${PROJECT_NAME} EXPORT mpeg2tsTargets)
