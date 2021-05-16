@@ -19,9 +19,9 @@ endif()
 add_library(${PROJECT_NAME} STATIC)
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
+    # PUBLIC
         # $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
