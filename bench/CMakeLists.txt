@@ -61,6 +61,7 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
             benchmark
             mpeg2codec
             h264codec
+            utility
             ${CMAKE_THREAD_LIBS_INIT}
    )
 

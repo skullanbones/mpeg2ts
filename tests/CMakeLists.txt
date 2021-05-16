@@ -116,6 +116,7 @@ target_link_libraries(${PROJECT_NAME}
         mpeg2ts
         mpeg2codec
         h264codec
+        utility
 )
 
 
