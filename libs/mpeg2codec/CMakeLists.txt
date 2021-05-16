@@ -81,6 +81,11 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Mpeg2Codec.cc
 )
 
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PRIVATE 
+        utility # For GetBits()
+)
 
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)
