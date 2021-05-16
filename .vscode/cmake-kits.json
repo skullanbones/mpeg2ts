@@ -71,5 +71,34 @@
             "name" : "Visual Studio 15 2017",
             "platform": "x86"
         }
+    },
+    {
+        "name": "MacOS-Clang-Debug-static-libs",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "OFF",
+            "BUILD_SHARED_LIBS": "OFF",
+            "CMAKE_BUILD_TYPE": "Debug"
+        },
+        "compilers" : {
+            "C": "/usr/bin/clang",
+            "CXX": "/usr/bin/clang++"
+        }
+    },
+    {
+        "name": "MacOS-Clang-Debug-dynamic-libs",
+        "cmakeSettings": {
+            "ENABLE_TESTS": "OFF",
+            "BUILD_SHARED_LIBS": "ON",
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_HOST_SYSTEM_PROCESSOR" : "arm64",
+            "CMAKE_SYSTEM_PROCESSOR": "arm64",
+            "CMAKE_OSX_ARCHITECTURES": "arm64",
+            "APPLE": "True",
+            "DEFAULT_SYSROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" 
+        },
+        "compilers" : {
+            "C": "/usr/bin/clang",
+            "CXX": "/usr/bin/clang++"
+        }
     }
 ]
