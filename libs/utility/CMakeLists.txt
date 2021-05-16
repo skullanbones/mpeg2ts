@@ -16,12 +16,7 @@ project(
 )
 endif()
 
-add_library(${PROJECT_NAME})
-
-# shared libraries need PIC
-# if (BUILD_SHARED_LIBS)
-#     set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
-# endif()
+add_library(${PROJECT_NAME} STATIC)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -50,11 +45,4 @@ target_sources(
     #     ${CMAKE_CURRENT_SOURCE_DIR}/include/GetBits.h
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
-)
-
-install(TARGETS ${PROJECT_NAME} EXPORT mpeg2tsTargets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
