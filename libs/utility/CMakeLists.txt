@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.5)
 
 if(CMAKE_MINOR_VERSION GREATER 9)
@@ -19,9 +18,9 @@ endif()
 add_library(${PROJECT_NAME} STATIC)
 
 target_include_directories(${PROJECT_NAME}
-    # PUBLIC
-        # $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-        # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PUBLIC
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
@@ -41,8 +40,7 @@ endif()
 
 target_sources(
     ${PROJECT_NAME}
-    # PUBLIC
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/include/GetBits.h
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/GetBits.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
 )
