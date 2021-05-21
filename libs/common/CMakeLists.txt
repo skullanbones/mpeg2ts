@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.5)
 
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
-    utility
+    common
     VERSION 0.6.0
     DESCRIPTION "Common utility lib"
     LANGUAGES CXX
 )
 else()
 project(
-    utility
+    common
     VERSION 0.6.0
     LANGUAGES CXX
 )

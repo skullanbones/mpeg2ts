@@ -105,7 +105,7 @@ target_sources(
 target_link_libraries(
     ${PROJECT_NAME} 
     PRIVATE 
-        utility # For GetBits()
+        common # For GetBits()
 )
 
 add_dependencies(${PROJECT_NAME} plog)
@@ -114,7 +114,7 @@ add_dependencies(${PROJECT_NAME} json)
 #-------------------
 # installation
 #-------------------
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
+install(TARGETS ${PROJECT_NAME} common EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -84,7 +84,7 @@ target_sources(
 target_link_libraries(
     ${PROJECT_NAME} 
     PRIVATE 
-        utility # For GetBits()
+        common # For GetBits()
 )
 
 add_dependencies(${PROJECT_NAME} plog)

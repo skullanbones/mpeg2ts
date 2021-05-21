@@ -61,7 +61,7 @@ target_link_libraries(
         mpeg2ts
         mpeg2codec
         h264codec
-        utility # For GetBits()
+        common # For GetBits()
 )
 
 set_target_properties(

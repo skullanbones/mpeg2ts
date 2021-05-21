@@ -59,7 +59,7 @@ target_link_libraries(
     ${PROJECT_NAME} 
     PRIVATE 
         h264codec
-        utility # For GetBits()
+        common # For GetBits()
 )
 
 set_target_properties(
