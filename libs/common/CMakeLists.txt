@@ -45,7 +45,8 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GetBits.cc
 )
 
-install(TARGETS ${PROJECT_NAME} common EXPORT ${PROJECT_NAME}Targets
+# mpeg2ts needs install common dependency
+install(TARGETS mpeg2ts EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
