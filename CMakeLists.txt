@@ -115,7 +115,7 @@ if(ENABLE_TESTS)
     add_subdirectory(bench)
 endif()
 
-if(MSVC OR APPLE)
+if(MSVC)
     set(ENABLE_COMPONENT_TESTS OFF)
 endif()
 if(ENABLE_COMPONENT_TESTS)

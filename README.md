@@ -6,7 +6,13 @@ international specification ISO/IEC 13818-1. The standard is also called H.222 i
 C++11. Mpeg2ts has been tested on the following operating systems:
 * Linux (Ubuntu 18.04 LTS and 16.04 LTS)
 * Windows (Windows 10)
-* Mac OS X (Sierra, Catalina)
+* Mac OS X (Sierra, Catalina, BigSur)
+
+and following architectures:
+* x86
+* amd64
+* Apple M1
+
 
 To simplify the build process on all these operating systems, CMake is being used.
 
@@ -136,7 +142,7 @@ Building:
     make component-benchmark-tests
     make unit-tests
 
-This will run component tests, benchmark and unit-tests. Component tests are developed via `pytest` while the unit tests are via google tests/mocks (`gtest`). The different layers like API, and tsutilities are tested as a component (the whole library as such) while class functions are tested as a unit.
+This will run component tests, benchmark and unit-tests. Component tests are developed via `pytest` while the unit tests are via google tests/mocks (`gtest`). The different layers like API, and tsutilities are tested as a component (the whole library as such) while class functions are tested as a unit. `virtualenv` is required for running component tests.
 
 ## Windows
 Since CMake is used for cross platform build, you first need install CMake on your Windows system if you havent done that already.

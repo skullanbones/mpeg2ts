@@ -59,7 +59,7 @@ target_link_libraries(
     ${PROJECT_NAME} 
     PRIVATE 
         h264codec
-        mpeg2ts # For GetBits() Should actually be moved out to its own lib
+        common # For GetBits()
 )
 
 set_target_properties(

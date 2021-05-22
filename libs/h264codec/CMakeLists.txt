@@ -80,6 +80,11 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/H264Codec.cc
 )
 
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PRIVATE 
+        common # For GetBits()
+)
 
-add_dependencies(h264codec plog)
-add_dependencies(h264codec json)
+add_dependencies(${PROJECT_NAME} plog)
+add_dependencies(${PROJECT_NAME} json)
