@@ -46,7 +46,7 @@ target_sources(
 )
 
 # mpeg2ts needs install common dependency
-install(TARGETS mpeg2ts EXPORT ${PROJECT_NAME}Targets
+install(TARGETS ${PROJECT_NAME} EXPORT mpeg2tsTargets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
