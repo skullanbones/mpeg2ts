@@ -87,5 +87,6 @@ target_link_libraries(
         common # For GetBits()
 )
 
+add_dependencies(${PROJECT_NAME} common)
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)
