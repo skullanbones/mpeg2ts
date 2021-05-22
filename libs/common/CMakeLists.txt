@@ -17,6 +17,11 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC)
 
+# shared libraries need PIC
+if (BUILD_SHARED_LIBS)
+    set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE 1)
+endif()
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
