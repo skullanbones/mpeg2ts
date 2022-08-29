@@ -57,6 +57,7 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
   unzip \
   doxygen \
   cmake \
+  openssh-client \
   git \
   graphviz && \
   apt-get clean && \

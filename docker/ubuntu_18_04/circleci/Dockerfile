@@ -38,6 +38,7 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
     build-essential \
     wget \
     cmake \
+    openssh-client \
     git \
     valgrind && \
     apt-get clean && \

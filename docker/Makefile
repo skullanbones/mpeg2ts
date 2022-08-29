@@ -51,7 +51,7 @@ docker-image:
 docker-image-circleci:
 	docker build \
 		--file=$(DOCKER_IMAGE_BASE)/circleci/Dockerfile \
-		--tag=heliconwave/circleci-ubuntu-18.04:v1 \
+		--tag=heliconwave/circleci-ubuntu-18.04:$(DOCKER_IMAGE_VER) \
 		--tag=heliconwave/circleci-ubuntu-18.04:latest ./
 
 docker-image-ubuntu-16.04:
@@ -60,10 +60,16 @@ docker-image-ubuntu-16.04:
 		--tag=heliconwave/mpeg2ts-ubuntu-16.04:v2 \
 		--tag=heliconwave/mpeg2ts-ubuntu-16.04:latest ./
 
+docker-image-circleci-ubuntu-18.04:
+	docker build \
+		--file=ubuntu_18_04/circleci/Dockerfile \
+		--tag=heliconwave/circleci-ubuntu-18.04:$(DOCKER_IMAGE_VER) \
+		--tag=heliconwave/circleci-ubuntu-18.04:latest ./
+
 docker-image-circleci-ubuntu-16.04:
 	docker build \
 		--file=ubuntu_16_04/circleci/Dockerfile \
-		--tag=heliconwave/circleci-ubuntu-16.04:v1 \
+		--tag=heliconwave/circleci-ubuntu-16.04:$(DOCKER_IMAGE_VER) \
 		--tag=heliconwave/circleci-ubuntu-16.04:latest ./
 
 docker-bash-ubuntu-16.04:
