@@ -335,27 +335,53 @@ TEST(TsParserTests, CheckParseLargePmtTable)
 }
 
 
+/*
+* Parses a complete PES packet distributed on many TS packets.
+*/
 TEST(TsParserTests, TestParsePesPacket)
 {
     TsParser parser;
     PesPacket pes;
     TsPacketInfo info;
 
-    parser.parseTsPacketInfo(pes_packet_1, info);
-    EXPECT_EQ(481, info.pid);
+    parser.parseTsPacketInfo(ts_pes_1, info);
+    EXPECT_EQ(50, info.pid);
+    EXPECT_FALSE(parser.collectPes(ts_pes_1, info, pes));
 
-    EXPECT_FALSE(parser.collectPes(pes_packet_1, info, pes)); // parse and buffer this one
-    EXPECT_TRUE(parser.collectPes(pes_packet_1, info, pes));  // here we send next pusi so it's time
-                                                              // to release the first one
+    parser.parseTsPacketInfo(ts_pes_2, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_2, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_3, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_3, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_4, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_4, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_5, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_5, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_6, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_6, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_7, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_7, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_8, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_8, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_9, info);
+    EXPECT_TRUE(parser.collectPes(ts_pes_9, info, pes));
+    
     EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
-    EXPECT_EQ(STREAM_ID_pes_video_stream, pes.stream_id);
-    EXPECT_EQ(0, pes.PES_packet_length);      // Unbounded video packet.
+    EXPECT_EQ(STREAM_ID_private_stream_1, pes.stream_id);
+    EXPECT_EQ(1554, pes.PES_packet_length);
+    EXPECT_TRUE(pes.PES_has_optional_header);
     EXPECT_FALSE(pes.PES_scrambling_control); // Unscrambled.
     EXPECT_FALSE(pes.PES_priority);
     EXPECT_TRUE(pes.data_alignment_indicator);
     EXPECT_FALSE(pes.copyright);
     EXPECT_FALSE(pes.original_or_copy);
-    EXPECT_EQ(3, pes.PTS_DTS_flags);
+    EXPECT_EQ(0x02, pes.PTS_DTS_flags); // only PTS flag (no DTS)
     EXPECT_FALSE(pes.ESCR_flag);
 
     EXPECT_FALSE(pes.ES_rate_flag);
@@ -363,10 +389,221 @@ TEST(TsParserTests, TestParsePesPacket)
     EXPECT_FALSE(pes.additional_copy_info_flag);
     EXPECT_FALSE(pes.PES_CRC_flag);
     EXPECT_FALSE(pes.PES_extension_flag);
-    EXPECT_EQ(10, pes.PES_header_data_length);
-    EXPECT_EQ(689094304, pes.pts);
-    EXPECT_EQ(689090704, pes.dts);
+    EXPECT_EQ(15, pes.PES_header_data_length);
+    EXPECT_EQ(161697, pes.pts);
+    EXPECT_EQ(-1, pes.dts); // No DTS...    
 }
+
+/*
+* Parses a complete PES packet distributed on many TS packets.
+*/
+TEST(TsParserTests, TestParsePesPacketLarge)
+{
+    TsParser parser;
+    PesPacket pes;
+    TsPacketInfo info;
+
+    parser.parseTsPacketInfo(ts_pes_euro1, info);
+    EXPECT_EQ(210, info.pid);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro1, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro2, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro2, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro3, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro3, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro4, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro4, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro5, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro5, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro6, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro6, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro7, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro7, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro8, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro8, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro9, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro9, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro10, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro10, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro11, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro11, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro12, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro12, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro13, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro13, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro14, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro14, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro15, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro15, info, pes));
+
+    parser.parseTsPacketInfo(ts_pes_euro16, info);
+    EXPECT_TRUE(parser.collectPes(ts_pes_euro16, info, pes));
+
+    EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
+    EXPECT_EQ(STREAM_ID_pes_audio_stream, pes.stream_id);
+    EXPECT_EQ(2890, pes.PES_packet_length);
+    EXPECT_TRUE(pes.PES_has_optional_header);
+    EXPECT_FALSE(pes.PES_scrambling_control); // Unscrambled.
+    EXPECT_FALSE(pes.PES_priority);
+    EXPECT_TRUE(pes.data_alignment_indicator);
+    EXPECT_TRUE(pes.copyright);
+    EXPECT_TRUE(pes.original_or_copy);
+    EXPECT_EQ(0x02, pes.PTS_DTS_flags); // only PTS flag (no DTS)
+    EXPECT_FALSE(pes.ESCR_flag);
+
+    EXPECT_FALSE(pes.ES_rate_flag);
+    EXPECT_FALSE(pes.DSM_trick_mode_flag);
+    EXPECT_FALSE(pes.additional_copy_info_flag);
+    EXPECT_FALSE(pes.PES_CRC_flag);
+    EXPECT_FALSE(pes.PES_extension_flag);
+    EXPECT_EQ(7, pes.PES_header_data_length);
+    EXPECT_EQ(1426376378, pes.pts);
+    EXPECT_EQ(-1, pes.dts); // No DTS...
+}
+
+/*
+* Parses 2 complete PES packet distributed on many TS packets and 2 PIDs.
+*/
+TEST(TsParserTests, TestParseTwoPesPackets)
+{
+    TsParser parser;
+    PesPacket pes50, pes210;
+    TsPacketInfo info50, info210;
+
+    parser.parseTsPacketInfo(ts_pes_euro1, info210);
+    EXPECT_EQ(210, info210.pid);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro1, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_1, info50);
+    EXPECT_EQ(50, info50.pid);
+    EXPECT_FALSE(parser.collectPes(ts_pes_1, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro2, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro2, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_2, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_2, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro3, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro3, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_3, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_3, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro4, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro4, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_4, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_4, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro5, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro5, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_5, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_5, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro6, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro6, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_6, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_6, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro7, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro7, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_7, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_7, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro8, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro8, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_8, info50);
+    EXPECT_FALSE(parser.collectPes(ts_pes_8, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro9, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro9, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_9, info50);
+    EXPECT_TRUE(parser.collectPes(ts_pes_9, info50, pes50));
+
+    parser.parseTsPacketInfo(ts_pes_euro10, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro10, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro11, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro11, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro12, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro12, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro13, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro13, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro14, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro14, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro15, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_euro15, info210, pes210));
+
+    parser.parseTsPacketInfo(ts_pes_euro16, info210);
+    EXPECT_TRUE(parser.collectPes(ts_pes_euro16, info210, pes210));
+
+    EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes210.packet_start_code_prefix);
+    EXPECT_EQ(STREAM_ID_pes_audio_stream, pes210.stream_id);
+    EXPECT_EQ(2890, pes210.PES_packet_length);
+    EXPECT_TRUE(pes210.PES_has_optional_header);
+    EXPECT_FALSE(pes210.PES_scrambling_control); // Unscrambled.
+    EXPECT_FALSE(pes210.PES_priority);
+    EXPECT_TRUE(pes210.data_alignment_indicator);
+    EXPECT_TRUE(pes210.copyright);
+    EXPECT_TRUE(pes210.original_or_copy);
+    EXPECT_EQ(0x02, pes210.PTS_DTS_flags); // only PTS flag (no DTS)
+    EXPECT_FALSE(pes210.ESCR_flag);
+
+    EXPECT_FALSE(pes210.ES_rate_flag);
+    EXPECT_FALSE(pes210.DSM_trick_mode_flag);
+    EXPECT_FALSE(pes210.additional_copy_info_flag);
+    EXPECT_FALSE(pes210.PES_CRC_flag);
+    EXPECT_FALSE(pes210.PES_extension_flag);
+    EXPECT_EQ(7, pes210.PES_header_data_length);
+    EXPECT_EQ(1426376378, pes210.pts);
+    EXPECT_EQ(-1, pes210.dts); // No DTS...
+
+
+    EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes50.packet_start_code_prefix);
+    EXPECT_EQ(STREAM_ID_private_stream_1, pes50.stream_id);
+    EXPECT_EQ(1554, pes50.PES_packet_length);
+    EXPECT_TRUE(pes50.PES_has_optional_header);
+    EXPECT_FALSE(pes50.PES_scrambling_control); // Unscrambled.
+    EXPECT_FALSE(pes50.PES_priority);
+    EXPECT_TRUE(pes50.data_alignment_indicator);
+    EXPECT_FALSE(pes50.copyright);
+    EXPECT_FALSE(pes50.original_or_copy);
+    EXPECT_EQ(0x02, pes50.PTS_DTS_flags); // only PTS flag (no DTS)
+    EXPECT_FALSE(pes50.ESCR_flag);
+
+    EXPECT_FALSE(pes50.ES_rate_flag);
+    EXPECT_FALSE(pes50.DSM_trick_mode_flag);
+    EXPECT_FALSE(pes50.additional_copy_info_flag);
+    EXPECT_FALSE(pes50.PES_CRC_flag);
+    EXPECT_FALSE(pes50.PES_extension_flag);
+    EXPECT_EQ(15, pes50.PES_header_data_length);
+    EXPECT_EQ(161697, pes50.pts);
+    EXPECT_EQ(-1, pes50.dts); // No DTS...  
+}
+
 
 TEST(TsParserTests, TestParsePcr)
 {

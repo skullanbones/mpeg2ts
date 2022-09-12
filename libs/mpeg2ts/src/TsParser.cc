@@ -280,25 +280,14 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
         mStatistics.buildPcrHistogram(pid, a_tsPacketInfo.pcr);
     }
 
+    // Start of new PES packet found, clearing buffers and prepare for collection
     if (a_tsPacketInfo.isPayloadStart)
     {
-        // We have start. So if we have any cached data it's time to return it.
+        // Parse PES header of a starting PES packet
         if (!mPesPacket[pid].mPesBuffer.empty())
         {
-            if (mPesPacket[pid].PES_packet_length &&
-                mPesPacket[pid].mPesBuffer.size() < mPesPacket[pid].PES_packet_length)
-            {
-                std::cerr << "Not returning incomplete PES packet on pid " << pid << '\n';
-            }
-            else
-            {
-                a_pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
-
-                mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
-                mStatistics.buildDtsHistogram(pid, a_pesPacket.dts);
-
-                ret = true;
-            }
+            std::cerr << "Not returning incomplete PES packet on pid " << pid << '\n';
+            mPesPacket.erase(pid);
         }
         
         mOrigins[pid] = origin;
@@ -311,7 +300,7 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
                                           &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
 
         parsePesPacket(pid);
-    }
+    } // Only append more PES payload to PES packet
     else
     {
         if (mPesPacket.count(pid) == 0)
@@ -323,7 +312,17 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
                                           &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
-        // TODO: check if we have boud PES and return it if it is coplete
+
+        // If last packet in a PES packet, copy it, and save statistics
+        if (static_cast<int>(mPesPacket[pid].mPesBuffer.size()) == mPesPacket[pid].PES_packet_length + PES_PACKET_HEADER_SIZE) {
+            a_pesPacket = mPesPacket[pid];
+            mPesPacket.erase(pid);
+
+            mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
+            mStatistics.buildDtsHistogram(pid, a_pesPacket.dts);
+
+            ret = true;
+        }
     }
 
     return ret;
@@ -495,6 +494,7 @@ void TsParser::parsePesPacket(int a_pid)
         mPesPacket[a_pid].stream_id != STREAM_ID_DSMCC_stream &&
         mPesPacket[a_pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
+        mPesPacket[a_pid].PES_has_optional_header = true;
         getBits(2); // '10'
         mPesPacket[a_pid].PES_scrambling_control = getBits(2);
 
@@ -523,7 +523,7 @@ void TsParser::parsePesPacket(int a_pid)
         }
         else if (mPesPacket[a_pid].PTS_DTS_flags == 0x02) // Only PTS value
         {
-            getBits(4);
+            getBits(4); // '0010'
             uint64_t pts = 0;
             uint64_t pts_32_30 = getBits(3);
             getBits(1); // marker_bit
@@ -539,7 +539,7 @@ void TsParser::parsePesPacket(int a_pid)
         }
         else if (mPesPacket[a_pid].PTS_DTS_flags == 0x03) // Both PTS and DTS
         {
-            getBits(4);
+            getBits(4); // '0011'
             uint64_t pts = 0;
             uint64_t pts_32_30 = getBits(3);
             getBits(1); // marker_bit

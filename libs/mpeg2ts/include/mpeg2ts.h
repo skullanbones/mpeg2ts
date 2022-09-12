@@ -57,9 +57,35 @@ typedef std::map<int, PidStatistic> PidStatisticsMap;
  */
 struct PesPacket
 {
+    PesPacket()
+        : packet_start_code_prefix{ 0 }
+        , stream_id{ 0 }
+        , PES_packet_length{ 0 }
+        , PES_has_optional_header { false }
+        , PES_scrambling_control{ false }
+        , PES_priority{ false }
+        , data_alignment_indicator{ false }
+        , copyright{ false }
+        , original_or_copy{ false }
+        , PTS_DTS_flags{ 0 }
+        , ESCR_flag{ false }
+        , ES_rate_flag{ false }
+        , DSM_trick_mode_flag{ 0 }
+        , additional_copy_info_flag{ false }
+        , PES_CRC_flag{ false }
+        , PES_extension_flag{ false }
+        , PES_header_data_length{ 0 }
+        , elementary_data_offset{ 0 }
+        , pts{ 0 }
+        , dts{ 0 }
+    {
+    }
+
+
     uint32_t packet_start_code_prefix;
     uint8_t stream_id;
     uint16_t PES_packet_length;
+    bool PES_has_optional_header;
 
     // Extended packet
     bool PES_scrambling_control;
