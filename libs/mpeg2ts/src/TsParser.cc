@@ -295,8 +295,6 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
             // Check ISO-IEC-13818-1 section 2.4.3.7
             else
             {
-                std::cout << "isPayloadStart TRUE releasing previous assembled packets. PID: " << pid << ", and bufferSize:" << 
-                static_cast<int>(mPesPacket[pid].mPesBuffer.size()) << '\n';
                 a_pesPacket = mPesPacket[pid]; // must copy/return as we override it below.
 
                 mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
