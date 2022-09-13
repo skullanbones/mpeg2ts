@@ -403,54 +403,54 @@ TEST(TsParserTests, TestParsePesPacketLarge)
     PesPacket pes;
     TsPacketInfo info;
 
-    parser.parseTsPacketInfo(ts_pes_euro1, info);
+    parser.parseTsPacketInfo(ts_pes_large1, info);
     EXPECT_EQ(210, info.pid);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro1, info, pes));
+    EXPECT_FALSE(parser.collectPes(ts_pes_large1, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro2, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro2, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large2, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large2, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro3, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro3, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large3, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large3, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro4, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro4, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large4, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large4, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro5, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro5, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large5, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large5, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro6, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro6, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large6, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large6, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro7, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro7, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large7, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large7, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro8, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro8, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large8, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large8, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro9, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro9, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large9, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large9, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro10, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro10, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large10, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large10, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro11, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro11, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large11, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large11, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro12, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro12, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large12, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large12, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro13, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro13, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large13, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large13, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro14, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro14, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large14, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large14, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro15, info);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro15, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large15, info);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large15, info, pes));
 
-    parser.parseTsPacketInfo(ts_pes_euro16, info);
-    EXPECT_TRUE(parser.collectPes(ts_pes_euro16, info, pes));
+    parser.parseTsPacketInfo(ts_pes_large16, info);
+    EXPECT_TRUE(parser.collectPes(ts_pes_large16, info, pes));
 
     EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
     EXPECT_EQ(STREAM_ID_pes_audio_stream, pes.stream_id);
@@ -483,82 +483,82 @@ TEST(TsParserTests, TestParseTwoPesPackets)
     PesPacket pes50, pes210;
     TsPacketInfo info50, info210;
 
-    parser.parseTsPacketInfo(ts_pes_euro1, info210);
+    parser.parseTsPacketInfo(ts_pes_large1, info210);
     EXPECT_EQ(210, info210.pid);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro1, info210, pes210));
+    EXPECT_FALSE(parser.collectPes(ts_pes_large1, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_1, info50);
     EXPECT_EQ(50, info50.pid);
     EXPECT_FALSE(parser.collectPes(ts_pes_1, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro2, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro2, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large2, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large2, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_2, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_2, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro3, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro3, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large3, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large3, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_3, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_3, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro4, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro4, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large4, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large4, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_4, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_4, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro5, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro5, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large5, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large5, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_5, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_5, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro6, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro6, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large6, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large6, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_6, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_6, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro7, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro7, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large7, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large7, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_7, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_7, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro8, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro8, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large8, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large8, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_8, info50);
     EXPECT_FALSE(parser.collectPes(ts_pes_8, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro9, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro9, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large9, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large9, info210, pes210));
 
     parser.parseTsPacketInfo(ts_pes_9, info50);
     EXPECT_TRUE(parser.collectPes(ts_pes_9, info50, pes50));
 
-    parser.parseTsPacketInfo(ts_pes_euro10, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro10, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large10, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large10, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro11, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro11, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large11, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large11, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro12, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro12, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large12, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large12, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro13, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro13, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large13, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large13, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro14, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro14, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large14, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large14, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro15, info210);
-    EXPECT_FALSE(parser.collectPes(ts_pes_euro15, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large15, info210);
+    EXPECT_FALSE(parser.collectPes(ts_pes_large15, info210, pes210));
 
-    parser.parseTsPacketInfo(ts_pes_euro16, info210);
-    EXPECT_TRUE(parser.collectPes(ts_pes_euro16, info210, pes210));
+    parser.parseTsPacketInfo(ts_pes_large16, info210);
+    EXPECT_TRUE(parser.collectPes(ts_pes_large16, info210, pes210));
 
     EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes210.packet_start_code_prefix);
     EXPECT_EQ(STREAM_ID_pes_audio_stream, pes210.stream_id);
