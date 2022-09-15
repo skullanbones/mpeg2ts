@@ -1,6 +1,6 @@
 /*****************************************************************
 *
-*    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+*    Copyright © 2017-2022 kohnech, lnwhome All rights reserved
 *
 *    mpeg2ts - mpeg2ts tests
 *
@@ -70,7 +70,22 @@ TEST(TsParserTests, CheckParserInfo)
     EXPECT_EQ(141, info.payloadStartOffset);
     EXPECT_TRUE(info.hasAdaptationField);
 
-    // TODO add more tests
+    EXPECT_EQ(0x47, info.hdr.sync_byte);
+    EXPECT_EQ(3, info.hdr.adaptation_field_control);
+    EXPECT_FALSE(info.isPayloadStart);
+    EXPECT_TRUE(info.hasAdaptationField);
+    EXPECT_TRUE(info.hasPayload);
+    EXPECT_FALSE(info.hasPrivateData);
+    EXPECT_FALSE(info.isScrambled);
+    EXPECT_FALSE(info.isDiscontinuity);
+    EXPECT_FALSE(info.continuityCounter);
+    EXPECT_EQ(-1, info.pcr);
+    EXPECT_EQ(-1, info.opcr);
+    EXPECT_EQ(-1, info.pts);
+    EXPECT_EQ(-1, info.dts);
+    EXPECT_EQ(47, info.payloadSize);
+    EXPECT_EQ(141, info.payloadStartOffset);
+    EXPECT_FALSE(info.isError);
 }
 
 TEST(TsParserTests, CheckPid)
@@ -81,6 +96,7 @@ TEST(TsParserTests, CheckPid)
     TsPacketInfo info;
     parser.parseTsPacketInfo(packet_3, info);
     EXPECT_EQ(289, info.pid);
+    EXPECT_EQ(289, info.hdr.PID);
     parser.parseTsPacketInfo(packet_4, info);
     EXPECT_EQ(481, info.pid);
     // TODO add more tests...
@@ -604,6 +620,39 @@ TEST(TsParserTests, TestParseTwoPesPackets)
     EXPECT_EQ(-1, pes50.dts); // No DTS...  
 }
 
+/* Parses only PES header from 1 TS-packet */
+TEST(TestParsePesPacket, TestParsePesHeader)
+{
+    TsParser parser;
+    PesPacket pes;
+    TsPacketInfo info;
+
+    parser.parseTsPacketInfo(pes_packet_1, info);
+    EXPECT_EQ(481, info.pid);
+
+    EXPECT_FALSE(parser.collectPes(pes_packet_1, info, pes));
+    EXPECT_TRUE(parser.collectPes(pes_packet_1, info, pes));  // Only needed to release PES packet (since unbounded)
+
+    EXPECT_EQ(PES_PACKET_START_CODE_PREFIX, pes.packet_start_code_prefix);
+    EXPECT_EQ(STREAM_ID_pes_video_stream, pes.stream_id);
+    EXPECT_EQ(0, pes.PES_packet_length);      // Unbounded video packet.
+    EXPECT_FALSE(pes.PES_scrambling_control); // Unscrambled.
+    EXPECT_FALSE(pes.PES_priority);
+    EXPECT_TRUE(pes.data_alignment_indicator);
+    EXPECT_FALSE(pes.copyright);
+    EXPECT_FALSE(pes.original_or_copy);
+    EXPECT_EQ(3, pes.PTS_DTS_flags);
+    EXPECT_FALSE(pes.ESCR_flag);
+
+    EXPECT_FALSE(pes.ES_rate_flag);
+    EXPECT_FALSE(pes.DSM_trick_mode_flag);
+    EXPECT_FALSE(pes.additional_copy_info_flag);
+    EXPECT_FALSE(pes.PES_CRC_flag);
+    EXPECT_FALSE(pes.PES_extension_flag);
+    EXPECT_EQ(10, pes.PES_header_data_length);
+    EXPECT_EQ(689094304, pes.pts);
+    EXPECT_EQ(689090704, pes.dts);
+}
 
 TEST(TsParserTests, TestParsePcr)
 {
