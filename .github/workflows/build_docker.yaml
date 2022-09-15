@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: - |
+      run: -|
             docker build docker/ --file docker/ubuntu_18_04/circleci/Dockerfile
             --tag heliconwave/circleci-ubuntu-18.04:$(date +%s)
             --tag heliconwave/circleci-ubuntu-18.04:latest
