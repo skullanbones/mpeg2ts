@@ -1,41 +1,41 @@
 /*****************************************************************
-*
-*    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
-*
-*    mpeg2ts - mpeg2ts lib
-*
-*    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
-*
-*    Unless you have obtained mpeg2ts under a different license,
-*    this version of mpeg2ts is mpeg2ts|GPL.
-*    Mpeg2ts|GPL is free software; you can redistribute it and/or
-*    modify it under the terms of the GNU General Public License as
-*    published by the Free Software Foundation; either version 2,
-*    or (at your option) any later version.
-*
-*    Mpeg2ts|GPL is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with mpeg2ts|GPL; see the file COPYING.  If not, write to the
-*    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-*    02111-1307, USA.
-*
-********************************************************************/
-#include <cstdint>        // for uint8_t
-#include <iostream>       // for operator<<, basic_ostream::operator<<, basi...
-#include <utility>        // for move
-#include <vector>         // for vector
+ *
+ *    Copyright © 2017-2020 kohnech, lnwhome All rights reserved
+ *
+ *    mpeg2ts - mpeg2ts lib
+ *
+ *    This file is part of mpeg2ts (Mpeg2 Transport Stream Library).
+ *
+ *    Unless you have obtained mpeg2ts under a different license,
+ *    this version of mpeg2ts is mpeg2ts|GPL.
+ *    Mpeg2ts|GPL is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU General Public License as
+ *    published by the Free Software Foundation; either version 2,
+ *    or (at your option) any later version.
+ *
+ *    Mpeg2ts|GPL is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with mpeg2ts|GPL; see the file COPYING.  If not, write to the
+ *    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ *    02111-1307, USA.
+ *
+ ********************************************************************/
+#include <cstdint>  // for uint8_t
+#include <iostream> // for operator<<, basic_ostream::operator<<, basi...
+#include <utility>  // for move
+#include <vector>   // for vector
 
 /// 3rd-party
-#include "plog/Log.h"     // for LOGE_, LOGV
-#include "plog/Record.h"  // for Record
+#include "plog/Log.h"    // for LOGE_, LOGV
+#include "plog/Record.h" // for Record
 
 /// Project files
+#include "Logging.h" // for FileLog
 #include "TsParser.h"
-#include "Logging.h"      // for FileLog
 
 namespace mpeg2ts
 {
@@ -145,8 +145,7 @@ void TsParser::parseAdaptationFieldData(const uint8_t* a_packet, TsPacketInfo& a
         return;
     }
 
-    auto ofsAfterAF =
-    getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
+    auto ofsAfterAF = getByteInx() - 1 + adaptHdr.adaptation_field_length; //-1 8 flags in TsAdaptationFieldHeader
 
     if (adaptHdr.PCR_flag)
     {
@@ -227,8 +226,7 @@ void TsParser::collectTable(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsP
     // Therefore we need be able collect different types of tables on their PID to handle this. If
     // we don't do it, the alternating table will reset the previous collected table since it start
     // over all from the beginning.
-    int PID =
-    a_tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
+    int PID = a_tsPacketInfo.pid; // There is a good reason, please see above to have a filter on PID...
     uint16_t pointerOffset = a_tsPacketInfo.payloadStartOffset;
 
     mStatistics.checkCCError(a_tsPacketInfo.pid, a_tsPacketInfo.continuityCounter);
@@ -280,19 +278,24 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
         mStatistics.buildPcrHistogram(pid, a_tsPacketInfo.pcr);
     }
 
+    // Start of new PES packet found, clearing buffers and prepare for collection
     if (a_tsPacketInfo.isPayloadStart)
     {
-        // We have start. So if we have any cached data it's time to return it.
+        // Parse PES header of a starting PES packet
         if (!mPesPacket[pid].mPesBuffer.empty())
         {
+            // For bounded PES packet where PES_packet_length is given, this is an error
             if (mPesPacket[pid].PES_packet_length &&
                 mPesPacket[pid].mPesBuffer.size() < mPesPacket[pid].PES_packet_length)
             {
-                std::cerr << "Not returning incomplete PES packet on pid " << pid << '\n';
+                std::cerr << "Not returning incomplete PES packet on pid " << pid
+                          << "PES_packet_length: " << mPesPacket[pid].PES_packet_length << '\n';
             }
+            // Returning previous PES packet is required since there are unbounded PES packets where PES_packet_length is 0.
+            // Check ISO-IEC-13818-1 section 2.4.3.7
             else
             {
-                a_pesPacket = mPesPacket[pid]; // TODO: must copy as we override it below.
+                a_pesPacket = mPesPacket[pid]; // must copy/return as we override it below.
 
                 mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
                 mStatistics.buildDtsHistogram(pid, a_pesPacket.dts);
@@ -300,7 +303,9 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
                 ret = true;
             }
         }
-        
+
+        // Starting of a new PES Packet
+        mPesPacket.erase(pid); // first delete old data since it has been returned
         mOrigins[pid] = origin;
 
         // Create new PES
@@ -309,11 +314,11 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
 
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
                                           &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
-
         parsePesPacket(pid);
-    }
+    } 
+    // Only append more PES payload data to PES packet
     else
-    {
+    {   
         if (mPesPacket.count(pid) == 0)
         {
             // PES has not started yet. Ignoring rest
@@ -323,7 +328,19 @@ bool TsParser::collectPes(const uint8_t* a_tsPacket, const TsPacketInfo& a_tsPac
         // Assemble packet
         mPesPacket[pid].mPesBuffer.insert(mPesPacket[pid].mPesBuffer.end(),
                                           &a_tsPacket[pointerOffset], &a_tsPacket[TS_PACKET_SIZE]);
-        // TODO: check if we have boud PES and return it if it is coplete
+
+        // If last packet in a PES packet, copy it, and save statistics, which is only true for bounded
+        // PES packets where PES_packet_length is given and NOT 0, which is not always the case.
+        if (static_cast<int>(mPesPacket[pid].mPesBuffer.size()) == mPesPacket[pid].PES_packet_length + PES_PACKET_HEADER_SIZE)
+        {
+            a_pesPacket = mPesPacket[pid];
+            mPesPacket.erase(pid);
+
+            mStatistics.buildPtsHistogram(pid, a_pesPacket.pts);
+            mStatistics.buildDtsHistogram(pid, a_pesPacket.dts);
+
+            ret = true;
+        }
     }
 
     return ret;
@@ -428,8 +445,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
             pointer_desc.metadata_application_format = static_cast<uint16_t>(getBits(16));
 
             pmt.descriptors.push_back(std::move(pointer_desc));
-            skipBytes(program_info_length - 2 -
-                      2); // TODO fix this, this is a much bigger descriptor...
+            skipBytes(program_info_length - 2 - 2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
         case DescriptorTag::user_private_178:
@@ -439,8 +455,7 @@ PmtTable TsParser::parsePmtPacket(int a_pid)
             user_private.descriptor_length = static_cast<uint8_t>(getBits(8));
 
             pmt.descriptors.push_back(std::move(user_private));
-            skipBytes(program_info_length -
-                      2); // TODO fix this, this is a much bigger descriptor...
+            skipBytes(program_info_length - 2); // TODO fix this, this is a much bigger descriptor...
             break;
         }
         default:
@@ -495,6 +510,7 @@ void TsParser::parsePesPacket(int a_pid)
         mPesPacket[a_pid].stream_id != STREAM_ID_DSMCC_stream &&
         mPesPacket[a_pid].stream_id != STREAM_ID_ITU_T_Rec_H222_1_type_E_stream)
     {
+        mPesPacket[a_pid].PES_has_optional_header = true;
         getBits(2); // '10'
         mPesPacket[a_pid].PES_scrambling_control = getBits(2);
 
@@ -523,7 +539,7 @@ void TsParser::parsePesPacket(int a_pid)
         }
         else if (mPesPacket[a_pid].PTS_DTS_flags == 0x02) // Only PTS value
         {
-            getBits(4);
+            getBits(4); // '0010'
             uint64_t pts = 0;
             uint64_t pts_32_30 = getBits(3);
             getBits(1); // marker_bit
@@ -539,7 +555,7 @@ void TsParser::parsePesPacket(int a_pid)
         }
         else if (mPesPacket[a_pid].PTS_DTS_flags == 0x03) // Both PTS and DTS
         {
-            getBits(4);
+            getBits(4); // '0011'
             uint64_t pts = 0;
             uint64_t pts_32_30 = getBits(3);
             getBits(1); // marker_bit

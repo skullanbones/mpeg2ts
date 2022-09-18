@@ -43,9 +43,14 @@ std::ostream& operator<<(std::ostream& ss, const TsPacketInfo& rhs)
     ss << "hasRandomAccess: " << rhs.hasRandomAccess << '\n';
     ss << "isScrambled: " << rhs.isScrambled << '\n';
     ss << "isDiscontinuity: " << rhs.isDiscontinuity << '\n';
+    ss << "continuityCounter: " << static_cast<int>(rhs.continuityCounter) << '\n';
 
     ss << "pcr: " << rhs.pcr << '\n';
     ss << "opcr: " << rhs.opcr << '\n';
+
+    ss << "pts: " << rhs.pts << '\n';
+    ss << "dts: " << rhs.dts << '\n';
+
     if (rhs.hasPrivateData)
     {
         ss << "privateDataSize: " << rhs.privateDataSize << '\n';

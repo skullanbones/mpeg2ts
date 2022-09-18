@@ -33,7 +33,7 @@ Check help in command line (CLI):
 
 Add option --write with the PES PID for writing PES packets to file.
 
-    ./tsparser --write 2504 --input assets/bbc_one.ts
+    ./tsparser --write 2306 --input assets/bbc_one.ts
 
 Just print PSI tables / PES header can be done by --pid option and the PID.
 
