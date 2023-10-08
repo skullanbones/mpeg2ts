@@ -1,0 +1,305 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired" : {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "windows-msvc-base",
+            "hidden": true,
+            "inherits": "windows-base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "windows-msvc-x64"
+                }
+            }
+        },
+        {
+            "name": "windows-clang-base",
+            "hidden": true,
+            "inherits": "windows-base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "clang-cl.exe"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "windows-clang-x64"
+                }
+            }
+        },
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+                },
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "linux-gcc-x64",
+                    "hostOS": [
+                        "Linux"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "linux-gcc-base",
+            "hidden": true,
+            "inherits": "linux-base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "linux-clang-base",
+            "hidden": true,
+            "inherits": "linux-base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "apple-m1-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "architecture": {
+                "value": "arm64",
+                "strategy": "external"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64"
+            }
+        },
+        {
+            "name": "ninja",
+            "hidden": true,
+            "generator": "Ninja"
+        },
+        {
+            "name": "make",
+            "hidden": true,
+            "generator": "Unix Makefiles"
+        },
+        {
+            "name": "_release",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "_debug",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "_relwithdebinfo",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "linux-clang-debug",
+            "inherits": [
+                "linux-clang-base",
+                "make",
+                "_debug"
+            ]
+        },
+        {
+            "name": "linux-clang-release",
+            "inherits": [
+                "linux-clang-base",
+                "make",
+                "_release"
+            ]
+        },
+        {
+            "name": "linux-clang-relwithdebinfo",
+            "inherits": [
+                "linux-clang-base",
+                "make",
+                "_relwithdebinfo"
+            ]
+        },
+        {
+            "name": "linux-gcc-debug",
+            "inherits": [
+                "linux-gcc-base",
+                "make",
+                "_debug"
+            ]
+        },
+        {
+            "name": "linux-gcc-release",
+            "inherits": [
+                "linux-gcc-base",
+                "make",
+                "_release"
+            ]
+        },
+        {
+            "name": "linux-gcc-relwithdebinfo",
+            "inherits": [
+                "linux-gcc-base",
+                "make",
+                "_relwithdebinfo"
+            ]
+        },
+        {
+            "name": "linux-clang-ninja-debug",
+            "inherits": [
+                "linux-clang-debug",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-clang-ninja-release",
+            "inherits": [
+                "linux-clang-release",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-clang-ninja-relwithdebinfo",
+            "inherits": [
+                "linux-clang-relwithdebinfo",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-gcc-ninja-debug",
+            "inherits": [
+                "linux-gcc-debug",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-gcc-ninja-release",
+            "inherits": [
+                "linux-gcc-release",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-gcc-ninja-relwithdebinfo",
+            "inherits": [
+                "linux-gcc-relwithdebinfo",
+                "ninja"
+            ]
+        },
+        {
+            "name": "linux-gcc-debug-with-clang-tidy",
+            "inherits": [
+                "linux-gcc-base",
+                "make",
+                "_debug"
+            ],
+            "cacheVariables": {
+                "USE_CLANG_TIDY": "ON"
+            }
+        },
+        {
+            "name": "windows-clang-ninja-release",
+            "inherits": [
+                "windows-clang-base",
+                "ninja",
+                "_release"
+            ]
+        },
+        {
+            "name": "windows-clang-ninja-debug",
+            "inherits": [
+                "windows-clang-base",
+                "ninja",
+                "_debug"
+            ]
+        },
+        {
+            "name": "windows-clang-ninja-relwithdebinfo",
+            "inherits": [
+                "windows-clang-base",
+                "ninja",
+                "_relwithdebinfo"
+            ]
+        },
+        {
+            "name": "windows-msvc-ninja-release",
+            "inherits": [
+                "windows-msvc-base",
+                "ninja",
+                "_release"
+            ]
+        },
+        {
+            "name": "windows-msvc-debug",
+            "inherits": [
+                "windows-msvc-base",
+                "_debug"
+            ]
+        },
+        {
+            "name": "windows-msvc-ninja-debug",
+            "inherits": [
+                "windows-msvc-base",
+                "ninja",
+                "_debug"
+            ]
+        },
+        {
+            "name": "windows-msvc-ninja-relwithdebinfo",
+            "inherits": [
+                "windows-msvc-base",
+                "ninja",
+                "_relwithdebinfo"
+            ]
+        },
+        {
+            "name": "apple-m1-ninja-debug",
+            "description": "Apple M1 preset",
+            "inherits": [
+                "apple-m1-base",
+                "ninja",
+                "_debug"
+            ],
+            "cacheVariables": {
+                "ENABLE_TESTS": "OFF",
+                "BUILD_SHARED_LIBS": false,
+                "ENABLE_COMPONENT_TESTS": "OFF"
+            }
+        }
+    ]
+}
