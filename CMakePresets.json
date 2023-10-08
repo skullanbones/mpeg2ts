@@ -95,6 +95,9 @@
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64"
             }
         },
         {
@@ -292,7 +295,7 @@
             "cacheVariables": {
                 "ENABLE_TESTS": "OFF",
                 "BUILD_SHARED_LIBS": false,
-                "ENABLE_COMPONENT_TESTS": "ON"
+                "ENABLE_COMPONENT_TESTS": "OFF"
             }
         }
     ]
