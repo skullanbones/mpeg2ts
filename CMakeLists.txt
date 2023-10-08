@@ -131,13 +131,13 @@ endif()
 #-------------------
 # compiler settings
 #-------------------
-if(NOT ENABLE_WEBASSEMBLY)
-    if (UNIX AND NOT APPLE)
-        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
-                            -Werror # Make the specified warning into an error.
-        )
-    endif()
-endif()
+#if(NOT ENABLE_WEBASSEMBLY)
+#    if (UNIX AND NOT APPLE)
+#        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
+#                            -Werror # Make the specified warning into an error.
+#        )
+#    endif()
+#endif()
 
 if (MSVC)
     add_compile_options(/W4)

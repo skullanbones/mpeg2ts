@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  build-ubuntu-18.04:
     docker:
       - image: heliconwave/circleci-ubuntu-18.04:latest
     steps:
@@ -34,7 +34,7 @@ jobs:
           paths:
             - Debug
             - Release
-  build-16.04:
+  build-ubuntu-16.04:
     docker:
       - image: heliconwave/circleci-ubuntu-16.04:latest
     steps:
@@ -76,7 +76,7 @@ jobs:
   #     - run:
   #         name: Build CMake WebAssembly
   #         command: cd /root/project && em++ --version && pwd && rm -rf build/ && mkdir build && cd build/ && emcmake cmake -DCMAKE_CXX_STANDARD=11 -DENABLE_TESTS=OFF -DENABLE_WEBASSEMBLY=ON .. && cmake --build . -- -j$(nproc)
-  test-unit:
+  test-unit-u18.04:
     docker:
       - image: heliconwave/circleci-ubuntu-18.04:latest
     working_directory: ~/project
@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Run CTest
           command: pwd && ls -ltrha && cd Debug/ && make unit-tests
-  test-unit-16.04:
+  test-unit-u16.04:
     docker:
       - image: heliconwave/circleci-ubuntu-16.04:latest
     working_directory: ~/project
@@ -133,21 +133,21 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
-      - build
-      - build-16.04
+      - build-ubuntu-18.04
+      - build-ubuntu-16.04
       # - build-webassembly
-      - test-unit:
+      - test-unit-u18.04:
           requires:
-            - build
-      - test-unit-16.04:
+            - build-ubuntu-18.04
+      - test-unit-u16.04:
           requires:
-            - build-16.04
+            - build-ubuntu-16.04
       - test-component:
           requires:
-            - build
+            - build-ubuntu-18.04
       - test-benchmark:
           requires:
-            - build
+            - build-ubuntu-18.04
       - test-memcheck:
           requires:
-            - build
+            - build-ubuntu-18.04
