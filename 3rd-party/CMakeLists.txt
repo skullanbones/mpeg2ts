@@ -70,17 +70,17 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
     endif(APPLE)
 
     # Download and unpack googletest at configure time
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download/CMakeLists.txt)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_googletest.txt.in ${CMAKE_CURRENT_BINARY_DIR}/googletest-download/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
         RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download 
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download 
     )
     if(result)
         message(FATAL_ERROR "CMake step for googletest failed: ${result}")
     endif()
     execute_process(COMMAND ${CMAKE_COMMAND} --build .
         RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/googletest-download )
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
     if(result)
         message(FATAL_ERROR "Build step for googletest failed: ${result}")
     endif()
@@ -91,8 +91,8 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
 
     # Add googletest directly to our build. This defines
     # the gtest and gtest_main targets.
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest-src
-        ${CMAKE_CURRENT_SOURCE_DIR}/googletest-build
+    add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+        ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
         EXCLUDE_FROM_ALL)
 
     # The gtest/gtest_main targets carry header search path
@@ -118,16 +118,16 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
     set(BENCHMARK_ENABLE_TESTING OFF)
 
     # Download and unpack benchmark at configure time
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_benchmark.txt.in ${CMAKE_CURRENT_SOURCE_DIR}/benchmark-download/CMakeLists.txt)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists_benchmark.txt.in ${CMAKE_CURRENT_BINARY_DIR}/benchmark-download/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
         RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/benchmark-download )
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/benchmark-download )
     if(result)
         message(FATAL_ERROR "CMake step for benchmark failed: ${result}")
     endif()
     execute_process(COMMAND ${CMAKE_COMMAND} --build .
         RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/benchmark-download )
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/benchmark-download )
     if(result)
         message(FATAL_ERROR "Build step for benchmark failed: ${result}")
     endif()
@@ -139,8 +139,8 @@ if(NOT USE_DOCKER AND NOT ENABLE_WEBASSEMBLY AND ENABLE_TESTS)
 
     # Add benchmark directly to our build. This defines
     # the gtest and gtest_main targets.
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/benchmark-src
-                     ${CMAKE_CURRENT_SOURCE_DIR}/benchmark-build
+    add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/benchmark-src
+                     ${CMAKE_CURRENT_BINARY_DIR}/benchmark-build
                      EXCLUDE_FROM_ALL)
 
     # The gtest/gtest_main targets carry header search path
