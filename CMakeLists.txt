@@ -173,10 +173,10 @@ endif()
 
 
 #-------------------
-# 3rd-party
+# Include 3rd-party
 #-------------------
-include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
-include_directories(3rd-party/plog-${PLOG_VERSION}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/3rd-party/json-${NLOHMANN_VERSION}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/3rd-party/plog-${PLOG_VERSION}/include)
 
 
 #-------------------
