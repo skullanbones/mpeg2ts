@@ -227,7 +227,7 @@
             ]
         },
         {
-            "name": "windows-clang-release",
+            "name": "windows-clang-ninja-release",
             "inherits": [
                 "windows-clang-base",
                 "ninja",
@@ -235,7 +235,7 @@
             ]
         },
         {
-            "name": "windows-clang-debug",
+            "name": "windows-clang-ninja-debug",
             "inherits": [
                 "windows-clang-base",
                 "ninja",
@@ -243,7 +243,7 @@
             ]
         },
         {
-            "name": "windows-clang-relwithdebinfo",
+            "name": "windows-clang-ninja-relwithdebinfo",
             "inherits": [
                 "windows-clang-base",
                 "ninja",
@@ -251,7 +251,7 @@
             ]
         },
         {
-            "name": "windows-msvc-release",
+            "name": "windows-msvc-ninja-release",
             "inherits": [
                 "windows-msvc-base",
                 "ninja",
@@ -262,12 +262,19 @@
             "name": "windows-msvc-debug",
             "inherits": [
                 "windows-msvc-base",
+                "_debug"
+            ]
+        },
+        {
+            "name": "windows-msvc-ninja-debug",
+            "inherits": [
+                "windows-msvc-base",
                 "ninja",
                 "_debug"
             ]
         },
         {
-            "name": "windows-msvc-relwithdebinfo",
+            "name": "windows-msvc-ninja-relwithdebinfo",
             "inherits": [
                 "windows-msvc-base",
                 "ninja",
