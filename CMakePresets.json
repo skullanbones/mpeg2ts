@@ -227,7 +227,10 @@
                 "linux-gcc-base",
                 "make",
                 "_debug"
-            ]
+            ],
+            "cacheVariables": {
+                "USE_CLANG_TIDY": "ON"
+            }
         },
         {
             "name": "windows-clang-ninja-release",
