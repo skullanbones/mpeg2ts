@@ -84,7 +84,7 @@
             }
         },
         {
-            "name": "apple-m1-base",
+            "name": "apple-mseries-base",
             "hidden": true,
             "binaryDir": "${sourceDir}/build/${presetName}",
             "architecture": {
@@ -288,18 +288,31 @@
             ]
         },
         {
-            "name": "apple-m1-ninja-debug",
-            "description": "Apple M1 preset",
+            "name": "apple-mseries-ninja-debug",
+            "description": "Apple M series Debug",
             "inherits": [
-                "apple-m1-base",
+                "apple-mseries-base",
                 "ninja",
                 "_debug"
-            ],
-            "cacheVariables": {
-                "ENABLE_TESTS": "OFF",
-                "BUILD_SHARED_LIBS": false,
-                "ENABLE_COMPONENT_TESTS": "OFF"
-            }
+            ]
+        },
+        {
+            "name": "apple-mseries-ninja-release",
+            "description": "Apple M series Release",
+            "inherits": [
+                "apple-mseries-base",
+                "ninja",
+                "_release"
+            ]
+        },
+        {
+            "name": "apple-mseries-ninja-relwithdebinfo",
+            "description": "Apple M series RelWithDebInfo",
+            "inherits": [
+                "apple-mseries-base",
+                "ninja",
+                "_relwithdebinfo"
+            ]
         }
     ]
 }
