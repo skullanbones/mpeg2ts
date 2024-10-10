@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2ts
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "Main project for MPEG-2 Parsing of transport streams"
     LANGUAGES CXX
 )
 else()
 project(
     mpeg2ts
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()

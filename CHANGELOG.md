@@ -1,5 +1,11 @@
 # Releases
 
+*V1.0.0*
+* [x] Support Apple M chipset
+* [x] Fix issue with google test
+* [x] Fix isse not including last PES packet
+* [x] Add CMake presets
+
 *V0.6.0*
 * [x] Add broader support
 * [x] Fix emscripten with CMake

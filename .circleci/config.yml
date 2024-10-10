@@ -28,7 +28,7 @@ jobs:
             cat CPackConfig.cmake &&
             cpack --config CPackConfig.cmake
       - store_artifacts:
-          path: /root/project/mpeg2ts-0.6.0-Linux.tar.gz
+          path: /root/project/mpeg2ts-1.0.0-Linux.tar.gz
       - persist_to_workspace:
           root: /root/project
           paths:
@@ -62,7 +62,7 @@ jobs:
             cat CPackConfig.cmake &&
             cpack --config CPackConfig.cmake
       - store_artifacts:
-          path: /root/project/mpeg2ts-0.6.0-Linux.tar.gz
+          path: /root/project/mpeg2ts-1.0.0-Linux.tar.gz
       - persist_to_workspace:
           root: /root/project
           paths:

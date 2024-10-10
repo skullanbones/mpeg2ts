@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     h264parser
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "CLI Parsing of h264 stream"
     LANGUAGES CXX
 )
 else()
 project(
     h264parser
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()

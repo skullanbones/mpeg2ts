@@ -30,14 +30,14 @@ if(CMAKE_MINOR_VERSION GREATER 9)
 include(GoogleTest) # Introduced in CMake 3.10
 project(
     run_gtests
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "GTests for mpeg2ts lib"
     LANGUAGES CXX
 )
 else()
 project(
     run_gtests
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()

@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     sample_tsutilities
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "Sample TsUtilities"
     LANGUAGES CXX
 )
 else()
 project(
     sample_tsutilities
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()
