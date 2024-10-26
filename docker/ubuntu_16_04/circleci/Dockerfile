@@ -52,6 +52,7 @@ RUN apt-get update && apt-get --yes --no-install-recommends install \
   zip \
   unzip \
   cmake \
+  openssh-client \
   git \
   graphviz && \
   apt-get clean && \
@@ -78,11 +79,11 @@ RUN git clone -q https://github.com/google/benchmark.git /benchmark \
 
 # python support
 RUN apt-get update && apt-get --yes --no-install-recommends install \
-  python3-setuptools=20.7.0-1 \
-  virtualenv=15.0.1+ds-3ubuntu1 \
-  python3-pip=8.1.1-2ubuntu0.4 \
-  python3-dev=3.5.1-3 \
-  python3-virtualenv=15.0.1+ds-3ubuntu1 \
+  python3-setuptools \
+  virtualenv \
+  python3-pip \
+  python3-dev \
+  python3-virtualenv \
   python3-pip && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*

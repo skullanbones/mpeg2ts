@@ -58,6 +58,7 @@ const int TS_PACKET_PID_TDT = 0x02;                // TDT packet, Table 2-28
 const int TS_PACKET_PID_IPMP = 0x03;               // IPMP packet, Table 2-28
 const int TS_PACKET_PID_NULL = 0x1fff;             // Null Packet, Section 2.4.1
 const int PES_PACKET_START_CODE_PREFIX = 0x000001; // Section 2.4.3.7
+const int PES_PACKET_HEADER_SIZE = 6; // Table 2-21 PES packet
 
 
 const int PCR_SIZE = 48 / 8;

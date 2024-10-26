@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     h264parser
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "CLI Parsing of h264 stream"
     LANGUAGES CXX
 )
 else()
 project(
     h264parser
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()
@@ -59,7 +59,7 @@ target_link_libraries(
     ${PROJECT_NAME} 
     PRIVATE 
         h264codec
-        mpeg2ts # For GetBits() Should actually be moved out to its own lib
+        common # For GetBits()
 )
 
 set_target_properties(

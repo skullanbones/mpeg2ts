@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2codec
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "MPEG2 Codec parser lib"
     LANGUAGES CXX
 )
 else()
 project(
     mpeg2codec
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()
@@ -81,6 +81,11 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Mpeg2Codec.cc
 )
 
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PRIVATE 
+        common # For GetBits()
+)
 
 add_dependencies(${PROJECT_NAME} plog)
 add_dependencies(${PROJECT_NAME} json)

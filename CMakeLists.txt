@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     mpeg2ts
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "Main project for MPEG-2 Parsing of transport streams"
     LANGUAGES CXX
 )
 else()
 project(
     mpeg2ts
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()
@@ -115,7 +115,7 @@ if(ENABLE_TESTS)
     add_subdirectory(bench)
 endif()
 
-if(MSVC OR APPLE)
+if(MSVC)
     set(ENABLE_COMPONENT_TESTS OFF)
 endif()
 if(ENABLE_COMPONENT_TESTS)
@@ -131,13 +131,13 @@ endif()
 #-------------------
 # compiler settings
 #-------------------
-if(NOT ENABLE_WEBASSEMBLY)
-    if (UNIX AND NOT APPLE)
-        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
-                            -Werror # Make the specified warning into an error.
-        )
-    endif()
-endif()
+#if(NOT ENABLE_WEBASSEMBLY)
+#    if (UNIX AND NOT APPLE)
+#        add_compile_options(-Wuseless-cast # warn if you perform a cast to the same type
+#                            -Werror # Make the specified warning into an error.
+#        )
+#    endif()
+#endif()
 
 if (MSVC)
     add_compile_options(/W4)
@@ -173,10 +173,10 @@ endif()
 
 
 #-------------------
-# 3rd-party
+# Include 3rd-party
 #-------------------
-include_directories(3rd-party/json-${NLOHMANN_VERSION}/include)
-include_directories(3rd-party/plog-${PLOG_VERSION}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/3rd-party/json-${NLOHMANN_VERSION}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/3rd-party/plog-${PLOG_VERSION}/include)
 
 
 #-------------------

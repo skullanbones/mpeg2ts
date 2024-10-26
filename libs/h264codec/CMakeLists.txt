@@ -29,14 +29,14 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_MINOR_VERSION GREATER 9)
 project(
     h264codec
-    VERSION 0.6.0
+    VERSION 1.0.0
     DESCRIPTION "H264 Codec parser lib"
     LANGUAGES CXX
 )
 else()
 project(
     h264codec
-    VERSION 0.6.0
+    VERSION 1.0.0
     LANGUAGES CXX
 )
 endif()
@@ -80,6 +80,11 @@ target_sources(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/H264Codec.cc
 )
 
+target_link_libraries(
+    ${PROJECT_NAME} 
+    PRIVATE 
+        common # For GetBits()
+)
 
-add_dependencies(h264codec plog)
-add_dependencies(h264codec json)
+add_dependencies(${PROJECT_NAME} plog)
+add_dependencies(${PROJECT_NAME} json)
